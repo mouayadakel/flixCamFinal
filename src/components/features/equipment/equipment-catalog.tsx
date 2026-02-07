@@ -25,9 +25,9 @@ export function EquipmentCatalog() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const skip = Math.max(0, parseInt(searchParams.get('skip') ?? '0', 10))
-  const categoryId = searchParams.get('categoryId') ?? ''
-  const brandId = searchParams.get('brandId') ?? ''
+  const skip = Math.max(0, parseInt(searchParams?.get('skip') ?? '0', 10))
+  const categoryId = searchParams?.get('categoryId') ?? ''
+  const brandId = searchParams?.get('brandId') ?? ''
 
   useEffect(() => {
     const params = new URLSearchParams()
@@ -94,7 +94,7 @@ export function EquipmentCatalog() {
                 <Button variant="outline" size="sm" asChild>
                   <Link
                     href={`/equipment?${new URLSearchParams({
-                      ...Object.fromEntries(searchParams.entries()),
+                      ...Object.fromEntries(searchParams?.entries() ?? []),
                       skip: String(Math.max(0, skip - PAGE_SIZE)),
                     }).toString()}`}
                   >
@@ -109,7 +109,7 @@ export function EquipmentCatalog() {
                 <Button variant="outline" size="sm" asChild>
                   <Link
                     href={`/equipment?${new URLSearchParams({
-                      ...Object.fromEntries(searchParams.entries()),
+                      ...Object.fromEntries(searchParams?.entries() ?? []),
                       skip: String(skip + PAGE_SIZE),
                     }).toString()}`}
                   >

@@ -38,7 +38,7 @@ const SEVERITIES = ['MINOR', 'MODERATE', 'SEVERE', 'TOTAL_LOSS'] as const
 function NewDamageClaimForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const bookingIdParam = searchParams.get('bookingId')
+  const bookingIdParam = searchParams?.get('bookingId')
   const { toast } = useToast()
   const [booking, setBooking] = useState<{ id: string; bookingNumber: string; equipment?: Array<{ id: string; quantity: number; equipment: { id: string; sku: string; model: string | null } }>; studioId?: string | null; studio?: { id: string; name: string } | null } | null>(null)
   const [loadingBooking, setLoadingBooking] = useState(!!bookingIdParam)

@@ -69,13 +69,15 @@ export default function ReviewDetailPage() {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    if (params.id) loadReview()
-  }, [params.id])
+    if (params?.id) loadReview()
+  }, [params?.id])
 
   const loadReview = async () => {
+    const id = params?.id
+    if (!id) return
     setLoading(true)
     try {
-      const res = await fetch(`/api/reviews/${params.id}`)
+      const res = await fetch(`/api/reviews/${id}`)
       if (!res.ok) throw new Error('Failed to load review')
       const data = await res.json()
       setReview(data)

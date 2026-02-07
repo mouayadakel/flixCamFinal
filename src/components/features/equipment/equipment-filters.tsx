@@ -37,11 +37,11 @@ export function EquipmentFilters({ categories, brands }: EquipmentFiltersProps) 
   const searchParams = useSearchParams()
   const { t } = useLocale()
 
-  const categoryId = searchParams.get('categoryId') ?? ''
-  const brandId = searchParams.get('brandId') ?? ''
+  const categoryId = searchParams?.get('categoryId') ?? ''
+  const brandId = searchParams?.get('brandId') ?? ''
 
   const updateParam = (key: string, value: string) => {
-    const next = new URLSearchParams(searchParams.toString())
+    const next = new URLSearchParams(searchParams?.toString() ?? '')
     if (value) next.set(key, value)
     else next.delete(key)
     next.delete('skip')

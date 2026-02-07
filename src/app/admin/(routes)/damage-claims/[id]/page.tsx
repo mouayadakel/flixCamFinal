@@ -75,13 +75,15 @@ export default function DamageClaimDetailPage() {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    if (params.id) loadClaim()
-  }, [params.id])
+    if (params?.id) loadClaim()
+  }, [params?.id])
 
   const loadClaim = async () => {
+    const id = params?.id
+    if (!id) return
     setLoading(true)
     try {
-      const res = await fetch(`/api/damage-claims/${params.id}`)
+      const res = await fetch(`/api/damage-claims/${id}`)
       if (!res.ok) throw new Error('Failed to load claim')
       const data = await res.json()
       setClaim(data)

@@ -83,7 +83,7 @@ export default function BookingDetailPage() {
 
   useEffect(() => {
     loadBooking()
-  }, [params.id])
+  }, [params?.id])
 
   useEffect(() => {
     if (booking?.id) {
@@ -95,9 +95,11 @@ export default function BookingDetailPage() {
   }, [booking?.id])
 
   const loadBooking = async () => {
+    const id = params?.id
+    if (!id) return
     setLoading(true)
     try {
-      const response = await fetch(`/api/bookings/${params.id}`)
+      const response = await fetch(`/api/bookings/${id}`)
       if (!response.ok) {
         throw new Error('فشل تحميل الحجز')
       }
@@ -119,7 +121,7 @@ export default function BookingDetailPage() {
 
     setTransitioning(true)
     try {
-      const response = await fetch(`/api/bookings/${params.id}/transition`, {
+      const response = await fetch(`/api/bookings/${params?.id}/transition`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

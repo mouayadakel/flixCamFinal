@@ -12,13 +12,13 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Starting database seed...')
 
-  // Default password "admin" for dev/TestSprite; change in production
-  const adminPasswordHash = await bcrypt.hash('admin', 10)
+  // Default password "admin123" for dev (matches common docs); change in production
+  const adminPasswordHash = await bcrypt.hash('admin123', 10)
 
-  // 1. Create Admin User
+  // 1. Create Admin User (upsert so re-seed updates password to current default)
   const admin = await prisma.user.upsert({
     where: { email: 'admin@flixcam.rent' },
-    update: {},
+    update: { passwordHash: adminPasswordHash },
     create: {
       email: 'admin@flixcam.rent',
       passwordHash: adminPasswordHash,

@@ -28,15 +28,17 @@ export default function PaymentPage() {
     }
     let cancelled = false
     async function run() {
+      if (!details) return
+      const d = details
       try {
         const res = await fetch('/api/checkout/create-session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             checkoutDetails: {
-              name: details.name,
-              email: details.email,
-              phone: details.phone,
+              name: d.name,
+              email: d.email,
+              phone: d.phone,
             },
           }),
         })

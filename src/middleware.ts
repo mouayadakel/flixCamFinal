@@ -1,10 +1,11 @@
 /**
  * @file middleware.ts
- * @description Next.js middleware for route protection and RBAC
+ * @description Next.js middleware for route protection and RBAC.
+ * Uses getToken (Edge-safe) instead of auth() to avoid pulling Node-only deps (winston, ioredis) into Edge.
  * @module middleware
  */
 
-import { auth } from '@/lib/auth'
+import { getToken } from 'next-auth/jwt'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { enforceReadOnly } from '@/lib/middleware/read-only-edge'
@@ -38,9 +39,20 @@ function hasMinimumRole(userRole: string | undefined, minimumRole: string): bool
   return userLevel >= minimumLevel
 }
 
-export default auth(async (req) => {
+const SESSION_COOKIE_NAME =
+  process.env.NODE_ENV === 'production' ? '__Secure-authjs.session-token' : 'authjs.session-token'
+
+export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
-  const session = req.auth
+  const token = await getToken({
+    req,
+    secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+    cookieName: SESSION_COOKIE_NAME,
+    secureCookie: process.env.NODE_ENV === 'production',
+  })
+  const session = token
+    ? { user: { id: token.id, email: token.email ?? '', name: token.name ?? undefined, role: token.role } }
+    : null
 
   // Enforce read-only mode for write operations
   if (pathname.startsWith('/api')) {
@@ -150,7 +162,7 @@ export default auth(async (req) => {
   }
 
   return NextResponse.next()
-})
+}
 
 export const config = {
   matcher: [

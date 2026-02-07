@@ -36,6 +36,22 @@ export default function LoginPage() {
   })
 
   useEffect(() => {
+    if (!searchParams) return
+    // #region agent log
+    const hasEmail = searchParams.get('email')
+    const hasPassword = searchParams.has('password')
+    if (hasEmail || hasPassword) {
+      fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'login/page.tsx:useEffect:urlParams', message: 'login page loaded with email or password in URL', data: { hasEmail: !!hasEmail, hasPassword }, timestamp: Date.now(), hypothesisId: 'H1' }) }).catch(() => {})
+    }
+    // #endregion
+    // Never leave password in URL (security + history). Strip it without reload.
+    if (typeof window !== 'undefined' && searchParams.has('password')) {
+      const next = new URLSearchParams(searchParams.toString())
+      next.delete('password')
+      const clean = next.toString()
+      const newUrl = clean ? `${window.location.pathname}?${clean}` : window.location.pathname
+      window.history.replaceState(null, '', newUrl)
+    }
     // Check for error in URL params
     const errorParam = searchParams.get('error')
     if (errorParam) {
@@ -60,6 +76,9 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true)
+    // #region agent log
+    fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'login/page.tsx:onSubmit:entry', message: 'onSubmit called', data: { email: data.email, hasPassword: !!data.password }, timestamp: Date.now(), hypothesisId: 'H1' }) }).catch(() => {})
+    // #endregion
 
     try {
       const result = await signIn('credentials', {
@@ -68,21 +87,41 @@ export default function LoginPage() {
         redirect: false,
       })
 
+      // #region agent log
+      fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'login/page.tsx:onSubmit:afterSignIn', message: 'signIn result', data: { ok: result?.ok, error: result?.error, url: result?.url ?? null }, timestamp: Date.now(), hypothesisId: 'H2' }) }).catch(() => {})
+      // #endregion
+
       if (result?.error) {
+        // #region agent log
+        fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'login/page.tsx:onSubmit:branch', message: 'branch result.error', data: { branch: 'error' }, timestamp: Date.now(), hypothesisId: 'H2' }) }).catch(() => {})
+        // #endregion
         toast({
           title: 'خطأ في تسجيل الدخول',
           description: 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
           variant: 'destructive',
         })
       } else if (result?.ok) {
+        // #region agent log
+        fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'login/page.tsx:onSubmit:branch', message: 'branch result.ok', data: { branch: 'ok' }, timestamp: Date.now(), hypothesisId: 'H2' }) }).catch(() => {})
+        // #endregion
         toast({
           title: 'تم تسجيل الدخول بنجاح',
           description: 'جاري التوجيه إلى لوحة التحكم...',
         })
-        router.push('/admin/dashboard')
-        router.refresh()
+        // Full page redirect so the session cookie is sent on the next request.
+        // router.push() can run before the cookie is attached, causing middleware to see no session.
+        const callbackUrl = searchParams?.get('callbackUrl')
+        const destination =
+          callbackUrl && callbackUrl.startsWith('/') && !callbackUrl.startsWith('//')
+            ? callbackUrl
+            : '/admin/dashboard'
+        window.location.href = destination
+        return
       }
     } catch (error) {
+      // #region agent log
+      fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'login/page.tsx:onSubmit:catch', message: 'onSubmit catch', data: { errorMessage: error instanceof Error ? error.message : String(error) }, timestamp: Date.now(), hypothesisId: 'H3' }) }).catch(() => {})
+      // #endregion
       console.error('Login error:', error)
       toast({
         title: 'خطأ',
@@ -141,7 +180,17 @@ export default function LoginPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form
+          method="post"
+          onSubmit={(e) => {
+            // #region agent log
+            const form = e.currentTarget
+            fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'login/page.tsx:form:onSubmit', message: 'form submit event', data: { method: form.method, action: form.action || '(current)' }, timestamp: Date.now(), hypothesisId: 'H1' }) }).catch(() => {})
+            // #endregion
+            handleSubmit(onSubmit)(e)
+          }}
+          className="space-y-6"
+        >
           {/* Email Field */}
           <div className="space-y-2">
             <Label htmlFor="email">{t.email}</Label>
