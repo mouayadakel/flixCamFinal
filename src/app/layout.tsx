@@ -25,17 +25,11 @@ export const metadata: Metadata = {
   description: 'Rent professional cinematic equipment and studios in Riyadh, Saudi Arabia',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={`${cairo.variable} ${inter.variable} font-arabic`}>
-        <script
-          dangerouslySetInnerHTML={{ __html: LOCALE_INIT_SCRIPT }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: LOCALE_INIT_SCRIPT }} />
         <Providers>
           <LocaleProvider>
             {children}

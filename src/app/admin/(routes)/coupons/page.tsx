@@ -43,7 +43,10 @@ interface Coupon {
   updatedAt: string
 }
 
-const STATUS_LABELS: Record<CouponStatus, { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_LABELS: Record<
+  CouponStatus,
+  { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   active: { ar: 'نشط', en: 'Active', variant: 'default' },
   inactive: { ar: 'غير نشط', en: 'Inactive', variant: 'secondary' },
   expired: { ar: 'منتهي', en: 'Expired', variant: 'destructive' },
@@ -71,11 +74,7 @@ export default function CouponsPage() {
     'scheduled',
   ]
 
-  const types: Array<CouponType | 'all'> = [
-    'all',
-    'percent',
-    'fixed',
-  ]
+  const types: Array<CouponType | 'all'> = ['all', 'percent', 'fixed']
 
   useEffect(() => {
     loadCoupons()
@@ -141,42 +140,42 @@ export default function CouponsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">الكوبونات</h1>
-          <p className="text-muted-foreground mt-2">
-            إدارة كوبونات الخصم والعروض
-          </p>
+          <p className="mt-2 text-muted-foreground">إدارة كوبونات الخصم والعروض</p>
         </div>
         <Button asChild>
           <Link href="/admin/coupons/new">
-            <Plus className="h-4 w-4 ml-2" />
+            <Plus className="ml-2 h-4 w-4" />
             كوبون جديد
           </Link>
         </Button>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 items-center flex-wrap">
+      <div className="flex flex-wrap items-center gap-4">
         <input
           type="text"
           placeholder="البحث برمز الكوبون..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="px-4 py-2 border rounded-lg flex-1 min-w-[200px]"
+          className="min-w-[200px] flex-1 rounded-lg border px-4 py-2"
         />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="rounded-lg border px-4 py-2"
         >
           {statuses.map((status) => (
             <option key={status} value={status}>
-              {status === 'all' ? 'جميع الحالات' : STATUS_LABELS[status as CouponStatus]?.ar || status}
+              {status === 'all'
+                ? 'جميع الحالات'
+                : STATUS_LABELS[status as CouponStatus]?.ar || status}
             </option>
           ))}
         </select>
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="rounded-lg border px-4 py-2"
         >
           {types.map((type) => (
             <option key={type} value={type}>
@@ -187,7 +186,7 @@ export default function CouponsPage() {
       </div>
 
       {/* Coupons Table */}
-      <div className="border rounded-lg">
+      <div className="rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -213,7 +212,7 @@ export default function CouponsPage() {
               </TableRow>
             ) : filteredCoupons.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
                   لا توجد كوبونات
                 </TableCell>
               </TableRow>
@@ -228,9 +227,7 @@ export default function CouponsPage() {
                   </TableCell>
                   <TableCell>{getTypeLabel(coupon.type)}</TableCell>
                   <TableCell>
-                    <span className="font-medium text-green-600">
-                      {formatDiscount(coupon)}
-                    </span>
+                    <span className="font-medium text-green-600">{formatDiscount(coupon)}</span>
                     {coupon.maxDiscountAmount && (
                       <div className="text-xs text-muted-foreground">
                         (حد أقصى: {formatCurrency(coupon.maxDiscountAmount)})
@@ -261,7 +258,7 @@ export default function CouponsPage() {
                     <div className="flex gap-2">
                       <Link href={`/admin/coupons/${coupon.id}`}>
                         <Button size="sm" variant="ghost">
-                          <Eye className="h-4 w-4 ml-1" />
+                          <Eye className="ml-1 h-4 w-4" />
                           عرض
                         </Button>
                       </Link>

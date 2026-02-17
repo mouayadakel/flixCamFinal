@@ -44,6 +44,7 @@ npm run worker:all
 ```
 
 This will start:
+
 - Import worker (processes Excel files)
 - AI processing worker (generates translations/SEO)
 - Image processing worker (uploads images to Cloudinary)
@@ -78,6 +79,7 @@ npx tsx scripts/check-import-status.ts
 ```
 
 You should see:
+
 - Jobs moving from `PENDING` → `PROCESSING` → `COMPLETED`
 - `processedRows` and `successRows` increasing
 - Products appearing in the database
@@ -91,6 +93,7 @@ You should see:
 ## Prevention
 
 For production, consider:
+
 - Running workers as a systemd service (Linux)
 - Using PM2 to manage worker processes
 - Setting up worker health checks and auto-restart

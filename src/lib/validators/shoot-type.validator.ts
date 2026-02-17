@@ -30,7 +30,11 @@ export const questionnaireSchema = z.array(questionnaireQuestionSchema).optional
 
 export const createShootTypeSchema = z.object({
   name: z.string().min(1, 'Name is required').max(200),
-  slug: z.string().min(1, 'Slug is required').max(100).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
+  slug: z
+    .string()
+    .min(1, 'Slug is required')
+    .max(100)
+    .regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
   description: z.string().max(2000).optional().nullable(),
   nameAr: z.string().max(200).optional().nullable(),
   nameZh: z.string().max(200).optional().nullable(),

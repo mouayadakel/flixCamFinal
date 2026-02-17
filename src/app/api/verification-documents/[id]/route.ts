@@ -11,10 +11,7 @@ import { reviewDocumentSchema } from '@/lib/validators/verification.validator'
 import { handleApiError } from '@/lib/utils/api-helpers'
 import { UnauthorizedError, NotFoundError } from '@/lib/errors'
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.id) throw new UnauthorizedError()
@@ -43,8 +40,8 @@ export async function PATCH(
       const allDocs = await prisma.verificationDocument.findMany({
         where: { userId: doc.userId },
       })
-      const allApproved = allDocs.every(
-        (d) => (d.id === id ? updated.status === 'approved' : d.status === 'approved')
+      const allApproved = allDocs.every((d) =>
+        d.id === id ? updated.status === 'approved' : d.status === 'approved'
       )
       if (allApproved) {
         await prisma.user.update({

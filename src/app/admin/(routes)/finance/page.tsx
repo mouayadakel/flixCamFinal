@@ -103,10 +103,14 @@ export default function FinancePage() {
       }
 
       // Calculate stats from data
-      const successPayments = payments.filter(p => p.status === 'SUCCESS')
+      const successPayments = payments.filter((p) => p.status === 'SUCCESS')
       const totalRevenue = successPayments.reduce((sum, p) => sum + Number(p.amount), 0)
-      const pendingPayments = payments.filter(p => p.status === 'PENDING').reduce((sum, p) => sum + Number(p.amount), 0)
-      const overdueInvoices = invoices.filter(i => i.status === 'overdue' || (new Date(i.dueDate) < new Date() && i.status !== 'paid')).length
+      const pendingPayments = payments
+        .filter((p) => p.status === 'PENDING')
+        .reduce((sum, p) => sum + Number(p.amount), 0)
+      const overdueInvoices = invoices.filter(
+        (i) => i.status === 'overdue' || (new Date(i.dueDate) < new Date() && i.status !== 'paid')
+      ).length
 
       setStats({
         totalRevenue,
@@ -130,15 +134,15 @@ export default function FinancePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">المالية</h1>
-          </div>
+        </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={loadData}>
-            <RefreshCw className="h-4 w-4 ml-2" />
+            <RefreshCw className="ml-2 h-4 w-4" />
             تحديث
           </Button>
           <Button asChild>
             <Link href="/admin/invoices/new">
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="ml-2 h-4 w-4" />
               فاتورة جديدة
             </Link>
           </Button>
@@ -146,7 +150,7 @@ export default function FinancePage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">إجمالي الإيرادات</CardTitle>
@@ -169,7 +173,9 @@ export default function FinancePage() {
             {loading ? (
               <Skeleton className="h-8 w-24" />
             ) : (
-              <div className="text-2xl font-bold text-yellow-600">{formatCurrency(stats?.pendingPayments || 0)}</div>
+              <div className="text-2xl font-bold text-yellow-600">
+                {formatCurrency(stats?.pendingPayments || 0)}
+              </div>
             )}
           </CardContent>
         </Card>
@@ -195,7 +201,9 @@ export default function FinancePage() {
             {loading ? (
               <Skeleton className="h-8 w-24" />
             ) : (
-              <div className="text-2xl font-bold text-green-600">{formatCurrency(stats?.thisMonthRevenue || 0)}</div>
+              <div className="text-2xl font-bold text-green-600">
+                {formatCurrency(stats?.thisMonthRevenue || 0)}
+              </div>
             )}
           </CardContent>
         </Card>
@@ -208,7 +216,7 @@ export default function FinancePage() {
         </TabsList>
 
         <TabsContent value="invoices" className="space-y-4">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">آخر الفواتير</h2>
             <Button variant="outline" size="sm" asChild>
               <Link href="/admin/invoices">عرض الكل</Link>
@@ -239,21 +247,29 @@ export default function FinancePage() {
                   </TableRow>
                 ) : invoices.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
                       لا توجد فواتير
                     </TableCell>
                   </TableRow>
                 ) : (
                   invoices.slice(0, 10).map((invoice) => {
-                    const statusConf = INVOICE_STATUS_CONFIG[invoice.status] || { label: invoice.status, color: 'bg-gray-100' }
-                    const isOverdue = new Date(invoice.dueDate) < new Date() && invoice.status !== 'paid'
+                    const statusConf = INVOICE_STATUS_CONFIG[invoice.status] || {
+                      label: invoice.status,
+                      color: 'bg-gray-100',
+                    }
+                    const isOverdue =
+                      new Date(invoice.dueDate) < new Date() && invoice.status !== 'paid'
                     return (
                       <TableRow key={invoice.id}>
                         <TableCell className="font-medium">{invoice.invoiceNumber}</TableCell>
-                        <TableCell>{invoice.customer?.name || invoice.customer?.email || '-'}</TableCell>
+                        <TableCell>
+                          {invoice.customer?.name || invoice.customer?.email || '-'}
+                        </TableCell>
                         <TableCell>{formatCurrency(invoice.totalAmount)}</TableCell>
                         <TableCell>
-                          <Badge className={isOverdue ? 'bg-red-100 text-red-800' : statusConf.color}>
+                          <Badge
+                            className={isOverdue ? 'bg-red-100 text-red-800' : statusConf.color}
+                          >
                             {isOverdue ? 'متأخرة' : statusConf.label}
                           </Badge>
                         </TableCell>
@@ -263,7 +279,7 @@ export default function FinancePage() {
                         <TableCell>
                           <Link href={`/admin/invoices/${invoice.id}`}>
                             <Button size="sm" variant="ghost">
-                              <Eye className="h-4 w-4 ml-1" />
+                              <Eye className="ml-1 h-4 w-4" />
                               عرض
                             </Button>
                           </Link>
@@ -278,7 +294,7 @@ export default function FinancePage() {
         </TabsContent>
 
         <TabsContent value="payments" className="space-y-4">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">آخر المدفوعات</h2>
             <Button variant="outline" size="sm" asChild>
               <Link href="/admin/payments">عرض الكل</Link>
@@ -310,23 +326,28 @@ export default function FinancePage() {
                   </TableRow>
                 ) : payments.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
                       لا توجد مدفوعات
                     </TableCell>
                   </TableRow>
                 ) : (
                   payments.slice(0, 10).map((payment) => {
-                    const statusConf = PAYMENT_STATUS_CONFIG[payment.status] || { label: payment.status, color: 'bg-gray-100' }
+                    const statusConf = PAYMENT_STATUS_CONFIG[payment.status] || {
+                      label: payment.status,
+                      color: 'bg-gray-100',
+                    }
                     return (
                       <TableRow key={payment.id}>
                         <TableCell className="font-mono text-sm">
-                          {payment.tapTransactionId ? payment.tapTransactionId.substring(0, 15) + '...' : '-'}
+                          {payment.tapTransactionId
+                            ? payment.tapTransactionId.substring(0, 15) + '...'
+                            : '-'}
                         </TableCell>
+                        <TableCell>{payment.booking?.bookingNumber || '-'}</TableCell>
                         <TableCell>
-                          {payment.booking?.bookingNumber || '-'}
-                        </TableCell>
-                        <TableCell>
-                          {payment.booking?.customer?.name || payment.booking?.customer?.email || '-'}
+                          {payment.booking?.customer?.name ||
+                            payment.booking?.customer?.email ||
+                            '-'}
                         </TableCell>
                         <TableCell>{formatCurrency(payment.amount)}</TableCell>
                         <TableCell>
@@ -336,7 +357,7 @@ export default function FinancePage() {
                         <TableCell>
                           <Link href={`/admin/payments/${payment.id}`}>
                             <Button size="sm" variant="ghost">
-                              <Eye className="h-4 w-4 ml-1" />
+                              <Eye className="ml-1 h-4 w-4" />
                               عرض
                             </Button>
                           </Link>

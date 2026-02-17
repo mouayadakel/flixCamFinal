@@ -14,7 +14,7 @@ export default function OtpPaymentSettingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">إعدادات OTP والدفع</h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="mt-2 text-muted-foreground">
           مزودي OTP (التحقق بالهاتف) وإعدادات بوابة الدفع (TAP، إلخ)
         </p>
       </div>

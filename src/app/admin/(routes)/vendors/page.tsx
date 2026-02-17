@@ -83,7 +83,7 @@ export default function VendorsPage() {
         <h1 className="text-2xl font-bold">الموردون</h1>
         <Link href="/admin/vendors/new">
           <Button>
-            <Plus className="h-4 w-4 ml-2" />
+            <Plus className="ml-2 h-4 w-4" />
             إضافة مورد
           </Button>
         </Link>
@@ -109,7 +109,7 @@ export default function VendorsPage() {
         </Select>
       </div>
 
-      <div className="border rounded-lg">
+      <div className="rounded-lg border">
         {loading ? (
           <div className="p-6">
             <Skeleton className="h-48 w-full" />
@@ -151,7 +151,7 @@ export default function VendorsPage() {
           </Table>
         )}
         {!loading && vendors.length === 0 && (
-          <p className="text-center py-8 text-muted-foreground">لا يوجد موردون</p>
+          <p className="py-8 text-center text-muted-foreground">لا يوجد موردون</p>
         )}
       </div>
     </div>

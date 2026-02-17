@@ -35,6 +35,7 @@ import {
   Wrench,
   Upload,
   Sparkles,
+  Star,
 } from 'lucide-react'
 
 interface ContextNavItem {
@@ -110,6 +111,12 @@ const contextNavConfig: Record<string, ContextNavItem[]> = {
       label: 'Equipment',
       href: '/admin/inventory/equipment',
       icon: Camera,
+      permission: 'equipment.read',
+    },
+    {
+      label: 'Featured Equipment',
+      href: '/admin/inventory/featured',
+      icon: Star,
       permission: 'equipment.read',
     },
     {
@@ -228,18 +235,21 @@ export function ContextSidebar() {
 
   // Determine which context section to show based on current path
   const getContextSection = (): string | null => {
-    if (pathname === '/admin/dashboard' || pathname?.startsWith('/admin/dashboard')) return 'dashboard'
+    if (pathname === '/admin/dashboard' || pathname?.startsWith('/admin/dashboard'))
+      return 'dashboard'
     if (
       pathname?.startsWith('/admin/users') ||
       pathname?.startsWith('/admin/invoices') ||
       pathname?.startsWith('/admin/wallet') ||
       pathname?.startsWith('/admin/calendar')
-    ) return 'sales'
+    )
+      return 'sales'
     if (
       pathname?.startsWith('/admin/inventory') ||
       pathname?.startsWith('/admin/studios') ||
       pathname?.startsWith('/admin/technicians')
-    ) return 'inventory'
+    )
+      return 'inventory'
     if (pathname?.startsWith('/admin/settings')) return 'settings'
     if (pathname?.startsWith('/admin/bookings')) return 'bookings'
     if (pathname?.startsWith('/admin/finance')) return 'finance'
@@ -249,7 +259,7 @@ export function ContextSidebar() {
 
   const contextSection = getContextSection()
   const allNavItems = contextSection ? contextNavConfig[contextSection] || [] : []
-  
+
   // Filter nav items by permissions
   const navItems = allNavItems.filter((item) => hasPermission(item.permission))
 
@@ -273,9 +283,9 @@ export function ContextSidebar() {
   }
 
   return (
-    <aside className="hidden lg:flex w-56 flex-col border-r bg-muted/30">
+    <aside className="hidden w-56 flex-col border-r bg-muted/30 lg:flex">
       <div className="flex h-16 items-center border-b px-4">
-        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           {sectionLabels[contextSection] || contextSection}
         </h3>
       </div>

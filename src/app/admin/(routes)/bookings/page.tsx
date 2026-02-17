@@ -154,7 +154,9 @@ export default function BookingsPage() {
     })
   }
   const exportSelected = () => {
-    const toExport = selectedIds.size ? sortedBookings.filter((b) => selectedIds.has(b.id)) : sortedBookings
+    const toExport = selectedIds.size
+      ? sortedBookings.filter((b) => selectedIds.has(b.id))
+      : sortedBookings
     const rows = toExport.map((b) => ({
       bookingNumber: b.bookingNumber,
       customerName: b.customer.name ?? '',
@@ -250,8 +252,15 @@ export default function BookingsPage() {
   }
 
   const getPaymentStatusLabel = (status: string) => {
-    if (status === 'PAYMENT_PENDING' || status === 'DRAFT' || status === 'RISK_CHECK') return { ar: 'غير مدفوع', variant: 'destructive' as const }
-    if (status === 'CONFIRMED' || status === 'ACTIVE' || status === 'RETURNED' || status === 'CLOSED') return { ar: 'مدفوع', variant: 'default' as const }
+    if (status === 'PAYMENT_PENDING' || status === 'DRAFT' || status === 'RISK_CHECK')
+      return { ar: 'غير مدفوع', variant: 'destructive' as const }
+    if (
+      status === 'CONFIRMED' ||
+      status === 'ACTIVE' ||
+      status === 'RETURNED' ||
+      status === 'CLOSED'
+    )
+      return { ar: 'مدفوع', variant: 'default' as const }
     if (status === 'CANCELLED') return { ar: 'ملغي', variant: 'secondary' as const }
     return { ar: '—', variant: 'outline' as const }
   }
@@ -300,9 +309,11 @@ export default function BookingsPage() {
         <div className="flex gap-2">
           {selectedIds.size > 0 && (
             <>
-              <span className="text-sm text-muted-foreground self-center">{selectedIds.size} محدد</span>
+              <span className="self-center text-sm text-muted-foreground">
+                {selectedIds.size} محدد
+              </span>
               <Button variant="outline" size="sm" onClick={exportSelected}>
-                <Download className="h-4 w-4 ml-2" />
+                <Download className="ml-2 h-4 w-4" />
                 تصدير المحدد
               </Button>
               <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>
@@ -310,13 +321,18 @@ export default function BookingsPage() {
               </Button>
             </>
           )}
-          <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={sortedBookings.length === 0}>
-            <Download className="h-4 w-4 ml-2" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportCSV}
+            disabled={sortedBookings.length === 0}
+          >
+            <Download className="ml-2 h-4 w-4" />
             تصدير CSV
           </Button>
           <Button asChild>
             <Link href="/admin/bookings/new">
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="ml-2 h-4 w-4" />
               حجز جديد
             </Link>
           </Button>
@@ -328,14 +344,14 @@ export default function BookingsPage() {
           type="date"
           value={dateFrom}
           onChange={(e) => setDateFrom(e.target.value)}
-          className="px-3 py-2 border rounded-md text-sm"
+          className="rounded-md border px-3 py-2 text-sm"
           placeholder="من تاريخ"
         />
         <input
           type="date"
           value={dateTo}
           onChange={(e) => setDateTo(e.target.value)}
-          className="px-3 py-2 border rounded-md text-sm"
+          className="rounded-md border px-3 py-2 text-sm"
           placeholder="إلى تاريخ"
         />
       </div>
@@ -368,7 +384,12 @@ export default function BookingsPage() {
                   aria-label="تحديد الكل"
                 />
               </TableHead>
-              <SortableTableHead sortKey="bookingNumber" currentSort={sortBy} direction={sortDirection} onSort={handleSort}>
+              <SortableTableHead
+                sortKey="bookingNumber"
+                currentSort={sortBy}
+                direction={sortDirection}
+                onSort={handleSort}
+              >
                 رقم الحجز
               </SortableTableHead>
               <TableHead>العميل</TableHead>
@@ -376,17 +397,37 @@ export default function BookingsPage() {
               <TableHead>المعدات</TableHead>
               <TableHead>المدة</TableHead>
               <TableHead>حالة الدفع</TableHead>
-              <SortableTableHead sortKey="totalAmount" currentSort={sortBy} direction={sortDirection} onSort={handleSort}>
+              <SortableTableHead
+                sortKey="totalAmount"
+                currentSort={sortBy}
+                direction={sortDirection}
+                onSort={handleSort}
+              >
                 المبلغ الإجمالي
               </SortableTableHead>
               <TableHead>العهدة</TableHead>
-              <SortableTableHead sortKey="startDate" currentSort={sortBy} direction={sortDirection} onSort={handleSort}>
+              <SortableTableHead
+                sortKey="startDate"
+                currentSort={sortBy}
+                direction={sortDirection}
+                onSort={handleSort}
+              >
                 تاريخ البداية
               </SortableTableHead>
-              <SortableTableHead sortKey="endDate" currentSort={sortBy} direction={sortDirection} onSort={handleSort}>
+              <SortableTableHead
+                sortKey="endDate"
+                currentSort={sortBy}
+                direction={sortDirection}
+                onSort={handleSort}
+              >
                 تاريخ النهاية
               </SortableTableHead>
-              <SortableTableHead sortKey="createdAt" currentSort={sortBy} direction={sortDirection} onSort={handleSort}>
+              <SortableTableHead
+                sortKey="createdAt"
+                currentSort={sortBy}
+                direction={sortDirection}
+                onSort={handleSort}
+              >
                 تاريخ الإنشاء
               </SortableTableHead>
               <TableHead className="text-right">الإجراءات</TableHead>
@@ -403,7 +444,7 @@ export default function BookingsPage() {
               ))
             ) : sortedBookings.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={13} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={13} className="py-8 text-center text-muted-foreground">
                   لا توجد حجوزات
                 </TableCell>
               </TableRow>
@@ -419,13 +460,13 @@ export default function BookingsPage() {
                         aria-label={`تحديد ${booking.bookingNumber}`}
                       />
                     </TableCell>
-                    <TableCell className="font-medium font-mono">
-                      {booking.bookingNumber}
-                    </TableCell>
+                    <TableCell className="font-mono font-medium">{booking.bookingNumber}</TableCell>
                     <TableCell>
                       <div>
                         <div className="font-medium">{booking.customer.name || 'بدون اسم'}</div>
-                        <div className="text-sm text-muted-foreground">{booking.customer.email}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {booking.customer.email}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>

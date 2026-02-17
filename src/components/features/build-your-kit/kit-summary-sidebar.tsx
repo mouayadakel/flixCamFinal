@@ -32,7 +32,10 @@ function formatSar(value: number): string {
   }).format(value)
 }
 
-function completenessPercent(categorySteps: { categoryId: string }[], selectedEquipment: Record<string, { categoryId?: string | null }>): number {
+function completenessPercent(
+  categorySteps: { categoryId: string }[],
+  selectedEquipment: Record<string, { categoryId?: string | null }>
+): number {
   if (categorySteps.length === 0) return 0
   const selectedIds = new Set(
     Object.values(selectedEquipment)
@@ -101,7 +104,9 @@ export function KitSummarySidebar({ className }: { className?: string }) {
         )}
       >
         <h3 className="mb-2 text-lg font-semibold text-text-heading">
-          {shootTypeData?.name ? `${shootTypeData.name} – ${t('kit.summaryTitle')}` : t('kit.summaryTitle')}
+          {shootTypeData?.name
+            ? `${shootTypeData.name} – ${t('kit.summaryTitle')}`
+            : t('kit.summaryTitle')}
         </h3>
         <p className="text-sm text-text-muted">{t('kit.emptyKit')}</p>
       </div>
@@ -109,7 +114,11 @@ export function KitSummarySidebar({ className }: { className?: string }) {
   }
 
   const completenessColor =
-    completeness >= 90 ? 'stroke-green-500' : completeness >= 60 ? 'stroke-amber-500' : 'stroke-orange-500'
+    completeness >= 90
+      ? 'stroke-green-500'
+      : completeness >= 60
+        ? 'stroke-amber-500'
+        : 'stroke-orange-500'
 
   return (
     <div
@@ -119,7 +128,9 @@ export function KitSummarySidebar({ className }: { className?: string }) {
       )}
     >
       <h3 className="mb-4 text-lg font-semibold text-text-heading">
-        {shootTypeData?.name ? `${shootTypeData.name} – ${t('kit.summaryTitle')}` : t('kit.summaryTitle')}
+        {shootTypeData?.name
+          ? `${shootTypeData.name} – ${t('kit.summaryTitle')}`
+          : t('kit.summaryTitle')}
       </h3>
 
       {/* A: Completeness score */}
@@ -163,10 +174,7 @@ export function KitSummarySidebar({ className }: { className?: string }) {
       {/* C: Selected items list */}
       <div className="mb-4 max-h-[200px] space-y-2 overflow-y-auto border-b border-border-light pb-3">
         {Object.entries(selectedEquipment).map(([id, item]) => (
-          <div
-            key={id}
-            className="flex items-center gap-2 text-sm"
-          >
+          <div key={id} className="flex items-center gap-2 text-sm">
             <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-white">
               {item.imageUrl ? (
                 <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
@@ -196,11 +204,15 @@ export function KitSummarySidebar({ className }: { className?: string }) {
       <dl className="space-y-2 text-sm">
         <div className="flex justify-between">
           <dt className="text-text-muted">{t('kit.items')}</dt>
-          <dd className="font-medium">{totalUnits} {t('kit.items')}</dd>
+          <dd className="font-medium">
+            {totalUnits} {t('kit.items')}
+          </dd>
         </div>
         <div className="flex justify-between">
           <dt className="text-text-muted">{t('kit.duration')}</dt>
-          <dd>{durationDays} {durationDays === 1 ? t('kit.day') : t('kit.days')}</dd>
+          <dd>
+            {durationDays} {durationDays === 1 ? t('kit.day') : t('kit.days')}
+          </dd>
         </div>
         <div className="flex justify-between border-t border-border-light pt-2">
           <dt className="text-text-muted">{t('kit.subtotal')}</dt>

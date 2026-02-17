@@ -82,11 +82,11 @@ export default function HeroBannersPage() {
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
+          <h1 className="flex items-center gap-2 text-3xl font-bold">
             <ImageIcon className="h-8 w-8" />
             البانر الرئيسي (Hero)
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             إدارة كاروسيل الصور والنصوص والروابط في الصفحة الرئيسية وصفحات أخرى
           </p>
         </div>
@@ -109,15 +109,16 @@ export default function HeroBannersPage() {
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
           ) : banners.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              لا توجد بانرات. انقر &quot;إنشاء بانر&quot; أو شغّل البذور لإنشاء بانر الصفحة الرئيسية.
+            <div className="py-12 text-center text-muted-foreground">
+              لا توجد بانرات. انقر &quot;إنشاء بانر&quot; أو شغّل البذور لإنشاء بانر الصفحة
+              الرئيسية.
             </div>
           ) : (
             <div className="space-y-3">
               {banners.map((b) => (
                 <div
                   key={b.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
+                  className="flex items-center justify-between rounded-lg border p-4 hover:bg-muted/50"
                 >
                   <div className="flex items-center gap-3">
                     <ImageIcon className="h-5 w-5 text-muted-foreground" />

@@ -52,19 +52,19 @@ After this first step, the Roles & Permissions page will be functionally correct
 
 ### Recommended next
 
-1. **Audit log page** (P0 in production doc)  
-   - Add `/admin/settings/audit-log`: list audit entries (action, user, resource, timestamp) with filters and search.  
+1. **Audit log page** (P0 in production doc)
+   - Add `/admin/settings/audit-log`: list audit entries (action, user, resource, timestamp) with filters and search.
    - Depends on `AuditService` / audit table already in use; wire UI to existing API or add `GET /api/audit` if missing.
 
-2. **Roles short-term (standards)**  
-   - Add `lib/services/role.service.ts`, `lib/policies/role.policy.ts`, `lib/validators/role.validator.ts`; use in role APIs.  
-   - Call `AuditService.log()` when role detail is viewed or (later) when roles are changed.  
+2. **Roles short-term (standards)**
+   - Add `lib/services/role.service.ts`, `lib/policies/role.policy.ts`, `lib/validators/role.validator.ts`; use in role APIs.
+   - Call `AuditService.log()` when role detail is viewed or (later) when roles are changed.
    - Optional: add `/admin/settings/roles/[id]/edit` (read-only for system roles; edit when custom roles exist).
 
 ### Later
 
-- **Custom roles:** DB schema for custom roles, POST create, edit flow.  
-- **Public website / booking flow:** `docs/public-website/`, `COMPLETE_PRODUCTION_READY_PLAN.md`.  
+- **Custom roles:** DB schema for custom roles, POST create, edit flow.
+- **Public website / booking flow:** `docs/public-website/`, `COMPLETE_PRODUCTION_READY_PLAN.md`.
 - **Other admin gaps:** Missing detail/create pages (invoices, payments, clients, coupons, etc.) per `ADMIN_PANEL_PRODUCTION_READY_COMPLETE_DETAILED.md`.
 
 ---

@@ -66,7 +66,11 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) {
-        toast({ title: t('common.error'), description: json.error ?? 'Failed to send code', variant: 'destructive' })
+        toast({
+          title: t('common.error'),
+          description: json.error ?? 'Failed to send code',
+          variant: 'destructive',
+        })
         return
       }
       setPhoneValue(data.phone)
@@ -88,7 +92,11 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) {
-        toast({ title: t('common.error'), description: json.error ?? 'Verification failed', variant: 'destructive' })
+        toast({
+          title: t('common.error'),
+          description: json.error ?? 'Verification failed',
+          variant: 'destructive',
+        })
         return
       }
       const { oneTimeToken } = json
@@ -117,7 +125,11 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) {
-        toast({ title: t('common.error'), description: json.error ?? 'Registration failed', variant: 'destructive' })
+        toast({
+          title: t('common.error'),
+          description: json.error ?? 'Registration failed',
+          variant: 'destructive',
+        })
         return
       }
       const result = await signIn('credentials', {
@@ -159,11 +171,13 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
                   className="mt-1"
                 />
                 {phoneForm.formState.errors.phone && (
-                  <p className="mt-1 text-sm text-destructive">{phoneForm.formState.errors.phone.message}</p>
+                  <p className="mt-1 text-sm text-destructive">
+                    {phoneForm.formState.errors.phone.message}
+                  </p>
                 )}
               </div>
               <Button type="submit" className="w-full" disabled={sendOtpLoading}>
-                {sendOtpLoading ? <Loader2 className="h-4 w-4 animate-spin me-2" /> : null}
+                {sendOtpLoading ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : null}
                 {t('checkout.sendOtp')}
               </Button>
             </form>
@@ -191,11 +205,13 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
                   className="mt-1"
                 />
                 {otpForm.formState.errors.code && (
-                  <p className="mt-1 text-sm text-destructive">{otpForm.formState.errors.code.message}</p>
+                  <p className="mt-1 text-sm text-destructive">
+                    {otpForm.formState.errors.code.message}
+                  </p>
                 )}
               </div>
               <Button type="submit" className="w-full" disabled={verifyLoading}>
-                {verifyLoading ? <Loader2 className="h-4 w-4 animate-spin me-2" /> : null}
+                {verifyLoading ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : null}
                 {t('checkout.verify')}
               </Button>
             </form>
@@ -213,7 +229,9 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
                 className="mt-1"
               />
               {registerForm.formState.errors.email && (
-                <p className="mt-1 text-sm text-destructive">{registerForm.formState.errors.email.message}</p>
+                <p className="mt-1 text-sm text-destructive">
+                  {registerForm.formState.errors.email.message}
+                </p>
               )}
             </div>
             <div>
@@ -225,7 +243,9 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
                 className="mt-1"
               />
               {registerForm.formState.errors.password && (
-                <p className="mt-1 text-sm text-destructive">{registerForm.formState.errors.password.message}</p>
+                <p className="mt-1 text-sm text-destructive">
+                  {registerForm.formState.errors.password.message}
+                </p>
               )}
             </div>
             <div>
@@ -233,7 +253,7 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
               <Input id="name" {...registerForm.register('name')} className="mt-1" />
             </div>
             <Button type="submit" className="w-full" disabled={registerLoading}>
-              {registerLoading ? <Loader2 className="h-4 w-4 animate-spin me-2" /> : null}
+              {registerLoading ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : null}
               {t('checkout.registerAndContinue')}
             </Button>
           </form>

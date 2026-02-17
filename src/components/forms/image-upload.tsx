@@ -149,7 +149,7 @@ export function ImageUpload({
         <TabsContent value="file" className="space-y-4">
           {!equipmentId && (
             <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-              <p className="font-medium mb-1">ملاحظة: للمعدات الجديدة</p>
+              <p className="mb-1 font-medium">ملاحظة: للمعدات الجديدة</p>
               <p className="text-xs">
                 رفع الملفات متاح فقط بعد إنشاء المعدة. يُفضل استخدام رابط URL للصور في هذه المرحلة.
                 يمكنك رفع الملفات لاحقاً من صفحة التعديل.
@@ -188,7 +188,7 @@ export function ImageUpload({
             </Button>
           </div>
           <p className="text-sm text-neutral-500">
-            {equipmentId 
+            {equipmentId
               ? 'الحد الأقصى: 10MB. أنواع الصور المدعومة: JPG, PNG, WebP, GIF, SVG'
               : 'للمعدات الجديدة: استخدم رابط URL للصور. يمكنك رفع الملفات بعد إنشاء المعدة.'}
           </p>
@@ -196,21 +196,15 @@ export function ImageUpload({
       </Tabs>
 
       {preview && (
-        <div className="relative w-full max-w-md rounded-lg border border-neutral-200 overflow-hidden">
+        <div className="relative w-full max-w-md overflow-hidden rounded-lg border border-neutral-200">
           <div className="relative aspect-video bg-neutral-100">
-            <Image
-              src={preview}
-              alt="Preview"
-              fill
-              className="object-cover"
-              unoptimized
-            />
+            <Image src={preview} alt="Preview" fill className="object-cover" unoptimized />
           </div>
           <Button
             type="button"
             variant="destructive"
             size="sm"
-            className="absolute top-2 left-2"
+            className="absolute left-2 top-2"
             onClick={handleDelete}
           >
             <X className="h-4 w-4" />

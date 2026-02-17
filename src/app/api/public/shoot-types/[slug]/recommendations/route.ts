@@ -11,10 +11,7 @@ import type { BudgetTier } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const rate = rateLimitByTier(request, 'public')
   if (!rate.allowed) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
@@ -31,10 +28,7 @@ export async function GET(
   }
 
   if (!categoryId) {
-    return NextResponse.json(
-      { error: 'categoryId is required' },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: 'categoryId is required' }, { status: 400 })
   }
 
   const recommendations = await ShootTypeService.getRecommendationsForCategory(
@@ -56,9 +50,12 @@ export async function GET(
         id: r.equipment.id,
         sku: r.equipment.sku,
         model: r.equipment.model,
-        dailyPrice: typeof r.equipment.dailyPrice === 'object' && r.equipment.dailyPrice != null && 'toNumber' in r.equipment.dailyPrice
-          ? (r.equipment.dailyPrice as { toNumber: () => number }).toNumber()
-          : Number(r.equipment.dailyPrice),
+        dailyPrice:
+          typeof r.equipment.dailyPrice === 'object' &&
+          r.equipment.dailyPrice != null &&
+          'toNumber' in r.equipment.dailyPrice
+            ? (r.equipment.dailyPrice as { toNumber: () => number }).toNumber()
+            : Number(r.equipment.dailyPrice),
         categoryId: r.equipment.categoryId,
         category: r.equipment.category,
         brand: r.equipment.brand,

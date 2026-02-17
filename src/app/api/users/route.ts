@@ -11,9 +11,7 @@ export async function GET(request: Request) {
   let data = mockUsers
   if (search) {
     data = data.filter(
-      (u) =>
-        u.name.toLowerCase().includes(search) ||
-        u.email.toLowerCase().includes(search)
+      (u) => u.name.toLowerCase().includes(search) || u.email.toLowerCase().includes(search)
     )
   }
   if (status) {

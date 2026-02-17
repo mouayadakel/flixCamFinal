@@ -17,10 +17,7 @@ interface AvailabilityBadgeProps {
   className?: string
 }
 
-const STATUS_STYLES: Record<
-  AvailabilityStatus,
-  { bg: string; dot: string; labelKey: string }
-> = {
+const STATUS_STYLES: Record<AvailabilityStatus, { bg: string; dot: string; labelKey: string }> = {
   available: {
     bg: 'bg-emerald-50 text-emerald-700 border-emerald-200/60 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/40',
     dot: 'bg-emerald-500',

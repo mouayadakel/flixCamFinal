@@ -14,10 +14,10 @@ export function HomeCta() {
   const { t } = useLocale()
 
   return (
-    <section className="relative overflow-hidden bg-cta-gradient py-16 md:py-20 lg:py-24">
+    <section className="relative overflow-hidden bg-cta-gradient py-10 md:py-12">
       {/* Decorative background elements */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,0.08)_0%,_transparent_70%)]" />
-      <div className="absolute -top-20 -end-20 h-60 w-60 rounded-full bg-white/5 blur-3xl" />
+      <div className="absolute -end-20 -top-20 h-60 w-60 rounded-full bg-white/5 blur-3xl" />
       <div className="absolute -bottom-20 -start-20 h-60 w-60 rounded-full bg-black/10 blur-3xl" />
 
       <PublicContainer>
@@ -25,16 +25,14 @@ export function HomeCta() {
           <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm">
             <Sparkles className="h-7 w-7 text-white" />
           </div>
-          <h2 className="mx-auto max-w-2xl text-3xl font-bold text-white md:text-4xl">
+          <h2 className="mx-auto max-w-2xl text-2xl font-bold text-white md:text-3xl">
             {t('home.ctaTitle')}
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-lg text-white/70">
-            {t('home.heroSubtitle')}
-          </p>
+          <p className="mx-auto mt-4 max-w-lg text-lg text-white/70">{t('home.ctaSubtitle')}</p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Button
               size="lg"
-              className="bg-white text-brand-primary hover:bg-white/90 rounded-xl px-8 font-semibold shadow-lg transition-all hover:shadow-xl active:scale-[0.98]"
+              className="rounded-xl bg-white px-8 font-semibold text-brand-primary shadow-lg transition-all hover:bg-white/90 hover:shadow-xl active:scale-[0.98]"
               asChild
             >
               <Link href="/equipment">
@@ -45,7 +43,7 @@ export function HomeCta() {
             <Button
               size="lg"
               variant="outline"
-              className="border-white/30 text-white hover:bg-white/10 hover:text-white rounded-xl px-8 font-semibold backdrop-blur-sm transition-all"
+              className="rounded-xl border-white/30 px-8 font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
               asChild
             >
               <Link href="/how-it-works">{t('nav.howItWorks')}</Link>

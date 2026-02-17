@@ -65,41 +65,151 @@ export interface EventPayload {
   'payment.refund_requested': { payment: any; userId: string }
   'equipment.created': { equipment: any; userId: string }
   'equipment.updated': { equipment: any; userId: string }
-  'warehouse.equipment.checked_out': { bookingId: string; equipmentIds: string[]; checkedOutBy: string; timestamp: Date }
-  'warehouse.equipment.checked_in': { bookingId: string; equipmentIds: string[]; checkedInBy: string; condition?: string; timestamp: Date }
-  'delivery.scheduled': { bookingId: string; deliveryId?: string; type: string; scheduledDate: Date; scheduledBy: string; timestamp: Date }
-  'delivery.status_updated': { deliveryId?: string; bookingId: string; status: string; updatedBy: string; timestamp: Date }
-  'quote.created': { quoteId: string; quoteNumber: string; customerId: string; createdBy: string; timestamp: Date }
+  'warehouse.equipment.checked_out': {
+    bookingId: string
+    equipmentIds: string[]
+    checkedOutBy: string
+    timestamp: Date
+  }
+  'warehouse.equipment.checked_in': {
+    bookingId: string
+    equipmentIds: string[]
+    checkedInBy: string
+    condition?: string
+    timestamp: Date
+  }
+  'delivery.scheduled': {
+    bookingId: string
+    deliveryId?: string
+    type: string
+    scheduledDate: Date
+    scheduledBy: string
+    timestamp: Date
+  }
+  'delivery.status_updated': {
+    deliveryId?: string
+    bookingId: string
+    status: string
+    updatedBy: string
+    timestamp: Date
+  }
+  'quote.created': {
+    quoteId: string
+    quoteNumber: string
+    customerId: string
+    createdBy: string
+    timestamp: Date
+  }
   'quote.updated': { quoteId: string; updatedBy: string; timestamp: Date }
-  'quote.converted': { quoteId: string; bookingId: string; bookingNumber: string; convertedBy: string; timestamp: Date }
+  'quote.converted': {
+    quoteId: string
+    bookingId: string
+    bookingNumber: string
+    convertedBy: string
+    timestamp: Date
+  }
   'quote.status_updated': { quoteId: string; status: string; updatedBy: string; timestamp: Date }
   'quote.deleted': { quoteId: string; deletedBy: string; timestamp: Date }
-  'maintenance.created': { maintenanceId: string; equipmentId: string; scheduledDate: Date; createdBy: string; timestamp: Date }
+  'maintenance.created': {
+    maintenanceId: string
+    equipmentId: string
+    scheduledDate: Date
+    createdBy: string
+    timestamp: Date
+  }
   'maintenance.updated': { maintenanceId: string; updatedBy: string; timestamp: Date }
-  'maintenance.completed': { maintenanceId: string; equipmentId: string; completedBy: string; timestamp: Date }
+  'maintenance.completed': {
+    maintenanceId: string
+    equipmentId: string
+    completedBy: string
+    timestamp: Date
+  }
   'maintenance.deleted': { maintenanceId: string; deletedBy: string; timestamp: Date }
-  'invoice.created': { invoiceId: string; invoiceNumber: string; bookingId: string | null; customerId: string; totalAmount: number; createdBy: string; timestamp: Date }
+  'invoice.created': {
+    invoiceId: string
+    invoiceNumber: string
+    bookingId: string | null
+    customerId: string
+    totalAmount: number
+    createdBy: string
+    timestamp: Date
+  }
   'invoice.updated': { invoiceId: string; updatedBy: string; timestamp: Date }
-  'invoice.payment_recorded': { invoiceId: string; invoiceNumber: string; amount: number; remainingAmount: number; recordedBy: string; timestamp: Date }
+  'invoice.payment_recorded': {
+    invoiceId: string
+    invoiceNumber: string
+    amount: number
+    remainingAmount: number
+    recordedBy: string
+    timestamp: Date
+  }
   'invoice.deleted': { invoiceId: string; deletedBy: string; timestamp: Date }
-  'payment.created': { paymentId: string; bookingId: string; amount: number; userId: string; timestamp: Date }
-  'payment.success': { paymentId: string; bookingId: string; amount: string; userId: string; timestamp: Date }
-  'payment.failed': { paymentId: string; bookingId: string; reason?: string; userId: string; timestamp: Date }
-  'payment.refunded': { paymentId: string; bookingId: string; refundAmount: string; userId: string; timestamp: Date }
-  'contract.created': { contractId: string; bookingId: string; termsVersion: string; createdBy: string; timestamp: Date }
+  'payment.created': {
+    paymentId: string
+    bookingId: string
+    amount: number
+    userId: string
+    timestamp: Date
+  }
+  'payment.success': {
+    paymentId: string
+    bookingId: string
+    amount: string
+    userId: string
+    timestamp: Date
+  }
+  'payment.failed': {
+    paymentId: string
+    bookingId: string
+    reason?: string
+    userId: string
+    timestamp: Date
+  }
+  'payment.refunded': {
+    paymentId: string
+    bookingId: string
+    refundAmount: string
+    userId: string
+    timestamp: Date
+  }
+  'contract.created': {
+    contractId: string
+    bookingId: string
+    termsVersion: string
+    createdBy: string
+    timestamp: Date
+  }
   'contract.updated': { contractId: string; updatedBy: string; timestamp: Date }
   'contract.signed': { contractId: string; bookingId: string; signedBy: string; timestamp: Date }
   'contract.deleted': { contractId: string; deletedBy: string; timestamp: Date }
   'client.created': { clientId: string; email: string; createdBy: string; timestamp: Date }
   'client.updated': { clientId: string; updatedBy: string; timestamp: Date }
   'client.deleted': { clientId: string; deletedBy: string; timestamp: Date }
-  'coupon.created': { couponId: string; code: string; type: string; value: number; createdBy: string; timestamp: Date }
+  'coupon.created': {
+    couponId: string
+    code: string
+    type: string
+    value: number
+    createdBy: string
+    timestamp: Date
+  }
   'coupon.updated': { couponId: string; updatedBy: string; timestamp: Date }
   'coupon.applied': { couponId: string; code: string; appliedBy: string; timestamp: Date }
   'coupon.deleted': { couponId: string; deletedBy: string; timestamp: Date }
-  'marketing.campaign.created': { campaignId: string; name: string; type: string; createdBy: string; timestamp: Date }
+  'marketing.campaign.created': {
+    campaignId: string
+    name: string
+    type: string
+    createdBy: string
+    timestamp: Date
+  }
   'marketing.campaign.updated': { campaignId: string; updatedBy: string; timestamp: Date }
-  'marketing.campaign.sent': { campaignId: string; recipients: number; sentBy: string; timestamp: Date }
+  'marketing.campaign.sent': {
+    campaignId: string
+    recipients: number
+    sentBy: string
+    timestamp: Date
+  }
   'marketing.campaign.deleted': { campaignId: string; deletedBy: string; timestamp: Date }
 }
 
@@ -107,10 +217,7 @@ export class EventBus {
   /**
    * Emit an event
    */
-  static async emit<T extends EventName>(
-    event: T,
-    payload: EventPayload[T]
-  ): Promise<void> {
+  static async emit<T extends EventName>(event: T, payload: EventPayload[T]): Promise<void> {
     // 1. Store event in database
     const eventRecord = await prisma.event.create({
       data: {

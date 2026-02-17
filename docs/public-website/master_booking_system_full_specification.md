@@ -11,6 +11,7 @@
 ## 1) Scope & Philosophy
 
 ### Scope
+
 - Equipment rental
 - Studio booking
 - Packages, bundles, offers
@@ -20,6 +21,7 @@
 - Support & post‑payment lifecycle
 
 ### Core Philosophy
+
 - **Simple for client / strict for system**
 - No silent changes after payment
 - Every rule must be explainable in UI
@@ -29,12 +31,12 @@
 
 ## 2) User Types
 
-| User | Description |
-|-----|-------------|
-| Guest Client | No account, can book & pay |
+| User              | Description                   |
+| ----------------- | ----------------------------- |
+| Guest Client      | No account, can book & pay    |
 | Registered Client | Has portal, history, requests |
-| Support/Admin | Manual override, approvals |
-| System | Validation, pricing, locking |
+| Support/Admin     | Manual override, approvals    |
+| System            | Validation, pricing, locking  |
 
 ---
 
@@ -75,33 +77,43 @@
 ## 5) User Stories (Master)
 
 ### US‑01 Browse & Discover
+
 Client can browse equipment/studios without dates.
 
 ### US‑02 Availability Check
+
 Client selects dates (equipment) or slot (studio).
 
 ### US‑03 Add to Cart
+
 Client adds equipment, studio, packages, bundles.
 
 ### US‑04 Price Transparency
+
 Client sees full breakdown before payment.
 
 ### US‑05 Payment
+
 Client completes payment securely.
 
 ### US‑06 Confirmation
+
 Client receives confirmation + documents.
 
 ### US‑07 Change Request
+
 Client requests change after payment.
 
 ### US‑08 Extension
+
 Client extends rental or session.
 
 ### US‑09 Refund
+
 Client receives partial/full refund per policy.
 
 ### US‑10 Support Contact
+
 Client contacts support with booking context.
 
 ---
@@ -109,32 +121,41 @@ Client contacts support with booking context.
 ## 6) Use Cases (Condensed)
 
 ### UC‑01 Equipment Booking
+
 - Validate availability
 - Lock inventory after payment
 
 ### UC‑02 Studio Booking
+
 - Validate slot + buffer + hours
 
 ### UC‑03 Package Booking
+
 - Validate all included items
 
 ### UC‑04 Bundle Application
+
 - Apply discount rules
 
 ### UC‑05 Recommendation Discount
+
 - Conditional discount logic
 
 ### UC‑06 Change After Payment
+
 - Quote difference
 - Collect/refund delta
 
 ### UC‑07 Extension
+
 - Revalidate availability
 
 ### UC‑08 Partial Refund
+
 - Item or duration removal
 
 ### UC‑09 Support Assisted Change
+
 - Admin override with audit log
 
 ---
@@ -142,10 +163,12 @@ Client contacts support with booking context.
 ## 7) Pricing & Discount Rules
 
 ### Price Lock
+
 - Price locked at **checkout start**
 - If changed before pay → show diff & require reconfirm
 
 ### Discount Priority (Strict)
+
 1. Package price
 2. Bundle discount
 3. Offer
@@ -158,6 +181,7 @@ Only one layer per item.
 ## 8) Payment Handling
 
 ### States
+
 - Draft
 - Validated
 - Payment Pending
@@ -167,6 +191,7 @@ Only one layer per item.
 - Expired
 
 ### Callback Delay Handling
+
 - Show “Processing Payment”
 - Poll every X seconds
 - Block duplicate attempts
@@ -196,6 +221,7 @@ Payment Pending → Expired (TTL)
 ## 10) Change / Extension / Refund Flows
 
 ### Change Request
+
 1. Request
 2. Revalidate
 3. Quote diff
@@ -203,10 +229,12 @@ Payment Pending → Expired (TTL)
 5. Apply change
 
 ### Extension
+
 - Same items preferred
 - Fallback to partial or alternative
 
 ### Partial Refund
+
 - Remove item or reduce duration
 - Calculate prorated amount
 - Refund or credit
@@ -228,11 +256,13 @@ Payment Pending → Expired (TTL)
 ## 12) Support & Communication
 
 ### Automated
+
 - Confirmation
 - Payment failure
 - Change approved
 
 ### Manual Support
+
 - Booking context auto‑attached
 - One‑click WhatsApp message
 
@@ -241,17 +271,20 @@ Payment Pending → Expired (TTL)
 ## 13) Test Cases (Master Matrix)
 
 ### Happy Paths
+
 - Equipment only
 - Studio only
 - Package booking
 
 ### Edge
+
 - Callback delay
 - Discount conflict
 - Partial refund
 - Extension conflict
 
 ### Abuse / Safety
+
 - Double pay click
 - Refresh during payment
 - Reopen expired session
@@ -276,4 +309,3 @@ Payment Pending → Expired (TTL)
 ---
 
 ## ✅ END – This document is the contract
-

@@ -147,7 +147,7 @@ export default function RoleUsersPage() {
               </CardDescription>
             </div>
             <Button onClick={() => setAssignModalOpen(true)}>
-              <UserPlus className="h-4 w-4 ml-2" />
+              <UserPlus className="ml-2 h-4 w-4" />
               ربط مستخدم
             </Button>
           </div>
@@ -172,7 +172,7 @@ export default function RoleUsersPage() {
                 <TableBody>
                   {users.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+                      <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
                         لا يوجد مستخدمون معيّنون لهذا الدور. اضغط &quot;ربط مستخدم&quot; للإضافة.
                       </TableCell>
                     </TableRow>
@@ -232,7 +232,8 @@ export default function RoleUsersPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>إزالة المستخدم من الدور</AlertDialogTitle>
             <AlertDialogDescription>
-              هل أنت متأكد من إزالة &quot;{removeTarget?.name || removeTarget?.email}&quot; من الدور &quot;{roleName}&quot;؟
+              هل أنت متأكد من إزالة &quot;{removeTarget?.name || removeTarget?.email}&quot; من الدور
+              &quot;{roleName}&quot;؟
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

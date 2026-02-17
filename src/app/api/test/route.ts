@@ -11,7 +11,7 @@ import { prisma } from '@/lib/db/prisma'
 export async function GET(request: Request) {
   // Rate limiting
   const rateLimit = rateLimitAPI(request)
-  
+
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: 'Too many requests', resetAt: rateLimit.resetAt },
@@ -56,17 +56,17 @@ export async function GET(request: Request) {
     )
   } catch (error: any) {
     // Handle database connection errors gracefully
-    const isConnectionError = 
+    const isConnectionError =
       error.message?.includes("Can't reach database") ||
-      error.message?.includes("Environment variable not found: DATABASE_URL") ||
-      error.message?.includes("P1001")
+      error.message?.includes('Environment variable not found: DATABASE_URL') ||
+      error.message?.includes('P1001')
 
     return NextResponse.json(
       {
         status: isConnectionError ? 'database_not_configured' : 'error',
         database: 'disconnected',
         error: error.message,
-        message: isConnectionError 
+        message: isConnectionError
           ? 'Database not configured. Please set up PostgreSQL and run migrations.'
           : 'An error occurred',
       },

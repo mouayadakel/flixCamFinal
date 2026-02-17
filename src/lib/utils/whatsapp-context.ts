@@ -8,10 +8,7 @@ const DEFAULT_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '966500000000'
  * Build WhatsApp chat URL with optional context message (pre-filled in chat).
  * Use for "Contact support", "Booking #XYZ", etc.
  */
-export function getWhatsAppUrl(options: {
-  number?: string
-  message?: string
-}): string {
+export function getWhatsAppUrl(options: { number?: string; message?: string }): string {
   const num = (options.number || DEFAULT_NUMBER).replace(/\D/g, '')
   const base = `https://wa.me/${num}`
   if (options.message?.trim()) {

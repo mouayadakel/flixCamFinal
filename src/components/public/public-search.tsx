@@ -40,7 +40,9 @@ export function PublicSearch() {
       aria-label={t('common.search')}
     >
       <div className="flex items-center ps-4">
-        <Search className={`h-4 w-4 transition-colors duration-200 ${focused ? 'text-brand-primary' : 'text-text-muted'}`} />
+        <Search
+          className={`h-4 w-4 transition-colors duration-200 ${focused ? 'text-brand-primary' : 'text-text-muted'}`}
+        />
       </div>
       <input
         ref={inputRef}
@@ -56,7 +58,7 @@ export function PublicSearch() {
       />
       <button
         type="submit"
-        className="h-9 me-1 rounded-pill bg-brand-primary px-5 text-sm font-semibold text-white transition-all duration-200 hover:bg-brand-primary-hover hover:shadow-md active:scale-[0.97]"
+        className="me-1 h-9 rounded-pill bg-brand-primary px-5 text-sm font-semibold text-white transition-all duration-200 hover:bg-brand-primary-hover hover:shadow-md active:scale-[0.97]"
       >
         {t('common.search')}
       </button>

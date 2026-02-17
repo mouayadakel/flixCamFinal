@@ -25,7 +25,7 @@ export function StudioBookingForm({ studioSlug, hourlyRate }: StudioBookingFormP
   const canAdd = date && slot && durationHours >= 1
 
   return (
-    <div className="rounded-lg border bg-card p-4 space-y-4">
+    <div className="space-y-4 rounded-lg border bg-card p-4">
       <h3 className="font-semibold">Book this studio</h3>
       <StudioSlotPicker
         studioSlug={studioSlug}
@@ -36,7 +36,7 @@ export function StudioBookingForm({ studioSlug, hourlyRate }: StudioBookingFormP
       />
       {slot && (
         <div>
-          <label className="text-sm font-medium block mb-1">Duration (hours)</label>
+          <label className="mb-1 block text-sm font-medium">Duration (hours)</label>
           <select
             value={durationHours}
             onChange={(e) => setDurationHours(parseInt(e.target.value, 10))}
@@ -50,13 +50,15 @@ export function StudioBookingForm({ studioSlug, hourlyRate }: StudioBookingFormP
           </select>
         </div>
       )}
-      {total > 0 && (
-        <p className="text-sm font-medium">
-          Total: {total.toLocaleString()} SAR
-        </p>
-      )}
+      {total > 0 && <p className="text-sm font-medium">Total: {total.toLocaleString()} SAR</p>}
       <Button asChild size="lg" disabled={!canAdd}>
-        <Link href={canAdd ? `/cart?studio=${studioSlug}&date=${date}&start=${slot?.start}&duration=${durationHours}` : '#'}>
+        <Link
+          href={
+            canAdd
+              ? `/cart?studio=${studioSlug}&date=${date}&start=${slot?.start}&duration=${durationHours}`
+              : '#'
+          }
+        >
           {t('common.addToCart')}
         </Link>
       </Button>

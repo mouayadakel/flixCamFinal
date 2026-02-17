@@ -14,13 +14,13 @@ The admin Roles & Permissions page (`/admin/settings/roles`) provides read-only 
 
 ## 2. Page Structure & File Map
 
-| File | Type | Purpose |
-|------|------|---------|
-| `src/app/admin/(routes)/settings/roles/page.tsx` | Client Component | Roles list UI, stats, table, actions |
-| `src/app/admin/(routes)/settings/roles/[id]/page.tsx` | Server Component | Role detail — **placeholder, not functional** |
-| `src/app/api/admin/roles/route.ts` | API | GET list, POST create (create returns 400) |
-| `src/app/api/admin/roles/[id]/route.ts` | API | GET role detail with permissions and users |
-| `src/lib/auth/permissions.ts` | Shared | Permission constants, `hasPermission`, role mappings |
+| File                                                  | Type             | Purpose                                              |
+| ----------------------------------------------------- | ---------------- | ---------------------------------------------------- |
+| `src/app/admin/(routes)/settings/roles/page.tsx`      | Client Component | Roles list UI, stats, table, actions                 |
+| `src/app/admin/(routes)/settings/roles/[id]/page.tsx` | Server Component | Role detail — **placeholder, not functional**        |
+| `src/app/api/admin/roles/route.ts`                    | API              | GET list, POST create (create returns 400)           |
+| `src/app/api/admin/roles/[id]/route.ts`               | API              | GET role detail with permissions and users           |
+| `src/lib/auth/permissions.ts`                         | Shared           | Permission constants, `hasPermission`, role mappings |
 
 ---
 
@@ -56,20 +56,20 @@ The admin Roles & Permissions page (`/admin/settings/roles`) provides read-only 
 
 ## 4. Predefined Roles (12)
 
-| Role ID | Name | Description |
-|---------|------|-------------|
-| ADMIN | Admin | Full operational access |
-| SALES_MANAGER | Sales Manager | Manage sales, bookings, quotes, clients |
-| ACCOUNTANT | Accountant | Financial operations and reporting |
-| WAREHOUSE_MANAGER | Warehouse Manager | Equipment and inventory management |
-| TECHNICIAN | Technician | Equipment maintenance and inspection |
-| CUSTOMER_SERVICE | Customer Service | Customer support and basic operations |
-| MARKETING_MANAGER | Marketing Manager | Marketing campaigns and analytics |
-| RISK_MANAGER | Risk Manager | Risk assessment and approvals |
-| APPROVAL_AGENT | Approval Agent | Process approval requests |
-| AUDITOR | Auditor | Read-only access for auditing |
-| AI_OPERATOR | AI Operator | AI features and automation |
-| DATA_ENTRY | Data Entry | Basic data entry access |
+| Role ID           | Name              | Description                             |
+| ----------------- | ----------------- | --------------------------------------- |
+| ADMIN             | Admin             | Full operational access                 |
+| SALES_MANAGER     | Sales Manager     | Manage sales, bookings, quotes, clients |
+| ACCOUNTANT        | Accountant        | Financial operations and reporting      |
+| WAREHOUSE_MANAGER | Warehouse Manager | Equipment and inventory management      |
+| TECHNICIAN        | Technician        | Equipment maintenance and inspection    |
+| CUSTOMER_SERVICE  | Customer Service  | Customer support and basic operations   |
+| MARKETING_MANAGER | Marketing Manager | Marketing campaigns and analytics       |
+| RISK_MANAGER      | Risk Manager      | Risk assessment and approvals           |
+| APPROVAL_AGENT    | Approval Agent    | Process approval requests               |
+| AUDITOR           | Auditor           | Read-only access for auditing           |
+| AI_OPERATOR       | AI Operator       | AI features and automation              |
+| DATA_ENTRY        | Data Entry        | Basic data entry access                 |
 
 Permission sets per role are defined in `ROLE_DETAILS` in `src/app/api/admin/roles/[id]/route.ts`.
 
@@ -79,33 +79,33 @@ Permission sets per role are defined in `ROLE_DETAILS` in `src/app/api/admin/rol
 
 ### 5.1 Critical
 
-| Issue | Location | Description |
-|-------|----------|-------------|
-| Detail page placeholder | `roles/[id]/page.tsx` | Uses hardcoded role name, description, and 5 permissions. Does not fetch from API or use `params.id`. Save buttons do nothing. |
-| Edit route missing | N/A | Links to `/admin/settings/roles/[id]/edit` but route does not exist. |
-| Custom roles disabled | `roles/route.ts` POST | Always returns 400: "Custom roles not yet supported". |
-| Permissions empty in list | `roles/page.tsx` | `permissions: []` in transformed data; list shows empty permission chips. |
-| ROLE_LABELS mismatch | `roles/page.tsx` | Uses ADMIN, MANAGER, WAREHOUSE, SALES, ACCOUNTANT, TECHNICIAN, CUSTOMER. API returns SALES_MANAGER, CUSTOMER_SERVICE, etc. Some roles will show raw ID. |
+| Issue                     | Location              | Description                                                                                                                                             |
+| ------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Detail page placeholder   | `roles/[id]/page.tsx` | Uses hardcoded role name, description, and 5 permissions. Does not fetch from API or use `params.id`. Save buttons do nothing.                          |
+| Edit route missing        | N/A                   | Links to `/admin/settings/roles/[id]/edit` but route does not exist.                                                                                    |
+| Custom roles disabled     | `roles/route.ts` POST | Always returns 400: "Custom roles not yet supported".                                                                                                   |
+| Permissions empty in list | `roles/page.tsx`      | `permissions: []` in transformed data; list shows empty permission chips.                                                                               |
+| ROLE_LABELS mismatch      | `roles/page.tsx`      | Uses ADMIN, MANAGER, WAREHOUSE, SALES, ACCOUNTANT, TECHNICIAN, CUSTOMER. API returns SALES_MANAGER, CUSTOMER_SERVICE, etc. Some roles will show raw ID. |
 
 ### 5.2 Architecture / Standards
 
-| Issue | Description |
-|-------|-------------|
-| No audit logging | `AuditService` imported in API but never used. No audit trail for role view/management. |
-| No event emissions | No `EventBus.emit()` for role-related actions. |
-| No service layer | Business logic in API routes instead of `lib/services/role.service.ts`. |
-| No policy layer | No `lib/policies/role.policy.ts`. |
-| No validator module | Zod schema inline in API route; no `lib/validators/role.validator.ts`. |
-| Detail page no auth | `[id]/page.tsx` is Server Component with no session/permission check. |
+| Issue               | Description                                                                             |
+| ------------------- | --------------------------------------------------------------------------------------- |
+| No audit logging    | `AuditService` imported in API but never used. No audit trail for role view/management. |
+| No event emissions  | No `EventBus.emit()` for role-related actions.                                          |
+| No service layer    | Business logic in API routes instead of `lib/services/role.service.ts`.                 |
+| No policy layer     | No `lib/policies/role.policy.ts`.                                                       |
+| No validator module | Zod schema inline in API route; no `lib/validators/role.validator.ts`.                  |
+| Detail page no auth | `[id]/page.tsx` is Server Component with no session/permission check.                   |
 
 ### 5.3 Minor
 
-| Issue | Description |
-|-------|-------------|
-| New Role button | No handler; should either implement flow or hide/disable until custom roles are supported. |
-| Search/filter | Not implemented. |
-| Pagination | Not needed for 12 roles; could be required if custom roles added. |
-| User count in detail | Uses `users.length` (capped at 100) instead of true DB count. |
+| Issue                | Description                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------------ |
+| New Role button      | No handler; should either implement flow or hide/disable until custom roles are supported. |
+| Search/filter        | Not implemented.                                                                           |
+| Pagination           | Not needed for 12 roles; could be required if custom roles added.                          |
+| User count in detail | Uses `users.length` (capped at 100) instead of true DB count.                              |
 
 ---
 
@@ -178,6 +178,7 @@ Permission sets per role are defined in `ROLE_DETAILS` in `src/app/api/admin/rol
 **Permission:** `settings.manage_roles`
 
 **Response 200:**
+
 ```json
 {
   "success": true,
@@ -198,6 +199,7 @@ Permission sets per role are defined in `ROLE_DETAILS` in `src/app/api/admin/rol
 **Permission:** `settings.manage_roles`
 
 **Response 200:**
+
 ```json
 {
   "success": true,
@@ -232,4 +234,4 @@ Permission sets per role are defined in `ROLE_DETAILS` in `src/app/api/admin/rol
 
 ---
 
-*End of report*
+_End of report_

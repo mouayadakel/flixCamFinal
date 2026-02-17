@@ -31,6 +31,7 @@ psql postgres -c "GRANT ALL PRIVILEGES ON DATABASE flixcam_rent TO flixcam;"
 4. The default connection is: `postgresql://localhost`
 
 Then update `.env`:
+
 ```
 DATABASE_URL="postgresql://localhost/flixcam_rent?schema=public"
 ```
@@ -75,14 +76,17 @@ psql -d flixcam_rent -c "SELECT version();"
 ## Troubleshooting
 
 ### "Can't reach database server"
+
 - Make sure PostgreSQL is running: `brew services list` (if using Homebrew)
 - Check if port 5432 is available: `lsof -i :5432`
 
 ### "Database does not exist"
+
 - Create it: `createdb flixcam_rent`
 - Or: `psql postgres -c "CREATE DATABASE flixcam_rent;"`
 
 ### Permission denied
+
 - Check PostgreSQL user permissions
 - Or use default postgres user and update `.env` accordingly
 

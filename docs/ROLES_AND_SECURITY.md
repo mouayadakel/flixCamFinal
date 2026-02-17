@@ -3,6 +3,7 @@
 ## Security Doctrine (Non-Negotiable)
 
 ### Rule 1: No Admin Bypass
+
 **ABSOLUTE BAN**: Admin accounts are the #1 attack vector. Every action must be auditable and policy-controlled.
 
 ```typescript
@@ -17,6 +18,7 @@ if (!policy.allowed) {
 ```
 
 ### Rule 2: Financial Operations = Approval Workflow
+
 All financial changes require human approval and audit trail.
 
 ```typescript
@@ -29,11 +31,12 @@ const approval = await ApprovalService.request({
   resourceId: paymentId,
   requestedBy: userId,
   reason: 'Customer request',
-  requiresRoles: ['admin', 'finance-director']
+  requiresRoles: ['admin', 'finance-director'],
 })
 ```
 
 ### Rule 3: Soft Delete Only
+
 No hard deletes without approval. All deletions are soft with audit trail.
 
 ```typescript
@@ -46,12 +49,13 @@ await prisma.booking.update({
   data: {
     deletedAt: new Date(),
     deletedBy: userId,
-    status: 'cancelled'
-  }
+    status: 'cancelled',
+  },
 })
 ```
 
 ### Rule 4: All Critical Actions Emit Events
+
 Every important action must emit an event for audit and processing.
 
 ```typescript
@@ -59,13 +63,14 @@ Every important action must emit an event for audit and processing.
 await EventBus.emit('booking.created', {
   booking,
   userId,
-  timestamp: new Date()
+  timestamp: new Date(),
 })
 ```
 
 ## Roles
 
 ### Base Roles
+
 - **admin**: Full system access (still goes through policies)
 - **warehouse-manager**: Equipment management, inventory
 - **technician**: Equipment maintenance, inspections
@@ -76,6 +81,7 @@ await EventBus.emit('booking.created', {
 - **data-entry**: Data entry, content management
 
 ### AI-Aware Roles (New)
+
 - **risk-manager**: Risk assessment, approval decisions
 - **approval-agent**: Handle approval requests
 - **auditor**: Review audit logs, compliance
@@ -84,11 +90,13 @@ await EventBus.emit('booking.created', {
 ## Permissions
 
 ### Permission Structure
+
 - **Resource-based**: `booking.create`, `equipment.edit`, `payment.refund`
 - **Action-based**: `create`, `read`, `update`, `delete`, `approve`
 - **Scope-based**: `own`, `team`, `all`
 
 ### Core Permissions
+
 - `booking.create`, `booking.edit`, `booking.delete`, `booking.view`
 - `equipment.create`, `equipment.edit`, `equipment.delete`, `equipment.view`
 - `payment.process`, `payment.refund`, `payment.approve`
@@ -108,7 +116,7 @@ export class BookingPolicy {
     if (!hasPermission) {
       return {
         allowed: false,
-        reason: 'Missing permission: booking.create'
+        reason: 'Missing permission: booking.create',
       }
     }
     return { allowed: true }
@@ -119,12 +127,15 @@ export class BookingPolicy {
 ## Audit Logging
 
 ### Mandatory Audit Fields
+
 Every model must include:
+
 - `createdAt`, `createdBy`
 - `updatedAt`, `updatedBy`
 - `deletedAt`, `deletedBy` (soft delete)
 
 ### Critical Actions Logged
+
 - User login/logout
 - Booking create/edit/delete
 - Payment operations
@@ -133,6 +144,7 @@ Every model must include:
 - Approval requests/decisions
 
 ### Audit Log Structure
+
 ```typescript
 {
   action: 'booking.created',

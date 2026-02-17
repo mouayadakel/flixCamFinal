@@ -77,22 +77,23 @@ export async function GET(request: NextRequest) {
     const totalEquipmentUnits = equipmentList.reduce((sum, e) => sum + (e.quantityTotal || 1), 0)
     const totalRentedDays = Array.from(equipmentRentedDays.values()).reduce((a, b) => a + b, 0)
     const totalAvailableUnitDays = totalEquipmentUnits * totalDays
-    const equipmentUtilizationRate = totalAvailableUnitDays > 0
-      ? (totalRentedDays / totalAvailableUnitDays) * 100
-      : 0
+    const equipmentUtilizationRate =
+      totalAvailableUnitDays > 0 ? (totalRentedDays / totalAvailableUnitDays) * 100 : 0
 
-    const equipmentUtilization = equipmentList.map((e) => {
-      const rentedDays = equipmentRentedDays.get(e.id) ?? 0
-      const unitDays = (e.quantityTotal || 1) * totalDays
-      const rate = unitDays > 0 ? (rentedDays / unitDays) * 100 : 0
-      return {
-        equipmentId: e.id,
-        equipmentName: e.sku || e.model || e.id,
-        quantityTotal: e.quantityTotal ?? 1,
-        rentedDays,
-        utilizationRate: Math.round(rate * 10) / 10,
-      }
-    }).sort((a, b) => b.utilizationRate - a.utilizationRate)
+    const equipmentUtilization = equipmentList
+      .map((e) => {
+        const rentedDays = equipmentRentedDays.get(e.id) ?? 0
+        const unitDays = (e.quantityTotal || 1) * totalDays
+        const rate = unitDays > 0 ? (rentedDays / unitDays) * 100 : 0
+        return {
+          equipmentId: e.id,
+          equipmentName: e.sku || e.model || e.id,
+          quantityTotal: e.quantityTotal ?? 1,
+          rentedDays,
+          utilizationRate: Math.round(rate * 10) / 10,
+        }
+      })
+      .sort((a, b) => b.utilizationRate - a.utilizationRate)
 
     const studioHoursMap = new Map<string, { hours: number; revenue: number }>()
     studios.forEach((s) => studioHoursMap.set(s.id, { hours: 0, revenue: 0 }))
@@ -109,20 +110,22 @@ export async function GET(request: NextRequest) {
       })
     })
 
-    const studioUtilization = studios.map((s) => {
-      const { hours, revenue } = studioHoursMap.get(s.id) ?? { hours: 0, revenue: 0 }
-      const availableHours = totalDays * hoursPerDay
-      const utilizationRate = availableHours > 0 ? (hours / availableHours) * 100 : 0
-      return {
-        studioId: s.id,
-        studioName: s.name,
-        slug: s.slug,
-        bookedHours: Math.round(hours * 10) / 10,
-        availableHours,
-        utilizationRate: Math.round(utilizationRate * 10) / 10,
-        revenue,
-      }
-    }).sort((a, b) => b.utilizationRate - a.utilizationRate)
+    const studioUtilization = studios
+      .map((s) => {
+        const { hours, revenue } = studioHoursMap.get(s.id) ?? { hours: 0, revenue: 0 }
+        const availableHours = totalDays * hoursPerDay
+        const utilizationRate = availableHours > 0 ? (hours / availableHours) * 100 : 0
+        return {
+          studioId: s.id,
+          studioName: s.name,
+          slug: s.slug,
+          bookedHours: Math.round(hours * 10) / 10,
+          availableHours,
+          utilizationRate: Math.round(utilizationRate * 10) / 10,
+          revenue,
+        }
+      })
+      .sort((a, b) => b.utilizationRate - a.utilizationRate)
 
     return NextResponse.json({
       periodDays: totalDays,

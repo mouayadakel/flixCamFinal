@@ -44,7 +44,7 @@ export function MultiSelectCheckbox({
       {/* Header with label + count */}
       {label && (
         <div className="flex items-center justify-between">
-          <Label className="text-xs font-medium uppercase tracking-wider text-text-muted flex items-center gap-1.5">
+          <Label className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-text-muted">
             <Tag className="h-3.5 w-3.5" />
             {label}
           </Label>
@@ -65,16 +65,13 @@ export function MultiSelectCheckbox({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={`Search ${label?.toLowerCase() ?? 'options'}...`}
-            className="w-full rounded-lg border border-border-light bg-surface-light py-1.5 ps-8 pe-3 text-xs text-text-heading placeholder:text-text-muted/60 focus:outline-none focus:ring-1 focus:ring-brand-primary/20"
+            className="w-full rounded-lg border border-border-light bg-surface-light py-1.5 pe-3 ps-8 text-xs text-text-heading placeholder:text-text-muted/60 focus:outline-none focus:ring-1 focus:ring-brand-primary/20"
           />
         </div>
       )}
 
       {/* Options list */}
-      <div
-        className="overflow-y-auto space-y-0.5 pe-1 scrollbar-none"
-        style={{ maxHeight }}
-      >
+      <div className="scrollbar-none space-y-0.5 overflow-y-auto pe-1" style={{ maxHeight }}>
         {filtered.length === 0 ? (
           <p className="py-2 text-center text-xs text-text-muted">No matches</p>
         ) : (
@@ -84,7 +81,7 @@ export function MultiSelectCheckbox({
               <label
                 key={opt.id}
                 className={cn(
-                  'flex items-center gap-2.5 cursor-pointer rounded-lg px-2 py-2 text-sm transition-colors',
+                  'flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-2 text-sm transition-colors',
                   isSelected
                     ? 'bg-brand-primary/5 text-text-heading'
                     : 'text-text-body hover:bg-surface-light'
@@ -95,7 +92,8 @@ export function MultiSelectCheckbox({
                   onCheckedChange={(checked) => onToggle(opt.id, checked === true)}
                   className={cn(
                     'shrink-0 rounded',
-                    isSelected && 'border-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white'
+                    isSelected &&
+                      'border-brand-primary data-[state=checked]:bg-brand-primary data-[state=checked]:text-white'
                   )}
                 />
                 <span className="truncate">{opt.label}</span>

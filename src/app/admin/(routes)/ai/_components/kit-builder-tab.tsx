@@ -48,7 +48,9 @@ export function KitBuilderTab() {
           useCase: formData.useCase || undefined,
           budget: formData.budget ? parseFloat(formData.budget) : undefined,
           duration: parseInt(formData.duration),
-          requirements: formData.requirements ? formData.requirements.split(',').map((r) => r.trim()) : undefined,
+          requirements: formData.requirements
+            ? formData.requirements.split(',').map((r) => r.trim())
+            : undefined,
         }),
       })
 
@@ -160,7 +162,7 @@ export function KitBuilderTab() {
                   <Label>Equipment:</Label>
                   <div className="grid grid-cols-2 gap-2">
                     {kit.equipment.map((eq, index) => (
-                      <div key={index} className="flex items-center gap-2 p-2 bg-muted rounded">
+                      <div key={index} className="flex items-center gap-2 rounded bg-muted p-2">
                         <Package className="h-4 w-4" />
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
@@ -178,7 +180,7 @@ export function KitBuilderTab() {
                   </div>
                   <div className="mt-4">
                     <Label>Reasoning:</Label>
-                    <p className="text-sm text-muted-foreground mt-1">{kit.reasoning}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{kit.reasoning}</p>
                   </div>
                 </div>
               </CardContent>

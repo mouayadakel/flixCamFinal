@@ -20,30 +20,27 @@ export const quoteEquipmentItemSchema = z.object({
   quantity: z.number().int().min(1, 'الكمية يجب أن تكون على الأقل 1'),
 })
 
-export const createQuoteSchema = z.object({
-  customerId: z.string().min(1, 'معرف العميل مطلوب'),
-  startDate: z.coerce.date({
-    errorMap: () => ({ message: 'تاريخ البداية مطلوب' }),
-  }),
-  endDate: z.coerce.date({
-    errorMap: () => ({ message: 'تاريخ النهاية مطلوب' }),
-  }),
-  equipment: z
-    .array(quoteEquipmentItemSchema)
-    .min(1, 'يجب تحديد معدات واحدة على الأقل'),
-  studioId: z.string().optional(),
-  studioStartTime: z.coerce.date().optional(),
-  studioEndTime: z.coerce.date().optional(),
-  notes: z.string().optional(),
-  validUntil: z.coerce.date().optional(),
-  discount: z.number().min(0).max(100).optional(),
-}).refine(
-  (data) => data.endDate > data.startDate,
-  {
+export const createQuoteSchema = z
+  .object({
+    customerId: z.string().min(1, 'معرف العميل مطلوب'),
+    startDate: z.coerce.date({
+      errorMap: () => ({ message: 'تاريخ البداية مطلوب' }),
+    }),
+    endDate: z.coerce.date({
+      errorMap: () => ({ message: 'تاريخ النهاية مطلوب' }),
+    }),
+    equipment: z.array(quoteEquipmentItemSchema).min(1, 'يجب تحديد معدات واحدة على الأقل'),
+    studioId: z.string().optional(),
+    studioStartTime: z.coerce.date().optional(),
+    studioEndTime: z.coerce.date().optional(),
+    notes: z.string().optional(),
+    validUntil: z.coerce.date().optional(),
+    discount: z.number().min(0).max(100).optional(),
+  })
+  .refine((data) => data.endDate > data.startDate, {
     message: 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية',
     path: ['endDate'],
-  }
-)
+  })
 
 export const updateQuoteSchema = z.object({
   startDate: z.coerce.date().optional(),

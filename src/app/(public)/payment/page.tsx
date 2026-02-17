@@ -69,11 +69,9 @@ export default function PaymentPage() {
 
   if (!details || items.length === 0) {
     return (
-      <main className="container mx-auto max-w-lg py-16 px-4 text-center">
-        <h1 className="text-2xl font-bold mb-4">الدفع</h1>
-        <p className="text-muted-foreground mb-6">
-          يرجى إكمال الطلب من صفحة السلة والتحقق.
-        </p>
+      <main className="container mx-auto max-w-lg px-4 py-16 text-center">
+        <h1 className="mb-4 text-2xl font-bold">الدفع</h1>
+        <p className="mb-6 text-muted-foreground">يرجى إكمال الطلب من صفحة السلة والتحقق.</p>
         <Button asChild>
           <Link href="/checkout">{t('common.back')}</Link>
         </Button>
@@ -83,8 +81,8 @@ export default function PaymentPage() {
 
   if (loading && !error) {
     return (
-      <main className="container mx-auto max-w-lg py-16 px-4 text-center">
-        <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-muted-foreground" />
+      <main className="container mx-auto max-w-lg px-4 py-16 text-center">
+        <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-muted-foreground" />
         <p className="text-muted-foreground">جاري التوجيه للدفع...</p>
       </main>
     )
@@ -92,9 +90,9 @@ export default function PaymentPage() {
 
   if (error) {
     return (
-      <main className="container mx-auto max-w-lg py-16 px-4 text-center">
-        <h1 className="text-2xl font-bold mb-4">خطأ</h1>
-        <p className="text-muted-foreground mb-6">{error}</p>
+      <main className="container mx-auto max-w-lg px-4 py-16 text-center">
+        <h1 className="mb-4 text-2xl font-bold">خطأ</h1>
+        <p className="mb-6 text-muted-foreground">{error}</p>
         <Button asChild>
           <Link href="/checkout">{t('common.back')}</Link>
         </Button>

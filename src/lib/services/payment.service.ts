@@ -8,11 +8,7 @@ import { prisma } from '@/lib/db/prisma'
 import { AuditService } from './audit.service'
 import { BookingService } from './booking.service'
 import { EventBus } from '@/lib/events/event-bus'
-import {
-  NotFoundError,
-  ValidationError,
-  ForbiddenError,
-} from '@/lib/errors'
+import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission } from '@/lib/auth/permissions'
 import { PaymentStatus, BookingStatus } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
@@ -143,11 +139,7 @@ export class PaymentService {
 
     // Update booking to CONFIRMED
     if (payment.booking.status === BookingStatus.PAYMENT_PENDING) {
-      await BookingService.transitionState(
-        payment.bookingId,
-        BookingStatus.CONFIRMED,
-        input.userId
-      )
+      await BookingService.transitionState(payment.bookingId, BookingStatus.CONFIRMED, input.userId)
     }
 
     await AuditService.log({
@@ -240,13 +232,14 @@ export class PaymentService {
       throw new ValidationError('Payment already fully refunded')
     }
 
-    if (payment.status !== PaymentStatus.SUCCESS && payment.status !== PaymentStatus.PARTIALLY_REFUNDED) {
+    if (
+      payment.status !== PaymentStatus.SUCCESS &&
+      payment.status !== PaymentStatus.PARTIALLY_REFUNDED
+    ) {
       throw new ValidationError('Can only refund successful or partially refunded payments')
     }
 
-    const refundAmount = input.amount
-      ? new Decimal(input.amount)
-      : payment.amount
+    const refundAmount = input.amount ? new Decimal(input.amount) : payment.amount
 
     if (refundAmount.greaterThan(payment.amount)) {
       throw new ValidationError('Refund amount cannot exceed payment amount')
@@ -288,11 +281,7 @@ export class PaymentService {
   /**
    * Process refund (after approval)
    */
-  static async processRefund(
-    paymentId: string,
-    approvalId: string,
-    userId: string
-  ) {
+  static async processRefund(paymentId: string, approvalId: string, userId: string) {
     const payment = await prisma.payment.findFirst({
       where: {
         id: paymentId,
@@ -582,10 +571,7 @@ export class PaymentService {
   /**
    * Verify Tap webhook signature
    */
-  static async verifyWebhookSignature(
-    payload: string,
-    signature: string
-  ): Promise<boolean> {
+  static async verifyWebhookSignature(payload: string, signature: string): Promise<boolean> {
     // TODO: Implement Tap webhook signature verification
     // This should verify the signature using the Tap secret key
     const secretKey = process.env.TAP_SECRET_KEY

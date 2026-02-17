@@ -7,7 +7,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
@@ -100,7 +107,9 @@ export function AIPreviewDialog({
       setTotalCost(data.totalCost || 0)
 
       // Auto-approve all by default
-      const allIndices = new Set<number>(data.suggestions?.map((_: unknown, idx: number) => idx) ?? [])
+      const allIndices = new Set<number>(
+        data.suggestions?.map((_: unknown, idx: number) => idx) ?? []
+      )
       setApproved(allIndices)
     } catch (error: any) {
       toast({
@@ -134,7 +143,8 @@ export function AIPreviewDialog({
             translations: {
               ...(current.translations || {}),
               [locale]: {
-                ...(current.translations?.[locale] || suggestions[index]?.aiSuggestions.translations[locale]),
+                ...(current.translations?.[locale] ||
+                  suggestions[index]?.aiSuggestions.translations[locale]),
                 [field]: value,
               },
             },
@@ -189,14 +199,15 @@ export function AIPreviewDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5" />
             AI Preview - Review Suggestions
           </DialogTitle>
           <DialogDescription>
-            Review and edit AI-generated translations and SEO suggestions before applying them to your import.
+            Review and edit AI-generated translations and SEO suggestions before applying them to
+            your import.
           </DialogDescription>
         </DialogHeader>
 
@@ -206,12 +217,10 @@ export function AIPreviewDialog({
             <span className="ml-3">Generating AI suggestions...</span>
           </div>
         ) : suggestions.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            No suggestions generated
-          </div>
+          <div className="py-12 text-center text-muted-foreground">No suggestions generated</div>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <Badge variant="outline">
                   {approved.size} / {suggestions.length} approved
@@ -246,11 +255,13 @@ export function AIPreviewDialog({
                 return (
                   <div
                     key={idx}
-                    className={`border rounded-lg p-4 ${isApproved ? 'border-green-500 bg-green-50/50' : 'border-gray-200'}`}
+                    className={`rounded-lg border p-4 ${isApproved ? 'border-green-500 bg-green-50/50' : 'border-gray-200'}`}
                   >
-                    <div className="flex items-start justify-between mb-3">
+                    <div className="mb-3 flex items-start justify-between">
                       <div>
-                        <h4 className="font-medium">Row {idx + 1}: {suggestion.original.name}</h4>
+                        <h4 className="font-medium">
+                          Row {idx + 1}: {suggestion.original.name}
+                        </h4>
                         <p className="text-sm text-muted-foreground">
                           {suggestion.original.category} • {suggestion.original.brand}
                         </p>
@@ -262,12 +273,12 @@ export function AIPreviewDialog({
                       >
                         {isApproved ? (
                           <>
-                            <Check className="h-4 w-4 mr-1" />
+                            <Check className="mr-1 h-4 w-4" />
                             Approved
                           </>
                         ) : (
                           <>
-                            <X className="h-4 w-4 mr-1" />
+                            <X className="mr-1 h-4 w-4" />
                             Approve
                           </>
                         )}
@@ -281,7 +292,7 @@ export function AIPreviewDialog({
                         <TabsTrigger value="zh">Chinese</TabsTrigger>
                       </TabsList>
 
-                      <TabsContent value="seo" className="space-y-3 mt-3">
+                      <TabsContent value="seo" className="mt-3 space-y-3">
                         <div>
                           <Label>Meta Title</Label>
                           <Input
@@ -306,7 +317,7 @@ export function AIPreviewDialog({
                         </div>
                       </TabsContent>
 
-                      <TabsContent value="ar" className="space-y-3 mt-3">
+                      <TabsContent value="ar" className="mt-3 space-y-3">
                         {finalSuggestion.translations.ar && (
                           <>
                             <div>
@@ -320,7 +331,9 @@ export function AIPreviewDialog({
                               <Label>Short Description (Arabic)</Label>
                               <Textarea
                                 value={finalSuggestion.translations.ar.shortDescription}
-                                onChange={(e) => handleEdit(idx, 'shortDescription', e.target.value, 'ar')}
+                                onChange={(e) =>
+                                  handleEdit(idx, 'shortDescription', e.target.value, 'ar')
+                                }
                                 rows={2}
                               />
                             </div>
@@ -328,7 +341,9 @@ export function AIPreviewDialog({
                               <Label>Long Description (Arabic)</Label>
                               <Textarea
                                 value={finalSuggestion.translations.ar.longDescription}
-                                onChange={(e) => handleEdit(idx, 'longDescription', e.target.value, 'ar')}
+                                onChange={(e) =>
+                                  handleEdit(idx, 'longDescription', e.target.value, 'ar')
+                                }
                                 rows={4}
                               />
                             </div>
@@ -336,7 +351,7 @@ export function AIPreviewDialog({
                         )}
                       </TabsContent>
 
-                      <TabsContent value="zh" className="space-y-3 mt-3">
+                      <TabsContent value="zh" className="mt-3 space-y-3">
                         {finalSuggestion.translations.zh && (
                           <>
                             <div>
@@ -350,7 +365,9 @@ export function AIPreviewDialog({
                               <Label>Short Description (Chinese)</Label>
                               <Textarea
                                 value={finalSuggestion.translations.zh.shortDescription}
-                                onChange={(e) => handleEdit(idx, 'shortDescription', e.target.value, 'zh')}
+                                onChange={(e) =>
+                                  handleEdit(idx, 'shortDescription', e.target.value, 'zh')
+                                }
                                 rows={2}
                               />
                             </div>
@@ -358,7 +375,9 @@ export function AIPreviewDialog({
                               <Label>Long Description (Chinese)</Label>
                               <Textarea
                                 value={finalSuggestion.translations.zh.longDescription}
-                                onChange={(e) => handleEdit(idx, 'longDescription', e.target.value, 'zh')}
+                                onChange={(e) =>
+                                  handleEdit(idx, 'longDescription', e.target.value, 'zh')
+                                }
                                 rows={4}
                               />
                             </div>

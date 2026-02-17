@@ -13,10 +13,7 @@ import { PaymentPolicy } from '@/lib/policies/payment.policy'
 import { updatePaymentSchema } from '@/lib/validators/payment.validator'
 import { ValidationError, ForbiddenError } from '@/lib/errors'
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
 
@@ -29,10 +26,7 @@ export async function GET(
     // Check policy
     const policy = await PaymentPolicy.canView(userId, params.id)
     if (!policy.allowed) {
-      return NextResponse.json(
-        { error: policy.reason || 'Forbidden' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: policy.reason || 'Forbidden' }, { status: 403 })
     }
 
     const payment = await PaymentService.getById(params.id, userId)
@@ -65,24 +59,15 @@ export async function GET(
     })
   } catch (error: any) {
     if (error instanceof ForbiddenError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 403 })
     }
 
     console.error('Get payment error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
 
@@ -95,10 +80,7 @@ export async function PATCH(
     // Check policy
     const policy = await PaymentPolicy.canUpdate(userId, params.id)
     if (!policy.allowed) {
-      return NextResponse.json(
-        { error: policy.reason || 'Forbidden' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: policy.reason || 'Forbidden' }, { status: 403 })
     }
 
     const body = await req.json()
@@ -150,17 +132,11 @@ export async function PATCH(
     })
   } catch (error: any) {
     if (error instanceof ValidationError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     if (error instanceof ForbiddenError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 403 })
     }
 
     if (error.name === 'ZodError') {
@@ -171,9 +147,6 @@ export async function PATCH(
     }
 
     console.error('Update payment error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

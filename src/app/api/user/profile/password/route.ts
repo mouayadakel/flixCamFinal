@@ -29,9 +29,10 @@ export async function POST(request: NextRequest) {
 
   const parsed = bodySchema.safeParse(body)
   if (!parsed.success) {
-    const msg = parsed.error.flatten().fieldErrors?.newPassword?.[0]
-      ?? parsed.error.flatten().fieldErrors?.currentPassword?.[0]
-      ?? 'Invalid input'
+    const msg =
+      parsed.error.flatten().fieldErrors?.newPassword?.[0] ??
+      parsed.error.flatten().fieldErrors?.currentPassword?.[0] ??
+      'Invalid input'
     return NextResponse.json({ error: msg }, { status: 400 })
   }
 
@@ -43,18 +44,12 @@ export async function POST(request: NextRequest) {
   })
 
   if (!user?.passwordHash) {
-    return NextResponse.json(
-      { error: 'Password not set for this account' },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: 'Password not set for this account' }, { status: 400 })
   }
 
   const isValid = await verifyPassword(currentPassword, user.passwordHash)
   if (!isValid) {
-    return NextResponse.json(
-      { error: 'Current password is incorrect' },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: 'Current password is incorrect' }, { status: 400 })
   }
 
   const passwordHash = await hashPassword(newPassword)

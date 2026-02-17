@@ -39,7 +39,11 @@ function ResetPasswordForm() {
   const { toast } = useToast()
   const [done, setDone] = useState(false)
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
   })
 
@@ -70,8 +74,8 @@ function ResetPasswordForm() {
   if (done) {
     return (
       <>
-        <h1 className="text-2xl font-bold mb-4">Password updated</h1>
-        <p className="text-muted-foreground mb-6">You can now sign in with your new password.</p>
+        <h1 className="mb-4 text-2xl font-bold">Password updated</h1>
+        <p className="mb-6 text-muted-foreground">You can now sign in with your new password.</p>
         <Button asChild>
           <Link href="/login">Sign in</Link>
         </Button>
@@ -82,8 +86,10 @@ function ResetPasswordForm() {
   if (!token) {
     return (
       <>
-        <h1 className="text-2xl font-bold mb-4">Invalid link</h1>
-        <p className="text-muted-foreground mb-6">This reset link is missing the token. Request a new one from the forgot password page.</p>
+        <h1 className="mb-4 text-2xl font-bold">Invalid link</h1>
+        <p className="mb-6 text-muted-foreground">
+          This reset link is missing the token. Request a new one from the forgot password page.
+        </p>
         <Button asChild variant="outline">
           <Link href="/forgot-password">Request reset link</Link>
         </Button>
@@ -93,23 +99,43 @@ function ResetPasswordForm() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold mb-4">Set new password</h1>
-      <p className="text-muted-foreground mb-6">Enter your new password below.</p>
+      <h1 className="mb-4 text-2xl font-bold">Set new password</h1>
+      <p className="mb-6 text-muted-foreground">Enter your new password below.</p>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <Label htmlFor="password">New password</Label>
-          <Input id="password" type="password" {...register('password')} className="mt-1" autoComplete="new-password" />
-          {errors.password && <p className="mt-1 text-sm text-destructive">{errors.password.message}</p>}
+          <Input
+            id="password"
+            type="password"
+            {...register('password')}
+            className="mt-1"
+            autoComplete="new-password"
+          />
+          {errors.password && (
+            <p className="mt-1 text-sm text-destructive">{errors.password.message}</p>
+          )}
         </div>
         <div>
           <Label htmlFor="confirmPassword">Confirm password</Label>
-          <Input id="confirmPassword" type="password" {...register('confirmPassword')} className="mt-1" autoComplete="new-password" />
-          {errors.confirmPassword && <p className="mt-1 text-sm text-destructive">{errors.confirmPassword.message}</p>}
+          <Input
+            id="confirmPassword"
+            type="password"
+            {...register('confirmPassword')}
+            className="mt-1"
+            autoComplete="new-password"
+          />
+          {errors.confirmPassword && (
+            <p className="mt-1 text-sm text-destructive">{errors.confirmPassword.message}</p>
+          )}
         </div>
-        <Button type="submit" className="w-full">Update password</Button>
+        <Button type="submit" className="w-full">
+          Update password
+        </Button>
       </form>
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        <Link href="/login" className="text-brand-primary underline">Back to login</Link>
+        <Link href="/login" className="text-brand-primary underline">
+          Back to login
+        </Link>
       </p>
     </>
   )
@@ -117,7 +143,7 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <main className="container mx-auto max-w-md py-12 px-4">
+    <main className="container mx-auto max-w-md px-4 py-12">
       <Suspense fallback={<p className="text-muted-foreground">Loading…</p>}>
         <ResetPasswordForm />
       </Suspense>

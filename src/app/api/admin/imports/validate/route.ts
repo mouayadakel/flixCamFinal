@@ -40,9 +40,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result)
   } catch (error: any) {
     console.error('Validation failed:', error)
-    return NextResponse.json(
-      { error: error.message || 'Validation failed' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Validation failed' }, { status: 500 })
   }
 }

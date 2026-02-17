@@ -11,8 +11,13 @@ export function EquipmentCatalogClient() {
   return (
     <>
       {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-sm text-text-muted">
-        <Link href="/" className="transition-colors hover:text-text-heading">Home</Link>
+      <nav
+        aria-label="Breadcrumb"
+        className="mb-4 flex items-center gap-1.5 text-sm text-text-muted"
+      >
+        <Link href="/" className="transition-colors hover:text-text-heading">
+          Home
+        </Link>
         <ChevronRight className="h-3.5 w-3.5" />
         <span className="font-medium text-text-heading">{t('nav.equipment')}</span>
       </nav>

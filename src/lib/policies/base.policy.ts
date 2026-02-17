@@ -15,10 +15,7 @@ export abstract class BasePolicy {
   /**
    * Check if user has permission
    */
-  protected static async checkPermission(
-    userId: string,
-    permission: string
-  ): Promise<boolean> {
+  protected static async checkPermission(userId: string, permission: string): Promise<boolean> {
     return hasPermission(userId, permission as any)
   }
 

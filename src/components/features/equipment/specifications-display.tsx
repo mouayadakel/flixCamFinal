@@ -23,14 +23,14 @@ import {
   Cable,
   ThermometerSun,
   Sun,
-  Gauge
+  Gauge,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
-  AccordionTrigger
+  AccordionTrigger,
 } from '@/components/ui/accordion'
 import type {
   SpecGroup,
@@ -38,7 +38,7 @@ import type {
   QuickSpec,
   SpecItem,
   StructuredSpecifications,
-  AnySpecifications
+  AnySpecifications,
 } from '@/lib/types/specifications.types'
 import { isStructuredSpecifications } from '@/lib/types/specifications.types'
 
@@ -67,7 +67,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   thermometer: ThermometerSun,
   sun: Sun,
   gauge: Gauge,
-  info: Info
+  info: Info,
 }
 
 function SpecIcon({ name, className }: { name: string; className?: string }) {
@@ -83,19 +83,17 @@ function SpecHeroCard({ highlights }: { highlights: SpecHighlight[] }) {
   if (!highlights?.length) return null
   return (
     <div className="rounded-2xl border border-border-light/60 bg-gradient-to-br from-brand-primary/[0.02] to-transparent p-6 shadow-sm">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
         {highlights.map((h, idx) => (
-          <div key={`${h.label}-${idx}`} className="text-center space-y-2">
+          <div key={`${h.label}-${idx}`} className="space-y-2 text-center">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-brand-primary/10 transition-all hover:scale-105 hover:bg-brand-primary/15">
               <SpecIcon name={h.icon} className="h-6 w-6 text-brand-primary" />
             </div>
             <div>
               <p className="text-xl font-bold text-text-heading">{h.value}</p>
-              {h.sublabel && (
-                <p className="text-xs text-text-muted mt-0.5">{h.sublabel}</p>
-              )}
+              {h.sublabel && <p className="mt-0.5 text-xs text-text-muted">{h.sublabel}</p>}
             </div>
-            <p className="text-xs font-medium text-text-muted uppercase tracking-wider">
+            <p className="text-xs font-medium uppercase tracking-wider text-text-muted">
               {h.label}
             </p>
           </div>
@@ -132,14 +130,13 @@ export function QuickSpecPills({ specs }: { specs: QuickSpec[] }) {
 // ============================================================================
 
 function BooleanSpec({ value }: { value: string }) {
-  const isTrue =
-    value.toLowerCase() === 'yes' || value.toLowerCase() === 'true'
+  const isTrue = value.toLowerCase() === 'yes' || value.toLowerCase() === 'true'
   return (
     <div className="flex items-center gap-2">
       {isTrue ? (
         <>
           <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-          <span className="text-emerald-700 font-medium">Yes</span>
+          <span className="font-medium text-emerald-700">Yes</span>
         </>
       ) : (
         <>
@@ -151,22 +148,16 @@ function BooleanSpec({ value }: { value: string }) {
   )
 }
 
-function RangeSpec({
-  value,
-  rangePercent = 70
-}: {
-  value: string
-  rangePercent?: number
-}) {
+function RangeSpec({ value, rangePercent = 70 }: { value: string; rangePercent?: number }) {
   return (
-    <div className="flex items-center gap-3 flex-1">
-      <div className="h-2 flex-1 rounded-full bg-surface-light/80 overflow-hidden">
+    <div className="flex flex-1 items-center gap-3">
+      <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-light/80">
         <div
           className="h-full rounded-full bg-gradient-to-r from-brand-primary/60 to-brand-primary transition-all duration-300"
           style={{ width: `${rangePercent}%` }}
         />
       </div>
-      <span className="text-sm font-medium text-text-heading shrink-0 min-w-[100px] text-right">
+      <span className="min-w-[100px] shrink-0 text-right text-sm font-medium text-text-heading">
         {value}
       </span>
     </div>
@@ -175,9 +166,9 @@ function RangeSpec({
 
 function ColorTempSpec({ value }: { value: string }) {
   return (
-    <div className="flex items-center gap-3 flex-1">
-      <div className="h-2 flex-1 rounded-full overflow-hidden bg-gradient-to-r from-orange-500 via-yellow-200 to-blue-500" />
-      <span className="text-sm font-medium text-text-heading shrink-0 min-w-[120px] text-right">
+    <div className="flex flex-1 items-center gap-3">
+      <div className="h-2 flex-1 overflow-hidden rounded-full bg-gradient-to-r from-orange-500 via-yellow-200 to-blue-500" />
+      <span className="min-w-[120px] shrink-0 text-right text-sm font-medium text-text-heading">
         {value}
       </span>
     </div>
@@ -191,7 +182,7 @@ function ColorTempSpec({ value }: { value: string }) {
 function SpecGroupCard({
   group,
   locale,
-  className
+  className,
 }: {
   group: SpecGroup
   locale: 'en' | 'ar'
@@ -201,53 +192,35 @@ function SpecGroupCard({
   return (
     <div
       className={cn(
-        'rounded-2xl border border-border-light/60 bg-white shadow-card overflow-hidden transition-all hover:shadow-lg',
+        'overflow-hidden rounded-2xl border border-border-light/60 bg-white shadow-card transition-all hover:shadow-lg',
         className
       )}
     >
       <div className="flex items-center gap-2.5 border-b border-border-light/40 bg-gradient-to-r from-surface-light/50 to-surface-light/20 px-5 py-3.5">
         <SpecIcon name={group.icon} className="h-5 w-5 text-brand-primary" />
-        <h3 className="text-sm font-semibold text-text-heading tracking-wide">
-          {label}
-        </h3>
+        <h3 className="text-sm font-semibold tracking-wide text-text-heading">{label}</h3>
       </div>
       <div className="divide-y divide-border-light/30">
         {group.specs.map((spec, specIdx) => (
-          <SpecRow
-            key={`${spec.key}-${specIdx}`}
-            spec={spec}
-            locale={locale}
-            index={specIdx}
-          />
+          <SpecRow key={`${spec.key}-${specIdx}`} spec={spec} locale={locale} index={specIdx} />
         ))}
       </div>
     </div>
   )
 }
 
-function SpecRow({
-  spec,
-  locale,
-  index
-}: {
-  spec: SpecItem
-  locale: 'en' | 'ar'
-  index: number
-}) {
+function SpecRow({ spec, locale, index }: { spec: SpecItem; locale: 'en' | 'ar'; index: number }) {
   const label = locale === 'ar' && spec.labelAr ? spec.labelAr : spec.label
   return (
     <div
       className={cn(
         'flex items-center gap-4 px-5 py-3.5 text-sm transition-colors hover:bg-surface-light/30',
-        spec.highlight &&
-          'bg-brand-primary/[0.03] border-l-2 border-l-brand-primary/40',
+        spec.highlight && 'border-l-2 border-l-brand-primary/40 bg-brand-primary/[0.03]',
         !spec.highlight && index % 2 !== 0 && 'bg-surface-light/20'
       )}
     >
-      <span className="min-w-[140px] shrink-0 font-medium text-text-muted">
-        {label}
-      </span>
-      <div className="flex items-center gap-2 flex-1 min-w-0">
+      <span className="min-w-[140px] shrink-0 font-medium text-text-muted">{label}</span>
+      <div className="flex min-w-0 flex-1 items-center gap-2">
         {spec.type === 'boolean' ? (
           <BooleanSpec value={spec.value} />
         ) : spec.type === 'range' ? (
@@ -257,7 +230,7 @@ function SpecRow({
         ) : (
           <span
             className={cn(
-              'text-text-body truncate',
+              'truncate text-text-body',
               spec.highlight && 'font-semibold text-text-heading'
             )}
           >
@@ -282,7 +255,7 @@ function GroupedSpecsDesktop({
   groups,
   locale,
   isExpanded,
-  onToggle
+  onToggle,
 }: {
   groups: SpecGroup[]
   locale: 'en' | 'ar'
@@ -296,14 +269,12 @@ function GroupedSpecsDesktop({
 
   return (
     <div className="space-y-4">
-      {first && (
-        <SpecGroupCard group={first} locale={locale} />
-      )}
+      {first && <SpecGroupCard group={first} locale={locale} />}
       {moreCount > 0 && (
         <button
           type="button"
           onClick={onToggle}
-          className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border border-border-light/60 bg-surface-light/40 text-sm font-medium text-text-heading hover:bg-surface-light/60 transition-colors"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-border-light/60 bg-surface-light/40 px-4 py-2.5 text-sm font-medium text-text-heading transition-colors hover:bg-surface-light/60"
         >
           {isExpanded ? (
             <>
@@ -320,13 +291,9 @@ function GroupedSpecsDesktop({
         </button>
       )}
       {isExpanded && moreCount > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {rest.map((group, idx) => (
-            <SpecGroupCard
-              key={`${group.label}-${idx}`}
-              group={group}
-              locale={locale}
-            />
+            <SpecGroupCard key={`${group.label}-${idx}`} group={group} locale={locale} />
           ))}
         </div>
       )}
@@ -342,7 +309,7 @@ function GroupedSpecsMobile({
   groups,
   locale,
   isExpanded,
-  onToggle
+  onToggle,
 }: {
   groups: SpecGroup[]
   locale: 'en' | 'ar'
@@ -361,7 +328,7 @@ function GroupedSpecsMobile({
         {first && (
           <AccordionItem
             value={first.label}
-            className="rounded-xl border border-border-light/60 bg-white overflow-hidden px-0"
+            className="overflow-hidden rounded-xl border border-border-light/60 bg-white px-0"
           >
             <AccordionTrigger className="px-4 py-3.5 hover:no-underline">
               <span className="flex items-center gap-2.5">
@@ -372,17 +339,14 @@ function GroupedSpecsMobile({
               </span>
             </AccordionTrigger>
             <AccordionContent className="px-0 pb-0">
-              <div className="border-t border-border-light/40 divide-y divide-border-light/30">
+              <div className="divide-y divide-border-light/30 border-t border-border-light/40">
                 {first.specs.map((spec, specIdx) => (
                   <div
                     key={`${spec.key}-${specIdx}`}
-                    className={cn(
-                      'px-4 py-3 text-sm',
-                      spec.highlight && 'bg-brand-primary/[0.03]'
-                    )}
+                    className={cn('px-4 py-3 text-sm', spec.highlight && 'bg-brand-primary/[0.03]')}
                   >
                     <div className="flex flex-col gap-1.5">
-                      <span className="font-medium text-text-muted text-xs uppercase tracking-wide">
+                      <span className="text-xs font-medium uppercase tracking-wide text-text-muted">
                         {locale === 'ar' && spec.labelAr ? spec.labelAr : spec.label}
                       </span>
                       {spec.type === 'boolean' ? (
@@ -413,7 +377,7 @@ function GroupedSpecsMobile({
             <AccordionItem
               key={`${group.label}-${idx}`}
               value={group.label}
-              className="rounded-xl border border-border-light/60 bg-white overflow-hidden px-0"
+              className="overflow-hidden rounded-xl border border-border-light/60 bg-white px-0"
             >
               <AccordionTrigger className="px-4 py-3.5 hover:no-underline">
                 <span className="flex items-center gap-2.5">
@@ -424,7 +388,7 @@ function GroupedSpecsMobile({
                 </span>
               </AccordionTrigger>
               <AccordionContent className="px-0 pb-0">
-                <div className="border-t border-border-light/40 divide-y divide-border-light/30">
+                <div className="divide-y divide-border-light/30 border-t border-border-light/40">
                   {group.specs.map((spec, specIdx) => (
                     <div
                       key={`${spec.key}-${specIdx}`}
@@ -434,7 +398,7 @@ function GroupedSpecsMobile({
                       )}
                     >
                       <div className="flex flex-col gap-1.5">
-                        <span className="font-medium text-text-muted text-xs uppercase tracking-wide">
+                        <span className="text-xs font-medium uppercase tracking-wide text-text-muted">
                           {locale === 'ar' && spec.labelAr ? spec.labelAr : spec.label}
                         </span>
                         {spec.type === 'boolean' ? (
@@ -465,7 +429,7 @@ function GroupedSpecsMobile({
         <button
           type="button"
           onClick={onToggle}
-          className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border border-border-light/60 bg-surface-light/40 text-sm font-medium text-text-heading hover:bg-surface-light/60 transition-colors"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-border-light/60 bg-surface-light/40 px-4 py-2.5 text-sm font-medium text-text-heading transition-colors hover:bg-surface-light/60"
         >
           {isExpanded ? (
             <>
@@ -491,7 +455,7 @@ function GroupedSpecsMobile({
 function FlatSpecsTable({
   specifications,
   showAllLabel,
-  showLessLabel
+  showLessLabel,
 }: {
   specifications: Record<string, unknown>
   showAllLabel?: string
@@ -501,16 +465,14 @@ function FlatSpecsTable({
     ([key]) => !RESERVED_FLAT_KEYS.includes(key)
   )
   const [expanded, setExpanded] = useState(false)
-  const visible = expanded
-    ? entries
-    : entries.slice(0, FLAT_TABLE_COLLAPSE_AFTER)
+  const visible = expanded ? entries : entries.slice(0, FLAT_TABLE_COLLAPSE_AFTER)
   const hasMore = entries.length > FLAT_TABLE_COLLAPSE_AFTER
   const moreCount = entries.length - FLAT_TABLE_COLLAPSE_AFTER
 
   if (entries.length === 0) {
     return (
       <div className="rounded-2xl border border-border-light/60 bg-white p-8 text-center">
-        <Info className="h-8 w-8 text-text-muted mx-auto mb-2" />
+        <Info className="mx-auto mb-2 h-8 w-8 text-text-muted" />
         <p className="text-text-muted">No specifications available</p>
       </div>
     )
@@ -518,7 +480,7 @@ function FlatSpecsTable({
 
   return (
     <div className="space-y-2">
-      <div className="rounded-2xl border border-border-light/60 bg-white shadow-card overflow-hidden">
+      <div className="overflow-hidden rounded-2xl border border-border-light/60 bg-white shadow-card">
         <table className="w-full text-sm">
           <tbody>
             {visible.map(([key, value], idx) => (
@@ -529,12 +491,10 @@ function FlatSpecsTable({
                   idx % 2 === 0 ? 'bg-white' : 'bg-surface-light/30'
                 )}
               >
-                <td className="px-5 py-3.5 font-medium text-text-heading capitalize whitespace-nowrap">
+                <td className="whitespace-nowrap px-5 py-3.5 font-medium capitalize text-text-heading">
                   {key.replace(/([A-Z])/g, ' $1').trim()}
                 </td>
-                <td className="px-5 py-3.5 text-text-body">
-                  {String(value ?? '—')}
-                </td>
+                <td className="px-5 py-3.5 text-text-body">{String(value ?? '—')}</td>
               </tr>
             ))}
           </tbody>
@@ -544,7 +504,7 @@ function FlatSpecsTable({
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl border border-border-light/60 bg-surface-light/40 text-sm font-medium text-text-heading hover:bg-surface-light/60 transition-colors"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-border-light/60 bg-surface-light/40 px-4 py-2.5 text-sm font-medium text-text-heading transition-colors hover:bg-surface-light/60"
         >
           {expanded ? (
             <>
@@ -581,15 +541,15 @@ export function SpecificationsDisplay({
   locale = 'en',
   showQuickSpecPills = true,
   showAllLabel,
-  showLessLabel
+  showLessLabel,
 }: SpecificationsDisplayProps) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   if (!specifications || typeof specifications !== 'object') {
     return (
       <div className="rounded-2xl border border-border-light/60 bg-white p-12 text-center">
-        <Info className="h-12 w-12 text-text-muted mx-auto mb-3" />
-        <p className="text-text-muted text-lg">No specifications available</p>
+        <Info className="mx-auto mb-3 h-12 w-12 text-text-muted" />
+        <p className="text-lg text-text-muted">No specifications available</p>
       </div>
     )
   }
@@ -597,8 +557,8 @@ export function SpecificationsDisplay({
   if (Object.keys(specifications).length === 0) {
     return (
       <div className="rounded-2xl border border-border-light/60 bg-white p-12 text-center">
-        <Info className="h-12 w-12 text-text-muted mx-auto mb-3" />
-        <p className="text-text-muted text-lg">No specifications available</p>
+        <Info className="mx-auto mb-3 h-12 w-12 text-text-muted" />
+        <p className="text-lg text-text-muted">No specifications available</p>
       </div>
     )
   }
@@ -606,9 +566,7 @@ export function SpecificationsDisplay({
   if (isStructuredSpecifications(specifications)) {
     return (
       <div className="space-y-6">
-        {specifications.highlights && (
-          <SpecHeroCard highlights={specifications.highlights} />
-        )}
+        {specifications.highlights && <SpecHeroCard highlights={specifications.highlights} />}
         {showQuickSpecPills && specifications.quickSpecs && (
           <QuickSpecPills specs={specifications.quickSpecs} />
         )}

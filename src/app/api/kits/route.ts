@@ -84,7 +84,8 @@ export async function POST(request: NextRequest) {
           name: parsed.name,
           slug: parsed.slug,
           description: parsed.description ?? null,
-          discountPercent: parsed.discountPercent != null ? new Decimal(parsed.discountPercent) : null,
+          discountPercent:
+            parsed.discountPercent != null ? new Decimal(parsed.discountPercent) : null,
           isActive: parsed.isActive ?? true,
           createdBy: session.user!.id,
         },

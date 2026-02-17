@@ -28,10 +28,14 @@ export function exportToCSV(
 
   const header = columns.map((c) => escape(c.label)).join(',')
   const rows = data.map((row) =>
-    columns.map((c) => {
-      const value = c.key.split('.').reduce((obj: unknown, k) => (obj as Record<string, unknown>)?.[k], row)
-      return escape(value)
-    }).join(',')
+    columns
+      .map((c) => {
+        const value = c.key
+          .split('.')
+          .reduce((obj: unknown, k) => (obj as Record<string, unknown>)?.[k], row)
+        return escape(value)
+      })
+      .join(',')
   )
   const csv = [header, ...rows].join('\n')
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })

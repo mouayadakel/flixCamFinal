@@ -17,11 +17,7 @@ import { formatCurrency, formatDate } from '@/lib/utils/format.utils'
 import { ArrowRight, Receipt, Download, CreditCard } from 'lucide-react'
 import { notFound } from 'next/navigation'
 
-export default async function PortalInvoiceDetailPage({
-  params,
-}: {
-  params: { id: string }
-}) {
+export default async function PortalInvoiceDetailPage({ params }: { params: { id: string } }) {
   const session = await auth()
 
   if (!session?.user?.id) {
@@ -95,30 +91,20 @@ export default async function PortalInvoiceDetailPage({
         <div>
           <Link
             href="/portal/invoices"
-            className="text-sm text-muted-foreground hover:text-foreground mb-2 inline-flex items-center gap-1"
+            className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowRight className="h-4 w-4" />
             العودة إلى الفواتير
           </Link>
-          <h1 className="text-3xl font-bold">
-            فاتورة #{invoice.invoiceNumber}
-          </h1>
+          <h1 className="text-3xl font-bold">فاتورة #{invoice.invoiceNumber}</h1>
         </div>
-        <Badge
-          variant={
-            isPaid ? 'default' : isPartiallyPaid ? 'secondary' : 'outline'
-          }
-        >
-          {isPaid
-            ? 'مدفوعة'
-            : isPartiallyPaid
-            ? 'مدفوعة جزئياً'
-            : 'غير مدفوعة'}
+        <Badge variant={isPaid ? 'default' : isPartiallyPaid ? 'secondary' : 'outline'}>
+          {isPaid ? 'مدفوعة' : isPartiallyPaid ? 'مدفوعة جزئياً' : 'غير مدفوعة'}
         </Badge>
       </div>
 
       {/* Invoice Information */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -129,9 +115,7 @@ export default async function PortalInvoiceDetailPage({
           <CardContent className="space-y-4">
             <div>
               <div className="text-sm text-muted-foreground">رقم الحجز</div>
-              <div className="font-medium">
-                #{invoice.bookingNumber}
-              </div>
+              <div className="font-medium">#{invoice.bookingNumber}</div>
             </div>
             <div>
               <div className="text-sm text-muted-foreground">تاريخ الإنشاء</div>
@@ -145,7 +129,7 @@ export default async function PortalInvoiceDetailPage({
             )}
             <div>
               <div className="text-sm text-muted-foreground">المبلغ الإجمالي</div>
-              <div className="font-medium text-lg">
+              <div className="text-lg font-medium">
                 {formatCurrency(invoice.totalAmount.toNumber())}
               </div>
             </div>
@@ -153,9 +137,7 @@ export default async function PortalInvoiceDetailPage({
               <>
                 <div>
                   <div className="text-sm text-muted-foreground">المدفوع</div>
-                  <div className="font-medium text-success-600">
-                    {formatCurrency(paidAmount)}
-                  </div>
+                  <div className="font-medium text-success-600">{formatCurrency(paidAmount)}</div>
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">المتبقي</div>
@@ -180,32 +162,26 @@ export default async function PortalInvoiceDetailPage({
                 {invoice.payments.map((payment) => (
                   <div
                     key={payment.id}
-                    className="flex items-center justify-between p-3 border rounded-lg"
+                    className="flex items-center justify-between rounded-lg border p-3"
                   >
                     <div>
-                      <div className="font-medium">
-                        {formatCurrency(payment.amount.toNumber())}
-                      </div>
+                      <div className="font-medium">{formatCurrency(payment.amount.toNumber())}</div>
                       <div className="text-sm text-muted-foreground">
                         {formatDate(payment.createdAt)}
                       </div>
                     </div>
-                    <Badge
-                      variant={
-                        payment.status === 'SUCCESS' ? 'default' : 'secondary'
-                      }
-                    >
-                      {payment.status === 'SUCCESS' 
-                        ? 'مدفوع' 
+                    <Badge variant={payment.status === 'SUCCESS' ? 'default' : 'secondary'}>
+                      {payment.status === 'SUCCESS'
+                        ? 'مدفوع'
                         : payment.status === 'PENDING'
-                        ? 'قيد الانتظار'
-                        : payment.status === 'PROCESSING'
-                        ? 'قيد المعالجة'
-                        : payment.status === 'FAILED'
-                        ? 'فشل'
-                        : payment.status === 'REFUNDED'
-                        ? 'مسترد'
-                        : payment.status}
+                          ? 'قيد الانتظار'
+                          : payment.status === 'PROCESSING'
+                            ? 'قيد المعالجة'
+                            : payment.status === 'FAILED'
+                              ? 'فشل'
+                              : payment.status === 'REFUNDED'
+                                ? 'مسترد'
+                                : payment.status}
                     </Badge>
                   </div>
                 ))}
@@ -226,19 +202,15 @@ export default async function PortalInvoiceDetailPage({
               {invoice.items.map((item, index: number) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 border rounded-lg"
+                  className="flex items-center justify-between rounded-lg border p-3"
                 >
                   <div>
                     <div className="font-medium">{item.description || `بند ${index + 1}`}</div>
                     {item.quantity && (
-                      <div className="text-sm text-muted-foreground">
-                        الكمية: {item.quantity}
-                      </div>
+                      <div className="text-sm text-muted-foreground">الكمية: {item.quantity}</div>
                     )}
                   </div>
-                  <div className="font-medium">
-                    {formatCurrency(item.amount)}
-                  </div>
+                  <div className="font-medium">{formatCurrency(item.amount)}</div>
                 </div>
               ))}
             </div>
@@ -255,12 +227,12 @@ export default async function PortalInvoiceDetailPage({
           <div className="flex items-center gap-4">
             {!isPaid && (
               <Button>
-                <CreditCard className="h-4 w-4 ml-2" />
+                <CreditCard className="ml-2 h-4 w-4" />
                 دفع الآن
               </Button>
             )}
             <Button variant="outline">
-              <Download className="h-4 w-4 ml-2" />
+              <Download className="ml-2 h-4 w-4" />
               تحميل PDF
             </Button>
             <Link href={`/portal/bookings/${invoice.bookingId}`}>

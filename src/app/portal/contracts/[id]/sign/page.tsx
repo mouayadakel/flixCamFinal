@@ -120,12 +120,10 @@ export default function ContractSignPage({ params }: ContractSignPageProps) {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="mx-auto max-w-4xl space-y-6">
       <div>
         <h1 className="text-3xl font-bold">توقيع العقد</h1>
-        <p className="text-muted-foreground mt-2">
-          يرجى قراءة العقد والتوقيع عليه
-        </p>
+        <p className="mt-2 text-muted-foreground">يرجى قراءة العقد والتوقيع عليه</p>
       </div>
 
       {/* Contract Preview */}
@@ -137,7 +135,7 @@ export default function ContractSignPage({ params }: ContractSignPageProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="border rounded-lg p-4 bg-neutral-50 max-h-96 overflow-y-auto">
+          <div className="max-h-96 overflow-y-auto rounded-lg border bg-neutral-50 p-4">
             {isLoading ? (
               <p className="text-sm text-muted-foreground">جاري تحميل العقد...</p>
             ) : contractContent ? (
@@ -146,9 +144,7 @@ export default function ContractSignPage({ params }: ContractSignPageProps) {
                 className="prose prose-sm max-w-none"
               />
             ) : (
-              <p className="text-sm text-muted-foreground">
-                لا يوجد محتوى للعقد
-              </p>
+              <p className="text-sm text-muted-foreground">لا يوجد محتوى للعقد</p>
             )}
           </div>
         </CardContent>
@@ -160,7 +156,7 @@ export default function ContractSignPage({ params }: ContractSignPageProps) {
           <CardTitle>التوقيع</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="border-2 border-dashed border-neutral-300 rounded-lg bg-white">
+          <div className="rounded-lg border-2 border-dashed border-neutral-300 bg-white">
             <SignatureCanvas
               ref={signatureRef}
               canvasProps={{
@@ -173,7 +169,7 @@ export default function ContractSignPage({ params }: ContractSignPageProps) {
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={handleClear} size="sm">
-              <X className="h-4 w-4 ml-2" />
+              <X className="ml-2 h-4 w-4" />
               مسح التوقيع
             </Button>
           </div>
@@ -192,12 +188,9 @@ export default function ContractSignPage({ params }: ContractSignPageProps) {
               checked={acceptedTerms}
               onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
             />
-            <Label
-              htmlFor="terms"
-              className="text-sm leading-relaxed cursor-pointer"
-            >
-              أوافق على جميع الشروط والأحكام المذكورة في هذا العقد. أقر بأنني
-              قرأت وفهمت جميع البنود وأوافق على الالتزام بها.
+            <Label htmlFor="terms" className="cursor-pointer text-sm leading-relaxed">
+              أوافق على جميع الشروط والأحكام المذكورة في هذا العقد. أقر بأنني قرأت وفهمت جميع البنود
+              وأوافق على الالتزام بها.
             </Label>
           </div>
         </CardContent>
@@ -208,15 +201,12 @@ export default function ContractSignPage({ params }: ContractSignPageProps) {
         <Link href={`/portal/contracts/${params.id}`}>
           <Button variant="outline">إلغاء</Button>
         </Link>
-        <Button
-          onClick={handleSubmit}
-          disabled={isSubmitting || !acceptedTerms}
-        >
+        <Button onClick={handleSubmit} disabled={isSubmitting || !acceptedTerms}>
           {isSubmitting ? (
             'جاري التوقيع...'
           ) : (
             <>
-              <Check className="h-4 w-4 ml-2" />
+              <Check className="ml-2 h-4 w-4" />
               تأكيد التوقيع
             </>
           )}

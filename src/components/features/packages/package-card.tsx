@@ -22,14 +22,14 @@ export function PackageCard({ pkg }: PackageCardProps) {
   return (
     <Link
       href={`/packages/${pkg.slug}`}
-      className="block rounded-lg border bg-card p-4 hover:shadow-md transition-shadow"
+      className="block rounded-lg border bg-card p-4 transition-shadow hover:shadow-md"
     >
       <h2 className="font-semibold">{pkg.name}</h2>
       {pkg.itemCount > 0 && (
-        <p className="text-sm text-muted-foreground mt-1">{pkg.itemCount} items</p>
+        <p className="mt-1 text-sm text-muted-foreground">{pkg.itemCount} items</p>
       )}
       {pkg.discountPercent != null && pkg.discountPercent > 0 && (
-        <span className="inline-block mt-2 text-sm font-medium text-green-600 dark:text-green-400">
+        <span className="mt-2 inline-block text-sm font-medium text-green-600 dark:text-green-400">
           {pkg.discountPercent}% off
         </span>
       )}

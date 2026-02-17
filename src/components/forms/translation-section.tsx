@@ -51,7 +51,7 @@ export function TranslationSection({
 
   const editor = useEditor({
     extensions: [StarterKit],
-    content: mounted ? (value.description || '') : '',
+    content: mounted ? value.description || '' : '',
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange({
@@ -69,7 +69,7 @@ export function TranslationSection({
   // Update editor when value changes externally (only after mount)
   useEffect(() => {
     if (!mounted || !editor) return
-    
+
     if (value.description && value.description !== editor.getHTML()) {
       // Use setTimeout to avoid setState during render
       const timeoutId = setTimeout(() => {
@@ -81,21 +81,14 @@ export function TranslationSection({
 
   return (
     <Card className={cn('overflow-hidden', className)} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-      <CardHeader
-        className="cursor-pointer"
-        onClick={() => setExpanded(!expanded)}
-      >
+      <CardHeader className="cursor-pointer" onClick={() => setExpanded(!expanded)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Languages className="h-5 w-5 text-neutral-400" />
             <h3 className="font-semibold">{localeLabels[locale]}</h3>
           </div>
           <Button type="button" variant="ghost" size="sm">
-            {expanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
+            {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </div>
       </CardHeader>
@@ -127,8 +120,8 @@ export function TranslationSection({
 
           <div className="space-y-2">
             <Label htmlFor={`description-${locale}`}>الوصف الكامل (HTML)</Label>
-            <div className="border border-neutral-200 rounded-md overflow-hidden">
-              <div className="border-b border-neutral-200 p-2 bg-neutral-50 flex gap-2">
+            <div className="overflow-hidden rounded-md border border-neutral-200">
+              <div className="flex gap-2 border-b border-neutral-200 bg-neutral-50 p-2">
                 <Button
                   type="button"
                   variant="ghost"
@@ -163,7 +156,7 @@ export function TranslationSection({
               {mounted && editor ? (
                 <EditorContent editor={editor} />
               ) : (
-                <div className="min-h-[200px] p-4 bg-neutral-50 flex items-center justify-center">
+                <div className="flex min-h-[200px] items-center justify-center bg-neutral-50 p-4">
                   <p className="text-sm text-neutral-500">جاري التحميل...</p>
                 </div>
               )}

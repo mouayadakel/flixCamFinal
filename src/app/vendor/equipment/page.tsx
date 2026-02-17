@@ -36,13 +36,11 @@ export default async function VendorEquipmentPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">معداتي</h1>
-          <p className="text-muted-foreground mt-1">
-            إدارة المعدات المدرجة وتتبع الإيجارات
-          </p>
+          <p className="mt-1 text-muted-foreground">إدارة المعدات المدرجة وتتبع الإيجارات</p>
         </div>
         <Link href="/vendor/equipment/new">
           <Button>
-            <Plus className="h-4 w-4 ml-2" />
+            <Plus className="ml-2 h-4 w-4" />
             إضافة معدات جديدة
           </Button>
         </Link>
@@ -57,8 +55,8 @@ export default async function VendorEquipmentPage() {
         </CardHeader>
         <CardContent>
           {equipment.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <div className="py-12 text-center text-muted-foreground">
+              <Package className="mx-auto mb-4 h-12 w-12 opacity-50" />
               <p>لا توجد معدات مدرجة بعد</p>
               <Link href="/vendor/equipment/new">
                 <Button className="mt-4">إضافة أول معدات</Button>
@@ -72,17 +70,17 @@ export default async function VendorEquipmentPage() {
                 return (
                   <div
                     key={eq.id}
-                    className="flex items-center justify-between p-4 border rounded-lg"
+                    className="flex items-center justify-between rounded-lg border p-4"
                   >
                     <div className="flex items-center gap-4">
                       {eq.media[0] ? (
                         <img
                           src={eq.media[0].url}
                           alt=""
-                          className="w-16 h-16 object-cover rounded"
+                          className="h-16 w-16 rounded object-cover"
                         />
                       ) : (
-                        <div className="w-16 h-16 bg-muted rounded flex items-center justify-center">
+                        <div className="flex h-16 w-16 items-center justify-center rounded bg-muted">
                           <Package className="h-8 w-8 text-muted-foreground" />
                         </div>
                       )}
@@ -91,7 +89,7 @@ export default async function VendorEquipmentPage() {
                         <div className="text-sm text-muted-foreground">
                           {eq.category?.name} {eq.brand?.name && `• ${eq.brand.name}`}
                         </div>
-                        <div className="flex items-center gap-2 mt-1">
+                        <div className="mt-1 flex items-center gap-2">
                           <Badge
                             variant={
                               status === 'approved'
@@ -107,17 +105,13 @@ export default async function VendorEquipmentPage() {
                                 ? 'معتمد'
                                 : 'مرفوض'}
                           </Badge>
-                          {!eq.isActive && (
-                            <Badge variant="outline">غير نشط</Badge>
-                          )}
+                          {!eq.isActive && <Badge variant="outline">غير نشط</Badge>}
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <div className="font-medium">
-                          {formatCurrency(Number(eq.dailyPrice))}
-                        </div>
+                        <div className="font-medium">{formatCurrency(Number(eq.dailyPrice))}</div>
                         <div className="text-xs text-muted-foreground">/ يوم</div>
                       </div>
                       <Link href={`/vendor/equipment/${eq.id}`}>

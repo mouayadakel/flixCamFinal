@@ -11,10 +11,7 @@ import { updateRecurringSeriesSchema } from '@/lib/validators/recurring.validato
 import { handleApiError } from '@/lib/utils/api-helpers'
 import { UnauthorizedError, NotFoundError } from '@/lib/errors'
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()
@@ -57,10 +54,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()

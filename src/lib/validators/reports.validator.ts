@@ -22,24 +22,23 @@ export const reportPeriodSchema = z.enum(
   }
 )
 
-export const reportFilterSchema = z.object({
-  dateFrom: z.coerce.date({
-    errorMap: () => ({ message: 'تاريخ البداية مطلوب' }),
-  }),
-  dateTo: z.coerce.date({
-    errorMap: () => ({ message: 'تاريخ النهاية مطلوب' }),
-  }),
-  period: reportPeriodSchema.optional(),
-  equipmentIds: z.array(z.string()).optional(),
-  customerIds: z.array(z.string()).optional(),
-  bookingStatuses: z.array(z.string()).optional(),
-  includeCancelled: z.boolean().optional(),
-}).refine(
-  (data) => data.dateTo >= data.dateFrom,
-  {
+export const reportFilterSchema = z
+  .object({
+    dateFrom: z.coerce.date({
+      errorMap: () => ({ message: 'تاريخ البداية مطلوب' }),
+    }),
+    dateTo: z.coerce.date({
+      errorMap: () => ({ message: 'تاريخ النهاية مطلوب' }),
+    }),
+    period: reportPeriodSchema.optional(),
+    equipmentIds: z.array(z.string()).optional(),
+    customerIds: z.array(z.string()).optional(),
+    bookingStatuses: z.array(z.string()).optional(),
+    includeCancelled: z.boolean().optional(),
+  })
+  .refine((data) => data.dateTo >= data.dateFrom, {
     message: 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية',
     path: ['dateTo'],
-  }
-)
+  })
 
 export type ReportFilterInput = z.infer<typeof reportFilterSchema>

@@ -73,8 +73,7 @@ export async function POST(request: NextRequest) {
         : parsed.name
             .toLowerCase()
             .replace(/\s+/g, '-')
-            .replace(/[^a-z0-9-]/g, '')
-      ) || parsed.name.toLowerCase().replace(/\s+/g, '-')
+            .replace(/[^a-z0-9-]/g, '')) || parsed.name.toLowerCase().replace(/\s+/g, '-')
 
     const existing = await prisma.brand.findFirst({
       where: {

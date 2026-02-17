@@ -48,7 +48,9 @@ export async function POST(request: NextRequest) {
   if (!user) {
     const placeholderEmail = `phone_${phone}@${GUEST_EMAIL_DOMAIN}`
     const existingEmail = await prisma.user.findUnique({ where: { email: placeholderEmail } })
-    const email = existingEmail ? `phone_${phone}_${Date.now()}@${GUEST_EMAIL_DOMAIN}` : placeholderEmail
+    const email = existingEmail
+      ? `phone_${phone}_${Date.now()}@${GUEST_EMAIL_DOMAIN}`
+      : placeholderEmail
     const passwordHash = await bcrypt.hash(randomBytes(32).toString('hex'), 10)
     user = await prisma.user.create({
       data: {

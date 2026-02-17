@@ -15,12 +15,9 @@ export const invoiceStatusSchema = z.enum(
   }
 )
 
-export const invoiceTypeSchema = z.enum(
-  ['booking', 'deposit', 'refund', 'adjustment'],
-  {
-    errorMap: () => ({ message: 'نوع الفاتورة غير صالح' }),
-  }
-)
+export const invoiceTypeSchema = z.enum(['booking', 'deposit', 'refund', 'adjustment'], {
+  errorMap: () => ({ message: 'نوع الفاتورة غير صالح' }),
+})
 
 export const invoiceItemSchema = z.object({
   description: z.string().min(1, 'الوصف مطلوب'),
@@ -31,29 +28,26 @@ export const invoiceItemSchema = z.object({
   vatAmount: z.number().min(0).optional(),
 })
 
-export const createInvoiceSchema = z.object({
-  bookingId: z.string().optional(),
-  customerId: z.string().min(1, 'معرف العميل مطلوب'),
-  type: invoiceTypeSchema,
-  issueDate: z.coerce.date({
-    errorMap: () => ({ message: 'تاريخ الإصدار مطلوب' }),
-  }),
-  dueDate: z.coerce.date({
-    errorMap: () => ({ message: 'تاريخ الاستحقاق مطلوب' }),
-  }),
-  items: z
-    .array(invoiceItemSchema)
-    .min(1, 'يجب تحديد عنصر واحد على الأقل'),
-  notes: z.string().optional(),
-  paymentTerms: z.string().optional(),
-  discount: z.number().min(0).optional(),
-}).refine(
-  (data) => data.dueDate >= data.issueDate,
-  {
+export const createInvoiceSchema = z
+  .object({
+    bookingId: z.string().optional(),
+    customerId: z.string().min(1, 'معرف العميل مطلوب'),
+    type: invoiceTypeSchema,
+    issueDate: z.coerce.date({
+      errorMap: () => ({ message: 'تاريخ الإصدار مطلوب' }),
+    }),
+    dueDate: z.coerce.date({
+      errorMap: () => ({ message: 'تاريخ الاستحقاق مطلوب' }),
+    }),
+    items: z.array(invoiceItemSchema).min(1, 'يجب تحديد عنصر واحد على الأقل'),
+    notes: z.string().optional(),
+    paymentTerms: z.string().optional(),
+    discount: z.number().min(0).optional(),
+  })
+  .refine((data) => data.dueDate >= data.issueDate, {
     message: 'تاريخ الاستحقاق يجب أن يكون بعد تاريخ الإصدار',
     path: ['dueDate'],
-  }
-)
+  })
 
 export const updateInvoiceSchema = z.object({
   issueDate: z.coerce.date().optional(),

@@ -7,7 +7,7 @@ description: Validates API contracts before and after changes. Documents current
 
 ## When to Trigger
 
-- Changes to API route files (src/app/api/**/route.ts)
+- Changes to API route files (src/app/api/\*\*/route.ts)
 - Changes to Zod schemas
 - Changes to response types
 - User mentions "API", "endpoint", "route"
@@ -38,17 +38,21 @@ Output:
 ### Endpoint: [METHOD] [path]
 
 #### Request Parameters
+
 [BEFORE/AFTER or unchanged/new/removed]
 
 #### Response Body
+
 BEFORE: [shape]
 AFTER: [shape]
 Breaking: Yes/No | Backwards compatible: Yes/No
 
 #### Affected Clients:
+
 - [Client name]: Compatible / Update needed
 
 #### Migration for Clients:
+
 [Code examples for old vs new usage]
 ```
 

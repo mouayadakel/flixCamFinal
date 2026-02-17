@@ -27,10 +27,7 @@ export async function GET(req: NextRequest) {
     // Check policy
     const policy = await WarehousePolicy.canViewInventory(userId)
     if (!policy.allowed) {
-      return NextResponse.json(
-        { error: policy.reason || 'Forbidden' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: policy.reason || 'Forbidden' }, { status: 403 })
     }
 
     const bookings = await WarehouseService.getReadyForCheckOut(userId)
@@ -41,16 +38,10 @@ export async function GET(req: NextRequest) {
     })
   } catch (error: any) {
     if (error instanceof ForbiddenError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 403 })
     }
 
     console.error('Check-out queue error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

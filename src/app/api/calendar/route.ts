@@ -10,7 +10,13 @@ import { prisma } from '@/lib/db/prisma'
 import { handleApiError } from '@/lib/utils/api-helpers'
 import { UnauthorizedError } from '@/lib/errors'
 
-const CALENDAR_VISIBLE_STATUSES = ['CONFIRMED', 'ACTIVE', 'PAYMENT_PENDING', 'DRAFT', 'RISK_CHECK'] as const
+const CALENDAR_VISIBLE_STATUSES = [
+  'CONFIRMED',
+  'ACTIVE',
+  'PAYMENT_PENDING',
+  'DRAFT',
+  'RISK_CHECK',
+] as const
 
 /**
  * GET /api/calendar - List bookings as calendar events for a date range
@@ -29,7 +35,9 @@ export async function GET(request: NextRequest) {
 
     const now = new Date()
     const from = fromParam ? new Date(fromParam) : new Date(now.getFullYear(), now.getMonth(), 1)
-    const to = toParam ? new Date(toParam) : new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
+    const to = toParam
+      ? new Date(toParam)
+      : new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
 
     const bookings = await prisma.booking.findMany({
       where: {

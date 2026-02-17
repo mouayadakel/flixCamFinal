@@ -61,7 +61,10 @@ interface PaymentsSummary {
   refundedTotal: number
 }
 
-const STATUS_LABELS: Record<PaymentStatus, { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_LABELS: Record<
+  PaymentStatus,
+  { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   PENDING: { ar: 'قيد الانتظار', en: 'Pending', variant: 'outline' },
   PROCESSING: { ar: 'قيد المعالجة', en: 'Processing', variant: 'secondary' },
   SUCCESS: { ar: 'نجح', en: 'Success', variant: 'default' },
@@ -164,17 +167,20 @@ export default function PaymentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">المدفوعات</h1>
-          <p className="text-muted-foreground mt-2">
-            إدارة المدفوعات والاستردادات
-          </p>
+          <p className="mt-2 text-muted-foreground">إدارة المدفوعات والاستردادات</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={filteredPayments.length === 0}>
-            <Download className="h-4 w-4 ml-2" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportCSV}
+            disabled={filteredPayments.length === 0}
+          >
+            <Download className="ml-2 h-4 w-4" />
             تصدير CSV
           </Button>
           <Button onClick={loadPayments} variant="outline">
-            <RefreshCw className="h-4 w-4 ml-2" />
+            <RefreshCw className="ml-2 h-4 w-4" />
             تحديث
           </Button>
         </div>
@@ -188,7 +194,9 @@ export default function PaymentsPage() {
               <DollarSign className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <span className="text-2xl font-bold text-green-600">{formatCurrency(summary.totalCollected)}</span>
+              <span className="text-2xl font-bold text-green-600">
+                {formatCurrency(summary.totalCollected)}
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -197,7 +205,9 @@ export default function PaymentsPage() {
               <Clock className="h-4 w-4 text-amber-600" />
             </CardHeader>
             <CardContent>
-              <span className="text-2xl font-bold text-amber-600">{formatCurrency(summary.pendingAmount)}</span>
+              <span className="text-2xl font-bold text-amber-600">
+                {formatCurrency(summary.pendingAmount)}
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -222,7 +232,7 @@ export default function PaymentsPage() {
       )}
 
       {/* Filters */}
-      <div className="flex gap-4 items-center flex-wrap">
+      <div className="flex flex-wrap items-center gap-4">
         <input
           type="date"
           value={dateFrom}
@@ -240,22 +250,34 @@ export default function PaymentsPage() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="rounded-lg border px-4 py-2"
         >
           {statuses.map((status) => (
             <option key={status} value={status}>
-              {status === 'all' ? 'جميع الحالات' : STATUS_LABELS[status as PaymentStatus]?.ar || status}
+              {status === 'all'
+                ? 'جميع الحالات'
+                : STATUS_LABELS[status as PaymentStatus]?.ar || status}
             </option>
           ))}
         </select>
       </div>
 
       {/* Payments Table */}
-      <div className="border rounded-lg">
+      <div className="rounded-lg border">
         {loading ? (
           <TableSkeleton
             rowCount={5}
-            headers={['رقم الحجز', 'العميل', 'المبلغ', 'طريقة الدفع', 'الحالة', 'مبلغ الاسترداد', 'معرف المعاملة', 'تاريخ الإنشاء', 'الإجراءات']}
+            headers={[
+              'رقم الحجز',
+              'العميل',
+              'المبلغ',
+              'طريقة الدفع',
+              'الحالة',
+              'مبلغ الاسترداد',
+              'معرف المعاملة',
+              'تاريخ الإنشاء',
+              'الإجراءات',
+            ]}
           />
         ) : filteredPayments.length === 0 ? (
           <EmptyState
@@ -299,11 +321,11 @@ export default function PaymentsPage() {
                   <TableCell>
                     {payment.refundAmount ? (
                       <div>
-                        <span className="text-destructive font-medium">
+                        <span className="font-medium text-destructive">
                           {formatCurrency(payment.refundAmount)}
                         </span>
                         {payment.refundReason && (
-                          <div className="text-xs text-muted-foreground mt-1">
+                          <div className="mt-1 text-xs text-muted-foreground">
                             {payment.refundReason}
                           </div>
                         )}
@@ -314,7 +336,7 @@ export default function PaymentsPage() {
                   </TableCell>
                   <TableCell>
                     {payment.tapTransactionId ? (
-                      <div className="text-sm font-mono">
+                      <div className="font-mono text-sm">
                         {payment.tapTransactionId.substring(0, 20)}...
                       </div>
                     ) : (
@@ -326,7 +348,7 @@ export default function PaymentsPage() {
                     <div className="flex gap-2">
                       <Link href={`/admin/payments/${payment.id}`}>
                         <Button size="sm" variant="ghost">
-                          <Eye className="h-4 w-4 ml-1" />
+                          <Eye className="ml-1 h-4 w-4" />
                           عرض
                         </Button>
                       </Link>

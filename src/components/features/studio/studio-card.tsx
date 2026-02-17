@@ -24,19 +24,19 @@ export function StudioCard({ studio }: StudioCardProps) {
   return (
     <Link
       href={`/studios/${studio.slug}`}
-      className="group rounded-lg border bg-card overflow-hidden hover:shadow-md transition-shadow"
+      className="group overflow-hidden rounded-lg border bg-card transition-shadow hover:shadow-md"
     >
-      <div className="aspect-[16/10] relative bg-muted">
+      <div className="relative aspect-[16/10] bg-muted">
         {studio.media[0]?.url ? (
           <Image
             src={studio.media[0].url}
             alt={studio.name}
             fill
-            className="object-cover group-hover:scale-105 transition-transform"
+            className="object-cover transition-transform group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
+          <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
             No image
           </div>
         )}
@@ -46,10 +46,8 @@ export function StudioCard({ studio }: StudioCardProps) {
         {studio.capacity != null && (
           <p className="text-sm text-muted-foreground">Capacity: {studio.capacity}</p>
         )}
-        <p className="text-sm font-medium mt-1">
-          {studio.hourlyRate > 0
-            ? `${Number(studio.hourlyRate).toLocaleString()} SAR / hour`
-            : '—'}
+        <p className="mt-1 text-sm font-medium">
+          {studio.hourlyRate > 0 ? `${Number(studio.hourlyRate).toLocaleString()} SAR / hour` : '—'}
         </p>
       </div>
     </Link>

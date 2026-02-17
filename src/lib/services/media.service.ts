@@ -10,7 +10,14 @@ import { join } from 'path'
 import { existsSync } from 'fs'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml']
+const ALLOWED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/svg+xml',
+]
 const UPLOAD_DIR = join(process.cwd(), 'public', 'uploads', 'equipment')
 
 export interface MediaInput {
@@ -41,7 +48,9 @@ export class MediaService {
     }
 
     if (!ALLOWED_IMAGE_TYPES.includes(mimeType)) {
-      throw new Error(`File type ${mimeType} is not allowed. Allowed types: ${ALLOWED_IMAGE_TYPES.join(', ')}`)
+      throw new Error(
+        `File type ${mimeType} is not allowed. Allowed types: ${ALLOWED_IMAGE_TYPES.join(', ')}`
+      )
     }
 
     // Create upload directory if it doesn't exist
@@ -52,9 +61,10 @@ export class MediaService {
 
     // Generate unique filename
     const timestamp = Date.now()
-    const extension = 'filename' in file 
-      ? file.filename.split('.').pop() || 'jpg'
-      : (file.name.split('.').pop() || 'jpg')
+    const extension =
+      'filename' in file
+        ? file.filename.split('.').pop() || 'jpg'
+        : file.name.split('.').pop() || 'jpg'
     const filename = `${timestamp}-${Math.random().toString(36).substring(7)}.${extension}`
     const filepath = join(equipmentDir, filename)
 

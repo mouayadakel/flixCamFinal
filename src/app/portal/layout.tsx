@@ -11,11 +11,7 @@ import { Button } from '@/components/ui/button'
 import { PortalSidebar } from '@/components/layouts/portal-sidebar'
 import { LogOut } from 'lucide-react'
 
-export default async function PortalLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function PortalLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
 
   if (!session) {
@@ -42,15 +38,13 @@ export default async function PortalLayout({
               }}
             >
               <Button type="submit" variant="ghost" size="sm">
-                <LogOut className="h-4 w-4 ml-2" />
+                <LogOut className="ml-2 h-4 w-4" />
                 تسجيل الخروج
               </Button>
             </form>
           </div>
         </header>
-        <main className="flex-1 px-6 py-8">
-          {children}
-        </main>
+        <main className="flex-1 px-6 py-8">{children}</main>
       </div>
     </div>
   )

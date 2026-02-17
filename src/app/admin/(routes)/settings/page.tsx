@@ -28,7 +28,7 @@ export default function SettingsPage() {
     <div className="space-y-6" dir="rtl">
       <div>
         <h1 className="text-3xl font-bold">الإعدادات</h1>
-        <p className="text-muted-foreground mt-1">إدارة تكاملات المنصة وإعدادات الحساب</p>
+        <p className="mt-1 text-muted-foreground">إدارة تكاملات المنصة وإعدادات الحساب</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

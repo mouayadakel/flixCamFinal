@@ -68,7 +68,9 @@ export default function DamageClaimDetailPage() {
   const [claim, setClaim] = useState<Claim | null>(null)
   const [loading, setLoading] = useState(true)
   const [resolveOpen, setResolveOpen] = useState(false)
-  const [resolveStatus, setResolveStatus] = useState<'APPROVED' | 'REJECTED' | 'RESOLVED'>('RESOLVED')
+  const [resolveStatus, setResolveStatus] = useState<'APPROVED' | 'REJECTED' | 'RESOLVED'>(
+    'RESOLVED'
+  )
   const [resolveResolution, setResolveResolution] = useState('')
   const [actualCost, setActualCost] = useState('')
   const [customerNotified, setCustomerNotified] = useState(false)
@@ -100,7 +102,11 @@ export default function DamageClaimDetailPage() {
 
   const handleResolve = async () => {
     if (!claim || !resolveResolution.trim()) {
-      toast({ title: 'Error', description: 'Resolution notes are required', variant: 'destructive' })
+      toast({
+        title: 'Error',
+        description: 'Resolution notes are required',
+        variant: 'destructive',
+      })
       return
     }
     setSubmitting(true)
@@ -153,26 +159,25 @@ export default function DamageClaimDetailPage() {
           </Link>
         </Button>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <AlertTriangle className="h-8 w-8" />
             Damage Claim
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             {claim.booking?.bookingNumber && (
               <>
                 Booking{' '}
-                <Link href={`/admin/bookings/${claim.bookingId}`} className="text-primary hover:underline">
+                <Link
+                  href={`/admin/bookings/${claim.bookingId}`}
+                  className="text-primary hover:underline"
+                >
                   #{claim.booking.bookingNumber}
                 </Link>
               </>
             )}
           </p>
         </div>
-        {canResolve && (
-          <Button onClick={() => setResolveOpen(true)}>
-            Resolve Claim
-          </Button>
-        )}
+        {canResolve && <Button onClick={() => setResolveOpen(true)}>Resolve Claim</Button>}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -188,7 +193,9 @@ export default function DamageClaimDetailPage() {
             </div>
             <div>
               <Label className="text-muted-foreground">Severity</Label>
-              <p><Badge>{claim.severity}</Badge></p>
+              <p>
+                <Badge>{claim.severity}</Badge>
+              </p>
             </div>
             <div>
               <Label className="text-muted-foreground">Description</Label>
@@ -197,9 +204,15 @@ export default function DamageClaimDetailPage() {
             {claim.photos && Array.isArray(claim.photos) && claim.photos.length > 0 && (
               <div>
                 <Label className="text-muted-foreground">Photos</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="mt-2 flex flex-wrap gap-2">
                   {claim.photos.map((url, i) => (
-                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                    <a
+                      key={i}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline"
+                    >
                       Photo {i + 1}
                     </a>
                   ))}
@@ -227,22 +240,23 @@ export default function DamageClaimDetailPage() {
             )}
             <div>
               <Label className="text-muted-foreground">Status</Label>
-              <p><Badge>{claim.status}</Badge></p>
+              <p>
+                <Badge>{claim.status}</Badge>
+              </p>
             </div>
             {claim.resolution && (
               <div>
                 <Label className="text-muted-foreground">Resolution</Label>
                 <p className="whitespace-pre-wrap">{claim.resolution}</p>
                 {claim.resolvedAt && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Resolved {formatDate(claim.resolvedAt)} {claim.resolver?.name && `by ${claim.resolver.name}`}
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Resolved {formatDate(claim.resolvedAt)}{' '}
+                    {claim.resolver?.name && `by ${claim.resolver.name}`}
                   </p>
                 )}
               </div>
             )}
-            {claim.insuranceClaim && (
-              <p className="text-sm text-amber-600">Insurance claim</p>
-            )}
+            {claim.insuranceClaim && <p className="text-sm text-amber-600">Insurance claim</p>}
           </CardContent>
         </Card>
       </div>
@@ -256,7 +270,10 @@ export default function DamageClaimDetailPage() {
             <div>
               <Label className="text-muted-foreground">Equipment</Label>
               <p>
-                <Link href={`/admin/inventory/equipment/${claim.equipment.id}`} className="text-primary hover:underline">
+                <Link
+                  href={`/admin/inventory/equipment/${claim.equipment.id}`}
+                  className="text-primary hover:underline"
+                >
                   {claim.equipment.sku} {claim.equipment.model ?? ''}
                 </Link>
               </p>
@@ -266,7 +283,10 @@ export default function DamageClaimDetailPage() {
             <div>
               <Label className="text-muted-foreground">Studio</Label>
               <p>
-                <Link href={`/admin/studios/${claim.studio.id}`} className="text-primary hover:underline">
+                <Link
+                  href={`/admin/studios/${claim.studio.id}`}
+                  className="text-primary hover:underline"
+                >
                   {claim.studio.name}
                 </Link>
               </p>
@@ -286,12 +306,17 @@ export default function DamageClaimDetailPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Resolve claim</DialogTitle>
-            <DialogDescription>Set resolution status and notes. Actual cost is optional.</DialogDescription>
+            <DialogDescription>
+              Set resolution status and notes. Actual cost is optional.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label>Outcome</Label>
-              <Select value={resolveStatus} onValueChange={(v) => setResolveStatus(v as 'APPROVED' | 'REJECTED' | 'RESOLVED')}>
+              <Select
+                value={resolveStatus}
+                onValueChange={(v) => setResolveStatus(v as 'APPROVED' | 'REJECTED' | 'RESOLVED')}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -333,7 +358,9 @@ export default function DamageClaimDetailPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setResolveOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setResolveOpen(false)}>
+              Cancel
+            </Button>
             <Button onClick={handleResolve} disabled={submitting || !resolveResolution.trim()}>
               {submitting ? 'Saving...' : 'Resolve'}
             </Button>

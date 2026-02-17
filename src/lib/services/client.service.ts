@@ -9,11 +9,7 @@
 import { prisma } from '@/lib/db/prisma'
 import { AuditService } from './audit.service'
 import { EventBus } from '@/lib/events/event-bus'
-import {
-  NotFoundError,
-  ValidationError,
-  ForbiddenError,
-} from '@/lib/errors'
+import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission } from '@/lib/auth/permissions'
 import { UserRole } from '@prisma/client'
 import { hashPassword } from '@/lib/auth/auth-helpers'
@@ -26,7 +22,7 @@ import type {
 
 /**
  * Client Service
- * 
+ *
  * Manages client users (users with DATA_ENTRY role or other client roles)
  */
 export class ClientService {
@@ -367,10 +363,7 @@ export class ClientService {
     })
 
     const totalBookings = bookings.length
-    const totalSpent = bookings.reduce(
-      (sum, booking) => sum + Number(booking.totalAmount),
-      0
-    )
+    const totalSpent = bookings.reduce((sum, booking) => sum + Number(booking.totalAmount), 0)
     const lastBookingDate = bookings.length > 0 ? bookings[0].createdAt : null
 
     return {

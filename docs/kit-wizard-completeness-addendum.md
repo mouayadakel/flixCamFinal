@@ -3,6 +3,7 @@
 ## ✅ What Was Covered
 
 ### From Original Audit (Addressed):
+
 1. ✅ Visual Design issues - Comprehensive redesign with platform tokens
 2. ✅ UX Flow problems - Multi-path wizard, progressive disclosure
 3. ✅ Localization/RTL - Arabic-first approach, logical properties
@@ -15,6 +16,7 @@
 10. ✅ Mobile optimization - Bottom sheets, gestures, responsive design
 
 ### Strategic Additions (Beyond Audit):
+
 11. ✅ AI-powered intelligence layer
 12. ✅ Visual innovations (3D, canvas, previews)
 13. ✅ Social proof integration
@@ -273,7 +275,7 @@ describe('Kit Compatibility Logic', () => {
   test('detects Canon lens on Sony body incompatibility', () => {
     const kit = {
       camera: { id: '1', brand: 'Sony', mount: 'E-mount' },
-      lens: { id: '2', brand: 'Canon', mount: 'EF' }
+      lens: { id: '2', brand: 'Canon', mount: 'EF' },
     }
     const result = checkCompatibility(kit)
     expect(result.issues).toHaveLength(1)
@@ -289,7 +291,7 @@ describe('Kit Pricing Calculations', () => {
   test('calculates daily rate correctly', () => {
     const kit = [
       { id: '1', dailyPrice: 100, quantity: 2 },
-      { id: '2', dailyPrice: 50, quantity: 1 }
+      { id: '2', dailyPrice: 50, quantity: 1 },
     ]
     const total = calculateDailyTotal(kit)
     expect(total).toBe(250) // (100*2) + (50*1)
@@ -298,7 +300,7 @@ describe('Kit Pricing Calculations', () => {
   test('applies duration-based discounts', () => {
     const baseRate = 1000
     expect(applyDurationDiscount(baseRate, 1)).toBe(1000) // 0%
-    expect(applyDurationDiscount(baseRate, 7)).toBe(850)  // 15%
+    expect(applyDurationDiscount(baseRate, 7)).toBe(850) // 15%
     expect(applyDurationDiscount(baseRate, 30)).toBe(670) // 33%
   })
 })
@@ -321,7 +323,7 @@ describe('Kit Wizard API Integration', () => {
   test('fetches project-based suggestions', async () => {
     const response = await fetch('/api/kits/suggest', {
       method: 'POST',
-      body: JSON.stringify({ projectType: 'wedding-photography' })
+      body: JSON.stringify({ projectType: 'wedding-photography' }),
     })
     const data = await response.json()
     expect(data.recommended).toHaveLength(5)
@@ -332,8 +334,8 @@ describe('Kit Wizard API Integration', () => {
     const response = await fetch('/api/equipment/compatibility', {
       method: 'POST',
       body: JSON.stringify({
-        equipmentIds: ['canon-5d', 'sony-lens', 'rode-mic']
-      })
+        equipmentIds: ['canon-5d', 'sony-lens', 'rode-mic'],
+      }),
     })
     const data = await response.json()
     expect(data.compatible).toBe(false)
@@ -348,29 +350,29 @@ describe('Kit Wizard API Integration', () => {
 test('complete kit building flow', async ({ page }) => {
   // Navigate to kit wizard
   await page.goto('/build-your-kit')
-  
+
   // Step 1: Select project type
   await page.click('[data-testid="project-wedding"]')
   await page.click('button:has-text("Next")')
-  
+
   // Step 2: Review AI suggestions and add items
   await expect(page.locator('[data-testid="suggested-equipment"]')).toBeVisible()
   await page.click('[data-testid="add-equipment-1"]')
   await page.click('[data-testid="add-equipment-2"]')
   await page.click('button:has-text("Next")')
-  
+
   // Step 3: Select duration
   await page.fill('[data-testid="duration-input"]', '7')
   await page.click('button:has-text("Next")')
-  
+
   // Step 4: Review summary
   await expect(page.locator('[data-testid="kit-summary"]')).toBeVisible()
   const total = await page.locator('[data-testid="total-price"]').textContent()
   expect(total).toContain('SAR')
-  
+
   // Add to cart
   await page.click('button:has-text("Add to Cart")')
-  
+
   // Verify redirect and cart contents
   await expect(page).toHaveURL(/\/cart/)
   await expect(page.locator('[data-testid="cart-items"]')).toContainText('Wedding')
@@ -378,35 +380,35 @@ test('complete kit building flow', async ({ page }) => {
 
 test('compatibility warning flow', async ({ page }) => {
   await page.goto('/build-your-kit')
-  
+
   // Add incompatible items
   await page.click('[data-testid="category-cameras"]')
   await page.click('[data-testid="add-sony-a7"]')
   await page.click('[data-testid="category-lenses"]')
   await page.click('[data-testid="add-canon-ef-lens"]')
-  
+
   // Expect compatibility warning
   await expect(page.locator('[data-testid="compatibility-warning"]')).toBeVisible()
   await expect(page.locator('text=requires adapter')).toBeVisible()
-  
+
   // Accept suggestion
   await page.click('button:has-text("Add adapter")')
-  
+
   // Warning should disappear
   await expect(page.locator('[data-testid="compatibility-warning"]')).not.toBeVisible()
 })
 
 test('mobile swipe navigation', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'Mobile only test')
-  
+
   await page.goto('/build-your-kit')
   await page.click('[data-testid="category-cameras"]')
-  
+
   const equipmentCard = page.locator('[data-testid="equipment-card"]').first()
-  
+
   // Swipe left to next equipment
   await equipmentCard.swipe('left', { distance: 200 })
-  
+
   // Verify next item is visible
   await expect(page.locator('[data-testid="equipment-card"]:nth-child(2)')).toBeInViewport()
 })
@@ -420,34 +422,34 @@ import { checkA11y, injectAxe } from 'axe-playwright'
 test('kit wizard meets WCAG 2.1 AA', async ({ page }) => {
   await page.goto('/build-your-kit')
   await injectAxe(page)
-  
+
   // Check initial page
   await checkA11y(page, null, {
     detailedReport: true,
-    detailedReportOptions: { html: true }
+    detailedReportOptions: { html: true },
   })
-  
+
   // Navigate through steps
   await page.click('button:has-text("Next")')
   await checkA11y(page)
-  
+
   await page.click('button:has-text("Next")')
   await checkA11y(page)
 })
 
 test('keyboard navigation works', async ({ page }) => {
   await page.goto('/build-your-kit')
-  
+
   // Tab through all interactive elements
   await page.keyboard.press('Tab')
   await expect(page.locator('[data-testid="project-wedding"]')).toBeFocused()
-  
+
   await page.keyboard.press('Tab')
   await expect(page.locator('[data-testid="project-documentary"]')).toBeFocused()
-  
+
   // Select with Enter
   await page.keyboard.press('Enter')
-  
+
   // Alt+Right arrow for next step
   await page.keyboard.press('Alt+ArrowRight')
   await expect(page.locator('h2:has-text("Choose Equipment")')).toBeVisible()
@@ -464,23 +466,23 @@ test('kit wizard loads in under 2 seconds', async ({ page }) => {
   await page.goto('/build-your-kit')
   await page.waitForSelector('[data-testid="project-type-grid"]')
   const loadTime = Date.now() - startTime
-  
+
   expect(loadTime).toBeLessThan(2000)
 })
 
 test('equipment list virtualizes for large datasets', async ({ page }) => {
   await page.goto('/build-your-kit')
   await page.click('[data-testid="category-cameras"]') // Assume 100+ items
-  
+
   // Only visible items should be in DOM
   const renderedItems = await page.locator('[data-testid="equipment-card"]').count()
   expect(renderedItems).toBeLessThan(20) // Virtual scrolling active
-  
+
   // Scroll and verify new items load
-  await page.locator('[data-testid="equipment-list"]').evaluate(el => {
+  await page.locator('[data-testid="equipment-list"]').evaluate((el) => {
     el.scrollTop = el.scrollHeight
   })
-  
+
   await page.waitForTimeout(100)
   const newItems = await page.locator('[data-testid="equipment-card"]').count()
   expect(newItems).toBeGreaterThan(renderedItems)
@@ -505,18 +507,18 @@ export const ProjectTypeSchema = z.enum([
   'music-video',
   'event',
   'travel-vlog',
-  'custom'
+  'custom',
 ])
 
 export const EquipmentSelectionSchema = z.object({
   equipmentId: z.string().uuid(),
-  quantity: z.number().int().min(1).max(10)
+  quantity: z.number().int().min(1).max(10),
 })
 
 export const DurationSchema = z.object({
   days: z.number().int().min(1).max(365),
   startDate: z.date().optional(),
-  endDate: z.date().optional()
+  endDate: z.date().optional(),
 })
 
 export const KitWizardStateSchema = z.object({
@@ -524,18 +526,18 @@ export const KitWizardStateSchema = z.object({
   categoryId: z.string().uuid().optional(),
   selectedEquipment: z.array(EquipmentSelectionSchema).max(50),
   duration: DurationSchema,
-  step: z.number().int().min(1).max(4)
+  step: z.number().int().min(1).max(4),
 })
 
 // Use in API endpoints
 export async function POST(req: Request) {
   const body = await req.json()
   const validated = KitWizardStateSchema.safeParse(body)
-  
+
   if (!validated.success) {
     return Response.json({ error: validated.error }, { status: 400 })
   }
-  
+
   // Proceed with validated data
 }
 ```
@@ -555,24 +557,22 @@ const ratelimit = new Ratelimit({
 
 export async function POST(req: Request) {
   const ip = req.headers.get('x-forwarded-for') ?? '127.0.0.1'
-  const { success, limit, reset, remaining } = await ratelimit.limit(
-    `kit_suggest_${ip}`
-  )
-  
+  const { success, limit, reset, remaining } = await ratelimit.limit(`kit_suggest_${ip}`)
+
   if (!success) {
     return Response.json(
       { error: 'Too many requests' },
-      { 
+      {
         status: 429,
         headers: {
           'X-RateLimit-Limit': limit.toString(),
           'X-RateLimit-Remaining': remaining.toString(),
-          'X-RateLimit-Reset': reset.toString()
-        }
+          'X-RateLimit-Reset': reset.toString(),
+        },
       }
     )
   }
-  
+
   // Process request
 }
 ```
@@ -581,29 +581,26 @@ export async function POST(req: Request) {
 
 ```typescript
 // Ensure user can only modify their own kit templates
-export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession()
-  
+
   if (!session?.user?.id) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  
+
   const template = await db.kitTemplate.findUnique({
     where: { id: params.id },
-    select: { userId: true }
+    select: { userId: true },
   })
-  
+
   if (!template) {
     return Response.json({ error: 'Not found' }, { status: 404 })
   }
-  
+
   if (template.userId !== session.user.id) {
     return Response.json({ error: 'Forbidden' }, { status: 403 })
   }
-  
+
   await db.kitTemplate.delete({ where: { id: params.id } })
   return Response.json({ success: true })
 }
@@ -619,10 +616,10 @@ function sanitizeKitTemplate(template: KitTemplateInput) {
   return {
     ...template,
     name: DOMPurify.sanitize(template.name, { ALLOWED_TAGS: [] }),
-    description: DOMPurify.sanitize(template.description, { 
+    description: DOMPurify.sanitize(template.description, {
       ALLOWED_TAGS: ['p', 'br', 'strong', 'em'],
-      ALLOWED_ATTR: []
-    })
+      ALLOWED_ATTR: [],
+    }),
   }
 }
 ```
@@ -639,19 +636,19 @@ import { redis } from '@/lib/redis'
 
 export async function fetchProjectSuggestions(projectType: string) {
   const cacheKey = `kit:suggestions:${projectType}`
-  
+
   // Check cache first
   const cached = await redis.get(cacheKey)
   if (cached) {
     return JSON.parse(cached)
   }
-  
+
   // Compute suggestions (expensive AI call)
   const suggestions = await computeAISuggestions(projectType)
-  
+
   // Cache for 1 hour
   await redis.setex(cacheKey, 3600, JSON.stringify(suggestions))
-  
+
   return suggestions
 }
 
@@ -675,7 +672,7 @@ module.exports = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days for equipment images
   },
-  
+
   // Static asset caching
   async headers() {
     return [
@@ -684,12 +681,12 @@ module.exports = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, s-maxage=300, stale-while-revalidate=600'
-          }
-        ]
-      }
+            value: 'public, s-maxage=300, stale-while-revalidate=600',
+          },
+        ],
+      },
     ]
-  }
+  },
 }
 ```
 
@@ -703,7 +700,7 @@ export function KitWizard() {
   const addToCart = async () => {
     try {
       const result = await api.cart.addKit(wizardState)
-      
+
       if (!result.success) {
         // Track business logic failures
         Sentry.captureMessage('Kit add to cart failed', {
@@ -711,15 +708,15 @@ export function KitWizard() {
           extra: {
             kitItems: wizardState.selectedEquipment.length,
             totalValue: wizardState.total,
-            errorCode: result.error
-          }
+            errorCode: result.error,
+          },
         })
       }
     } catch (error) {
       // Track unexpected errors
       Sentry.captureException(error, {
         tags: { feature: 'kit-wizard' },
-        extra: { step: currentStep }
+        extra: { step: currentStep },
       })
     }
   }
@@ -731,7 +728,7 @@ import { datadogRum } from '@datadog/browser-rum'
 datadogRum.addAction('kit_wizard_step_completed', {
   step: currentStep,
   duration_ms: stepDuration,
-  items_selected: selectedEquipment.length
+  items_selected: selectedEquipment.length,
 })
 ```
 
@@ -746,7 +743,7 @@ export function KitWizard() {
   const showAISuggestions = ldClient?.variation('kit-ai-suggestions', false)
   const show3DModels = ldClient?.variation('kit-3d-models', false)
   const enableCollaboration = ldClient?.variation('kit-collaboration', false)
-  
+
   return (
     <>
       {showAISuggestions && <ProjectBasedSuggestions />}
@@ -764,18 +761,21 @@ export function KitWizard() {
 #### 5.1 Phased Rollout Strategy
 
 **Phase 1: Internal Testing (Week 1)**
+
 - Deploy to staging environment
 - Internal team testing (5-10 users)
 - Fix critical bugs
 - Performance benchmarking
 
 **Phase 2: Beta Testing (Week 2-3)**
+
 - Invite 50 trusted customers
 - Feature flag: `kit-wizard-beta` = true for selected users
 - Collect feedback via in-app surveys
 - Monitor error rates, completion rates
 
 **Phase 3: Soft Launch (Week 4-5)**
+
 - Enable for 25% of traffic
 - A/B test: New wizard vs. old flow
 - Monitor key metrics:
@@ -785,6 +785,7 @@ export function KitWizard() {
   - Customer support tickets
 
 **Phase 4: Full Rollout (Week 6)**
+
 - Enable for 100% if metrics positive
 - Deprecate old flow
 - Marketing announcement
@@ -795,9 +796,9 @@ export function KitWizard() {
 // Migrate existing saved searches to kit templates
 async function migrateUserData() {
   const users = await db.user.findMany({
-    include: { savedSearches: true }
+    include: { savedSearches: true },
   })
-  
+
   for (const user of users) {
     for (const search of user.savedSearches) {
       // Convert old saved search to new kit template
@@ -808,12 +809,12 @@ async function migrateUserData() {
           description: 'Auto-migrated from saved search',
           projectType: inferProjectType(search.filters),
           items: {
-            create: search.equipmentIds.map(id => ({
+            create: search.equipmentIds.map((id) => ({
               equipmentId: id,
-              quantity: 1
-            }))
-          }
-        }
+              quantity: 1,
+            })),
+          },
+        },
       })
     }
   }
@@ -874,7 +875,7 @@ if (errorRate > 5% || completionRate < 10%) {
 
 #### 6.2 Developer Documentation
 
-```markdown
+````markdown
 # Kit Wizard Developer Guide
 
 ## Architecture Overview
@@ -883,6 +884,7 @@ The Kit Wizard is a multi-step form component with intelligent recommendations
 and real-time compatibility checking.
 
 ### File Structure
+
 - `/app/(public)/build-your-kit/page.tsx` - Page wrapper
 - `/components/features/kit-wizard/` - Main feature components
 - `/lib/stores/kit-wizard.store.ts` - Zustand state management
@@ -901,6 +903,7 @@ checks lens mounts, audio connections, and power requirements.
 
 **3. State Management**
 Zustand store with persistence enables:
+
 - Resume interrupted sessions
 - Undo/redo functionality
 - URL-based sharing of configurations
@@ -908,12 +911,15 @@ Zustand store with persistence enables:
 ### Adding New Project Types
 
 1. Add to database:
+
 ```sql
 INSERT INTO project_types (slug, name_en, name_ar, icon_name)
 VALUES ('music-video', 'Music Video', 'فيديو موسيقي', 'Music');
 ```
+````
 
 2. Add translation keys:
+
 ```json
 {
   "kit": {
@@ -928,21 +934,23 @@ VALUES ('music-video', 'Music Video', 'فيديو موسيقي', 'Music');
 ```
 
 3. Configure recommendations:
+
 ```typescript
 // lib/config/project-recommendations.ts
 export const PROJECT_RECOMMENDATIONS = {
   'music-video': {
     required: ['cinema-camera', 'stabilizer', 'lighting-kit'],
     optional: ['drone', 'slider', 'fog-machine'],
-    budgetRange: [500, 2000]
-  }
+    budgetRange: [500, 2000],
+  },
 }
 ```
 
 ### API Reference
 
 See `/docs/api/kit-endpoints.md` for detailed API documentation.
-```
+
+````
 
 ---
 
@@ -954,13 +962,13 @@ See `/docs/api/kit-endpoints.md` for detailed API documentation.
 // User consent for analytics tracking
 export function KitWizard() {
   const { hasConsent } = useCookieConsent()
-  
+
   const trackEvent = (event: string, data: any) => {
     if (hasConsent) {
       analytics.track(event, data)
     }
   }
-  
+
   // Track only with consent
   useEffect(() => {
     trackEvent('Kit Wizard Viewed', { timestamp: Date.now() })
@@ -973,11 +981,11 @@ export async function exportUserKitData(userId: string) {
     where: { userId },
     include: { items: { include: { equipment: true } } }
   })
-  
+
   const sharedKits = await db.sharedKit.findMany({
     where: { ownerUserId: userId }
   })
-  
+
   return {
     templates: templates.map(t => ({
       name: t.name,
@@ -991,13 +999,14 @@ export async function exportUserKitData(userId: string) {
     }))
   }
 }
-```
+````
 
 #### 7.2 Terms of Service Considerations
 
 **Legal review needed for:**
 
 1. **Equipment Recommendations Disclaimer**
+
    ```
    "Suggestions are provided for convenience and do not guarantee
    suitability for your specific project. Always verify equipment
@@ -1005,6 +1014,7 @@ export async function exportUserKitData(userId: string) {
    ```
 
 2. **User-Generated Content (Comments on Shared Kits)**
+
    ```
    "By posting comments, you grant FlixCam.rent a non-exclusive
    license to display your content. You are responsible for
@@ -1052,7 +1062,7 @@ Hi [Customer Name],
 
 I see you're having trouble with equipment compatibility in the Kit Wizard.
 
-This happens when selected items aren't designed to work together (e.g., 
+This happens when selected items aren't designed to work together (e.g.,
 Canon lens with Sony camera). Here's how to resolve it:
 
 1. Look for the yellow warning badge next to the incompatible item
@@ -1113,6 +1123,7 @@ Best,
 ## ✅ Completeness Checklist Summary
 
 ### Now Covered (After Addendum):
+
 - ✅ Backend API requirements
 - ✅ Database schema changes
 - ✅ Testing strategy (unit, integration, e2e, a11y, performance)
@@ -1124,6 +1135,7 @@ Best,
 - ✅ Customer support preparation
 
 ### Still Potentially Missing:
+
 - ⚠️ **Budget & Resource Allocation** - How many dev hours per sprint?
 - ⚠️ **Vendor Integrations** - If using third-party AI (OpenAI, Anthropic)?
 - ⚠️ **Localization Workflow** - How to manage 3 languages (en/ar/zh)?
@@ -1137,6 +1149,7 @@ Best,
 **YES** - For a **technical implementation plan**.
 
 The strategic document + this addendum now covers:
+
 - ✅ Product strategy & UX vision
 - ✅ Technical architecture
 - ✅ Testing & quality assurance
@@ -1145,6 +1158,7 @@ The strategic document + this addendum now covers:
 - ✅ Rollout & risk mitigation
 
 **For actual development**, you still need:
+
 - Project management (Jira tickets, sprint planning)
 - Design mockups (Figma files)
 - Content writing (help articles, tooltips)

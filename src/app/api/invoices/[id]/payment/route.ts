@@ -13,10 +13,7 @@ import { InvoicePolicy } from '@/lib/policies/invoice.policy'
 import { invoicePaymentSchema } from '@/lib/validators/invoice.validator'
 import { ValidationError, ForbiddenError } from '@/lib/errors'
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
 
@@ -29,10 +26,7 @@ export async function POST(
     // Check policy
     const policy = await InvoicePolicy.canMarkPaid(userId)
     if (!policy.allowed) {
-      return NextResponse.json(
-        { error: policy.reason || 'Forbidden' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: policy.reason || 'Forbidden' }, { status: 403 })
     }
 
     const body = await req.json()
@@ -54,17 +48,11 @@ export async function POST(
     })
   } catch (error: any) {
     if (error instanceof ValidationError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     if (error instanceof ForbiddenError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 403 })
     }
 
     if (error.name === 'ZodError') {
@@ -75,9 +63,6 @@ export async function POST(
     }
 
     console.error('Record payment error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

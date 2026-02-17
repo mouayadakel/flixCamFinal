@@ -26,10 +26,10 @@ export const createRecurringSeriesSchema = z
       notes: z.string().max(500).optional().nullable(),
     }),
   })
-  .refine(
-    (data) => data.endDate != null || data.occurrenceCount != null,
-    { message: 'Either endDate or occurrenceCount is required', path: ['endDate'] }
-  )
+  .refine((data) => data.endDate != null || data.occurrenceCount != null, {
+    message: 'Either endDate or occurrenceCount is required',
+    path: ['endDate'],
+  })
 
 export const updateRecurringSeriesSchema = z.object({
   name: z.string().min(1).max(120).optional(),

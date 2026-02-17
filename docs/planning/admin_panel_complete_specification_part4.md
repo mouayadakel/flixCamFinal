@@ -5,6 +5,7 @@
 ## 5.1 `/admin/studios` - تحويل كامل من Mock إلى Live
 
 ### **الوضع الحالي:**
+
 - ❌ Mock Data بالكامل
 - ❌ لا توجد إدارة حقيقية
 - ❌ لا توجد قاعدة بيانات
@@ -15,13 +16,13 @@
 StudiosManagement {
   list: {
     studios: Studio[]
-    
+
     Studio: {
       id: string
       name: string
       slug: string
       status: "active" | "inactive" | "maintenance"
-      
+
       location: {
         address: string
         city: string
@@ -30,12 +31,12 @@ StudiosManagement {
         directions: string
         mapUrl: string
       }
-      
+
       specifications: {
         size: number // sqm
         capacity: number // people
         height: number // meters
-        
+
         features: {
           naturalLight: boolean
           soundproof: boolean
@@ -46,7 +47,7 @@ StudiosManagement {
           bathroom: boolean
           changingRoom: boolean
         }
-        
+
         equipment: {
           lighting: string[]
           backdrops: string[]
@@ -54,7 +55,7 @@ StudiosManagement {
           other: string[]
         }
       }
-      
+
       media: {
         images: {
           url: string
@@ -66,7 +67,7 @@ StudiosManagement {
         virtualTour: string
         floorPlan: string
       }
-      
+
       pricing: {
         hourly: number
         halfDay: {
@@ -77,18 +78,18 @@ StudiosManagement {
           hours: number
           price: number
         }
-        
+
         overtime: {
           perHour: number
           gracePeriod: number // minutes
         }
-        
+
         deposit: {
           required: boolean
           amount: number
         }
       }
-      
+
       availability: {
         operatingHours: {
           [day: string]: {
@@ -98,34 +99,34 @@ StudiosManagement {
             breaks: { start: string, end: string }[]
           }
         }
-        
+
         bufferTime: number // minutes between sessions
-        
+
         maintenanceSchedule: {
           startDate: Date
           endDate: Date
           reason: string
         }[]
-        
+
         blackoutDates: Date[]
       }
-      
+
       addons: {
         addonId: string
         name: string
         price: number
         available: boolean
       }[]
-      
+
       policies: {
         cancellation: string
         lateFee: number
         cleaningFee: number
         damageDeposit: number
-        
+
         rules: string[]
       }
-      
+
       stats: {
         totalBookings: number
         totalRevenue: number
@@ -136,7 +137,7 @@ StudiosManagement {
       }
     }
   }
-  
+
   create: {
     wizard: {
       steps: [
@@ -151,7 +152,7 @@ StudiosManagement {
       progress: number
       saveProgress: boolean
     }
-    
+
     basicInfo: {
       name: string
       description: string
@@ -159,7 +160,7 @@ StudiosManagement {
       status: "draft" | "active"
       tags: string[]
     }
-    
+
     location: {
       address: {
         street: string
@@ -168,13 +169,13 @@ StudiosManagement {
         city: string
         country: string
       }
-      
+
       coordinates: {
         lat: number
         lng: number
         getFromMap: boolean
       }
-      
+
       accessInfo: {
         parkingAvailable: boolean
         parkingNotes: string
@@ -183,7 +184,7 @@ StudiosManagement {
         entryInstructions: string
       }
     }
-    
+
     specifications: {
       dimensions: {
         length: number
@@ -191,13 +192,13 @@ StudiosManagement {
         height: number
         totalArea: number // calculated
       }
-      
+
       capacity: {
         seated: number
         standing: number
         crew: number
       }
-      
+
       features: {
         category: "lighting" | "sound" | "comfort" | "tech"
         items: {
@@ -206,7 +207,7 @@ StudiosManagement {
           notes: string
         }[]
       }[]
-      
+
       includedEquipment: {
         lighting: string[]
         audio: string[]
@@ -214,14 +215,14 @@ StudiosManagement {
         accessories: string[]
         furniture: string[]
       }
-      
+
       optionalEquipment: {
         // equipment that can be added for extra fee
         equipmentId: string
         price: number
       }[]
     }
-    
+
     mediaGallery: {
       images: {
         upload: FileUpload[]
@@ -233,64 +234,64 @@ StudiosManagement {
           formats: ["jpg", "png", "webp"]
         }
       }
-      
+
       videos: {
         url: string
         thumbnail: string
         platform: "youtube" | "vimeo" | "direct"
       }[]
-      
+
       documents: {
         floorPlan: File
         brochure: File
         virtualTour: string // URL
       }
     }
-    
+
     pricing: {
       baseRates: {
         hourly: {
           rate: number
           minimumHours: number
         }
-        
+
         halfDay: {
           hours: number
           rate: number
           discount: number // % vs hourly
         }
-        
+
         fullDay: {
           hours: number
           rate: number
           discount: number // % vs hourly
         }
       }
-      
+
       additionalCharges: {
         overtime: {
           enabled: boolean
           rate: number
           gracePeriod: number // minutes
         }
-        
+
         setup: {
           fee: number
           included: boolean
         }
-        
+
         cleaning: {
           fee: number
           refundable: boolean
         }
       }
-      
+
       deposits: {
         booking: {
           type: "percentage" | "fixed"
           amount: number
         }
-        
+
         damage: {
           required: boolean
           amount: number
@@ -298,7 +299,7 @@ StudiosManagement {
         }
       }
     }
-    
+
     schedule: {
       operatingHours: {
         monday: { open: string, close: string, closed: boolean }
@@ -309,30 +310,30 @@ StudiosManagement {
         saturday: { open: string, close: string, closed: boolean }
         sunday: { open: string, close: string, closed: boolean }
       }
-      
+
       breaks: {
         day: string
         start: string
         end: string
         reason: string
       }[]
-      
+
       bufferTime: {
         between: number // minutes between bookings
         setup: number // before first booking
         cleanup: number // after last booking
       }
-      
+
       advanceBooking: {
         minimum: number // hours
         maximum: number // days
       }
     }
-    
+
     policies: {
       cancellation: {
         policy: "standard" | "flexible" | "strict" | "custom"
-        
+
         custom: {
           fullRefund: number // hours before
           partialRefund: {
@@ -342,17 +343,17 @@ StudiosManagement {
           noRefund: number // hours before
         }
       }
-      
+
       usage: {
         maxOccupancy: number
         allowFood: boolean
         allowDrinks: boolean
         smokingAllowed: boolean
         petsAllowed: boolean
-        
+
         restrictions: string[]
       }
-      
+
       liability: {
         insuranceRequired: boolean
         waiverRequired: boolean
@@ -361,21 +362,21 @@ StudiosManagement {
       }
     }
   }
-  
+
   analytics: {
     overview: {
       totalRevenue: number
       totalBookings: number
       occupancyRate: number
       avgBookingValue: number
-      
+
       trends: {
         revenue: ChartData[]
         bookings: ChartData[]
         occupancy: ChartData[]
       }
     }
-    
+
     utilization: {
       byDayOfWeek: {
         day: string
@@ -383,49 +384,49 @@ StudiosManagement {
         hours: number
         revenue: number
       }[]
-      
+
       byHour: {
         hour: number
         frequency: number
         avgRevenue: number
       }[]
-      
+
       byDuration: {
         duration: string // "1-2h", "3-4h", "full-day"
         count: number
         revenue: number
       }[]
-      
+
       peakTimes: {
         day: string
         hour: string
         avgOccupancy: number
       }[]
     }
-    
+
     revenue: {
       byPackage: {
         packageName: string
         bookings: number
         revenue: number
       }[]
-      
+
       byDuration: {
         type: string
         revenue: number
       }[]
-      
+
       byClientType: {
         type: string
         revenue: number
       }[]
     }
-    
+
     clientInsights: {
       repeatRate: number
       avgSessionsPerClient: number
       topClients: Client[]
-      
+
       satisfaction: {
         rating: number
         reviews: number
@@ -437,6 +438,7 @@ StudiosManagement {
 ```
 
 **UI - Studio Creation Wizard:**
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ Create Studio                    Step 1/7: Basic Info  │
@@ -480,13 +482,14 @@ StudiosManagement {
 ## 5.2 `/admin/studios/packages` (جديد - حرج للعمليات)
 
 ### **الهدف:**
+
 إدارة باقات الاستوديو الجاهزة (Podcast, Product Photography, etc.)
 
 ```typescript
 StudioPackages {
   list: {
     packages: StudioPackage[]
-    
+
     StudioPackage: {
       id: string
       name: string
@@ -494,13 +497,13 @@ StudioPackages {
       studioName: string
       type: "podcast" | "product" | "portrait" | "interview" | "event" | "custom"
       status: "active" | "inactive" | "seasonal"
-      
+
       duration: {
         hours: number
         extendable: boolean
         maxExtension: number
       }
-      
+
       includedServices: {
         setup: {
           description: string
@@ -510,14 +513,14 @@ StudioPackages {
             diagram: string
           }[]
         }
-        
+
         equipment: {
           lighting: string[]
           audio: string[]
           video: string[]
           accessories: string[]
         }
-        
+
         staff: {
           technician: boolean
           photographer: boolean
@@ -525,7 +528,7 @@ StudioPackages {
           assistant: boolean
           hours: number
         }
-        
+
         postProduction: {
           included: boolean
           type: string[] // "basic_editing", "color_grading"
@@ -533,25 +536,25 @@ StudioPackages {
           deliverables: string[]
         }
       }
-      
+
       addons: {
         addonId: string
         name: string
         price: number
         included: boolean // in base package
       }[]
-      
+
       pricing: {
         basePrice: number
         deposit: number
-        
+
         variations: {
           duration: {
             hours: number
             price: number
           }[]
         }
-        
+
         discounts: {
           weekday: number // %
           multiSession: {
@@ -560,27 +563,27 @@ StudioPackages {
           }[]
         }
       }
-      
+
       requirements: {
         minimumNotice: number // hours
         clientBriefRequired: boolean
         prepaymentRequired: boolean
-        
+
         clientRequirements: string[]
       }
-      
+
       terms: {
         cancellationPolicy: string
         reschedulePolicy: string
         additionalNotes: string
       }
-      
+
       media: {
         thumbnail: string
         images: string[]
         examples: string[] // example work
       }
-      
+
       stats: {
         bookings: number
         revenue: number
@@ -589,7 +592,7 @@ StudioPackages {
       }
     }
   }
-  
+
   create: {
     wizard: {
       steps: [
@@ -602,7 +605,7 @@ StudioPackages {
         "review"
       ]
     }
-    
+
     basic: {
       name: string
       studio: string
@@ -610,14 +613,14 @@ StudioPackages {
       description: string
       targetAudience: string[]
     }
-    
+
     configuration: {
       duration: {
         default: number
         options: number[] // available duration options
         minimumBooking: number
       }
-      
+
       setup: {
         configurations: {
           name: string
@@ -626,7 +629,7 @@ StudioPackages {
           setupTime: number
         }[]
       }
-      
+
       included: {
         services: {
           studioAccess: boolean
@@ -636,7 +639,7 @@ StudioPackages {
         }
       }
     }
-    
+
     equipment: {
       categories: {
         category: "lighting" | "audio" | "video" | "accessories"
@@ -647,7 +650,7 @@ StudioPackages {
         }[]
       }[]
     }
-    
+
     staff: {
       included: {
         technician: { included: boolean, hours: number }
@@ -655,28 +658,28 @@ StudioPackages {
         videographer: { included: boolean, hours: number }
         assistant: { included: boolean, hours: number }
       }
-      
+
       optional: {
         staffRole: string
         pricePerHour: number
         available: boolean
       }[]
     }
-    
+
     pricing: {
       base: {
         calculation: "fixed" | "hourly" | "tiered"
-        
+
         fixed: {
           price: number
         }
-        
+
         hourly: {
           rate: number
           includedHours: number
           additionalRate: number
         }
-        
+
         tiered: {
           tiers: {
             hours: number
@@ -684,13 +687,13 @@ StudioPackages {
           }[]
         }
       }
-      
+
       deposit: {
         required: boolean
         type: "percentage" | "fixed"
         amount: number
       }
-      
+
       discounts: {
         weekday: number
         multiSession: {
@@ -699,17 +702,17 @@ StudioPackages {
         }[]
       }
     }
-    
+
     media: {
       thumbnail: File
       gallery: File[]
       examples: File[] // example work from previous sessions
     }
   }
-  
+
   templates: {
     // Pre-built package templates
-    
+
     podcast: {
       name: "Professional Podcast Recording"
       duration: 2 // hours
@@ -724,7 +727,7 @@ StudioPackages {
       ]
       pricing: "SAR 800/2 hours"
     }
-    
+
     product: {
       name: "Product Photography Package"
       duration: 4 // hours
@@ -738,7 +741,7 @@ StudioPackages {
       ]
       pricing: "SAR 1,200/4 hours"
     }
-    
+
     portrait: {
       name: "Portrait Studio Session"
       duration: 1 // hour
@@ -751,7 +754,7 @@ StudioPackages {
       ]
       pricing: "SAR 500/hour"
     }
-    
+
     interview: {
       name: "Interview Recording Setup"
       duration: 3 // hours
@@ -766,7 +769,7 @@ StudioPackages {
       pricing: "SAR 900/3 hours"
     }
   }
-  
+
   analytics: {
     performance: {
       topPackages: {
@@ -775,26 +778,26 @@ StudioPackages {
         revenue: number
         growth: number
       }[]
-      
+
       conversionRate: {
         impressions: number
         bookings: number
         rate: number
       }
     }
-    
+
     insights: {
       popularDurations: {
         duration: number
         percentage: number
       }[]
-      
+
       addonsPerformance: {
         addon: string
         attachRate: number
         revenue: number
       }[]
-      
+
       clientPreferences: {
         preference: string
         count: number
@@ -805,6 +808,7 @@ StudioPackages {
 ```
 
 **UI - Package Creation:**
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ Create Studio Package            Step 2/7: Configuration│
@@ -849,51 +853,52 @@ StudioPackages {
 ## 5.3 `/admin/studios/add-ons` (جديد - مهم للإيرادات)
 
 ### **الهدف:**
+
 إدارة الخدمات والإضافات للاستوديو
 
 ```typescript
 StudioAddOns {
   list: {
     addons: StudioAddOn[]
-    
+
     StudioAddOn: {
       id: string
       name: string
       category: "staff" | "equipment" | "service" | "catering"
       type: "per_hour" | "per_session" | "per_unit"
-      
+
       description: string
-      
+
       pricing: {
         basePrice: number
         unit: string // "hour", "session", "person"
-        
+
         minimumCharge: number
         minimumUnits: number
       }
-      
+
       availability: {
         requiresAdvanceBooking: boolean
         advanceNotice: number // hours
-        
+
         limitedAvailability: boolean
         maxPerDay: number
-        
+
         staffDependent: boolean
         checkStaffSchedule: boolean
       }
-      
+
       applicability: {
         studios: string[] // which studios
         packages: string[] // which packages
-        
+
         restrictions: {
           minimumBookingDuration: number
           maximumQuantity: number
           clientTypeRestrictions: string[]
         }
       }
-      
+
       stats: {
         timesBooked: number
         revenue: number
@@ -902,7 +907,7 @@ StudioAddOns {
       }
     }
   }
-  
+
   categories: {
     staff: {
       examples: [
@@ -942,7 +947,7 @@ StudioAddOns {
         }
       ]
     }
-    
+
     equipment: {
       examples: [
         {
@@ -977,7 +982,7 @@ StudioAddOns {
         }
       ]
     }
-    
+
     service: {
       examples: [
         {
@@ -1020,7 +1025,7 @@ StudioAddOns {
         }
       ]
     }
-    
+
     catering: {
       examples: [
         {
@@ -1046,35 +1051,35 @@ StudioAddOns {
       ]
     }
   }
-  
+
   create: {
     basic: {
       name: string
       category: "staff" | "equipment" | "service" | "catering"
       description: string
-      
+
       icon: string
       image: string
     }
-    
+
     pricing: {
       model: "fixed" | "hourly" | "per_unit" | "tiered"
-      
+
       fixed: {
         price: number
       }
-      
+
       hourly: {
         rate: number
         minimumHours: number
       }
-      
+
       perUnit: {
         unit: string // "person", "item", "delivery"
         pricePerUnit: number
         minimumUnits: number
       }
-      
+
       tiered: {
         tiers: {
           from: number
@@ -1083,11 +1088,11 @@ StudioAddOns {
         }[]
       }
     }
-    
+
     availability: {
       schedule: {
         followStudioHours: boolean
-        
+
         customHours: {
           [day: string]: {
             available: boolean
@@ -1095,34 +1100,34 @@ StudioAddOns {
           }
         }
       }
-      
+
       capacity: {
         unlimited: boolean
         maxPerDay: number
         maxPerSession: number
       }
-      
+
       booking: {
         requiresAdvanceNotice: boolean
         minimumNotice: number // hours
-        
+
         staffRequired: boolean
         checkStaffAvailability: boolean
       }
     }
-    
+
     applicability: {
       studios: {
         all: boolean
         specific: string[]
       }
-      
+
       packages: {
         all: boolean
         specific: string[]
         canBeIncluded: boolean // in package base price
       }
-      
+
       restrictions: {
         minimumBooking: number // hours
         clientTypes: string[]
@@ -1130,24 +1135,24 @@ StudioAddOns {
       }
     }
   }
-  
+
   analytics: {
     performance: {
       totalRevenue: number
       totalBookings: number
       attachRate: number
       avgValue: number
-      
+
       trend: ChartData[]
     }
-    
+
     topAddOns: {
       addon: StudioAddOn
       revenue: number
       bookings: number
       growth: number
     }[]
-    
+
     insights: {
       mostPopularCombination: StudioAddOn[]
       optimalPricing: number
@@ -1155,7 +1160,7 @@ StudioAddOns {
         month: string
         demand: number
       }[]
-      
+
       recommendations: {
         action: string
         rationale: string
@@ -1181,6 +1186,7 @@ StudioAddOns {
 ## 7.1 `/admin/ops/warehouse` (تحسينات حرجة)
 
 ### **الوضع الحالي:**
+
 - ✅ Queue List موجود
 - ❌ Check-out Process مفقود
 - ❌ Check-in Process مفقود
@@ -1195,7 +1201,7 @@ WarehouseOperations {
       pending: Booking[]
       inProgress: Booking[]
       completed: Booking[]
-      
+
       Booking: {
         id: string
         client: Client
@@ -1206,10 +1212,10 @@ WarehouseOperations {
         status: "pending" | "in_progress" | "completed"
       }
     }
-    
+
     process: {
       bookingId: string
-      
+
       steps: [
         {
           step: "verification"
@@ -1251,41 +1257,41 @@ WarehouseOperations {
           status: "pending" | "completed"
         }
       ]
-      
+
       scanning: {
         method: "barcode" | "qr" | "manual"
-        
+
         scan: (code: string) => {
           equipment: Equipment
           verified: boolean
           conflicts: string[]
         }
       }
-      
+
       conditionAssessment: {
         equipment: Equipment
-        
+
         checklist: {
           item: string
           status: "good" | "fair" | "damaged"
           notes: string
           photo: string
         }[]
-        
+
         overallCondition: "excellent" | "good" | "fair" | "poor"
       }
-      
+
       clientHandover: {
         identityVerification: boolean
         signatureRequired: boolean
         photoIDRequired: boolean
-        
+
         instructions: {
           verbal: boolean
           written: boolean
           video: boolean
         }
-        
+
         acknowledgement: {
           understands: boolean
           accepted: boolean
@@ -1293,7 +1299,7 @@ WarehouseOperations {
         }
       }
     }
-    
+
     completion: {
       receipt: {
         generate: boolean
@@ -1303,20 +1309,20 @@ WarehouseOperations {
           sms: boolean
         }
       }
-      
+
       updateInventory: boolean
       notifyDelivery: boolean
-      
+
       nextInQueue: Booking
     }
   }
-  
+
   checkIn: {
     queue: {
       expected: Booking[] // due today
       overdue: Booking[] // past return date
       completed: Booking[] // returned today
-      
+
       Booking: {
         id: string
         client: Client
@@ -1327,10 +1333,10 @@ WarehouseOperations {
         status: "expected" | "overdue" | "completed"
       }
     }
-    
+
     process: {
       bookingId: string
-      
+
       steps: [
         {
           step: "verification"
@@ -1372,41 +1378,41 @@ WarehouseOperations {
           status: "pending" | "completed"
         }
       ]
-      
+
       scanning: {
         method: "barcode" | "qr" | "manual"
-        
+
         scan: (code: string) => {
           equipment: Equipment
           expectedReturn: boolean
           condition: Condition
         }
-        
+
         batch: {
           enabled: boolean
           scannedItems: Equipment[]
           missingItems: Equipment[]
         }
       }
-      
+
       conditionInspection: {
         equipment: Equipment
-        
+
         checkoutCondition: Condition
         returnCondition: Condition
-        
+
         comparison: {
           deterioration: boolean
           damages: Damage[]
           functionalIssues: string[]
         }
-        
+
         photos: {
           before: string[]
           after: string[]
         }
       }
-      
+
       damageAssessment: {
         damages: {
           type: "cosmetic" | "functional" | "missing_parts"
@@ -1415,15 +1421,15 @@ WarehouseOperations {
           photos: string[]
           estimatedCost: number
         }[]
-        
+
         totalCost: number
-        
+
         client: Notification {
           notifyClient: boolean
           requireApproval: boolean
         }
       }
-      
+
       settlement: {
         lateFees: {
           days: number
@@ -1432,13 +1438,13 @@ WarehouseOperations {
           waived: boolean
           waiverReason: string
         }
-        
+
         damageCharges: {
           total: number
           paid: boolean
           paymentMethod: string
         }
-        
+
         deposit: {
           original: number
           deductions: number
@@ -1446,20 +1452,20 @@ WarehouseOperations {
         }
       }
     }
-    
+
     completion: {
       updateInventory: {
         markAvailable: boolean
         updateCondition: boolean
         scheduleMaintenanceم boolean
       }
-      
+
       documentation: {
         generateReport: boolean
         updateBooking: boolean
         notifyClient: boolean
       }
-      
+
       followUp: {
         satisfactionSurvey: boolean
         requestReview: boolean
@@ -1467,13 +1473,13 @@ WarehouseOperations {
       }
     }
   }
-  
+
   inventory: {
     realTime: {
       available: Equipment[]
       checkedOut: Equipment[]
       inMaintenance: Equipment[]
-      
+
       tracking: {
         equipmentId: string
         status: "available" | "rented" | "maintenance" | "damaged"
@@ -1482,7 +1488,7 @@ WarehouseOperations {
         nextAvailable: Date
       }
     }
-    
+
     movements: {
       timestamp: Date
       type: "check_out" | "check_in" | "transfer" | "maintenance"
@@ -1491,7 +1497,7 @@ WarehouseOperations {
       to: string
       performedBy: string
     }[]
-    
+
     alerts: {
       lowStock: Equipment[]
       damaged: Equipment[]
@@ -1515,4 +1521,3 @@ WarehouseOperations {
 7. ✅ Warehouse Operations (كامل في هذا الملف)
 
 الملفات جاهزة للاستخدام والتنفيذ!
-

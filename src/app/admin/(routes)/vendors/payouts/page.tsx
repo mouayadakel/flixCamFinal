@@ -13,12 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -148,11 +143,7 @@ export default function VendorPayoutsPage() {
                     </TableCell>
                     <TableCell>
                       {p.status === 'PENDING' && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openMarkPaid(p)}
-                        >
+                        <Button variant="outline" size="sm" onClick={() => openMarkPaid(p)}>
                           تسجيل الدفع
                         </Button>
                       )}
@@ -163,7 +154,7 @@ export default function VendorPayoutsPage() {
             </Table>
           )}
           {!loading && payouts.length === 0 && (
-            <p className="text-center py-8 text-muted-foreground">لا توجد مدفوعات</p>
+            <p className="py-8 text-center text-muted-foreground">لا توجد مدفوعات</p>
           )}
         </CardContent>
       </Card>

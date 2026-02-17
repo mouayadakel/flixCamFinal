@@ -1,4 +1,5 @@
 # Admin Panel Implementation Roadmap
+
 **Equipment & Studio Rental Platform**  
 **Date**: February 3, 2026  
 **Based on**: ADMIN_CONTROL_PANEL_AUDIT_REPORT.md
@@ -16,6 +17,7 @@
 **Team**: Assumes 2-3 full-stack developers
 
 **Priority Focus Areas**:
+
 1. **Weeks 1-4**: Studios module (PLACEHOLDER → LIVE) + Calendar view
 2. **Weeks 5-8**: Advanced booking features + Damage management
 3. **Weeks 9-12**: Financial module completion + Pricing engine
@@ -28,11 +30,13 @@
 ## 1. Quick Win Opportunities (Implement This Week)
 
 ### Quick Win #1: Approvals Page - Wire to API
+
 **Route**: `/admin/approvals`  
 **Current Status**: EXISTS (UI present; approve/reject not calling API)  
 **Estimated Hours**: 4-6 hours
 
 **What's Missing**:
+
 - API endpoints for approve/reject actions
 - Optimistic UI updates
 - Toast notifications on success/error
@@ -42,35 +46,32 @@
 
 ```typescript
 // Step 1: Create API route at src/app/api/admin/approvals/[id]/route.ts
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import { getServerSession } from 'next-auth'
 
-export async function POST(
-  req: Request, 
-  { params }: { params: { id: string } }
-) {
-  const session = await getServerSession();
+export async function POST(req: Request, { params }: { params: { id: string } }) {
+  const session = await getServerSession()
   if (!session?.user?.isAdmin) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { action, notes } = await req.json();
-  
+  const { action, notes } = await req.json()
+
   try {
     const booking = await prisma.booking.update({
       where: { id: params.id },
-      data: { 
+      data: {
         status: action === 'approve' ? 'CONFIRMED' : 'REJECTED',
         approvedBy: session.user.id,
         approvedAt: new Date(),
-        approvalNotes: notes
+        approvalNotes: notes,
       },
       include: {
         customer: true,
-        items: true
-      }
-    });
+        items: true,
+      },
+    })
 
     // Log the approval action
     await prisma.auditLog.create({
@@ -79,25 +80,22 @@ export async function POST(
         action: `BOOKING_${action.toUpperCase()}`,
         entityType: 'BOOKING',
         entityId: params.id,
-        details: { notes, previousStatus: booking.status }
-      }
-    });
+        details: { notes, previousStatus: booking.status },
+      },
+    })
 
     // Send notification to customer
     if (action === 'approve') {
       await sendEmail({
         to: booking.customer.email,
         template: 'booking-approved',
-        data: booking
-      });
+        data: booking,
+      })
     }
 
-    return NextResponse.json(booking);
+    return NextResponse.json(booking)
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to process approval' }, 
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to process approval' }, { status: 500 })
   }
 }
 ```
@@ -114,7 +112,7 @@ export default function ApprovalsPage() {
 
   const handleApproval = async (bookingId: string, action: 'approve' | 'reject') => {
     setLoading(bookingId);
-    
+
     try {
       const response = await fetch(`/api/admin/approvals/${bookingId}`, {
         method: 'POST',
@@ -125,10 +123,10 @@ export default function ApprovalsPage() {
       if (!response.ok) throw new Error('Failed to process approval');
 
       const updated = await response.json();
-      
+
       toast.success(
-        action === 'approve' 
-          ? '✅ Booking approved successfully' 
+        action === 'approve'
+          ? '✅ Booking approved successfully'
           : '❌ Booking rejected'
       );
 
@@ -148,6 +146,7 @@ export default function ApprovalsPage() {
 ```
 
 **Testing Checklist**:
+
 - [ ] Approve action updates booking status to CONFIRMED
 - [ ] Reject action updates booking status to REJECTED
 - [ ] Audit log entry created
@@ -158,6 +157,7 @@ export default function ApprovalsPage() {
 ---
 
 ### Quick Win #2: Brands Page - Connect to Database
+
 **Route**: `/admin/inventory/brands`  
 **Current Status**: EXISTS (page present, likely mock data)  
 **Estimated Hours**: 3-4 hours
@@ -170,51 +170,51 @@ export async function GET() {
   const brands = await prisma.brand.findMany({
     include: {
       _count: {
-        select: { equipment: true }
-      }
+        select: { equipment: true },
+      },
     },
-    orderBy: { name: 'asc' }
-  });
-  return NextResponse.json(brands);
+    orderBy: { name: 'asc' },
+  })
+  return NextResponse.json(brands)
 }
 
 export async function POST(req: Request) {
-  const { name, logo, website } = await req.json();
-  
+  const { name, logo, website } = await req.json()
+
   const brand = await prisma.brand.create({
-    data: { name, logo, website }
-  });
-  
-  return NextResponse.json(brand);
+    data: { name, logo, website },
+  })
+
+  return NextResponse.json(brand)
 }
 ```
 
 ```typescript
 // Step 2: Update brands page to fetch real data
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query'
 
 export default function BrandsPage() {
   const { data: brands, isLoading } = useQuery({
     queryKey: ['brands'],
     queryFn: async () => {
-      const res = await fetch('/api/admin/brands');
-      return res.json();
-    }
-  });
+      const res = await fetch('/api/admin/brands')
+      return res.json()
+    },
+  })
 
   const createBrand = useMutation({
     mutationFn: async (data: BrandInput) => {
       const res = await fetch('/api/admin/brands', {
         method: 'POST',
-        body: JSON.stringify(data)
-      });
-      return res.json();
+        body: JSON.stringify(data),
+      })
+      return res.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['brands']);
-      toast.success('Brand created');
-    }
-  });
+      queryClient.invalidateQueries(['brands'])
+      toast.success('Brand created')
+    },
+  })
 
   // ... render brands table
 }
@@ -223,11 +223,13 @@ export default function BrandsPage() {
 ---
 
 ### Quick Win #3: Calendar - Replace Mock Data
+
 **Route**: `/admin/calendar`  
 **Current Status**: PLACEHOLDER (mock data)  
 **Estimated Hours**: 6-8 hours
 
 **What's Missing**:
+
 - Real booking data feed
 - Equipment + Studio combined view
 - Basic navigation (no drag-drop yet)
@@ -238,33 +240,33 @@ export default function BrandsPage() {
 // Step 1: Create calendar API endpoint
 // src/app/api/admin/calendar/route.ts
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const start = new Date(searchParams.get('start') || '');
-  const end = new Date(searchParams.get('end') || '');
+  const { searchParams } = new URL(req.url)
+  const start = new Date(searchParams.get('start') || '')
+  const end = new Date(searchParams.get('end') || '')
 
   const bookings = await prisma.booking.findMany({
     where: {
       AND: [
         { startDate: { lte: end } },
         { endDate: { gte: start } },
-        { status: { in: ['CONFIRMED', 'PENDING', 'ACTIVE'] } }
-      ]
+        { status: { in: ['CONFIRMED', 'PENDING', 'ACTIVE'] } },
+      ],
     },
     include: {
       customer: { select: { name: true } },
       items: {
         include: {
-          equipment: { select: { name: true } }
-        }
+          equipment: { select: { name: true } },
+        },
       },
-      studio: { select: { name: true } }
-    }
-  });
+      studio: { select: { name: true } },
+    },
+  })
 
   // Transform to calendar events format
-  const events = bookings.flatMap(booking => {
-    const events = [];
-    
+  const events = bookings.flatMap((booking) => {
+    const events = []
+
     // Add studio booking if exists
     if (booking.studio) {
       events.push({
@@ -275,12 +277,12 @@ export async function GET(req: Request) {
         resourceType: 'studio',
         resourceId: booking.studioId,
         bookingId: booking.id,
-        status: booking.status
-      });
+        status: booking.status,
+      })
     }
 
     // Add equipment bookings
-    booking.items.forEach(item => {
+    booking.items.forEach((item) => {
       events.push({
         id: `equipment-${booking.id}-${item.equipmentId}`,
         title: `${booking.customer.name} - ${item.equipment.name}`,
@@ -289,14 +291,14 @@ export async function GET(req: Request) {
         resourceType: 'equipment',
         resourceId: item.equipmentId,
         bookingId: booking.id,
-        status: booking.status
-      });
-    });
+        status: booking.status,
+      })
+    })
 
-    return events;
-  });
+    return events
+  })
 
-  return NextResponse.json(events);
+  return NextResponse.json(events)
 }
 ```
 
@@ -369,11 +371,13 @@ export default function CalendarPage() {
 ---
 
 ### Quick Win #4: Action Center - Connect Real Data
+
 **Route**: `/admin/action-center`  
 **Current Status**: EXISTS (mixed sample data)  
 **Estimated Hours**: 3-4 hours
 
 **Steps**:
+
 1. Create `/api/admin/action-center` endpoint
 2. Aggregate pending tasks (bookings needing approval, overdue returns, maintenance due)
 3. Replace mock data with real queries
@@ -382,6 +386,7 @@ export default function CalendarPage() {
 ---
 
 ### Quick Win #5: Dashboard Sub-pages
+
 **Routes**: `/admin/dashboard/overview`, `revenue`, `activity`, etc.  
 **Current Status**: PLACEHOLDER  
 **Estimated Hours**: 8-10 hours total
@@ -395,6 +400,7 @@ export default function CalendarPage() {
 ### Feature 1: Real-time Booking Calendar (CRITICAL)
 
 **Prerequisites**:
+
 - ✅ Booking API exists (LIVE)
 - ❌ Studio API needs to be implemented
 - ❌ Equipment availability calculation logic
@@ -411,6 +417,7 @@ ALTER TABLE bookings ADD COLUMN buffer_after INTEGER DEFAULT 0;
 ```
 
 **Dependent Features**:
+
 - Drag-and-drop rescheduling (Phase 2)
 - Availability checker in booking form
 - Resource utilization reports
@@ -432,6 +439,7 @@ ALTER TABLE bookings ADD COLUMN buffer_after INTEGER DEFAULT 0;
 **Current State**: PLACEHOLDER - entirely mock data
 
 **Prerequisites**:
+
 - ❌ Studio Prisma model complete (add missing fields)
 - ❌ Studio API endpoints
 - ❌ Image upload for floor plans
@@ -451,7 +459,7 @@ model Studio {
   hourlyRate              Decimal   @db.Decimal(10, 2)
   dailyRate               Decimal?  @db.Decimal(10, 2)
   weeklyRate              Decimal?  @db.Decimal(10, 2)
-  
+
   // NEW FIELDS
   floorPlanUrl            String?
   setupTimeMinutes        Int       @default(30)
@@ -461,11 +469,11 @@ model Studio {
   peakHourMultiplier      Decimal?  @db.Decimal(3, 2) // e.g., 1.5 = 150%
   offPeakDiscount         Decimal?  @db.Decimal(3, 2)
   overtimeRate            Decimal?  @db.Decimal(10, 2)
-  
+
   status                  StudioStatus @default(ACTIVE)
   amenities               StudioAmenity[]
   bookings                Booking[]
-  
+
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
 }
@@ -516,39 +524,42 @@ GET    /api/admin/studios/available           // Find available studios for crit
 ```typescript
 // Example: Studios list API
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const status = searchParams.get('status');
-  const capacity = searchParams.get('minCapacity');
+  const { searchParams } = new URL(req.url)
+  const status = searchParams.get('status')
+  const capacity = searchParams.get('minCapacity')
 
   const studios = await prisma.studio.findMany({
     where: {
       ...(status && { status: status as StudioStatus }),
-      ...(capacity && { capacity: { gte: parseInt(capacity) } })
+      ...(capacity && { capacity: { gte: parseInt(capacity) } }),
     },
     include: {
       amenities: true,
       _count: {
-        select: { bookings: true }
-      }
+        select: { bookings: true },
+      },
     },
-    orderBy: { name: 'asc' }
-  });
+    orderBy: { name: 'asc' },
+  })
 
-  return NextResponse.json(studios);
+  return NextResponse.json(studios)
 }
 ```
 
 **Week 2**: UI Pages
+
 - Studios list page with filters (status, capacity, location)
 - Studio detail page with tabs (Overview, Amenities, Bookings, Analytics)
 - Create/Edit studio form with image upload
 
 **Week 3**: Amenities & Floor Plans
+
 - Amenity management UI
 - Floor plan upload (use S3 or similar)
 - Image gallery component
 
 **Week 4**: Booking Integration
+
 - Connect studios to booking flow
 - Availability checker
 - Pricing calculator with peak/off-peak
@@ -558,6 +569,7 @@ export async function GET(req: Request) {
 ### Feature 3: Equipment Maintenance Log
 
 **Prerequisites**:
+
 - ✅ Equipment model exists
 - ❌ MaintenanceLog model
 - ❌ Maintenance scheduling logic
@@ -569,25 +581,25 @@ model MaintenanceLog {
   id                String           @id @default(cuid())
   equipmentId       String
   equipment         Equipment        @relation(fields: [equipmentId], references: [id])
-  
+
   maintenanceDate   DateTime
   type              MaintenanceType
   description       String           @db.Text
   cost              Decimal          @db.Decimal(10, 2)
-  
+
   technicianName    String?
   technicianId      String?
   technician        User?            @relation(fields: [technicianId], references: [id])
-  
+
   nextServiceDate   DateTime?
   status            MaintenanceStatus @default(SCHEDULED)
-  
+
   notes             String?          @db.Text
   attachments       Json?            // URLs to photos/documents
-  
+
   createdBy         String
   creator           User             @relation("CreatedMaintenance", fields: [createdBy], references: [id])
-  
+
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
 }
@@ -621,6 +633,7 @@ GET    /api/admin/maintenance/overdue             // Get overdue maintenance
 ```
 
 **Implementation** (Week 5-6):
+
 1. Create migration for MaintenanceLog model
 2. Build API routes
 3. Add "Maintenance" tab to equipment detail page
@@ -640,34 +653,34 @@ model DamageClaim {
   id              String        @id @default(cuid())
   bookingId       String
   booking         Booking       @relation(fields: [bookingId], references: [id])
-  
+
   equipmentId     String?
   equipment       Equipment?    @relation(fields: [equipmentId], references: [id])
-  
+
   studioId        String?
   studio          Studio?       @relation(fields: [studioId], references: [id])
-  
+
   reportedBy      String
   reporter        User          @relation(fields: [reportedBy], references: [id])
-  
+
   damageType      DamageType
   severity        DamageSeverity
   description     String        @db.Text
-  
+
   photos          Json?         // Array of photo URLs
-  
+
   estimatedCost   Decimal       @db.Decimal(10, 2)
   actualCost      Decimal?      @db.Decimal(10, 2)
-  
+
   status          ClaimStatus   @default(PENDING)
   resolution      String?       @db.Text
   resolvedBy      String?
   resolver        User?         @relation("ResolvedClaims", fields: [resolvedBy], references: [id])
   resolvedAt      DateTime?
-  
+
   customerNotified Boolean      @default(false)
   insuranceClaim   Boolean      @default(false)
-  
+
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 }
@@ -710,6 +723,7 @@ GET    /api/admin/bookings/:id/damage-claims // Get claims for booking
 ```
 
 **UI Flow**:
+
 1. From booking detail → "Report Damage" button
 2. Form: Select equipment, damage type, upload photos, estimate cost
 3. Claims list with filters (status, severity, date range)
@@ -733,23 +747,23 @@ model EquipmentCategory {
   slug        String              @unique
   description String?             @db.Text
   icon        String?
-  
+
   parentId    String?
   parent      EquipmentCategory?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children    EquipmentCategory[] @relation("CategoryHierarchy")
-  
+
   equipment   Equipment[]
-  
+
   sortOrder   Int                 @default(0)
   isActive    Boolean             @default(true)
-  
+
   // Pricing defaults for category
   defaultDailyRate   Decimal? @db.Decimal(10, 2)
   defaultWeeklyRate  Decimal? @db.Decimal(10, 2)
-  
+
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  
+
   @@index([parentId])
   @@index([sortOrder])
 }
@@ -769,10 +783,10 @@ model PricingRule {
   id              String        @id @default(cuid())
   name            String
   description     String?       @db.Text
-  
+
   ruleType        PricingRuleType
   priority        Int           @default(0) // Higher = applies first
-  
+
   // Conditions
   conditions      Json          // Complex conditions as JSON
   /* Example conditions structure:
@@ -785,22 +799,22 @@ model PricingRule {
     "studioIds": ["studio_1"]
   }
   */
-  
+
   // Action
   adjustmentType  PriceAdjustmentType // PERCENTAGE, FIXED, REPLACE
   adjustmentValue Decimal       @db.Decimal(10, 2)
-  
+
   isActive        Boolean       @default(true)
-  
+
   validFrom       DateTime?
   validUntil      DateTime?
-  
+
   createdBy       String
   creator         User          @relation(fields: [createdBy], references: [id])
-  
+
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-  
+
   @@index([priority])
   @@index([isActive])
 }
@@ -826,84 +840,84 @@ enum PriceAdjustmentType {
 ```typescript
 // src/lib/pricing-engine.ts
 export async function calculatePrice(params: {
-  equipmentIds?: string[];
-  studioId?: string;
-  startDate: Date;
-  endDate: Date;
-  customerId: string;
+  equipmentIds?: string[]
+  studioId?: string
+  startDate: Date
+  endDate: Date
+  customerId: string
 }) {
   // 1. Get base prices
-  const basePrices = await getBasePrices(params);
-  
+  const basePrices = await getBasePrices(params)
+
   // 2. Fetch applicable pricing rules (ordered by priority)
   const rules = await prisma.pricingRule.findMany({
     where: {
       isActive: true,
       OR: [
         { validFrom: null, validUntil: null },
-        { validFrom: { lte: params.startDate }, validUntil: { gte: params.endDate } }
-      ]
+        { validFrom: { lte: params.startDate }, validUntil: { gte: params.endDate } },
+      ],
     },
-    orderBy: { priority: 'desc' }
-  });
-  
+    orderBy: { priority: 'desc' },
+  })
+
   // 3. Apply rules in sequence
-  let finalPrice = basePrices.total;
-  const appliedRules = [];
-  
+  let finalPrice = basePrices.total
+  const appliedRules = []
+
   for (const rule of rules) {
     if (ruleApplies(rule, params)) {
-      finalPrice = applyAdjustment(finalPrice, rule);
-      appliedRules.push({ 
-        rule: rule.name, 
-        adjustment: rule.adjustmentValue 
-      });
+      finalPrice = applyAdjustment(finalPrice, rule)
+      appliedRules.push({
+        rule: rule.name,
+        adjustment: rule.adjustmentValue,
+      })
     }
   }
-  
+
   return {
     basePrice: basePrices.total,
     finalPrice,
     breakdown: basePrices.breakdown,
-    appliedRules
-  };
+    appliedRules,
+  }
 }
 
 function ruleApplies(rule: PricingRule, params: any): boolean {
-  const conditions = rule.conditions as any;
-  
+  const conditions = rule.conditions as any
+
   // Check date range
   if (conditions.dateRange) {
-    const start = new Date(conditions.dateRange.start);
-    const end = new Date(conditions.dateRange.end);
+    const start = new Date(conditions.dateRange.start)
+    const end = new Date(conditions.dateRange.end)
     if (params.startDate < start || params.startDate > end) {
-      return false;
+      return false
     }
   }
-  
+
   // Check days of week
   if (conditions.daysOfWeek?.length) {
-    const dayOfWeek = params.startDate.getDay();
+    const dayOfWeek = params.startDate.getDay()
     if (!conditions.daysOfWeek.includes(dayOfWeek)) {
-      return false;
+      return false
     }
   }
-  
+
   // Check minimum duration
   if (conditions.minDuration) {
-    const days = differenceInDays(params.endDate, params.startDate);
+    const days = differenceInDays(params.endDate, params.startDate)
     if (days < conditions.minDuration) {
-      return false;
+      return false
     }
   }
-  
+
   // Check customer segment
   if (conditions.customerSegments?.length) {
     // Fetch customer and check segment
     // ...
   }
-  
-  return true;
+
+  return true
 }
 ```
 
@@ -921,12 +935,12 @@ model CustomerSegment {
   name            String    @unique
   slug            String    @unique
   description     String?   @db.Text
-  
+
   // Benefits
   discountPercent Decimal?  @db.Decimal(5, 2) // e.g., 10.00 = 10%
   priorityBooking Boolean   @default(false)
   extendedTerms   Boolean   @default(false) // Longer payment terms
-  
+
   // Criteria (auto-assign or manual)
   autoAssignRules Json?
   /* Example:
@@ -936,9 +950,9 @@ model CustomerSegment {
     "avgBookingValue": 500
   }
   */
-  
+
   customers       Customer[]
-  
+
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 }
@@ -946,14 +960,14 @@ model CustomerSegment {
 // Add to Customer model
 model Customer {
   // ... existing fields
-  
+
   segmentId       String?
   segment         CustomerSegment? @relation(fields: [segmentId], references: [id])
-  
+
   lifetimeValue   Decimal          @db.Decimal(10, 2) @default(0)
   riskScore       Int?             // 0-100, higher = riskier
   creditLimit     Decimal?         @db.Decimal(10, 2)
-  
+
   verificationStatus VerificationStatus @default(UNVERIFIED)
   isBlacklisted   Boolean          @default(false)
   blacklistReason String?          @db.Text
@@ -973,27 +987,27 @@ enum VerificationStatus {
 // src/jobs/auto-assign-segments.ts
 export async function autoAssignCustomerSegments() {
   const segments = await prisma.customerSegment.findMany({
-    where: { autoAssignRules: { not: null } }
-  });
-  
+    where: { autoAssignRules: { not: null } },
+  })
+
   for (const segment of segments) {
-    const rules = segment.autoAssignRules as any;
-    
+    const rules = segment.autoAssignRules as any
+
     const customers = await prisma.customer.findMany({
       where: {
         segmentId: null, // Not already assigned
         lifetimeValue: { gte: rules.minLifetimeValue || 0 },
         _count: {
-          bookings: { gte: rules.minBookings || 0 }
-        }
-      }
-    });
-    
+          bookings: { gte: rules.minBookings || 0 },
+        },
+      },
+    })
+
     // Assign segment
     await prisma.customer.updateMany({
-      where: { id: { in: customers.map(c => c.id) } },
-      data: { segmentId: segment.id }
-    });
+      where: { id: { in: customers.map((c) => c.id) } },
+      data: { segmentId: segment.id },
+    })
   }
 }
 ```
@@ -1012,26 +1026,26 @@ model NotificationTemplate {
   name        String
   slug        String            @unique
   description String?           @db.Text
-  
+
   trigger     NotificationTrigger
   channel     NotificationChannel
-  
+
   subject     String?           // For email
   bodyText    String            @db.Text
   bodyHtml    String?           @db.Text
-  
+
   // Variables that can be used
   variables   Json              // e.g., ["customerName", "bookingId", "totalAmount"]
-  
+
   isActive    Boolean           @default(true)
   language    String            @default("en")
-  
+
   // For A/B testing
   variant     String?
-  
+
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
-  
+
   @@unique([slug, language])
 }
 
@@ -1061,7 +1075,7 @@ enum NotificationChannel {
 
 ```typescript
 // src/lib/notifications.ts
-import Handlebars from 'handlebars';
+import Handlebars from 'handlebars'
 
 export async function sendNotification(
   trigger: NotificationTrigger,
@@ -1069,43 +1083,44 @@ export async function sendNotification(
   data: Record<string, any>
 ) {
   const template = await prisma.notificationTemplate.findUnique({
-    where: { 
-      slug_language: { 
-        slug: trigger.toLowerCase(), 
-        language: 'en' 
-      } 
-    }
-  });
-  
+    where: {
+      slug_language: {
+        slug: trigger.toLowerCase(),
+        language: 'en',
+      },
+    },
+  })
+
   if (!template || !template.isActive) {
-    console.warn(`No active template for ${trigger}`);
-    return;
+    console.warn(`No active template for ${trigger}`)
+    return
   }
-  
+
   // Compile template
-  const compiledSubject = Handlebars.compile(template.subject || '');
-  const compiledBody = Handlebars.compile(template.bodyText);
-  
-  const subject = compiledSubject(data);
-  const body = compiledBody(data);
-  
+  const compiledSubject = Handlebars.compile(template.subject || '')
+  const compiledBody = Handlebars.compile(template.bodyText)
+
+  const subject = compiledSubject(data)
+  const body = compiledBody(data)
+
   // Send based on channel
   if (template.channel === 'EMAIL') {
     await sendEmail({
       to: data.recipientEmail,
       subject,
-      html: template.bodyHtml ? Handlebars.compile(template.bodyHtml)(data) : body
-    });
+      html: template.bodyHtml ? Handlebars.compile(template.bodyHtml)(data) : body,
+    })
   } else if (template.channel === 'SMS') {
     await sendSMS({
       to: data.recipientPhone,
-      message: body
-    });
+      message: body,
+    })
   }
 }
 ```
 
 **Admin UI**:
+
 - Template list with filters (trigger, channel, active)
 - Template editor with variable picker
 - Preview with sample data
@@ -1131,6 +1146,7 @@ npx prisma db seed
 ```
 
 **Day 3-4**: API Routes
+
 - GET /api/admin/studios (with filters)
 - POST /api/admin/studios
 - GET /api/admin/studios/:id
@@ -1138,6 +1154,7 @@ npx prisma db seed
 - DELETE /api/admin/studios/:id
 
 **Day 5**: Testing
+
 - Unit tests for API routes
 - Test data validation
 - Test error handling
@@ -1167,7 +1184,7 @@ export default function StudiosPage() {
       const params = new URLSearchParams();
       if (filters.status !== 'all') params.set('status', filters.status);
       if (filters.minCapacity) params.set('minCapacity', filters.minCapacity);
-      
+
       const res = await fetch(`/api/admin/studios?${params}`);
       return res.json();
     }
@@ -1200,8 +1217,8 @@ export default function StudiosPage() {
         const status = row.getValue('status') as string;
         return (
           <Badge variant={
-            status === 'ACTIVE' ? 'success' : 
-            status === 'MAINTENANCE' ? 'warning' : 
+            status === 'ACTIVE' ? 'success' :
+            status === 'MAINTENANCE' ? 'warning' :
             'secondary'
           }>
             {status}
@@ -1332,23 +1349,23 @@ function AmenitiesManager({ studioId }: { studioId: string }) {
 ```typescript
 async function uploadFloorPlan(file: File, studioId: string) {
   // 1. Upload to S3 or similar
-  const formData = new FormData();
-  formData.append('file', file);
-  
+  const formData = new FormData()
+  formData.append('file', file)
+
   const uploadRes = await fetch('/api/upload', {
     method: 'POST',
-    body: formData
-  });
-  
-  const { url } = await uploadRes.json();
-  
+    body: formData,
+  })
+
+  const { url } = await uploadRes.json()
+
   // 2. Update studio with floor plan URL
   await fetch(`/api/admin/studios/${studioId}`, {
     method: 'PATCH',
-    body: JSON.stringify({ floorPlanUrl: url })
-  });
-  
-  toast.success('Floor plan uploaded');
+    body: JSON.stringify({ floorPlanUrl: url }),
+  })
+
+  toast.success('Floor plan uploaded')
 }
 ```
 
@@ -1360,53 +1377,43 @@ async function uploadFloorPlan(file: File, studioId: string) {
 
 ```typescript
 // /api/admin/studios/[id]/availability/route.ts
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  const { searchParams } = new URL(req.url);
-  const start = new Date(searchParams.get('start')!);
-  const end = new Date(searchParams.get('end')!);
-  
+export async function GET(req: Request, { params }: { params: { id: string } }) {
+  const { searchParams } = new URL(req.url)
+  const start = new Date(searchParams.get('start')!)
+  const end = new Date(searchParams.get('end')!)
+
   const studio = await prisma.studio.findUnique({
     where: { id: params.id },
     select: {
       setupTimeMinutes: true,
-      cleanupTimeMinutes: true
-    }
-  });
-  
+      cleanupTimeMinutes: true,
+    },
+  })
+
   // Get all bookings in date range
   const bookings = await prisma.booking.findMany({
     where: {
       studioId: params.id,
       status: { in: ['CONFIRMED', 'ACTIVE'] },
-      AND: [
-        { startDate: { lt: end } },
-        { endDate: { gt: start } }
-      ]
+      AND: [{ startDate: { lt: end } }, { endDate: { gt: start } }],
     },
-    orderBy: { startDate: 'asc' }
-  });
-  
+    orderBy: { startDate: 'asc' },
+  })
+
   // Calculate unavailable slots (including buffer times)
-  const unavailableSlots = bookings.map(booking => ({
+  const unavailableSlots = bookings.map((booking) => ({
     start: subMinutes(booking.startDate, studio.setupTimeMinutes),
-    end: addMinutes(booking.endDate, studio.cleanupTimeMinutes)
-  }));
-  
+    end: addMinutes(booking.endDate, studio.cleanupTimeMinutes),
+  }))
+
   // Find available slots
-  const availableSlots = calculateAvailableSlots(
-    start, 
-    end, 
-    unavailableSlots
-  );
-  
+  const availableSlots = calculateAvailableSlots(start, end, unavailableSlots)
+
   return NextResponse.json({
     available: availableSlots.length > 0,
     slots: availableSlots,
-    bookedSlots: unavailableSlots
-  });
+    bookedSlots: unavailableSlots,
+  })
 }
 ```
 
@@ -1438,9 +1445,9 @@ export async function isFeatureEnabled(
   const feature = await prisma.featureFlag.findUnique({
     where: { key: FEATURE_FLAGS[flag] }
   });
-  
+
   if (!feature || !feature.enabled) return false;
-  
+
   // Check rollout percentage
   if (feature.rolloutPercent < 100) {
     // Use consistent hashing for gradual rollout
@@ -1450,7 +1457,7 @@ export async function isFeatureEnabled(
     }
     return false;
   }
-  
+
   return true;
 }
 
@@ -1460,11 +1467,11 @@ function CalendarPage() {
     queryKey: ['feature-flag', 'ADVANCED_CALENDAR'],
     queryFn: () => isFeatureEnabled('ADVANCED_CALENDAR')
   });
-  
+
   if (!isEnabled) {
     return <BasicCalendar />;
   }
-  
+
   return <AdvancedCalendar />;
 }
 ```
@@ -1473,14 +1480,14 @@ function CalendarPage() {
 
 **Feature: Damage Claims System**
 
-| Week | Rollout % | Audience | Monitoring |
-|------|-----------|----------|------------|
-| 1 | 0% | Internal QA only | Bug reports, performance |
-| 2 | 10% | Beta admin users | User feedback, error rates |
-| 3 | 25% | Early adopters | Feature usage analytics |
-| 4 | 50% | Half of admins | Load testing, DB performance |
-| 5 | 75% | Majority | Final stability checks |
-| 6 | 100% | All users | Full monitoring |
+| Week | Rollout % | Audience         | Monitoring                   |
+| ---- | --------- | ---------------- | ---------------------------- |
+| 1    | 0%        | Internal QA only | Bug reports, performance     |
+| 2    | 10%       | Beta admin users | User feedback, error rates   |
+| 3    | 25%       | Early adopters   | Feature usage analytics      |
+| 4    | 50%       | Half of admins   | Load testing, DB performance |
+| 5    | 75%       | Majority         | Final stability checks       |
+| 6    | 100%      | All users        | Full monitoring              |
 
 ---
 
@@ -1489,10 +1496,12 @@ function CalendarPage() {
 ### Command Center Section
 
 **Existing**:
+
 - ✅ GET /api/admin/dashboard - Main dashboard KPIs
 - ✅ GET /api/admin/action-center - Action items (partial)
 
 **Missing**:
+
 - ❌ GET /api/admin/approvals - List pending approvals
 - ❌ POST /api/admin/approvals/:id/approve
 - ❌ POST /api/admin/approvals/:id/reject
@@ -1505,6 +1514,7 @@ function CalendarPage() {
 ### Booking Engine Section
 
 **Existing**:
+
 - ✅ GET /api/admin/quotes - List quotes
 - ✅ GET /api/admin/quotes/:id - Quote detail
 - ✅ POST /api/admin/quotes - Create quote
@@ -1515,6 +1525,7 @@ function CalendarPage() {
 - ✅ PATCH /api/admin/bookings/:id - Update booking
 
 **Missing**:
+
 - ❌ GET /api/admin/calendar/events - Calendar events feed
 - ❌ POST /api/admin/bookings/:id/reschedule - Drag-drop rescheduling
 - ❌ GET /api/admin/bookings/recurring - Recurring bookings
@@ -1530,6 +1541,7 @@ function CalendarPage() {
 ### Inventory & Assets Section
 
 **Existing**:
+
 - ✅ GET /api/admin/inventory/equipment
 - ✅ POST /api/admin/inventory/equipment
 - ✅ GET /api/admin/inventory/equipment/:id
@@ -1538,6 +1550,7 @@ function CalendarPage() {
 - ✅ GET /api/admin/inventory/brands
 
 **Missing**:
+
 - ❌ GET /api/admin/inventory/categories - Hierarchical categories
 - ❌ POST /api/admin/inventory/categories
 - ❌ PATCH /api/admin/inventory/categories/:id
@@ -1562,11 +1575,13 @@ function CalendarPage() {
 ### Field Operations Section
 
 **Existing**:
+
 - ✅ GET /api/admin/ops/warehouse - Warehouse queues
 - ✅ GET /api/admin/ops/delivery - Deliveries
 - ✅ GET /api/admin/maintenance - Maintenance list
 
 **Missing**:
+
 - ❌ POST /api/admin/ops/warehouse/check-out - Process checkout
 - ❌ POST /api/admin/ops/warehouse/check-in - Process check-in
 - ❌ GET /api/admin/equipment/:id/maintenance - Maintenance history
@@ -1588,6 +1603,7 @@ function CalendarPage() {
 ### Finance & Legal Section
 
 **Existing**:
+
 - ✅ GET /api/admin/invoices
 - ✅ GET /api/admin/invoices/:id
 - ✅ GET /api/admin/payments
@@ -1595,6 +1611,7 @@ function CalendarPage() {
 - ✅ GET /api/admin/finance/reports
 
 **Missing**:
+
 - ❌ POST /api/admin/invoices - Generate invoice
 - ❌ POST /api/admin/invoices/:id/send - Email invoice
 - ❌ GET /api/admin/invoices/:id/pdf - Download PDF
@@ -1614,6 +1631,7 @@ function CalendarPage() {
 ### CRM & Marketing Section
 
 **Existing**:
+
 - ✅ GET /api/admin/clients
 - ✅ GET /api/admin/clients/:id
 - ✅ POST /api/admin/clients
@@ -1622,6 +1640,7 @@ function CalendarPage() {
 - ✅ GET /api/admin/marketing - Campaigns list
 
 **Missing**:
+
 - ❌ GET /api/admin/clients/:id/rental-history
 - ❌ POST /api/admin/clients/:id/verification - Upload docs
 - ❌ PATCH /api/admin/clients/:id/verification - Approve/reject
@@ -1643,10 +1662,12 @@ function CalendarPage() {
 ### Settings Section
 
 **Existing**:
+
 - ✅ GET /api/admin/settings/integrations
 - ✅ GET /api/admin/settings/features
 
 **Missing**:
+
 - ❌ GET /api/admin/settings/business
 - ❌ PATCH /api/admin/settings/business
 - ❌ GET /api/admin/settings/operating-hours
@@ -1672,26 +1693,27 @@ function CalendarPage() {
 ### Inconsistent Patterns Found
 
 **Problem 1: Mixed Date Handling**
+
 - Some pages use date-fns, others use moment.js, some use native Date
 - **Fix**: Standardize on date-fns across all components
 
 ```typescript
 // Create utility file: src/lib/date-utils.ts
-import { format, parseISO, formatDistance } from 'date-fns';
-import { enUS, ar } from 'date-fns/locale';
+import { format, parseISO, formatDistance } from 'date-fns'
+import { enUS, ar } from 'date-fns/locale'
 
 export function formatDate(date: Date | string, formatStr = 'PP'): string {
-  const dateObj = typeof date === 'string' ? parseISO(date) : date;
-  return format(dateObj, formatStr, { locale: getCurrentLocale() });
+  const dateObj = typeof date === 'string' ? parseISO(date) : date
+  return format(dateObj, formatStr, { locale: getCurrentLocale() })
 }
 
 export function formatDateTime(date: Date | string): string {
-  return formatDate(date, 'PPp');
+  return formatDate(date, 'PPp')
 }
 
 export function formatRelative(date: Date | string): string {
-  const dateObj = typeof date === 'string' ? parseISO(date) : date;
-  return formatDistance(dateObj, new Date(), { addSuffix: true });
+  const dateObj = typeof date === 'string' ? parseISO(date) : date
+  return formatDistance(dateObj, new Date(), { addSuffix: true })
 }
 
 // Use everywhere
@@ -1702,6 +1724,7 @@ export function formatRelative(date: Date | string): string {
 ---
 
 **Problem 2: Inconsistent Form Validation**
+
 - Some forms use react-hook-form + zod
 - Others use manual validation
 - **Fix**: Standardize on react-hook-form + zod
@@ -1751,6 +1774,7 @@ function StudioForm() {
 ---
 
 **Problem 3: Inconsistent Loading States**
+
 - Some pages show skeleton loaders
 - Others show spinners
 - Some show nothing
@@ -1775,9 +1799,9 @@ export function TableSkeleton({ rows = 5, columns = 4 }) {
 // Usage
 function EquipmentList() {
   const { data, isLoading } = useQuery(/* ... */);
-  
+
   if (isLoading) return <TableSkeleton rows={10} columns={5} />;
-  
+
   return <DataTable data={data} />;
 }
 ```
@@ -1785,16 +1809,17 @@ function EquipmentList() {
 ---
 
 **Problem 4: Missing Empty States**
+
 - Many tables/lists show nothing when empty
 - **Fix**: Create EmptyState component
 
 ```typescript
 // src/components/ui/empty-state.tsx
-export function EmptyState({ 
-  icon: Icon, 
-  title, 
-  description, 
-  action 
+export function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  action
 }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16">
@@ -1827,7 +1852,7 @@ function StudiosList() {
       />
     );
   }
-  
+
   return <DataTable data={studios} />;
 }
 ```
@@ -1849,6 +1874,7 @@ function StudiosList() {
 ### Accessibility Issues
 
 **Issues Found**:
+
 - ❌ Many buttons lack aria-labels
 - ❌ Modals don't trap focus
 - ❌ Tables missing proper headers
@@ -1880,15 +1906,15 @@ const equipment = await prisma.equipment.findMany({
     dailyRate: true,
     condition: true,
     category: {
-      select: { id: true, name: true }
+      select: { id: true, name: true },
     },
     brand: {
-      select: { id: true, name: true }
+      select: { id: true, name: true },
     },
     // Don't load bookings or maintenance logs
   },
-  orderBy: { name: 'asc' }
-});
+  orderBy: { name: 'asc' },
+})
 ```
 
 **Expected Improvement**: < 500ms page load
@@ -1907,14 +1933,14 @@ const [bookingStats, revenueStats, customerCount] = await Promise.all([
   prisma.booking.groupBy({
     by: ['status'],
     _count: true,
-    where: { createdAt: { gte: startOfMonth } }
+    where: { createdAt: { gte: startOfMonth } },
   }),
   prisma.payment.aggregate({
     _sum: { amount: true },
-    where: { createdAt: { gte: startOfMonth } }
+    where: { createdAt: { gte: startOfMonth } },
   }),
-  prisma.customer.count()
-]);
+  prisma.customer.count(),
+])
 ```
 
 **Expected Improvement**: Dashboard loads in 1-2 queries instead of 8-10
@@ -1932,39 +1958,39 @@ enum Permission {
   EQUIPMENT_CREATE = 'equipment:create',
   EQUIPMENT_EDIT = 'equipment:edit',
   EQUIPMENT_DELETE = 'equipment:delete',
-  
+
   // Studios
   STUDIO_VIEW = 'studio:view',
   STUDIO_MANAGE = 'studio:manage',
-  
+
   // Bookings
   BOOKING_VIEW = 'booking:view',
   BOOKING_CREATE = 'booking:create',
   BOOKING_APPROVE = 'booking:approve',
   BOOKING_CANCEL = 'booking:cancel',
-  
+
   // Financial
   INVOICE_VIEW = 'invoice:view',
   INVOICE_CREATE = 'invoice:create',
   PAYMENT_VIEW = 'payment:view',
   PAYMENT_PROCESS = 'payment:process',
   FINANCIAL_REPORTS = 'reports:financial',
-  
+
   // Customers
   CUSTOMER_VIEW = 'customer:view',
   CUSTOMER_EDIT = 'customer:edit',
   CUSTOMER_DELETE = 'customer:delete',
-  
+
   // Settings
   SETTINGS_VIEW = 'settings:view',
   SETTINGS_MANAGE = 'settings:manage',
   USER_MANAGE = 'user:manage',
   ROLE_MANAGE = 'role:manage',
-  
+
   // Maintenance
   MAINTENANCE_VIEW = 'maintenance:view',
   MAINTENANCE_CREATE = 'maintenance:create',
-  
+
   // Claims
   DAMAGE_CLAIM_CREATE = 'claim:create',
   DAMAGE_CLAIM_RESOLVE = 'claim:resolve',
@@ -1987,12 +2013,14 @@ enum Permission {
 
 ### Sprint 1-2 (Weeks 1-4): Foundation & Studios
 
-**Goals**: 
+**Goals**:
+
 - Quick wins (Approvals, Brands, Calendar with real data)
 - Studios module LIVE
 - Categories implementation
 
 **Tasks**:
+
 - [ ] Wire Approvals API (4h)
 - [ ] Connect Brands to database (3h)
 - [ ] Replace Calendar mock data (6h)
@@ -2005,6 +2033,7 @@ enum Permission {
 - [ ] Testing (8h)
 
 **Deliverables**:
+
 - Studios fully functional
 - Calendar shows real bookings
 - Equipment categories live
@@ -2014,11 +2043,13 @@ enum Permission {
 ### Sprint 3-4 (Weeks 5-8): Booking Enhancements
 
 **Goals**:
+
 - Advanced calendar features
 - Maintenance logging
 - Damage claims system
 
 **Tasks**:
+
 - [ ] Multi-resource calendar view (12h)
 - [ ] Buffer time handling (6h)
 - [ ] Drag-and-drop rescheduling (16h)
@@ -2030,6 +2061,7 @@ enum Permission {
 - [ ] Testing (10h)
 
 **Deliverables**:
+
 - Fully functional calendar with drag-drop
 - Maintenance tracking live
 - Damage claim system operational
@@ -2039,11 +2071,13 @@ enum Permission {
 ### Sprint 5-6 (Weeks 9-12): Financial & Pricing
 
 **Goals**:
+
 - Pricing rules engine
 - Enhanced financial reports
 - Customer segments
 
 **Tasks**:
+
 - [ ] Pricing rules schema (6h)
 - [ ] Pricing calculation engine (16h)
 - [ ] Pricing rules admin UI (12h)
@@ -2058,6 +2092,7 @@ enum Permission {
 - [ ] Testing (8h)
 
 **Deliverables**:
+
 - Dynamic pricing fully operational
 - Customer segmentation live
 - Complete financial reporting suite
@@ -2068,12 +2103,14 @@ enum Permission {
 ### Sprint 7-8 (Weeks 13-16): Marketing & Customer Experience
 
 **Goals**:
+
 - Notification templates system
 - Reviews & ratings
 - Customer verification
 - Enhanced CRM features
 
 **Tasks**:
+
 - [ ] Notification templates schema (4h)
 - [ ] Template editor UI with Handlebars (12h)
 - [ ] Email/SMS integration (8h)
@@ -2087,6 +2124,7 @@ enum Permission {
 - [ ] Testing (10h)
 
 **Deliverables**:
+
 - Customizable notification system
 - Review management operational
 - Customer verification process
@@ -2097,12 +2135,14 @@ enum Permission {
 ### Sprint 9-10 (Weeks 17-20): Analytics & Reporting
 
 **Goals**:
+
 - Business intelligence dashboard
 - Utilization reports
 - Customer analytics
 - Revenue forecasting
 
 **Tasks**:
+
 - [ ] BI dashboard schema design (4h)
 - [ ] Equipment utilization calculations (8h)
 - [ ] Studio performance metrics (8h)
@@ -2116,6 +2156,7 @@ enum Permission {
 - [ ] Testing (8h)
 
 **Deliverables**:
+
 - Executive BI dashboard
 - Comprehensive utilization reports
 - Customer insights dashboard
@@ -2126,12 +2167,14 @@ enum Permission {
 ### Sprint 11-12 (Weeks 21-24): Polish, Optimization & Advanced Features
 
 **Goals**:
+
 - Performance optimization
 - Advanced booking features
 - System polish and bug fixes
 - Production readiness
 
 **Week 21**: Performance Optimization
+
 - [ ] Database query optimization (8h)
 - [ ] Implement caching strategy (8h)
 - [ ] Bundle size reduction (6h)
@@ -2140,6 +2183,7 @@ enum Permission {
 - [ ] Load testing (6h)
 
 **Week 22**: Advanced Booking Features
+
 - [ ] Recurring bookings schema + API (10h)
 - [ ] Recurring booking UI (8h)
 - [ ] Waitlist system (8h)
@@ -2148,6 +2192,7 @@ enum Permission {
 - [ ] Booking extension workflow (6h)
 
 **Week 23**: UX/UI Polish
+
 - [ ] Accessibility audit and fixes (12h)
 - [ ] Mobile responsiveness improvements (10h)
 - [ ] Loading states standardization (6h)
@@ -2156,6 +2201,7 @@ enum Permission {
 - [ ] Form validation harmonization (6h)
 
 **Week 24**: Final Polish & Production Prep
+
 - [ ] Security audit (8h)
 - [ ] Comprehensive testing (12h)
 - [ ] Documentation (8h)
@@ -2164,6 +2210,7 @@ enum Permission {
 - [ ] Performance monitoring setup (4h)
 
 **Deliverables**:
+
 - Production-ready admin panel
 - Optimized performance (<2s page loads)
 - Complete feature set
@@ -2196,27 +2243,27 @@ Week 24:    Production Launch 🚀
 
 ### Technical KPIs
 
-| Metric | Target | Critical Threshold |
-|--------|--------|-------------------|
-| Page Load Time | <2s | >5s |
-| API Response Time | <500ms | >2s |
-| Error Rate | <0.5% | >2% |
-| Uptime | >99.9% | <99% |
-| Database Query Time | <100ms | >1s |
-| Bundle Size | <500KB | >1MB |
-| Test Coverage | >80% | <60% |
+| Metric              | Target | Critical Threshold |
+| ------------------- | ------ | ------------------ |
+| Page Load Time      | <2s    | >5s                |
+| API Response Time   | <500ms | >2s                |
+| Error Rate          | <0.5%  | >2%                |
+| Uptime              | >99.9% | <99%               |
+| Database Query Time | <100ms | >1s                |
+| Bundle Size         | <500KB | >1MB               |
+| Test Coverage       | >80%   | <60%               |
 
 ### Business KPIs
 
-| Metric | Description | Target |
-|--------|-------------|--------|
-| Booking Completion Rate | % of bookings completed without errors | >95% |
-| Admin Efficiency | Time to process approval/booking | <2 min |
-| Equipment Utilization | % of time equipment is rented | >60% |
-| Studio Utilization | % of studio hours booked | >50% |
-| Revenue per Admin Hour | Revenue generated per hour worked | Increase 30% |
-| Customer Satisfaction | Based on reviews/feedback | >4.5/5 |
-| Damage Claim Resolution Time | Average days to resolve claim | <3 days |
+| Metric                       | Description                            | Target       |
+| ---------------------------- | -------------------------------------- | ------------ |
+| Booking Completion Rate      | % of bookings completed without errors | >95%         |
+| Admin Efficiency             | Time to process approval/booking       | <2 min       |
+| Equipment Utilization        | % of time equipment is rented          | >60%         |
+| Studio Utilization           | % of studio hours booked               | >50%         |
+| Revenue per Admin Hour       | Revenue generated per hour worked      | Increase 30% |
+| Customer Satisfaction        | Based on reviews/feedback              | >4.5/5       |
+| Damage Claim Resolution Time | Average days to resolve claim          | <3 days      |
 
 ---
 
@@ -2224,12 +2271,12 @@ Week 24:    Production Launch 🚀
 
 ### Critical Risks
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| Data Loss | Low | Critical | Daily backups, point-in-time recovery |
-| Third-Party Outage | Medium | High | Queue system, graceful degradation |
-| Performance Issues | Medium | Medium | Load testing, auto-scaling, caching |
-| Security Breach | Low | Critical | Security audit, regular updates, audit logging |
+| Risk               | Probability | Impact   | Mitigation                                     |
+| ------------------ | ----------- | -------- | ---------------------------------------------- |
+| Data Loss          | Low         | Critical | Daily backups, point-in-time recovery          |
+| Third-Party Outage | Medium      | High     | Queue system, graceful degradation             |
+| Performance Issues | Medium      | Medium   | Load testing, auto-scaling, caching            |
+| Security Breach    | Low         | Critical | Security audit, regular updates, audit logging |
 
 ---
 

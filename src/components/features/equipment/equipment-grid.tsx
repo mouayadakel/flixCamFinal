@@ -30,7 +30,7 @@ export function EquipmentGrid({ items, isLoading }: EquipmentGridProps) {
             <List className="h-4 w-4" />
           </Button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <EquipmentCardSkeleton key={i} />
           ))}
@@ -64,7 +64,7 @@ export function EquipmentGrid({ items, isLoading }: EquipmentGridProps) {
       <div
         className={
           layout === 'grid'
-            ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5'
+            ? 'grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
             : 'flex flex-col gap-3'
         }
       >

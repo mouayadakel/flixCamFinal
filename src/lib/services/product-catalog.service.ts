@@ -4,7 +4,13 @@
  */
 
 import { prisma } from '@/lib/db/prisma'
-import { Prisma, InventoryItemStatus, ProductStatus, ProductType, TranslationLocale } from '@prisma/client'
+import {
+  Prisma,
+  InventoryItemStatus,
+  ProductStatus,
+  ProductType,
+  TranslationLocale,
+} from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 import { ValidationError, NotFoundError } from '@/lib/errors'
 
@@ -86,7 +92,11 @@ function computePricing(input: PricingInput) {
   return { daily, weekly, monthly }
 }
 
-function enforceStatusRules(status: ProductStatus | undefined, daily: number, boxContents?: string | null) {
+function enforceStatusRules(
+  status: ProductStatus | undefined,
+  daily: number,
+  boxContents?: string | null
+) {
   const boxEmpty = !boxContents || boxContents.trim().length === 0
 
   // Force Draft if no/zero price or empty box contents (per blueprint rule)
@@ -146,7 +156,10 @@ function ensureUniqueLocales(translations: TranslationInput[]) {
   }
 }
 
-async function ensureInventoryUniqueness(items: InventoryItemInput[] = [], excludeProductId?: string) {
+async function ensureInventoryUniqueness(
+  items: InventoryItemInput[] = [],
+  excludeProductId?: string
+) {
   const serials = new Set<string>()
   const barcodes = new Set<string>()
 
@@ -210,7 +223,7 @@ export class ProductCatalogService {
     })
 
     const status = enforceStatusRules(input.status, daily, input.boxContents)
-    const resolvedQuantity = input.quantity ?? (input.inventoryItems?.length ?? 0)
+    const resolvedQuantity = input.quantity ?? input.inventoryItems?.length ?? 0
     validateQuantity(resolvedQuantity)
 
     const product = await prisma.$transaction(async (tx) => {
@@ -287,7 +300,10 @@ export class ProductCatalogService {
 
     if (input.brandId) await validateBrand(input.brandId)
     if (input.categoryId || input.subCategoryId) {
-      await validateCategoryHierarchy(input.categoryId ?? product.categoryId, input.subCategoryId ?? product.subCategoryId)
+      await validateCategoryHierarchy(
+        input.categoryId ?? product.categoryId,
+        input.subCategoryId ?? product.subCategoryId
+      )
     }
 
     if (input.translations) ensureUniqueLocales(input.translations)
@@ -296,11 +312,18 @@ export class ProductCatalogService {
     const { daily, weekly, monthly } = computePricing({
       priceDaily: input.priceDaily ?? Number(product.priceDaily),
       priceWeekly: input.priceWeekly ?? (product.priceWeekly ? Number(product.priceWeekly) : null),
-      priceMonthly: input.priceMonthly ?? (product.priceMonthly ? Number(product.priceMonthly) : null),
+      priceMonthly:
+        input.priceMonthly ?? (product.priceMonthly ? Number(product.priceMonthly) : null),
     })
 
-    const status = enforceStatusRules(input.status ?? product.status, daily, input.boxContents ?? product.boxContents)
-    const resolvedQuantity = input.quantity ?? (input.inventoryItems ? input.inventoryItems.length : product.quantity ?? 0)
+    const status = enforceStatusRules(
+      input.status ?? product.status,
+      daily,
+      input.boxContents ?? product.boxContents
+    )
+    const resolvedQuantity =
+      input.quantity ??
+      (input.inventoryItems ? input.inventoryItems.length : (product.quantity ?? 0))
     validateQuantity(resolvedQuantity)
 
     const updated = await prisma.$transaction(async (tx) => {
@@ -316,13 +339,18 @@ export class ProductCatalogService {
           priceDaily: new Decimal(daily),
           priceWeekly: weekly ? new Decimal(weekly) : null,
           priceMonthly: monthly ? new Decimal(monthly) : null,
-          depositAmount: input.depositAmount !== undefined ? (input.depositAmount ? new Decimal(input.depositAmount) : null) : product.depositAmount,
+          depositAmount:
+            input.depositAmount !== undefined
+              ? input.depositAmount
+                ? new Decimal(input.depositAmount)
+                : null
+              : product.depositAmount,
           bufferTime: input.bufferTime ?? product.bufferTime,
           boxContents: input.boxContents ?? product.boxContents,
           featuredImage: input.featuredImage ?? product.featuredImage,
-          galleryImages: input.galleryImages ?? (product.galleryImages ?? Prisma.JsonNull),
+          galleryImages: input.galleryImages ?? product.galleryImages ?? Prisma.JsonNull,
           videoUrl: input.videoUrl ?? product.videoUrl,
-          relatedProducts: input.relatedProducts ?? (product.relatedProducts ?? Prisma.JsonNull),
+          relatedProducts: input.relatedProducts ?? product.relatedProducts ?? Prisma.JsonNull,
           tags: input.tags ?? product.tags,
           quantity: resolvedQuantity,
           updatedBy: input.updatedBy,

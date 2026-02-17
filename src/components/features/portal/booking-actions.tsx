@@ -56,12 +56,7 @@ export interface BookingActionsProps {
   equipmentOptions?: BookingEquipmentOption[]
 }
 
-const CANCELABLE_STATUSES: BookingStatus[] = [
-  'DRAFT',
-  'RISK_CHECK',
-  'PAYMENT_PENDING',
-  'CONFIRMED',
-]
+const CANCELABLE_STATUSES: BookingStatus[] = ['DRAFT', 'RISK_CHECK', 'PAYMENT_PENDING', 'CONFIRMED']
 const REQUEST_CHANGE_EXTENSION_STATUSES: BookingStatus[] = ['CONFIRMED', 'ACTIVE']
 const REPORT_DAMAGE_STATUSES: BookingStatus[] = ['ACTIVE', 'RETURNED']
 
@@ -256,7 +251,7 @@ export function BookingActions({
               onClick={() => setChangeOpen(true)}
               className="justify-start"
             >
-              <Edit3 className="h-4 w-4 ml-2" />
+              <Edit3 className="ml-2 h-4 w-4" />
               طلب تعديل
             </Button>
             <Button
@@ -271,7 +266,7 @@ export function BookingActions({
               }}
               className="justify-start"
             >
-              <CalendarPlus className="h-4 w-4 ml-2" />
+              <CalendarPlus className="ml-2 h-4 w-4" />
               طلب تمديد
             </Button>
           </>
@@ -286,7 +281,7 @@ export function BookingActions({
             title={!canCancel ? cancelNotAllowedMessage : undefined}
             disabled={!canCancel}
           >
-            <XCircle className="h-4 w-4 ml-2" />
+            <XCircle className="ml-2 h-4 w-4" />
             إلغاء الحجز
           </Button>
         )}
@@ -298,7 +293,7 @@ export function BookingActions({
             onClick={() => setDamageOpen(true)}
             className="justify-start"
           >
-            <AlertTriangle className="h-4 w-4 ml-2" />
+            <AlertTriangle className="ml-2 h-4 w-4" />
             الإبلاغ عن ضرر
           </Button>
         )}
@@ -481,12 +476,12 @@ export function BookingActions({
             <AlertDialogDescription>
               هل أنت متأكد من إلغاء هذا الحجز؟ يمكنك ذكر سبب اختياري أدناه.
               {cancelNotAllowedMessage && !canCancel && (
-                <span className="block mt-2 text-destructive">{cancelNotAllowedMessage}</span>
+                <span className="mt-2 block text-destructive">{cancelNotAllowedMessage}</span>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-2">
-            <Label htmlFor="cancel-reason" className="text-muted-foreground text-sm">
+            <Label htmlFor="cancel-reason" className="text-sm text-muted-foreground">
               السبب (اختياري)
             </Label>
             <Input

@@ -10,11 +10,7 @@
 import { prisma } from '@/lib/db/prisma'
 import { AuditService } from './audit.service'
 import { EventBus } from '@/lib/events/event-bus'
-import {
-  NotFoundError,
-  ValidationError,
-  ForbiddenError,
-} from '@/lib/errors'
+import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission } from '@/lib/auth/permissions'
 import type {
   Campaign,
@@ -23,7 +19,10 @@ import type {
   CampaignCreateInput,
   CampaignUpdateInput,
 } from '@/lib/types/marketing.types'
-import { CampaignType as PrismaCampaignType, CampaignStatus as PrismaCampaignStatus } from '@prisma/client'
+import {
+  CampaignType as PrismaCampaignType,
+  CampaignStatus as PrismaCampaignStatus,
+} from '@prisma/client'
 
 /**
  * Marketing Service
@@ -221,7 +220,8 @@ export class MarketingService {
         type: input.type ? this.mapCampaignType(input.type) : undefined,
         subject: input.subject !== undefined ? input.subject : undefined,
         content: input.content !== undefined ? input.content : undefined,
-        targetAudience: input.targetAudience !== undefined ? (input.targetAudience as any) : undefined,
+        targetAudience:
+          input.targetAudience !== undefined ? (input.targetAudience as any) : undefined,
         scheduledAt: input.scheduledAt,
         status,
         updatedBy: userId,

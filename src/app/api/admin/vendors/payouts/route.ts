@@ -64,10 +64,7 @@ export async function PATCH(request: NextRequest) {
 
   const parsed = markPaidSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.flatten().fieldErrors },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 })
   }
 
   const payout = await PayoutService.markPayoutPaid(parsed.data.payoutId, session.user.id, {

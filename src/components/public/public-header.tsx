@@ -47,16 +47,14 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
     <header
       className={cn(
         'sticky top-0 z-40 w-full transition-all duration-300',
-        scrolled
-          ? 'glass-heavy shadow-header-scrolled'
-          : 'bg-white/95 shadow-header'
+        scrolled ? 'glass-heavy shadow-header-scrolled' : 'bg-white/95 shadow-header'
       )}
     >
       {/* Top bar – contact + language; hidden on small */}
       <div
         className={cn(
-          'hidden border-b border-border-light/60 md:block transition-all duration-300 overflow-hidden',
-          scrolled ? 'max-h-0 opacity-0 border-b-0' : 'max-h-12 opacity-100'
+          'hidden overflow-hidden border-b border-border-light/60 transition-all duration-300 md:block',
+          scrolled ? 'max-h-0 border-b-0 opacity-0' : 'max-h-12 opacity-100'
         )}
       >
         <PublicContainer>
@@ -69,10 +67,7 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
                 {phone}
               </a>
               <span className="h-3 w-px bg-border-light" />
-              <a
-                href={`mailto:${email}`}
-                className="transition-colors hover:text-brand-primary"
-              >
+              <a href={`mailto:${email}`} className="transition-colors hover:text-brand-primary">
                 {email}
               </a>
             </span>
@@ -106,7 +101,7 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
                     variant="ghost"
                     size="icon"
                     aria-label={t('common.search')}
-                    className="text-text-heading hover:bg-brand-primary/5 hover:text-brand-primary rounded-full transition-colors"
+                    className="rounded-full text-text-heading transition-colors hover:bg-brand-primary/5 hover:text-brand-primary"
                   >
                     <Search className="h-5 w-5" />
                   </Button>
@@ -124,7 +119,11 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
               </Dialog>
             </div>
 
-            <PublicNav className="hidden flex-shrink-0 md:flex" hiddenRoutes={hiddenRoutes} />
+            <PublicNav
+              className="hidden flex-shrink-0 md:flex"
+              enableEquipmentDropdown
+              hiddenRoutes={hiddenRoutes}
+            />
 
             {/* Auth actions – ms-auto keeps them at end (visible in RTL) */}
             <div className="ms-auto flex flex-shrink-0 items-center gap-1.5">
@@ -137,13 +136,13 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
                       variant="ghost"
                       size="sm"
                       onClick={() => authModal.openAuthModal('login')}
-                      className="text-text-body hover:text-text-heading hover:bg-transparent font-medium transition-colors"
+                      className="font-medium text-text-body transition-colors hover:bg-transparent hover:text-text-heading"
                     >
                       {t('nav.login')}
                     </Button>
                     <Button
                       size="sm"
-                      className="bg-brand-primary hover:bg-brand-primary-hover rounded-lg px-5 font-semibold shadow-sm transition-all hover:shadow-md"
+                      className="rounded-lg bg-brand-primary px-5 font-semibold shadow-sm transition-all hover:bg-brand-primary-hover hover:shadow-md"
                       onClick={() => authModal.openAuthModal('register')}
                     >
                       {t('nav.register')}
@@ -155,13 +154,13 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
                       variant="ghost"
                       size="sm"
                       asChild
-                      className="text-text-body hover:text-text-heading hover:bg-transparent font-medium transition-colors"
+                      className="font-medium text-text-body transition-colors hover:bg-transparent hover:text-text-heading"
                     >
                       <Link href="/login">{t('nav.login')}</Link>
                     </Button>
                     <Button
                       size="sm"
-                      className="bg-brand-primary hover:bg-brand-primary-hover rounded-lg px-5 font-semibold shadow-sm transition-all hover:shadow-md"
+                      className="rounded-lg bg-brand-primary px-5 font-semibold shadow-sm transition-all hover:bg-brand-primary-hover hover:shadow-md"
                       asChild
                     >
                       <Link href="/register">{t('nav.register')}</Link>
@@ -169,7 +168,7 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
                   </>
                 )}
               </div>
-              <div className="md:hidden flex items-center gap-1">
+              <div className="flex items-center gap-1 md:hidden">
                 <MiniCart />
                 <MobileNav hiddenRoutes={hiddenRoutes} />
               </div>

@@ -8,68 +8,68 @@
 
 ### Public routes
 
-| Spec Route | Current Route | Action |
-|------------|---------------|--------|
-| `/` | `(public)/page.tsx` | ✅ Exists |
-| `/categories` | — | **Add** `(public)/categories/page.tsx` (or use existing equipment with category index) |
-| `/c/:categorySlug` | `(public)/equipment` (no slug in path) | **Add** `(public)/c/[categorySlug]/page.tsx` or align equipment to use `/c/:slug` for category listing |
-| `/search?q=` | — | **Add** `(public)/search/page.tsx` (or handle in equipment/categories) |
-| `/p/:productSlug` | `(public)/equipment/[slug]/page.tsx` | **Rename/mirror:** Add `(public)/p/[productSlug]/page.tsx` that forwards to equipment detail, or migrate to `/p/:slug` |
-| `/kits` | `(public)/packages/page.tsx` | **Add** `(public)/kits/page.tsx` redirect or alias to packages |
-| `/how-it-works` | `(public)/how-it-works/page.tsx` | ✅ Exists |
-| `/policies` | `(public)/policies/page.tsx` | ✅ Exists |
-| `/contact` | `(public)/support/page.tsx` | Align: add `/contact` or keep support |
-| `/auth/login` | `(auth)/login/page.tsx` | **Add** `(public)/auth/login` → redirect to `/login` or move under `/auth` |
-| `/auth/register` | `(auth)/register/page.tsx` | **Add** `(public)/auth/register` or redirect |
-| `/auth/verify-email` | — | **Add** `(public)/auth/verify-email/page.tsx` |
-| `/auth/forgot-password` | — | **Add** `(public)/auth/forgot-password/page.tsx` |
+| Spec Route              | Current Route                          | Action                                                                                                                 |
+| ----------------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `/`                     | `(public)/page.tsx`                    | ✅ Exists                                                                                                              |
+| `/categories`           | —                                      | **Add** `(public)/categories/page.tsx` (or use existing equipment with category index)                                 |
+| `/c/:categorySlug`      | `(public)/equipment` (no slug in path) | **Add** `(public)/c/[categorySlug]/page.tsx` or align equipment to use `/c/:slug` for category listing                 |
+| `/search?q=`            | —                                      | **Add** `(public)/search/page.tsx` (or handle in equipment/categories)                                                 |
+| `/p/:productSlug`       | `(public)/equipment/[slug]/page.tsx`   | **Rename/mirror:** Add `(public)/p/[productSlug]/page.tsx` that forwards to equipment detail, or migrate to `/p/:slug` |
+| `/kits`                 | `(public)/packages/page.tsx`           | **Add** `(public)/kits/page.tsx` redirect or alias to packages                                                         |
+| `/how-it-works`         | `(public)/how-it-works/page.tsx`       | ✅ Exists                                                                                                              |
+| `/policies`             | `(public)/policies/page.tsx`           | ✅ Exists                                                                                                              |
+| `/contact`              | `(public)/support/page.tsx`            | Align: add `/contact` or keep support                                                                                  |
+| `/auth/login`           | `(auth)/login/page.tsx`                | **Add** `(public)/auth/login` → redirect to `/login` or move under `/auth`                                             |
+| `/auth/register`        | `(auth)/register/page.tsx`             | **Add** `(public)/auth/register` or redirect                                                                           |
+| `/auth/verify-email`    | —                                      | **Add** `(public)/auth/verify-email/page.tsx`                                                                          |
+| `/auth/forgot-password` | —                                      | **Add** `(public)/auth/forgot-password/page.tsx`                                                                       |
 
 **Suggestion:** Either (A) add new spec routes as redirects/aliases to existing pages, or (B) migrate public routes to spec paths and update links. Prefer (A) for minimal breakage.
 
 ### User (app) routes
 
-| Spec Route | Current Route | Action |
-|------------|---------------|--------|
-| `/app` | `/portal` or `/portal/dashboard` | **Add** `(portal)/app/page.tsx` as dashboard or redirect `/app` → `/portal` |
-| `/app/browse` | — | **Add** or map to portal browse (equipment) |
-| `/app/kits` | — | **Add** or map to portal kits |
-| `/app/cart` | `(public)/cart/page.tsx` | Move under `/app` or add `/app/cart` → redirect to `/cart` |
-| `/app/checkout` | `(public)/checkout/page.tsx` | Move under app or add `/app/checkout` redirect |
-| `/app/bookings` | `portal/bookings/page.tsx` | **Add** `(portal)/app/bookings/page.tsx` or redirect `/app/bookings` → `/portal/bookings` |
-| `/app/bookings/:id` | `portal/bookings/[id]/page.tsx` | Same |
-| `/app/invoices` | — | **Add** if not under portal |
-| `/app/saved` | — | **Add** Saved Gear page |
-| `/app/profile` | — | **Add** or map to portal profile |
-| `/app/notifications` | — | **Add** or map to notifications |
-| `/app/support` | — | **Add** (feature toggle) |
+| Spec Route           | Current Route                    | Action                                                                                    |
+| -------------------- | -------------------------------- | ----------------------------------------------------------------------------------------- |
+| `/app`               | `/portal` or `/portal/dashboard` | **Add** `(portal)/app/page.tsx` as dashboard or redirect `/app` → `/portal`               |
+| `/app/browse`        | —                                | **Add** or map to portal browse (equipment)                                               |
+| `/app/kits`          | —                                | **Add** or map to portal kits                                                             |
+| `/app/cart`          | `(public)/cart/page.tsx`         | Move under `/app` or add `/app/cart` → redirect to `/cart`                                |
+| `/app/checkout`      | `(public)/checkout/page.tsx`     | Move under app or add `/app/checkout` redirect                                            |
+| `/app/bookings`      | `portal/bookings/page.tsx`       | **Add** `(portal)/app/bookings/page.tsx` or redirect `/app/bookings` → `/portal/bookings` |
+| `/app/bookings/:id`  | `portal/bookings/[id]/page.tsx`  | Same                                                                                      |
+| `/app/invoices`      | —                                | **Add** if not under portal                                                               |
+| `/app/saved`         | —                                | **Add** Saved Gear page                                                                   |
+| `/app/profile`       | —                                | **Add** or map to portal profile                                                          |
+| `/app/notifications` | —                                | **Add** or map to notifications                                                           |
+| `/app/support`       | —                                | **Add** (feature toggle)                                                                  |
 
 **Suggestion:** Current user area is under `/portal`. Either rename route group to `app` and use `/app/*`, or keep `/portal` and add redirects from `/app/*` to `/portal/*` so spec URLs work.
 
 ### Admin routes
 
-| Spec Route | Current Route | Action |
-|------------|---------------|--------|
-| `/admin` | `/admin` → redirect dashboard | ✅ |
-| `/admin/monitor` | `/admin/live-ops` | **Add** `/admin/monitor` or alias to live-ops |
-| `/admin/bookings` | `/admin/bookings` | ✅ |
-| `/admin/bookings/calendar` | `/admin/calendar` | **Add** `/admin/bookings/calendar` or redirect to `/admin/calendar` |
-| `/admin/bookings/conflicts` | — | **Add** `/admin/bookings/conflicts/page.tsx` |
-| `/admin/inventory/equipment` | `/admin/inventory/equipment` | ✅ |
-| `/admin/inventory/categories` | `/admin/inventory/categories` | ✅ |
-| `/admin/inventory/brands` | `/admin/inventory/brands` | ✅ |
-| `/admin/inventory/packages` | `/admin/inventory/kits` | **Add** `/admin/inventory/packages` redirect to kits or duplicate |
-| `/admin/holds` | — | **Add** `/admin/holds/page.tsx` (Availability & Holds) |
-| `/admin/users` | `/admin/users` (and settings/roles) | ✅ Ensure Approvals / Credit in same area |
-| `/admin/finance/invoices` | `/admin/invoices` | **Add** `/admin/finance/invoices` redirect or move under finance |
-| `/admin/finance/payments` | `/admin/payments` | Same |
-| `/admin/finance/deposits` | — | **Add** or under finance |
-| `/admin/finance/refunds` | Part of payments | Same |
-| `/admin/pricing-rules` | `/admin/dynamic-pricing` | **Add** alias or redirect |
-| `/admin/discounts` | — | **Add** (feature toggle) |
-| `/admin/roles-permissions` | `/admin/settings/roles` | **Add** `/admin/roles-permissions` redirect |
-| `/admin/feature-toggles` | `/admin/settings/features` | **Add** redirect |
-| `/admin/audit-log` | — | **Add** `/admin/audit-log/page.tsx` |
-| `/admin/settings` | `/admin/settings` | ✅ Add sub-routes: Branches, Zones, Taxes, Templates |
+| Spec Route                    | Current Route                       | Action                                                              |
+| ----------------------------- | ----------------------------------- | ------------------------------------------------------------------- |
+| `/admin`                      | `/admin` → redirect dashboard       | ✅                                                                  |
+| `/admin/monitor`              | `/admin/live-ops`                   | **Add** `/admin/monitor` or alias to live-ops                       |
+| `/admin/bookings`             | `/admin/bookings`                   | ✅                                                                  |
+| `/admin/bookings/calendar`    | `/admin/calendar`                   | **Add** `/admin/bookings/calendar` or redirect to `/admin/calendar` |
+| `/admin/bookings/conflicts`   | —                                   | **Add** `/admin/bookings/conflicts/page.tsx`                        |
+| `/admin/inventory/equipment`  | `/admin/inventory/equipment`        | ✅                                                                  |
+| `/admin/inventory/categories` | `/admin/inventory/categories`       | ✅                                                                  |
+| `/admin/inventory/brands`     | `/admin/inventory/brands`           | ✅                                                                  |
+| `/admin/inventory/packages`   | `/admin/inventory/kits`             | **Add** `/admin/inventory/packages` redirect to kits or duplicate   |
+| `/admin/holds`                | —                                   | **Add** `/admin/holds/page.tsx` (Availability & Holds)              |
+| `/admin/users`                | `/admin/users` (and settings/roles) | ✅ Ensure Approvals / Credit in same area                           |
+| `/admin/finance/invoices`     | `/admin/invoices`                   | **Add** `/admin/finance/invoices` redirect or move under finance    |
+| `/admin/finance/payments`     | `/admin/payments`                   | Same                                                                |
+| `/admin/finance/deposits`     | —                                   | **Add** or under finance                                            |
+| `/admin/finance/refunds`      | Part of payments                    | Same                                                                |
+| `/admin/pricing-rules`        | `/admin/dynamic-pricing`            | **Add** alias or redirect                                           |
+| `/admin/discounts`            | —                                   | **Add** (feature toggle)                                            |
+| `/admin/roles-permissions`    | `/admin/settings/roles`             | **Add** `/admin/roles-permissions` redirect                         |
+| `/admin/feature-toggles`      | `/admin/settings/features`          | **Add** redirect                                                    |
+| `/admin/audit-log`            | —                                   | **Add** `/admin/audit-log/page.tsx`                                 |
+| `/admin/settings`             | `/admin/settings`                   | ✅ Add sub-routes: Branches, Zones, Taxes, Templates                |
 
 ---
 
@@ -133,20 +133,20 @@
 
 ## 7) UI Components (Required)
 
-| Component | Current | Action |
-|-----------|---------|--------|
-| AppShell | Public layout + header/footer | Name or extract AppShell (Header/Footer/Sidebar) |
-| AdminShell | Admin layout | Name or extract AdminShell (AdminSidebar + header) |
-| FilterPanel | — | **Create** sticky FilterPanel (multi-select, clear-all, price slider) |
-| ProductCard | equipment-card | Ensure has AvailabilityBadge, price/day, add-to-cart |
-| AvailabilityBadge | — | **Create** (green/red/label by date range) |
-| DateRangePicker | — | **Create** or use existing date picker for pickup/return |
-| Tabs | UI tabs | ✅ |
-| Stepper | checkout-steps | Extend to 5 steps; reuse as Stepper |
-| CartDrawer/CartPage | cart page | Add CartDrawer (optional) + keep CartPage |
-| OrderSummary | — | **Create** sticky OrderSummary for checkout desktop |
-| Modal, Toast, EmptyState | UI components | ✅ |
-| PermissionGuard | ProtectedRoute | Extend for action-level (e.g. disable button if no permission) |
+| Component                | Current                       | Action                                                                |
+| ------------------------ | ----------------------------- | --------------------------------------------------------------------- |
+| AppShell                 | Public layout + header/footer | Name or extract AppShell (Header/Footer/Sidebar)                      |
+| AdminShell               | Admin layout                  | Name or extract AdminShell (AdminSidebar + header)                    |
+| FilterPanel              | —                             | **Create** sticky FilterPanel (multi-select, clear-all, price slider) |
+| ProductCard              | equipment-card                | Ensure has AvailabilityBadge, price/day, add-to-cart                  |
+| AvailabilityBadge        | —                             | **Create** (green/red/label by date range)                            |
+| DateRangePicker          | —                             | **Create** or use existing date picker for pickup/return              |
+| Tabs                     | UI tabs                       | ✅                                                                    |
+| Stepper                  | checkout-steps                | Extend to 5 steps; reuse as Stepper                                   |
+| CartDrawer/CartPage      | cart page                     | Add CartDrawer (optional) + keep CartPage                             |
+| OrderSummary             | —                             | **Create** sticky OrderSummary for checkout desktop                   |
+| Modal, Toast, EmptyState | UI components                 | ✅                                                                    |
+| PermissionGuard          | ProtectedRoute                | Extend for action-level (e.g. disable button if no permission)        |
 
 ---
 

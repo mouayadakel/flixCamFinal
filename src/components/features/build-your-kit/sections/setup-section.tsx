@@ -31,7 +31,11 @@ export function SetupSection({ onSetupComplete }: SetupSectionProps) {
   const { t } = useLocale()
   const { toast } = useToast()
   const starterRef = useRef<HTMLDivElement>(null)
-  const { data: shootTypes = [], isLoading: loadingShootTypes, error: shootTypesError } = useShootTypes()
+  const {
+    data: shootTypes = [],
+    isLoading: loadingShootTypes,
+    error: shootTypesError,
+  } = useShootTypes()
 
   const shootTypeId = useKitWizardStore((s) => s.shootTypeId)
   const shootTypeSlug = useKitWizardStore((s) => s.shootTypeSlug)
@@ -83,7 +87,7 @@ export function SetupSection({ onSetupComplete }: SetupSectionProps) {
   if (shootTypesError) {
     return (
       <div className="rounded-xl border border-border-light bg-surface-light p-8 text-center">
-        <p className="text-destructive mb-4">{shootTypesError.message}</p>
+        <p className="mb-4 text-destructive">{shootTypesError.message}</p>
         <button
           type="button"
           className="text-sm text-brand-primary underline"
@@ -98,12 +102,8 @@ export function SetupSection({ onSetupComplete }: SetupSectionProps) {
   return (
     <section id="setup" className="animate-fade-in space-y-8">
       <div>
-        <h2 className="text-section-title text-text-heading mb-1">
-          {t('kit.chooseShootType')}
-        </h2>
-        <p className="text-body-main text-text-muted mb-4">
-          {t('kit.chooseShootTypeDesc')}
-        </p>
+        <h2 className="mb-1 text-section-title text-text-heading">{t('kit.chooseShootType')}</h2>
+        <p className="mb-4 text-body-main text-text-muted">{t('kit.chooseShootTypeDesc')}</p>
         <div
           role="radiogroup"
           aria-label={t('kit.chooseShootType')}
@@ -143,14 +143,15 @@ export function SetupSection({ onSetupComplete }: SetupSectionProps) {
                 <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
                   <h3 className="font-semibold">{st.name}</h3>
                   {st.description && (
-                    <p className="mt-1 text-sm text-white/90 line-clamp-2">{st.description}</p>
+                    <p className="mt-1 line-clamp-2 text-sm text-white/90">{st.description}</p>
                   )}
                   <p className="mt-2 text-xs text-white/80">
-                    {st.categoryCount} {t('kit.stepCategory')} · {st.recommendationCount}+ {t('kit.items')}
+                    {st.categoryCount} {t('kit.stepCategory')} · {st.recommendationCount}+{' '}
+                    {t('kit.items')}
                   </p>
                 </div>
                 {shootTypeId === st.id && (
-                  <div className="absolute top-3 end-3 flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary text-white">
+                  <div className="absolute end-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary text-white">
                     <Check className="h-5 w-5" />
                   </div>
                 )}
@@ -162,8 +163,8 @@ export function SetupSection({ onSetupComplete }: SetupSectionProps) {
 
       <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <h2 className="text-lg font-semibold text-text-heading mb-2">{t('kit.chooseBudget')}</h2>
-          <p className="text-body-main text-text-muted mb-4">{t('kit.chooseBudgetDesc')}</p>
+          <h2 className="mb-2 text-lg font-semibold text-text-heading">{t('kit.chooseBudget')}</h2>
+          <p className="mb-4 text-body-main text-text-muted">{t('kit.chooseBudgetDesc')}</p>
           <div
             role="radiogroup"
             aria-label={t('kit.chooseBudget')}
@@ -179,7 +180,7 @@ export function SetupSection({ onSetupComplete }: SetupSectionProps) {
                 className={cn(
                   'flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-all',
                   budgetTier === id
-                    ? 'border-brand-primary bg-brand-primary/10 ring-2 ring-brand-primary ring-offset-2 text-brand-primary'
+                    ? 'border-brand-primary bg-brand-primary/10 text-brand-primary ring-2 ring-brand-primary ring-offset-2'
                     : 'border-border-light/60 bg-white text-text-muted hover:border-brand-primary/40'
                 )}
                 aria-label={t(labelKey)}
@@ -192,9 +193,9 @@ export function SetupSection({ onSetupComplete }: SetupSectionProps) {
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold text-text-heading mb-2">{t('kit.duration')}</h2>
-          <p className="text-body-main text-text-muted mb-4">{t('kit.durationDesc')}</p>
-          <div className="flex flex-wrap gap-2 mb-3">
+          <h2 className="mb-2 text-lg font-semibold text-text-heading">{t('kit.duration')}</h2>
+          <p className="mb-4 text-body-main text-text-muted">{t('kit.durationDesc')}</p>
+          <div className="mb-3 flex flex-wrap gap-2">
             {DURATION_PRESETS.map((days) => (
               <button
                 key={days}

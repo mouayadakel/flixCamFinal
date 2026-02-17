@@ -26,16 +26,10 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('startDate')
       ? new Date(searchParams.get('startDate')!)
       : undefined
-    const endDate = searchParams.get('endDate')
-      ? new Date(searchParams.get('endDate')!)
-      : undefined
+    const endDate = searchParams.get('endDate') ? new Date(searchParams.get('endDate')!) : undefined
     const search = searchParams.get('search') || undefined
-    const limit = searchParams.get('limit')
-      ? parseInt(searchParams.get('limit')!)
-      : 50
-    const offset = searchParams.get('offset')
-      ? parseInt(searchParams.get('offset')!)
-      : 0
+    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 50
+    const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : 0
 
     const result = await BookingService.list(session.user.id, {
       customerId,
@@ -76,9 +70,7 @@ export async function POST(request: NextRequest) {
 
     // Get IP and user agent for audit
     const ipAddress =
-      request.headers.get('x-forwarded-for') ||
-      request.headers.get('x-real-ip') ||
-      'unknown'
+      request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'
 
     // Create booking
@@ -105,10 +97,7 @@ export async function POST(request: NextRequest) {
     console.error('Error creating booking:', error)
 
     if (error instanceof Error && error.name === 'ZodError') {
-      return NextResponse.json(
-        { error: 'بيانات غير صالحة', details: error },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'بيانات غير صالحة', details: error }, { status: 400 })
     }
 
     return NextResponse.json(

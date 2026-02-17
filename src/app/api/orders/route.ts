@@ -12,8 +12,7 @@ export async function GET(request: Request) {
   if (search) {
     data = data.filter(
       (o) =>
-        o.orderNumber.toLowerCase().includes(search) ||
-        o.customer.toLowerCase().includes(search)
+        o.orderNumber.toLowerCase().includes(search) || o.customer.toLowerCase().includes(search)
     )
   }
   if (status) {

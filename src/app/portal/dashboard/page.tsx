@@ -13,15 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
-import {
-  Calendar,
-  DollarSign,
-  Package,
-  Clock,
-  ArrowLeft,
-  FileText,
-  Receipt,
-} from 'lucide-react'
+import { Calendar, DollarSign, Package, Clock, ArrowLeft, FileText, Receipt } from 'lucide-react'
 import { formatCurrency, formatDate } from '@/lib/utils/format.utils'
 import { BookingStatus } from '@prisma/client'
 
@@ -99,21 +91,20 @@ export default async function PortalDashboardPage() {
   })
 
   // Categorize bookings
-  const activeBookings = bookings.filter(
-    (b) => b.status === 'ACTIVE' || b.status === 'CONFIRMED'
-  )
+  const activeBookings = bookings.filter((b) => b.status === 'ACTIVE' || b.status === 'CONFIRMED')
   const upcomingBookings = bookings.filter(
     (b) =>
       b.status === 'CONFIRMED' &&
       new Date(b.startDate) > new Date() &&
       new Date(b.startDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
   )
-  const pastBookings = bookings.filter(
-    (b) => b.status === 'CLOSED' || b.status === 'RETURNED'
-  )
+  const pastBookings = bookings.filter((b) => b.status === 'CLOSED' || b.status === 'RETURNED')
 
   function getStatusBadge(status: BookingStatus) {
-    const statusConfig: Record<BookingStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+    const statusConfig: Record<
+      BookingStatus,
+      { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+    > = {
       DRAFT: { label: 'مسودة', variant: 'outline' },
       RISK_CHECK: { label: 'فحص المخاطر', variant: 'outline' },
       PAYMENT_PENDING: { label: 'انتظار الدفع', variant: 'secondary' },
@@ -133,13 +124,11 @@ export default async function PortalDashboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">لوحة التحكم</h1>
-        <p className="text-muted-foreground mt-2">
-          مرحباً بك في لوحة تحكم العميل
-        </p>
+        <p className="mt-2 text-muted-foreground">مرحباً بك في لوحة تحكم العميل</p>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">إجمالي الحجوزات</CardTitle>
@@ -147,9 +136,7 @@ export default async function PortalDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalBookings}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              جميع الحجوزات
-            </p>
+            <p className="mt-1 text-xs text-muted-foreground">جميع الحجوزات</p>
           </CardContent>
         </Card>
 
@@ -162,9 +149,7 @@ export default async function PortalDashboardPage() {
             <div className="text-2xl font-bold">
               {formatCurrency(totalSpent._sum.amount?.toNumber() ?? 0)}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              المدفوع حتى الآن
-            </p>
+            <p className="mt-1 text-xs text-muted-foreground">المدفوع حتى الآن</p>
           </CardContent>
         </Card>
 
@@ -175,9 +160,7 @@ export default async function PortalDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{upcomingReturns}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              خلال 7 أيام القادمة
-            </p>
+            <p className="mt-1 text-xs text-muted-foreground">خلال 7 أيام القادمة</p>
           </CardContent>
         </Card>
       </div>
@@ -196,23 +179,18 @@ export default async function PortalDashboardPage() {
               {activeBookings.map((booking) => (
                 <div
                   key={booking.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
+                  className="flex items-center justify-between rounded-lg border p-4"
                 >
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-medium">
-                        حجز #{booking.bookingNumber}
-                      </span>
+                    <div className="mb-2 flex items-center gap-3">
+                      <span className="font-medium">حجز #{booking.bookingNumber}</span>
                       {getStatusBadge(booking.status)}
                     </div>
-                    <div className="text-sm text-muted-foreground space-y-1">
+                    <div className="space-y-1 text-sm text-muted-foreground">
                       <div>
-                        من {formatDate(booking.startDate)} إلى{' '}
-                        {formatDate(booking.endDate)}
+                        من {formatDate(booking.startDate)} إلى {formatDate(booking.endDate)}
                       </div>
-                      <div>
-                        {formatCurrency(booking.totalAmount.toNumber())}
-                      </div>
+                      <div>{formatCurrency(booking.totalAmount.toNumber())}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -243,23 +221,18 @@ export default async function PortalDashboardPage() {
               {upcomingBookings.map((booking) => (
                 <div
                   key={booking.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
+                  className="flex items-center justify-between rounded-lg border p-4"
                 >
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-medium">
-                        حجز #{booking.bookingNumber}
-                      </span>
+                    <div className="mb-2 flex items-center gap-3">
+                      <span className="font-medium">حجز #{booking.bookingNumber}</span>
                       {getStatusBadge(booking.status)}
                     </div>
-                    <div className="text-sm text-muted-foreground space-y-1">
+                    <div className="space-y-1 text-sm text-muted-foreground">
                       <div>
-                        من {formatDate(booking.startDate)} إلى{' '}
-                        {formatDate(booking.endDate)}
+                        من {formatDate(booking.startDate)} إلى {formatDate(booking.endDate)}
                       </div>
-                      <div>
-                        {formatCurrency(booking.totalAmount.toNumber())}
-                      </div>
+                      <div>{formatCurrency(booking.totalAmount.toNumber())}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -282,22 +255,22 @@ export default async function PortalDashboardPage() {
           <CardTitle>إجراءات سريعة</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <Link href="/portal/bookings">
               <Button variant="outline" className="w-full justify-start">
-                <Calendar className="h-4 w-4 ml-2" />
+                <Calendar className="ml-2 h-4 w-4" />
                 عرض جميع الحجوزات
               </Button>
             </Link>
             <Link href="/portal/contracts">
               <Button variant="outline" className="w-full justify-start">
-                <FileText className="h-4 w-4 ml-2" />
+                <FileText className="ml-2 h-4 w-4" />
                 العقود
               </Button>
             </Link>
             <Link href="/portal/invoices">
               <Button variant="outline" className="w-full justify-start">
-                <Receipt className="h-4 w-4 ml-2" />
+                <Receipt className="ml-2 h-4 w-4" />
                 الفواتير
               </Button>
             </Link>

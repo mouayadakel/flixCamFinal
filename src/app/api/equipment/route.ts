@@ -25,8 +25,18 @@ export async function GET(request: NextRequest) {
       categoryId: searchParams.get('categoryId') || undefined,
       brandId: searchParams.get('brandId') || undefined,
       condition: searchParams.get('condition') as any,
-      isActive: searchParams.get('isActive') === 'true' ? true : searchParams.get('isActive') === 'false' ? false : undefined,
-      featured: searchParams.get('featured') === 'true' ? true : searchParams.get('featured') === 'false' ? false : undefined,
+      isActive:
+        searchParams.get('isActive') === 'true'
+          ? true
+          : searchParams.get('isActive') === 'false'
+            ? false
+            : undefined,
+      featured:
+        searchParams.get('featured') === 'true'
+          ? true
+          : searchParams.get('featured') === 'false'
+            ? false
+            : undefined,
       skip: parseInt(searchParams.get('skip') || '0'),
       take: parseInt(searchParams.get('take') || '50'),
     }
@@ -55,8 +65,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
+    const { featured: _featured, ...rest } = body
     const equipment = await EquipmentService.createEquipment({
-      ...body,
+      ...rest,
       createdBy: session.user.id,
     })
 

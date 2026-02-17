@@ -47,8 +47,21 @@ import { formatCurrency } from '@/lib/utils/format.utils'
 
 interface ExecutiveStats {
   revenue: { today: number; thisWeek: number; thisMonth: number; thisYear: number; growth: number }
-  bookings: { today: number; thisWeek: number; thisMonth: number; pending: number; active: number; growth: number }
-  equipment: { total: number; available: number; rented: number; maintenance: number; utilization: number }
+  bookings: {
+    today: number
+    thisWeek: number
+    thisMonth: number
+    pending: number
+    active: number
+    growth: number
+  }
+  equipment: {
+    total: number
+    available: number
+    rented: number
+    maintenance: number
+    utilization: number
+  }
   customers: { total: number; active: number; newThisMonth: number; growth: number }
 }
 
@@ -63,10 +76,20 @@ interface UtilizationData {
   equipment: {
     totalUnits: number
     utilizationRate: number
-    byEquipment: Array<{ equipmentId: string; equipmentName: string; utilizationRate: number; rentedDays: number }>
+    byEquipment: Array<{
+      equipmentId: string
+      equipmentName: string
+      utilizationRate: number
+      rentedDays: number
+    }>
   }
   studio: {
-    byStudio: Array<{ studioName: string; utilizationRate: number; bookedHours: number; revenue: number }>
+    byStudio: Array<{
+      studioName: string
+      utilizationRate: number
+      bookedHours: number
+      revenue: number
+    }>
   }
 }
 
@@ -86,7 +109,11 @@ export default function AnalyticsPage() {
       const data = await res.json()
       setExecutive(data)
     } catch {
-      toast({ title: 'Error', description: 'Failed to load executive stats', variant: 'destructive' })
+      toast({
+        title: 'Error',
+        description: 'Failed to load executive stats',
+        variant: 'destructive',
+      })
     }
   }
 
@@ -138,7 +165,7 @@ export default function AnalyticsPage() {
     return (
       <div className="space-y-6">
         <Skeleton className="h-10 w-64" />
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-28" />
           ))}
@@ -152,20 +179,20 @@ export default function AnalyticsPage() {
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <BarChart3 className="h-8 w-8" />
             التحليلات والإشغال
           </h1>
-          <p className="text-muted-foreground mt-1">لوحة BI ونسب إشغال المعدات والاستوديوهات</p>
+          <p className="mt-1 text-muted-foreground">لوحة BI ونسب إشغال المعدات والاستوديوهات</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleRefresh} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
           <Button variant="outline" asChild>
             <Link href="/admin/finance/reports">
-              <ExternalLink className="h-4 w-4 mr-2" />
+              <ExternalLink className="mr-2 h-4 w-4" />
               التقارير المالية
             </Link>
           </Button>
@@ -182,7 +209,8 @@ export default function AnalyticsPage() {
             <CardContent>
               <p className="text-2xl font-bold">{formatCurrency(executive.revenue.thisMonth)}</p>
               <p className="text-xs text-muted-foreground">
-                {executive.revenue.growth >= 0 ? '+' : ''}{executive.revenue.growth.toFixed(1)}% عن الشهر الماضي
+                {executive.revenue.growth >= 0 ? '+' : ''}
+                {executive.revenue.growth.toFixed(1)}% عن الشهر الماضي
               </p>
             </CardContent>
           </Card>
@@ -218,7 +246,8 @@ export default function AnalyticsPage() {
             <CardContent>
               <p className="text-2xl font-bold">{executive.customers.total}</p>
               <p className="text-xs text-muted-foreground">
-                نشط هذا الشهر: {executive.customers.active} · جديد: {executive.customers.newThisMonth}
+                نشط هذا الشهر: {executive.customers.active} · جديد:{' '}
+                {executive.customers.newThisMonth}
               </p>
             </CardContent>
           </Card>
@@ -261,21 +290,43 @@ export default function AnalyticsPage() {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="period" tick={{ fontSize: 11 }} />
                     <YAxis yAxisId="left" tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
-                    <YAxis yAxisId="right" orientation="right" tickFormatter={(v) => v.toString()} />
+                    <YAxis
+                      yAxisId="right"
+                      orientation="right"
+                      tickFormatter={(v) => v.toString()}
+                    />
                     <Tooltip
                       formatter={(value, name) => [
-                        name === 'revenue' ? formatCurrency(Number(value ?? 0)) : Number(value ?? 0),
+                        name === 'revenue'
+                          ? formatCurrency(Number(value ?? 0))
+                          : Number(value ?? 0),
                         name === 'revenue' ? 'الإيرادات' : 'الحجوزات',
                       ]}
                       labelFormatter={(label) => label}
                     />
                     <Legend />
-                    <Line yAxisId="left" type="monotone" dataKey="revenue" stroke="#1F87E8" name="الإيرادات" strokeWidth={2} />
-                    <Line yAxisId="right" type="monotone" dataKey="bookings" stroke="#10B981" name="الحجوزات" strokeWidth={2} />
+                    <Line
+                      yAxisId="left"
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke="#1F87E8"
+                      name="الإيرادات"
+                      strokeWidth={2}
+                    />
+                    <Line
+                      yAxisId="right"
+                      type="monotone"
+                      dataKey="bookings"
+                      stroke="#10B981"
+                      name="الحجوزات"
+                      strokeWidth={2}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex h-80 items-center justify-center text-muted-foreground">لا توجد بيانات للفترة المحددة</div>
+                <div className="flex h-80 items-center justify-center text-muted-foreground">
+                  لا توجد بيانات للفترة المحددة
+                </div>
               )}
             </CardContent>
           </Card>
@@ -290,7 +341,9 @@ export default function AnalyticsPage() {
                     <Package className="h-5 w-5" />
                     إشغال المعدات
                   </CardTitle>
-                  <CardDescription>نسبة الاستخدام حسب القطعة (أيام مستأجرة / أيام متاحة)</CardDescription>
+                  <CardDescription>
+                    نسبة الاستخدام حسب القطعة (أيام مستأجرة / أيام متاحة)
+                  </CardDescription>
                 </div>
                 <Select value={utilDays} onValueChange={setUtilDays}>
                   <SelectTrigger className="w-[120px]">
@@ -307,8 +360,9 @@ export default function AnalyticsPage() {
             <CardContent>
               {utilization && utilization.equipment.byEquipment.length > 0 ? (
                 <>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    إجمالي نسبة الإشغال: <strong>{utilization.equipment.utilizationRate}%</strong> ({utilization.periodDays} يوم)
+                  <p className="mb-4 text-sm text-muted-foreground">
+                    إجمالي نسبة الإشغال: <strong>{utilization.equipment.utilizationRate}%</strong> (
+                    {utilization.periodDays} يوم)
                   </p>
                   <ResponsiveContainer width="100%" height={360}>
                     <BarChart
@@ -317,15 +371,32 @@ export default function AnalyticsPage() {
                       margin={{ left: 120 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis type="number" domain={[0, 100]} unit="%" tickFormatter={(v) => `${v}%`} />
-                      <YAxis type="category" dataKey="equipmentName" width={110} tick={{ fontSize: 11 }} />
+                      <XAxis
+                        type="number"
+                        domain={[0, 100]}
+                        unit="%"
+                        tickFormatter={(v) => `${v}%`}
+                      />
+                      <YAxis
+                        type="category"
+                        dataKey="equipmentName"
+                        width={110}
+                        tick={{ fontSize: 11 }}
+                      />
                       <Tooltip formatter={(value) => [`${Number(value ?? 0)}%`, 'نسبة الإشغال']} />
-                      <Bar dataKey="utilizationRate" fill="#1F87E8" name="نسبة الإشغال" radius={[0, 4, 4, 0]} />
+                      <Bar
+                        dataKey="utilizationRate"
+                        fill="#1F87E8"
+                        name="نسبة الإشغال"
+                        radius={[0, 4, 4, 0]}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </>
               ) : (
-                <div className="flex h-60 items-center justify-center text-muted-foreground">لا توجد بيانات إشغال للمعدات</div>
+                <div className="flex h-60 items-center justify-center text-muted-foreground">
+                  لا توجد بيانات إشغال للمعدات
+                </div>
               )}
             </CardContent>
           </Card>
@@ -347,15 +418,30 @@ export default function AnalyticsPage() {
                     <YAxis tickFormatter={(v) => `${v}%`} />
                     <Tooltip
                       formatter={(value, name) => [
-                        name === 'utilizationRate' ? `${Number(value ?? 0)}%` : name === 'revenue' ? formatCurrency(Number(value ?? 0)) : Number(value ?? 0),
-                        name === 'utilizationRate' ? 'نسبة الإشغال' : name === 'revenue' ? 'الإيرادات' : 'ساعات',
+                        name === 'utilizationRate'
+                          ? `${Number(value ?? 0)}%`
+                          : name === 'revenue'
+                            ? formatCurrency(Number(value ?? 0))
+                            : Number(value ?? 0),
+                        name === 'utilizationRate'
+                          ? 'نسبة الإشغال'
+                          : name === 'revenue'
+                            ? 'الإيرادات'
+                            : 'ساعات',
                       ]}
                     />
-                    <Bar dataKey="utilizationRate" fill="#6366F1" name="نسبة الإشغال" radius={[4, 4, 0, 0]} />
+                    <Bar
+                      dataKey="utilizationRate"
+                      fill="#6366F1"
+                      name="نسبة الإشغال"
+                      radius={[4, 4, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex h-40 items-center justify-center text-muted-foreground">لا توجد بيانات إشغال للاستوديوهات</div>
+                <div className="flex h-40 items-center justify-center text-muted-foreground">
+                  لا توجد بيانات إشغال للاستوديوهات
+                </div>
               )}
             </CardContent>
           </Card>

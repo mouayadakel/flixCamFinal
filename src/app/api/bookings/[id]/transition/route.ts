@@ -12,10 +12,7 @@ import { stateTransitionSchema } from '@/lib/validators/booking.validator'
 /**
  * POST /api/bookings/[id]/transition - Transition booking state
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
     if (!session?.user?.id) {
@@ -26,9 +23,7 @@ export async function POST(
     const validated = stateTransitionSchema.parse(body)
 
     const ipAddress =
-      request.headers.get('x-forwarded-for') ||
-      request.headers.get('x-real-ip') ||
-      'unknown'
+      request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'
 
     const booking = await BookingService.transitionState(
@@ -44,10 +39,7 @@ export async function POST(
     console.error('Error transitioning booking:', error)
 
     if (error instanceof Error && error.name === 'ZodError') {
-      return NextResponse.json(
-        { error: 'بيانات غير صالحة', details: error },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'بيانات غير صالحة', details: error }, { status: 400 })
     }
 
     return NextResponse.json(

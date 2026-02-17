@@ -7,17 +7,30 @@
 
 // Enums
 export type EquipmentCondition = 'new' | 'excellent' | 'good' | 'fair' | 'damaged' | 'retired'
-export type EquipmentStatus = 'available' | 'booked' | 'checked_out' | 'maintenance' | 'lost' | 'sold'
-export type BookingState = 
-  | 'draft' 
-  | 'risk_check' 
-  | 'payment_pending' 
-  | 'confirmed' 
-  | 'active' 
-  | 'returned' 
-  | 'closed' 
+export type EquipmentStatus =
+  | 'available'
+  | 'booked'
+  | 'checked_out'
+  | 'maintenance'
+  | 'lost'
+  | 'sold'
+export type BookingState =
+  | 'draft'
+  | 'risk_check'
+  | 'payment_pending'
+  | 'confirmed'
+  | 'active'
+  | 'returned'
+  | 'closed'
   | 'cancelled'
-export type UserRole = 'super_admin' | 'admin' | 'staff' | 'warehouse' | 'driver' | 'technician' | 'client'
+export type UserRole =
+  | 'super_admin'
+  | 'admin'
+  | 'staff'
+  | 'warehouse'
+  | 'driver'
+  | 'technician'
+  | 'client'
 
 // Multi-language text type
 export interface MultiLangText {

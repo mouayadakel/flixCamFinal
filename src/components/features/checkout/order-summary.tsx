@@ -63,9 +63,7 @@ export function OrderSummary({ holdExpiresAt, depositAmount, className }: OrderS
         className
       )}
     >
-      <h3 className="mb-4 text-lg font-semibold text-text-heading">
-        {t('checkout.orderSummary')}
-      </h3>
+      <h3 className="mb-4 text-lg font-semibold text-text-heading">{t('checkout.orderSummary')}</h3>
 
       <ul className="mb-4 space-y-2 border-b border-border-light pb-4">
         {items.map((item) => (

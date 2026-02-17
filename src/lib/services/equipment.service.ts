@@ -239,7 +239,12 @@ export class EquipmentService {
     const bufferTimeUnit = (customFields?.bufferTimeUnit as 'hours' | 'days') || undefined
 
     // Get related equipment if IDs exist
-    let relatedEquipment: { id: string; sku: string; model: string | null; category: { name: string } }[] = []
+    let relatedEquipment: {
+      id: string
+      sku: string
+      model: string | null
+      category: { name: string }
+    }[] = []
     if (relatedEquipmentIds.length > 0) {
       relatedEquipment = await prisma.equipment.findMany({
         where: {
@@ -330,8 +335,11 @@ export class EquipmentService {
           isActive: input.isActive !== undefined ? input.isActive : true,
           warehouseLocation: input.warehouseLocation,
           barcode: input.barcode,
-          specifications: input.specifications ? JSON.parse(JSON.stringify(input.specifications)) : null,
-          customFields: Object.keys(customFields).length > 0 ? JSON.parse(JSON.stringify(customFields)) : null,
+          specifications: input.specifications
+            ? JSON.parse(JSON.stringify(input.specifications))
+            : null,
+          customFields:
+            Object.keys(customFields).length > 0 ? JSON.parse(JSON.stringify(customFields)) : null,
           createdBy: input.createdBy,
         },
         include: {
@@ -343,7 +351,12 @@ export class EquipmentService {
       // Save translations
       if (input.translations && input.translations.length > 0) {
         const translationInputs = TranslationService.formatTranslationsForSave(input.translations)
-        await TranslationService.saveTranslations('equipment', newEquipment.id, translationInputs, input.createdBy)
+        await TranslationService.saveTranslations(
+          'equipment',
+          newEquipment.id,
+          translationInputs,
+          input.createdBy
+        )
       }
 
       // Create media records using transaction client
@@ -400,18 +413,33 @@ export class EquipmentService {
   /**
    * Update equipment
    */
-  static async updateEquipment(input: UpdateEquipmentInput & {
-    translations?: EquipmentTranslationInput[]
-    featuredImageUrl?: string
-    galleryImageUrls?: string[]
-    videoUrl?: string
-    relatedEquipmentIds?: string[]
-    boxContents?: string
-    bufferTime?: number
-    bufferTimeUnit?: 'hours' | 'days'
-    vendorSubmissionStatus?: VendorSubmissionStatus
-  }) {
-    const { id, updatedBy, translations, featuredImageUrl, galleryImageUrls, videoUrl, relatedEquipmentIds, boxContents, bufferTime, bufferTimeUnit, vendorSubmissionStatus, ...data } = input
+  static async updateEquipment(
+    input: UpdateEquipmentInput & {
+      translations?: EquipmentTranslationInput[]
+      featuredImageUrl?: string
+      galleryImageUrls?: string[]
+      videoUrl?: string
+      relatedEquipmentIds?: string[]
+      boxContents?: string
+      bufferTime?: number
+      bufferTimeUnit?: 'hours' | 'days'
+      vendorSubmissionStatus?: VendorSubmissionStatus
+    }
+  ) {
+    const {
+      id,
+      updatedBy,
+      translations,
+      featuredImageUrl,
+      galleryImageUrls,
+      videoUrl,
+      relatedEquipmentIds,
+      boxContents,
+      bufferTime,
+      bufferTimeUnit,
+      vendorSubmissionStatus,
+      ...data
+    } = input
 
     // Check if equipment exists
     const existing = await prisma.equipment.findFirst({
@@ -471,8 +499,13 @@ export class EquipmentService {
         where: { id },
         data: {
           ...data,
-          specifications: data.specifications ? JSON.parse(JSON.stringify(data.specifications)) : undefined,
-          customFields: Object.keys(customFields).length > 0 ? JSON.parse(JSON.stringify(customFields)) : undefined,
+          specifications: data.specifications
+            ? JSON.parse(JSON.stringify(data.specifications))
+            : undefined,
+          customFields:
+            Object.keys(customFields).length > 0
+              ? JSON.parse(JSON.stringify(customFields))
+              : undefined,
           updatedBy,
           updatedAt: new Date(),
         },
@@ -659,10 +692,7 @@ export class EquipmentService {
           deletedAt: null,
           OR: [
             {
-              AND: [
-                { startDate: { lte: endDate } },
-                { endDate: { gte: startDate } },
-              ],
+              AND: [{ startDate: { lte: endDate } }, { endDate: { gte: startDate } }],
             },
           ],
           ...(excludeBookingId ? { id: { not: excludeBookingId } } : {}),

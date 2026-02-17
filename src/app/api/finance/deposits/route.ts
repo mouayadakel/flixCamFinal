@@ -50,7 +50,12 @@ export async function GET() {
     const data = bookings.map((b) => {
       const deposit = Number(b.depositAmount ?? 0)
       const successPayment = b.payments.find((p) => p.status === 'SUCCESS')
-      const refunded = b.payments.some((p) => p.status === 'REFUNDED' || p.status === 'PARTIALLY_REFUNDED' || (p.refundAmount && Number(p.refundAmount) > 0))
+      const refunded = b.payments.some(
+        (p) =>
+          p.status === 'REFUNDED' ||
+          p.status === 'PARTIALLY_REFUNDED' ||
+          (p.refundAmount && Number(p.refundAmount) > 0)
+      )
       let depositStatus: 'paid' | 'pending' | 'refunded' = 'pending'
       if (refunded) depositStatus = 'refunded'
       else if (successPayment && Number(successPayment.amount) >= deposit) depositStatus = 'paid'
@@ -70,14 +75,24 @@ export async function GET() {
       }
     })
 
-    const totalHeld = data.filter((d) => d.depositStatus === 'paid' && !['CANCELLED', 'CLOSED'].includes(d.status)).reduce((s, d) => s + d.depositAmount, 0)
-    const pending = data.filter((d) => d.depositStatus === 'pending').reduce((s, d) => s + d.depositAmount, 0)
-    const refunded = data.filter((d) => d.depositStatus === 'refunded').reduce((s, d) => s + d.depositAmount, 0)
+    const totalHeld = data
+      .filter((d) => d.depositStatus === 'paid' && !['CANCELLED', 'CLOSED'].includes(d.status))
+      .reduce((s, d) => s + d.depositAmount, 0)
+    const pending = data
+      .filter((d) => d.depositStatus === 'pending')
+      .reduce((s, d) => s + d.depositAmount, 0)
+    const refunded = data
+      .filter((d) => d.depositStatus === 'refunded')
+      .reduce((s, d) => s + d.depositAmount, 0)
 
     return NextResponse.json({
       data,
       total: data.length,
-      summary: { totalDepositsHeld: totalHeld, pendingDeposits: pending, refundedDeposits: refunded },
+      summary: {
+        totalDepositsHeld: totalHeld,
+        pendingDeposits: pending,
+        refundedDeposits: refunded,
+      },
     })
   } catch (e) {
     console.error('Deposits list error:', e)

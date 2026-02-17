@@ -55,9 +55,12 @@ export async function PATCH(request: NextRequest) {
 
     const body = await request.json()
     const vat_rate = typeof body.vat_rate === 'number' ? body.vat_rate : parseFloat(body.vat_rate)
-    const vat_number = typeof body.vat_number === 'string' ? body.vat_number : String(body.vat_number ?? '')
-    const tax_name = typeof body.tax_name === 'string' ? body.tax_name : String(body.tax_name ?? 'VAT')
-    const is_inclusive = typeof body.is_inclusive === 'boolean' ? body.is_inclusive : Boolean(body.is_inclusive)
+    const vat_number =
+      typeof body.vat_number === 'string' ? body.vat_number : String(body.vat_number ?? '')
+    const tax_name =
+      typeof body.tax_name === 'string' ? body.tax_name : String(body.tax_name ?? 'VAT')
+    const is_inclusive =
+      typeof body.is_inclusive === 'boolean' ? body.is_inclusive : Boolean(body.is_inclusive)
 
     const value = JSON.stringify({
       vat_rate: Number.isNaN(vat_rate) ? 15 : vat_rate,
@@ -82,7 +85,12 @@ export async function PATCH(request: NextRequest) {
       })
     }
 
-    return NextResponse.json({ vat_rate: Number.isNaN(vat_rate) ? 15 : vat_rate, vat_number, tax_name, is_inclusive })
+    return NextResponse.json({
+      vat_rate: Number.isNaN(vat_rate) ? 15 : vat_rate,
+      vat_number,
+      tax_name,
+      is_inclusive,
+    })
   } catch (e) {
     console.error('Tax settings update error:', e)
     return NextResponse.json({ error: 'Failed to update tax settings' }, { status: 500 })

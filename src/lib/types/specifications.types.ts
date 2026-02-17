@@ -114,9 +114,7 @@ export type AnySpecifications = StructuredSpecifications | FlatSpecifications
 /**
  * Type guard to check if specifications are structured
  */
-export function isStructuredSpecifications(
-  specs: unknown
-): specs is StructuredSpecifications {
+export function isStructuredSpecifications(specs: unknown): specs is StructuredSpecifications {
   return (
     typeof specs === 'object' &&
     specs !== null &&
@@ -129,11 +127,8 @@ export function isStructuredSpecifications(
 /**
  * Type guard to check if specifications are flat
  */
-export function isFlatSpecifications(
-  specs: unknown
-): specs is FlatSpecifications {
+export function isFlatSpecifications(specs: unknown): specs is FlatSpecifications {
   if (typeof specs !== 'object' || specs === null) return false
-  if ('groups' in specs && Array.isArray((specs as { groups: unknown }).groups))
-    return false
+  if ('groups' in specs && Array.isArray((specs as { groups: unknown }).groups)) return false
   return Object.keys(specs as Record<string, unknown>).length > 0
 }

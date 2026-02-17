@@ -8,7 +8,10 @@ import { useEffect, useRef } from 'react'
 import { useLocale } from '@/hooks/use-locale'
 import { useKitWizardStore } from '@/lib/stores/kit-wizard.store'
 import { useEquipmentInfinite, type EquipmentListItem } from '@/lib/hooks/use-kit-queries'
-import { KitEquipmentCard, type KitEquipmentItem } from '@/components/features/build-your-kit/kit-equipment-card'
+import {
+  KitEquipmentCard,
+  type KitEquipmentItem,
+} from '@/components/features/build-your-kit/kit-equipment-card'
 import { EquipmentSkeleton } from '@/components/features/build-your-kit/kit-skeleton'
 import { Button } from '@/components/ui/button'
 
@@ -89,7 +92,7 @@ export function InfiniteEquipmentGrid({
   if (isError) {
     return (
       <div className="rounded-xl border border-border-light bg-surface-light p-8 text-center">
-        <p className="text-destructive mb-4">{error?.message ?? t('kit.errorLoading')}</p>
+        <p className="mb-4 text-destructive">{error?.message ?? t('kit.errorLoading')}</p>
         <Button type="button" variant="outline" onClick={() => refetch()}>
           {t('common.retry')}
         </Button>
@@ -146,9 +149,7 @@ export function InfiniteEquipmentGrid({
       )}
 
       {!hasNextPage && equipment.length > 0 && (
-        <p className="text-center py-6 text-sm text-text-muted">
-          —
-        </p>
+        <p className="py-6 text-center text-sm text-text-muted">—</p>
       )}
     </div>
   )

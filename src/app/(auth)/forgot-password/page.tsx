@@ -21,7 +21,11 @@ type FormData = z.infer<typeof schema>
 export default function ForgotPasswordPage() {
   const { toast } = useToast()
   const [sent, setSent] = useState(false)
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
   })
 
@@ -35,7 +39,10 @@ export default function ForgotPasswordPage() {
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Request failed')
       setSent(true)
-      toast({ title: 'Check your email', description: 'If an account exists we sent a reset link.' })
+      toast({
+        title: 'Check your email',
+        description: 'If an account exists we sent a reset link.',
+      })
     } catch (e) {
       toast({
         title: 'Error',
@@ -47,10 +54,11 @@ export default function ForgotPasswordPage() {
 
   if (sent) {
     return (
-      <main className="container mx-auto max-w-md py-12 px-4">
-        <h1 className="text-2xl font-bold mb-4">Check your email</h1>
-        <p className="text-muted-foreground mb-6">
-          If an account exists for that email we sent a password reset link. Check spam if you don’t see it.
+      <main className="container mx-auto max-w-md px-4 py-12">
+        <h1 className="mb-4 text-2xl font-bold">Check your email</h1>
+        <p className="mb-6 text-muted-foreground">
+          If an account exists for that email we sent a password reset link. Check spam if you don’t
+          see it.
         </p>
         <Button asChild variant="outline">
           <Link href="/login">Back to login</Link>
@@ -60,15 +68,21 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <main className="container mx-auto max-w-md py-12 px-4">
-      <h1 className="text-2xl font-bold mb-4">Forgot password</h1>
-      <p className="text-muted-foreground mb-6">
+    <main className="container mx-auto max-w-md px-4 py-12">
+      <h1 className="mb-4 text-2xl font-bold">Forgot password</h1>
+      <p className="mb-6 text-muted-foreground">
         Enter your email and we’ll send a link to reset your password.
       </p>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" disabled={isSubmitting} {...register('email')} className="mt-1" />
+          <Input
+            id="email"
+            type="email"
+            disabled={isSubmitting}
+            {...register('email')}
+            className="mt-1"
+          />
           {errors.email && <p className="mt-1 text-sm text-destructive">{errors.email.message}</p>}
         </div>
         <Button type="submit" className="w-full" disabled={isSubmitting}>
@@ -83,7 +97,9 @@ export default function ForgotPasswordPage() {
         </Button>
       </form>
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        <Link href="/login" className="text-brand-primary underline">Back to login</Link>
+        <Link href="/login" className="text-brand-primary underline">
+          Back to login
+        </Link>
       </p>
     </main>
   )

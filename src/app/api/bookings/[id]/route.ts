@@ -13,10 +13,7 @@ import { BookingStatus } from '@prisma/client'
 /**
  * GET /api/bookings/[id] - Get booking by ID
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
     if (!session?.user?.id) {
@@ -39,10 +36,7 @@ export async function GET(
 /**
  * PATCH /api/bookings/[id] - Update booking
  */
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
     if (!session?.user?.id) {
@@ -55,9 +49,7 @@ export async function PATCH(
     if (body.toState) {
       const validated = stateTransitionSchema.parse(body)
       const ipAddress =
-        request.headers.get('x-forwarded-for') ||
-        request.headers.get('x-real-ip') ||
-        'unknown'
+        request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
       const userAgent = request.headers.get('user-agent') || 'unknown'
 
       const booking = await BookingService.transitionState(
@@ -75,18 +67,12 @@ export async function PATCH(
     const validated = updateBookingSchema.parse(body)
     // TODO: Implement update method in BookingService
     // For now, return not implemented
-    return NextResponse.json(
-      { error: 'تحديث الحجز غير متاح حالياً' },
-      { status: 501 }
-    )
+    return NextResponse.json({ error: 'تحديث الحجز غير متاح حالياً' }, { status: 501 })
   } catch (error) {
     console.error('Error updating booking:', error)
 
     if (error instanceof Error && error.name === 'ZodError') {
-      return NextResponse.json(
-        { error: 'بيانات غير صالحة', details: error },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'بيانات غير صالحة', details: error }, { status: 400 })
     }
 
     return NextResponse.json(
@@ -101,10 +87,7 @@ export async function PATCH(
 /**
  * DELETE /api/bookings/[id] - Cancel booking
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
     if (!session?.user?.id) {
@@ -115,17 +98,13 @@ export async function DELETE(
     const reason = searchParams.get('reason') || undefined
 
     const ipAddress =
-      request.headers.get('x-forwarded-for') ||
-      request.headers.get('x-real-ip') ||
-      'unknown'
+      request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'
 
-    const booking = await BookingService.cancel(
-      params.id,
-      session.user.id,
-      reason,
-      { ipAddress, userAgent }
-    )
+    const booking = await BookingService.cancel(params.id, session.user.id, reason, {
+      ipAddress,
+      userAgent,
+    })
 
     return NextResponse.json(booking)
   } catch (error) {

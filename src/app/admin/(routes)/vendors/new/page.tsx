@@ -72,7 +72,7 @@ export default function NewVendorPage() {
       <div>
         <Link
           href="/admin/vendors"
-          className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1 mb-2"
+          className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowRight className="h-4 w-4" />
           العودة للموردين
@@ -86,7 +86,7 @@ export default function NewVendorPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <Label>البريد الإلكتروني *</Label>
                 <Input
@@ -107,7 +107,7 @@ export default function NewVendorPage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <Label>الاسم</Label>
                 <Input
@@ -123,7 +123,7 @@ export default function NewVendorPage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <Label>اسم الشركة *</Label>
                 <Input
@@ -155,7 +155,7 @@ export default function NewVendorPage() {
             </div>
             <div className="flex gap-4">
               <Button type="submit" disabled={loading}>
-                {loading && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+                {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
                 إنشاء المورد
               </Button>
               <Button type="button" variant="outline" onClick={() => router.back()}>

@@ -46,7 +46,7 @@ export function VideoUrlInput({
   const getEmbedUrl = (videoUrl: string): string | null => {
     try {
       const url = new URL(videoUrl)
-      
+
       // YouTube
       if (url.hostname.includes('youtube.com') || url.hostname.includes('youtu.be')) {
         const videoId = url.hostname.includes('youtu.be')
@@ -56,7 +56,7 @@ export function VideoUrlInput({
           return `https://www.youtube.com/embed/${videoId}`
         }
       }
-      
+
       // Vimeo
       if (url.hostname.includes('vimeo.com')) {
         const videoId = url.pathname.split('/').pop()
@@ -64,7 +64,7 @@ export function VideoUrlInput({
           return `https://player.vimeo.com/video/${videoId}`
         }
       }
-      
+
       return null
     } catch {
       return null
@@ -97,17 +97,17 @@ export function VideoUrlInput({
       </div>
 
       {embedUrl ? (
-        <div className="relative aspect-video rounded-lg border border-neutral-200 overflow-hidden bg-neutral-100">
+        <div className="relative aspect-video overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100">
           <iframe
             src={embedUrl}
-            className="absolute inset-0 w-full h-full"
+            className="absolute inset-0 h-full w-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             title="Video preview"
           />
         </div>
       ) : url ? (
-        <div className="flex items-center gap-2 p-4 border border-neutral-200 rounded-lg bg-neutral-50">
+        <div className="flex items-center gap-2 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
           <Video className="h-5 w-5 text-neutral-400" />
           <span className="text-sm text-neutral-600">
             رابط فيديو غير مدعوم للمعاينة. سيتم حفظ الرابط كما هو.

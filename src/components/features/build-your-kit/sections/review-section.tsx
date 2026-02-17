@@ -17,10 +17,8 @@ export function ReviewSection() {
 
   return (
     <section id="review" className="animate-fade-in">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-text-heading">
-          {t('kit.stepSummary')}
-        </h2>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-text-heading">{t('kit.stepSummary')}</h2>
         {hasItems && (
           <button
             type="button"

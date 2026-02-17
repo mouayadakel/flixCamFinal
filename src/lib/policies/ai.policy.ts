@@ -20,7 +20,9 @@ export class AIPolicy {
   }
 
   static async canViewRiskAssessment(userId: string): Promise<PolicyResult> {
-    const hasAccess = await hasPermission(userId, PERMISSIONS.AI_RISK_ASSESSMENT) || await hasPermission(userId, PERMISSIONS.BOOKING_READ)
+    const hasAccess =
+      (await hasPermission(userId, PERMISSIONS.AI_RISK_ASSESSMENT)) ||
+      (await hasPermission(userId, PERMISSIONS.BOOKING_READ))
     if (!hasAccess) {
       return {
         allowed: false,
@@ -31,7 +33,9 @@ export class AIPolicy {
   }
 
   static async canUseKitBuilder(userId: string): Promise<PolicyResult> {
-    const hasAccess = await hasPermission(userId, PERMISSIONS.AI_KIT_BUILDER) || await hasPermission(userId, PERMISSIONS.BOOKING_CREATE)
+    const hasAccess =
+      (await hasPermission(userId, PERMISSIONS.AI_KIT_BUILDER)) ||
+      (await hasPermission(userId, PERMISSIONS.BOOKING_CREATE))
     if (!hasAccess) {
       return {
         allowed: false,
@@ -42,7 +46,9 @@ export class AIPolicy {
   }
 
   static async canViewPricingSuggestions(userId: string): Promise<PolicyResult> {
-    const hasAccess = await hasPermission(userId, 'ai.pricing') || await hasPermission(userId, 'equipment.update')
+    const hasAccess =
+      (await hasPermission(userId, 'ai.pricing')) ||
+      (await hasPermission(userId, 'equipment.update'))
     if (!hasAccess) {
       return {
         allowed: false,
@@ -53,7 +59,9 @@ export class AIPolicy {
   }
 
   static async canViewDemandForecast(userId: string): Promise<PolicyResult> {
-    const hasAccess = await hasPermission(userId, 'ai.demand_forecast') || await hasPermission(userId, 'reports.read')
+    const hasAccess =
+      (await hasPermission(userId, 'ai.demand_forecast')) ||
+      (await hasPermission(userId, 'reports.read'))
     if (!hasAccess) {
       return {
         allowed: false,

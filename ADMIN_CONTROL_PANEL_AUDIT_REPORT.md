@@ -12,12 +12,12 @@ The admin control panel is broadly functional with **live data** on dashboard, b
 
 **Summary by priority:**
 
-| Priority | Count | Focus |
-|----------|--------|--------|
-| **P0 – Critical** | 3 | Security (encryption default, XSS), data (approvals not persisted) |
-| **P1 – High** | 8 | RBAC/permissions, API wiring, layout, read-only persistence |
-| **P2 – Medium** | 10 | Placeholders, validation, UX, links |
-| **P3 – Low** | 6 | Code quality, duplication, types |
+| Priority          | Count | Focus                                                              |
+| ----------------- | ----- | ------------------------------------------------------------------ |
+| **P0 – Critical** | 3     | Security (encryption default, XSS), data (approvals not persisted) |
+| **P1 – High**     | 8     | RBAC/permissions, API wiring, layout, read-only persistence        |
+| **P2 – Medium**   | 10    | Placeholders, validation, UX, links                                |
+| **P3 – Low**      | 6     | Code quality, duplication, types                                   |
 
 **Recommendation:** Address P0 and P1 first (security and core flows), then fill P2 gaps (placeholders and UX), and finally P3 refactors.
 
@@ -29,16 +29,16 @@ The admin control panel is broadly functional with **live data** on dashboard, b
 
 #### P0-1. Default encryption key in production (Security)
 
-| Field | Value |
-|-------|--------|
-| **Location** | `src/lib/services/integration-config.service.ts` lines 12–13 |
-| **Severity** | Critical |
-| **Category** | Security |
-| **Description** | `ENCRYPTION_KEY` falls back to `'default-key-change-in-production'` when `process.env.ENCRYPTION_KEY` is unset. In production this allows decryption of stored integration secrets by anyone who knows the default. |
-| **Impact** | Payment/email/WhatsApp/analytics configs stored in DB could be decrypted; compliance and breach risk. |
-| **Reproduction** | Deploy without `ENCRYPTION_KEY`; inspect code or env. |
-| **Recommended fix** | Do not default in production; require `ENCRYPTION_KEY` and fail fast if missing. |
-| **Code example** | |
+| Field               | Value                                                                                                                                                                                                               |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Location**        | `src/lib/services/integration-config.service.ts` lines 12–13                                                                                                                                                        |
+| **Severity**        | Critical                                                                                                                                                                                                            |
+| **Category**        | Security                                                                                                                                                                                                            |
+| **Description**     | `ENCRYPTION_KEY` falls back to `'default-key-change-in-production'` when `process.env.ENCRYPTION_KEY` is unset. In production this allows decryption of stored integration secrets by anyone who knows the default. |
+| **Impact**          | Payment/email/WhatsApp/analytics configs stored in DB could be decrypted; compliance and breach risk.                                                                                                               |
+| **Reproduction**    | Deploy without `ENCRYPTION_KEY`; inspect code or env.                                                                                                                                                               |
+| **Recommended fix** | Do not default in production; require `ENCRYPTION_KEY` and fail fast if missing.                                                                                                                                    |
+| **Code example**    |                                                                                                                                                                                                                     |
 
 ```ts
 // Before
@@ -55,16 +55,16 @@ if (!ENCRYPTION_KEY || (process.env.NODE_ENV === 'production' && ENCRYPTION_KEY.
 
 #### P0-2. XSS via `dangerouslySetInnerHTML` on equipment HTML (Security)
 
-| Field | Value |
-|-------|--------|
-| **Location** | `src/app/admin/(routes)/inventory/equipment/[id]/page.tsx` lines 460, 500, 562 |
-| **Severity** | Critical |
-| **Category** | Security (XSS) |
-| **Description** | `trans.description`, `equipment.specifications.html`, and `equipment.boxContents` are rendered with `dangerouslySetInnerHTML` without sanitization. If any of this HTML is user-controlled or import-controlled, it can execute script. |
-| **Impact** | Stored XSS for any admin viewing the equipment detail page. |
-| **Reproduction** | Create or import equipment with description/specs/boxContents containing `<script>...</script>` or event handlers; open equipment detail. |
-| **Recommended fix** | Sanitize HTML before render (e.g. DOMPurify) or render as plain text. |
-| **Code example** | |
+| Field               | Value                                                                                                                                                                                                                                   |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Location**        | `src/app/admin/(routes)/inventory/equipment/[id]/page.tsx` lines 460, 500, 562                                                                                                                                                          |
+| **Severity**        | Critical                                                                                                                                                                                                                                |
+| **Category**        | Security (XSS)                                                                                                                                                                                                                          |
+| **Description**     | `trans.description`, `equipment.specifications.html`, and `equipment.boxContents` are rendered with `dangerouslySetInnerHTML` without sanitization. If any of this HTML is user-controlled or import-controlled, it can execute script. |
+| **Impact**          | Stored XSS for any admin viewing the equipment detail page.                                                                                                                                                                             |
+| **Reproduction**    | Create or import equipment with description/specs/boxContents containing `<script>...</script>` or event handlers; open equipment detail.                                                                                               |
+| **Recommended fix** | Sanitize HTML before render (e.g. DOMPurify) or render as plain text.                                                                                                                                                                   |
+| **Code example**    |                                                                                                                                                                                                                                         |
 
 ```ts
 // Add: npm install dompurify && npm install -D @types/dompurify
@@ -88,16 +88,16 @@ Apply the same pattern for `equipment.specifications.html` and `equipment.boxCon
 
 #### P0-3. Approvals page: approve/reject not persisted (Data / Functionality)
 
-| Field | Value |
-|-------|--------|
-| **Location** | `src/app/admin/(routes)/approvals/page.tsx` lines 191–224 |
-| **Severity** | Critical |
-| **Category** | Data / Functionality |
-| **Description** | `handleAction` uses `await new Promise(resolve => setTimeout(resolve, 1000))` and only updates local state. It does not call `POST /api/approvals/[id]/approve` or `POST /api/approvals/[id]/reject`. |
-| **Impact** | Approve/reject has no effect on the backend; approvals are not really resolved; workflow is broken. |
-| **Reproduction** | Open Approvals, click Approve or Reject; refresh page – state is unchanged on server. |
-| **Recommended fix** | Call the real approval APIs and refresh list (or update from response). |
-| **Code example** | |
+| Field               | Value                                                                                                                                                                                                 |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Location**        | `src/app/admin/(routes)/approvals/page.tsx` lines 191–224                                                                                                                                             |
+| **Severity**        | Critical                                                                                                                                                                                              |
+| **Category**        | Data / Functionality                                                                                                                                                                                  |
+| **Description**     | `handleAction` uses `await new Promise(resolve => setTimeout(resolve, 1000))` and only updates local state. It does not call `POST /api/approvals/[id]/approve` or `POST /api/approvals/[id]/reject`. |
+| **Impact**          | Approve/reject has no effect on the backend; approvals are not really resolved; workflow is broken.                                                                                                   |
+| **Reproduction**    | Open Approvals, click Approve or Reject; refresh page – state is unchanged on server.                                                                                                                 |
+| **Recommended fix** | Call the real approval APIs and refresh list (or update from response).                                                                                                                               |
+| **Code example**    |                                                                                                                                                                                                       |
 
 ```ts
 // In handleAction, replace the simulated delay with:
@@ -126,16 +126,16 @@ Handle approval IDs that match the API (e.g. feature-flag approvals use differen
 
 #### P1-1. PERMISSIONS.USER_VIEW / USER_CREATE missing from PERMISSIONS object (Functionality / RBAC)
 
-| Field | Value |
-|-------|--------|
-| **Location** | `src/lib/auth/permissions.ts` (PERMISSIONS object ends at line 105); `src/app/api/admin/users/route.ts` lines 63, 156 |
-| **Severity** | High |
-| **Category** | Functionality / RBAC |
-| **Description** | Admin users API uses `PERMISSIONS.USER_VIEW` and `PERMISSIONS.USER_CREATE`, but the `PERMISSIONS` object in `permissions.ts` does not define `USER_VIEW` or `USER_CREATE`. If the project compiles, they may exist in another build or branch; in the current file they are missing. |
-| **Impact** | TypeScript error or runtime 403 for user list/create if permission check fails. |
-| **Reproduction** | Open Users page or create user as admin; check console/network for 403 or compile. |
-| **Recommended fix** | Add to `PERMISSIONS` and include in admin (and optionally super_admin) role. |
-| **Code example** | |
+| Field               | Value                                                                                                                                                                                                                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Location**        | `src/lib/auth/permissions.ts` (PERMISSIONS object ends at line 105); `src/app/api/admin/users/route.ts` lines 63, 156                                                                                                                                                                |
+| **Severity**        | High                                                                                                                                                                                                                                                                                 |
+| **Category**        | Functionality / RBAC                                                                                                                                                                                                                                                                 |
+| **Description**     | Admin users API uses `PERMISSIONS.USER_VIEW` and `PERMISSIONS.USER_CREATE`, but the `PERMISSIONS` object in `permissions.ts` does not define `USER_VIEW` or `USER_CREATE`. If the project compiles, they may exist in another build or branch; in the current file they are missing. |
+| **Impact**          | TypeScript error or runtime 403 for user list/create if permission check fails.                                                                                                                                                                                                      |
+| **Reproduction**    | Open Users page or create user as admin; check console/network for 403 or compile.                                                                                                                                                                                                   |
+| **Recommended fix** | Add to `PERMISSIONS` and include in admin (and optionally super_admin) role.                                                                                                                                                                                                         |
+| **Code example**    |                                                                                                                                                                                                                                                                                      |
 
 In `src/lib/auth/permissions.ts` inside the `PERMISSIONS` object (before `} as const`):
 
@@ -159,16 +159,16 @@ In `ROLE_PERMISSIONS.admin` array add:
 
 #### P1-2. Permission string mismatch: `booking.view` vs `booking.read` (Logic)
 
-| Field | Value |
-|-------|--------|
-| **Location** | `src/lib/services/booking.service.ts` lines 549, 615; `src/lib/auth/permissions.ts` line 15 |
-| **Severity** | High |
-| **Category** | Logic |
-| **Description** | `BookingService.list` and related logic use `hasPermission(userId, 'booking.view' as any)`. `PERMISSIONS` defines `BOOKING_READ: 'booking.read'`. Roles are granted `booking.read`, not `booking.view`. |
-| **Impact** | Permission check can always fail, blocking list/cancel for non-super_admin users. |
-| **Reproduction** | Log in as staff/admin, open Bookings list or trigger cancel; may get 403 or empty list. |
-| **Recommended fix** | Use `PERMISSIONS.BOOKING_READ` (or add `BOOKING_VIEW: 'booking.view'` and align roles) so that the same string is used in both permission constants and `hasPermission`. |
-| **Code example** | |
+| Field               | Value                                                                                                                                                                                                   |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Location**        | `src/lib/services/booking.service.ts` lines 549, 615; `src/lib/auth/permissions.ts` line 15                                                                                                             |
+| **Severity**        | High                                                                                                                                                                                                    |
+| **Category**        | Logic                                                                                                                                                                                                   |
+| **Description**     | `BookingService.list` and related logic use `hasPermission(userId, 'booking.view' as any)`. `PERMISSIONS` defines `BOOKING_READ: 'booking.read'`. Roles are granted `booking.read`, not `booking.view`. |
+| **Impact**          | Permission check can always fail, blocking list/cancel for non-super_admin users.                                                                                                                       |
+| **Reproduction**    | Log in as staff/admin, open Bookings list or trigger cancel; may get 403 or empty list.                                                                                                                 |
+| **Recommended fix** | Use `PERMISSIONS.BOOKING_READ` (or add `BOOKING_VIEW: 'booking.view'` and align roles) so that the same string is used in both permission constants and `hasPermission`.                                |
+| **Code example**    |                                                                                                                                                                                                         |
 
 ```ts
 // In booking.service.ts
@@ -186,86 +186,86 @@ Do the same for the second occurrence (around line 615). Update `context-sidebar
 
 #### P1-3. Read-only mode not persisted (Data / Operations)
 
-| Field | Value |
-|-------|--------|
-| **Location** | `src/lib/middleware/read-only.middleware.ts` lines 11–19 |
-| **Severity** | High |
-| **Category** | Data / Operations |
-| **Description** | `readOnlyMode` is an in-memory variable. Restart or scale-out resets it; there is no persistence (DB/Redis) or admin UI to see/toggle it across instances. |
-| **Impact** | Read-only mode cannot be relied on for maintenance or recovery across restarts or multiple instances. |
-| **Reproduction** | Enable read-only via `POST /api/admin/read-only`, restart server; read-only is off. |
-| **Recommended fix** | Persist in DB (e.g. `SystemSetting`) or Redis; have middleware and `GET/POST /api/admin/read-only` read/write from that store. |
-| **Code example** | Conceptual: add a `SystemSetting` key `read_only_mode` and in middleware call a small helper that reads from DB/Redis; in read-only API, update that store instead of a global variable. |
+| Field               | Value                                                                                                                                                                                    |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Location**        | `src/lib/middleware/read-only.middleware.ts` lines 11–19                                                                                                                                 |
+| **Severity**        | High                                                                                                                                                                                     |
+| **Category**        | Data / Operations                                                                                                                                                                        |
+| **Description**     | `readOnlyMode` is an in-memory variable. Restart or scale-out resets it; there is no persistence (DB/Redis) or admin UI to see/toggle it across instances.                               |
+| **Impact**          | Read-only mode cannot be relied on for maintenance or recovery across restarts or multiple instances.                                                                                    |
+| **Reproduction**    | Enable read-only via `POST /api/admin/read-only`, restart server; read-only is off.                                                                                                      |
+| **Recommended fix** | Persist in DB (e.g. `SystemSetting`) or Redis; have middleware and `GET/POST /api/admin/read-only` read/write from that store.                                                           |
+| **Code example**    | Conceptual: add a `SystemSetting` key `read_only_mode` and in middleware call a small helper that reads from DB/Redis; in read-only API, update that store instead of a global variable. |
 
 ---
 
 #### P1-4. Duplicate breadcrumbs in admin layout (UX)
 
-| Field | Value |
-|-------|--------|
-| **Location** | `src/app/admin/layout.tsx` lines 32–37 |
-| **Severity** | High (UX) |
-| **Category** | UX |
-| **Description** | `AdminBreadcrumbs` is rendered once in the layout; many admin pages also render `AdminBreadcrumbs` again inside their content (e.g. clients/[id], approvals, action-center). Layout already wraps `children` in a container that includes breadcrumbs, so page-level breadcrumbs duplicate them. |
-| **Impact** | Double breadcrumb trail on many pages; cluttered and inconsistent. |
-| **Reproduction** | Open any admin page that imports and renders `AdminBreadcrumbs` (e.g. `/admin/clients`, `/admin/approvals`). |
-| **Recommended fix** | Keep breadcrumbs only in the admin layout; remove `AdminBreadcrumbs` from individual admin pages so layout is the single source. |
-| **Code example** | In `src/app/admin/layout.tsx` keep the existing breadcrumbs block. In each admin page that renders `<AdminBreadcrumbs />`, remove that component. |
+| Field               | Value                                                                                                                                                                                                                                                                                            |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Location**        | `src/app/admin/layout.tsx` lines 32–37                                                                                                                                                                                                                                                           |
+| **Severity**        | High (UX)                                                                                                                                                                                                                                                                                        |
+| **Category**        | UX                                                                                                                                                                                                                                                                                               |
+| **Description**     | `AdminBreadcrumbs` is rendered once in the layout; many admin pages also render `AdminBreadcrumbs` again inside their content (e.g. clients/[id], approvals, action-center). Layout already wraps `children` in a container that includes breadcrumbs, so page-level breadcrumbs duplicate them. |
+| **Impact**          | Double breadcrumb trail on many pages; cluttered and inconsistent.                                                                                                                                                                                                                               |
+| **Reproduction**    | Open any admin page that imports and renders `AdminBreadcrumbs` (e.g. `/admin/clients`, `/admin/approvals`).                                                                                                                                                                                     |
+| **Recommended fix** | Keep breadcrumbs only in the admin layout; remove `AdminBreadcrumbs` from individual admin pages so layout is the single source.                                                                                                                                                                 |
+| **Code example**    | In `src/app/admin/layout.tsx` keep the existing breadcrumbs block. In each admin page that renders `<AdminBreadcrumbs />`, remove that component.                                                                                                                                                |
 
 ---
 
 #### P1-5. Approvals page: wrong link for “view” (Functionality)
 
-| Field | Value |
-|-------|--------|
-| **Location** | `src/app/admin/(routes)/approvals/page.tsx` line 361 |
-| **Severity** | High |
-| **Category** | Functionality |
-| **Description** | Link is built as `/admin/${approval.relatedType}s/${approval.relatedId}`. For `relatedType: 'booking'` this becomes `/admin/bookings/xxx` (correct). For `relatedType: 'quote'` this becomes `/admin/quotes/xxx` (correct). If `relatedType` is ever singular or different, the path can be wrong (e.g. `bookingss`). |
-| **Impact** | 404 or wrong resource if `relatedType` does not match route naming. |
-| **Reproduction** | Click “view” on an approval that has `relatedType` not matching the admin route segment (e.g. typo or new type). |
-| **Recommended fix** | Map `relatedType` to route prefix explicitly (e.g. `{ booking: 'bookings', quote: 'quotes' }[approval.relatedType]`) and handle unknown types (hide link or open in new tab to a generic view). |
+| Field               | Value                                                                                                                                                                                                                                                                                                                 |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Location**        | `src/app/admin/(routes)/approvals/page.tsx` line 361                                                                                                                                                                                                                                                                  |
+| **Severity**        | High                                                                                                                                                                                                                                                                                                                  |
+| **Category**        | Functionality                                                                                                                                                                                                                                                                                                         |
+| **Description**     | Link is built as `/admin/${approval.relatedType}s/${approval.relatedId}`. For `relatedType: 'booking'` this becomes `/admin/bookings/xxx` (correct). For `relatedType: 'quote'` this becomes `/admin/quotes/xxx` (correct). If `relatedType` is ever singular or different, the path can be wrong (e.g. `bookingss`). |
+| **Impact**          | 404 or wrong resource if `relatedType` does not match route naming.                                                                                                                                                                                                                                                   |
+| **Reproduction**    | Click “view” on an approval that has `relatedType` not matching the admin route segment (e.g. typo or new type).                                                                                                                                                                                                      |
+| **Recommended fix** | Map `relatedType` to route prefix explicitly (e.g. `{ booking: 'bookings', quote: 'quotes' }[approval.relatedType]`) and handle unknown types (hide link or open in new tab to a generic view).                                                                                                                       |
 
 ---
 
 #### P1-6. Bookings API response shape vs Action Center / Approvals (Functionality)
 
-| Field | Value |
-|-------|--------|
-| **Location** | `src/lib/services/booking.service.ts` return at lines 692–697; `src/app/admin/(routes)/action-center/page.tsx` lines 119–122; `src/app/admin/(routes)/approvals/page.tsx` lines 112–114 |
-| **Severity** | High |
-| **Category** | Functionality |
-| **Description** | `BookingService.list` returns `{ data, total, limit, offset }`. The bookings API returns this object directly. Action Center and Approvals use `bookingsData.data` and assume a `data` array. If the API ever returns a different shape (e.g. pagination wrapper), these pages can break. |
-| **Impact** | Empty or broken lists on Action Center and Approvals if response shape changes. |
-| **Reproduction** | Change API to return `{ result: [...] }`; Action Center and Approvals show no items. |
-| **Recommended fix** | Keep a single contract: e.g. always `{ data: T[], total?, limit?, offset? }` for list endpoints. Document it and add a type (e.g. `ListResponse<T>`). In pages, use optional chaining: `const bookings = bookingsData?.data ?? []`. |
+| Field               | Value                                                                                                                                                                                                                                                                                     |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Location**        | `src/lib/services/booking.service.ts` return at lines 692–697; `src/app/admin/(routes)/action-center/page.tsx` lines 119–122; `src/app/admin/(routes)/approvals/page.tsx` lines 112–114                                                                                                   |
+| **Severity**        | High                                                                                                                                                                                                                                                                                      |
+| **Category**        | Functionality                                                                                                                                                                                                                                                                             |
+| **Description**     | `BookingService.list` returns `{ data, total, limit, offset }`. The bookings API returns this object directly. Action Center and Approvals use `bookingsData.data` and assume a `data` array. If the API ever returns a different shape (e.g. pagination wrapper), these pages can break. |
+| **Impact**          | Empty or broken lists on Action Center and Approvals if response shape changes.                                                                                                                                                                                                           |
+| **Reproduction**    | Change API to return `{ result: [...] }`; Action Center and Approvals show no items.                                                                                                                                                                                                      |
+| **Recommended fix** | Keep a single contract: e.g. always `{ data: T[], total?, limit?, offset? }` for list endpoints. Document it and add a type (e.g. `ListResponse<T>`). In pages, use optional chaining: `const bookings = bookingsData?.data ?? []`.                                                       |
 
 ---
 
 #### P1-7. Admin read-only API: only ADMIN role (RBAC)
 
-| Field | Value |
-|-------|--------|
-| **Location** | `src/app/api/admin/read-only/route.ts` lines 37, 73 |
-| **Severity** | High |
-| **Category** | RBAC |
-| **Description** | GET/POST require `session.user.role === UserRole.ADMIN`. Prisma `UserRole` has no `SUPER_ADMIN`; if super_admin is represented as ADMIN with a flag or different table, they are allowed. If super_admin is a separate role, it is not allowed here. |
-| **Impact** | Super-admin might be unable to toggle read-only if that role is distinct from ADMIN. |
-| **Reproduction** | Log in as super_admin (if different from ADMIN); call GET/POST read-only; may get 403. |
-| **Recommended fix** | If super_admin exists as a role, allow both ADMIN and SUPER_ADMIN for read-only; otherwise document that only ADMIN can toggle and ensure super_admin is mapped to ADMIN in auth. |
+| Field               | Value                                                                                                                                                                                                                                                |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Location**        | `src/app/api/admin/read-only/route.ts` lines 37, 73                                                                                                                                                                                                  |
+| **Severity**        | High                                                                                                                                                                                                                                                 |
+| **Category**        | RBAC                                                                                                                                                                                                                                                 |
+| **Description**     | GET/POST require `session.user.role === UserRole.ADMIN`. Prisma `UserRole` has no `SUPER_ADMIN`; if super_admin is represented as ADMIN with a flag or different table, they are allowed. If super_admin is a separate role, it is not allowed here. |
+| **Impact**          | Super-admin might be unable to toggle read-only if that role is distinct from ADMIN.                                                                                                                                                                 |
+| **Reproduction**    | Log in as super_admin (if different from ADMIN); call GET/POST read-only; may get 403.                                                                                                                                                               |
+| **Recommended fix** | If super_admin exists as a role, allow both ADMIN and SUPER_ADMIN for read-only; otherwise document that only ADMIN can toggle and ensure super_admin is mapped to ADMIN in auth.                                                                    |
 
 ---
 
 #### P1-8. Integration config raw SQL uses parameterized queries (Security – low risk, verify)
 
-| Field | Value |
-|-------|--------|
-| **Location** | `src/lib/services/integration-config.service.ts` lines 45–47, 132–155 |
-| **Severity** | High (verify only) |
-| **Category** | Security |
-| **Description** | `$queryRawUnsafe` / `$executeRawUnsafe` are used with `$1`, `$2` placeholders and values passed as subsequent arguments. Prisma binds these as parameters, so SQL injection risk is low. |
-| **Impact** | If any concatenation or non-parameterized usage is introduced later, risk increases. |
-| **Reproduction** | N/A (review only). |
+| Field               | Value                                                                                                                                                                                                                      |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Location**        | `src/lib/services/integration-config.service.ts` lines 45–47, 132–155                                                                                                                                                      |
+| **Severity**        | High (verify only)                                                                                                                                                                                                         |
+| **Category**        | Security                                                                                                                                                                                                                   |
+| **Description**     | `$queryRawUnsafe` / `$executeRawUnsafe` are used with `$1`, `$2` placeholders and values passed as subsequent arguments. Prisma binds these as parameters, so SQL injection risk is low.                                   |
+| **Impact**          | If any concatenation or non-parameterized usage is introduced later, risk increases.                                                                                                                                       |
+| **Reproduction**    | N/A (review only).                                                                                                                                                                                                         |
 | **Recommended fix** | Prefer Prisma typed client for `IntegrationConfig` (e.g. `findFirst`/`upsert`) when the model exists; if raw SQL is kept, keep strict parameterization and add a short comment that parameters must never be concatenated. |
 
 ---
@@ -379,16 +379,16 @@ Do the same for the second occurrence (around line 615). Update `context-sidebar
 1. **List API contract**  
    Standardize all list endpoints on `{ data: T[], total?, limit?, offset?, totalPages? }` and a shared `ListResponse<T>` type. Use it in dashboard, bookings, equipment, clients, etc.
 
-2. **Permission constants and role matrix**  
-   - Add missing user-management permissions to `PERMISSIONS` and align all `hasPermission` calls (e.g. `BOOKING_READ` instead of `'booking.view'`).  
+2. **Permission constants and role matrix**
+   - Add missing user-management permissions to `PERMISSIONS` and align all `hasPermission` calls (e.g. `BOOKING_READ` instead of `'booking.view'`).
    - Consider a single source of truth for “which role can do what” (e.g. generated from a matrix or config).
 
 3. **Admin layout and breadcrumbs**  
    Remove duplicate `AdminBreadcrumbs` from all admin pages; rely on layout only. Optionally make breadcrumb segments derive from route path + page meta.
 
-4. **Approval workflow**  
-   - Unify approval resource types (booking, refund, feature-flag, etc.) and IDs.  
-   - Ensure Approvals page calls approve/reject APIs and refetches or updates from response.  
+4. **Approval workflow**
+   - Unify approval resource types (booking, refund, feature-flag, etc.) and IDs.
+   - Ensure Approvals page calls approve/reject APIs and refetches or updates from response.
    - Add a simple “pending approvals” count in header/sidebar from `/api/approvals/pending`.
 
 5. **Read-only mode**  
@@ -416,24 +416,24 @@ Do the same for the second occurrence (around line 615). Update `context-sidebar
 
 ## 5. Implementation Roadmap (Prioritized)
 
-| Phase | Focus | Items |
-|-------|--------|--------|
-| **1** | P0 security & data | P0-1 (ENCRYPTION_KEY), P0-2 (XSS sanitization), P0-3 (approvals API wiring) |
-| **2** | P1 RBAC & layout | P1-1 (USER_VIEW/USER_CREATE), P1-2 (booking.read), P1-4 (breadcrumbs), P1-5 (approval link map) |
-| **3** | P1 operations | P1-3 (read-only persistence), P1-6 (response shape), P1-7 (read-only role) |
-| **4** | P2 placeholders | Dashboard sub-pages, calendar, users/studios/technicians/wallet, settings/roles, categories/brands |
-| **5** | P2 CRUD & links | Invoices/orders/clients/coupons/quotes new and detail pages; warehouse sub-pages |
-| **6** | P3 quality | Error message sanitization, TypeScript (`unknown`), Zod checks, loading states, sidebar cleanup |
+| Phase | Focus              | Items                                                                                              |
+| ----- | ------------------ | -------------------------------------------------------------------------------------------------- |
+| **1** | P0 security & data | P0-1 (ENCRYPTION_KEY), P0-2 (XSS sanitization), P0-3 (approvals API wiring)                        |
+| **2** | P1 RBAC & layout   | P1-1 (USER_VIEW/USER_CREATE), P1-2 (booking.read), P1-4 (breadcrumbs), P1-5 (approval link map)    |
+| **3** | P1 operations      | P1-3 (read-only persistence), P1-6 (response shape), P1-7 (read-only role)                         |
+| **4** | P2 placeholders    | Dashboard sub-pages, calendar, users/studios/technicians/wallet, settings/roles, categories/brands |
+| **5** | P2 CRUD & links    | Invoices/orders/clients/coupons/quotes new and detail pages; warehouse sub-pages                   |
+| **6** | P3 quality         | Error message sanitization, TypeScript (`unknown`), Zod checks, loading states, sidebar cleanup    |
 
 ---
 
 ## 6. Quick Reference – Files Touched by Priority
 
-| Priority | Files |
-|---------|--------|
-| P0 | `integration-config.service.ts`, `inventory/equipment/[id]/page.tsx`, `approvals/page.tsx` |
-| P1 | `permissions.ts`, `booking.service.ts`, `read-only.middleware.ts`, `admin/layout.tsx`, `approvals/page.tsx`, `read-only/route.ts` |
-| P2 | Dashboard sub-pages, calendar, users, studios, technicians, wallet, settings/roles, inventory categories/brands, warehouse pages, invoices/orders/clients/coupons/quotes |
-| P3 | Multiple API route catch blocks, sidebar, loading components |
+| Priority | Files                                                                                                                                                                    |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| P0       | `integration-config.service.ts`, `inventory/equipment/[id]/page.tsx`, `approvals/page.tsx`                                                                               |
+| P1       | `permissions.ts`, `booking.service.ts`, `read-only.middleware.ts`, `admin/layout.tsx`, `approvals/page.tsx`, `read-only/route.ts`                                        |
+| P2       | Dashboard sub-pages, calendar, users, studios, technicians, wallet, settings/roles, inventory categories/brands, warehouse pages, invoices/orders/clients/coupons/quotes |
+| P3       | Multiple API route catch blocks, sidebar, loading components                                                                                                             |
 
 This report can be used as a single reference for triage and implementation; refer to the existing Arabic audit for page-by-page notes and sidebar coverage.

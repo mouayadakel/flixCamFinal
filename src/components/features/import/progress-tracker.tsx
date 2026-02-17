@@ -94,7 +94,11 @@ export function ProgressTracker({ jobId, onComplete }: ProgressTrackerProps) {
       document.body.removeChild(a)
       toast({ title: 'Error report downloaded' })
     } catch (error: any) {
-      toast({ title: 'Failed to download errors', description: error.message, variant: 'destructive' })
+      toast({
+        title: 'Failed to download errors',
+        description: error.message,
+        variant: 'destructive',
+      })
     }
   }
 
@@ -132,11 +136,11 @@ export function ProgressTracker({ jobId, onComplete }: ProgressTrackerProps) {
             {progress.status === 'COMPLETED' && products.errors > 0 && (
               <>
                 <Button variant="outline" size="sm" onClick={handleDownloadErrors}>
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className="mr-2 h-4 w-4" />
                   Download Errors
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleRetry}>
-                  <RefreshCw className="h-4 w-4 mr-2" />
+                  <RefreshCw className="mr-2 h-4 w-4" />
                   Retry Failed
                 </Button>
               </>
@@ -158,7 +162,7 @@ export function ProgressTracker({ jobId, onComplete }: ProgressTrackerProps) {
             <span>✓ {products.success} success</span>
             {products.errors > 0 && (
               <span className="text-red-600">
-                <XCircle className="h-3 w-3 inline mr-1" />
+                <XCircle className="mr-1 inline h-3 w-3" />
                 {products.errors} errors
               </span>
             )}
@@ -174,15 +178,13 @@ export function ProgressTracker({ jobId, onComplete }: ProgressTrackerProps) {
                 {ai.processed} / {ai.total}
               </Badge>
             </div>
-            <Progress
-              value={ai.total > 0 ? Math.round((ai.processed / ai.total) * 100) : 0}
-            />
+            <Progress value={ai.total > 0 ? Math.round((ai.processed / ai.total) * 100) : 0} />
             <div className="flex gap-4 text-xs text-muted-foreground">
               <span>Status: {ai.status}</span>
               {ai.cost > 0 && <span>Cost: ${ai.cost.toFixed(4)}</span>}
               {ai.failed > 0 && (
                 <span className="text-red-600">
-                  <XCircle className="h-3 w-3 inline mr-1" />
+                  <XCircle className="mr-1 inline h-3 w-3" />
                   {ai.failed} failed
                 </span>
               )}
@@ -206,7 +208,7 @@ export function ProgressTracker({ jobId, onComplete }: ProgressTrackerProps) {
               <span>Status: {images.status}</span>
               {images.failed > 0 && (
                 <span className="text-red-600">
-                  <XCircle className="h-3 w-3 inline mr-1" />
+                  <XCircle className="mr-1 inline h-3 w-3" />
                   {images.failed} failed
                 </span>
               )}
@@ -216,8 +218,9 @@ export function ProgressTracker({ jobId, onComplete }: ProgressTrackerProps) {
 
         {/* ETA */}
         {progress.timestamps.estimatedCompletion && (
-          <div className="text-xs text-muted-foreground pt-2 border-t">
-            Estimated completion: {new Date(progress.timestamps.estimatedCompletion).toLocaleString()}
+          <div className="border-t pt-2 text-xs text-muted-foreground">
+            Estimated completion:{' '}
+            {new Date(progress.timestamps.estimatedCompletion).toLocaleString()}
           </div>
         )}
       </CardContent>

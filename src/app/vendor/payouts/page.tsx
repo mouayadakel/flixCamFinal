@@ -47,12 +47,10 @@ export default async function VendorPayoutsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">المدفوعات</h1>
-        <p className="text-muted-foreground mt-1">
-          سجل مدفوعاتك من المنصة
-        </p>
+        <p className="mt-1 text-muted-foreground">سجل مدفوعاتك من المنصة</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium">معلق الدفع</CardTitle>
@@ -61,9 +59,7 @@ export default async function VendorPayoutsPage() {
             <div className="text-2xl font-bold">
               {formatCurrency(Number(pendingSum._sum.netAmount ?? 0))}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {pendingSum._count} دفعة
-            </p>
+            <p className="mt-1 text-xs text-muted-foreground">{pendingSum._count} دفعة</p>
           </CardContent>
         </Card>
         <Card>
@@ -74,9 +70,7 @@ export default async function VendorPayoutsPage() {
             <div className="text-2xl font-bold">
               {formatCurrency(Number(paidSum._sum.netAmount ?? 0))}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {paidSum._count} دفعة
-            </p>
+            <p className="mt-1 text-xs text-muted-foreground">{paidSum._count} دفعة</p>
           </CardContent>
         </Card>
       </div>
@@ -87,16 +81,11 @@ export default async function VendorPayoutsPage() {
         </CardHeader>
         <CardContent>
           {payouts.length === 0 ? (
-            <p className="text-center py-12 text-muted-foreground">
-              لا توجد مدفوعات بعد
-            </p>
+            <p className="py-12 text-center text-muted-foreground">لا توجد مدفوعات بعد</p>
           ) : (
             <div className="space-y-4">
               {payouts.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
-                >
+                <div key={p.id} className="flex items-center justify-between rounded-lg border p-4">
                   <div>
                     <div className="flex items-center gap-2">
                       <Badge
@@ -116,7 +105,7 @@ export default async function VendorPayoutsPage() {
                         </span>
                       )}
                     </div>
-                    <div className="text-sm text-muted-foreground mt-1">
+                    <div className="mt-1 text-sm text-muted-foreground">
                       {formatDate(p.createdAt)}
                       {p.paidAt && ` • تم الدفع: ${formatDate(p.paidAt)}`}
                     </div>

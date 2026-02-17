@@ -97,11 +97,11 @@ export default function NewUserPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">مستخدم جديد</h1>
-          <p className="text-muted-foreground mt-1">إضافة مستخدم إلى المنصة</p>
+          <p className="mt-1 text-muted-foreground">إضافة مستخدم إلى المنصة</p>
         </div>
         <Button variant="outline" asChild>
           <Link href="/admin/users">
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="ml-2 h-4 w-4" />
             العودة
           </Link>
         </Button>
@@ -110,7 +110,10 @@ export default function NewUserPage() {
       <Card className="max-w-xl">
         <CardHeader>
           <CardTitle>بيانات المستخدم</CardTitle>
-          <CardDescription>البريد الإلكتروني والدور مطلوبان. كلمة المرور اختيارية (يُولَّد تلقائياً إن تُركت فارغة).</CardDescription>
+          <CardDescription>
+            البريد الإلكتروني والدور مطلوبان. كلمة المرور اختيارية (يُولَّد تلقائياً إن تُركت
+            فارغة).
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -176,7 +179,7 @@ export default function NewUserPage() {
             </div>
             <div className="flex gap-2 pt-2">
               <Button type="submit" disabled={submitting}>
-                {submitting && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+                {submitting && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
                 إنشاء مستخدم
               </Button>
               <Button type="button" variant="outline" asChild>

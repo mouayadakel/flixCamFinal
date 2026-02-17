@@ -56,7 +56,7 @@ export function StepShootType() {
   if (error) {
     return (
       <div className="rounded-xl border border-border-light bg-surface-light p-8 text-center">
-        <p className="text-destructive mb-4">{error}</p>
+        <p className="mb-4 text-destructive">{error}</p>
         <button
           type="button"
           className="text-sm text-brand-primary underline"
@@ -70,12 +70,8 @@ export function StepShootType() {
 
   return (
     <div className="animate-fade-in">
-      <h2 className="text-section-title text-text-heading mb-1">
-        {t('kit.chooseShootType')}
-      </h2>
-      <p className="text-body-main text-text-muted mb-6">
-        {t('kit.chooseShootTypeDesc')}
-      </p>
+      <h2 className="mb-1 text-section-title text-text-heading">{t('kit.chooseShootType')}</h2>
+      <p className="mb-6 text-body-main text-text-muted">{t('kit.chooseShootTypeDesc')}</p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {list.map((st) => (
           <button
@@ -113,14 +109,15 @@ export function StepShootType() {
               <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
                 <h3 className="font-semibold">{st.name}</h3>
                 {st.description && (
-                  <p className="mt-1 text-sm text-white/90 line-clamp-2">{st.description}</p>
+                  <p className="mt-1 line-clamp-2 text-sm text-white/90">{st.description}</p>
                 )}
                 <p className="mt-2 text-xs text-white/80">
-                  {st.categoryCount} {t('kit.stepCategory')} · {st.recommendationCount}+ {t('kit.items')}
+                  {st.categoryCount} {t('kit.stepCategory')} · {st.recommendationCount}+{' '}
+                  {t('kit.items')}
                 </p>
               </div>
               {shootTypeId === st.id && (
-                <div className="absolute top-3 end-3 flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary text-white">
+                <div className="absolute end-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary text-white">
                   <Check className="h-5 w-5" />
                 </div>
               )}

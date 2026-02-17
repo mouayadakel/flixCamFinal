@@ -3,6 +3,7 @@
 ## Frontend
 
 ### Core Framework
+
 - **Next.js 14** (App Router)
   - Server Components by default
   - Client Components when needed
@@ -10,12 +11,14 @@
   - Built-in optimization
 
 ### UI Framework
+
 - **React 18+** with TypeScript
   - Type-safe components
   - Server Components support
   - Concurrent features
 
 ### Styling
+
 - **Tailwind CSS**
   - Utility-first CSS
   - Design tokens
@@ -23,6 +26,7 @@
   - Dark mode support
 
 ### Component Library
+
 - **Shadcn UI**
   - Accessible components
   - Customizable
@@ -30,6 +34,7 @@
   - Tailwind CSS integration
 
 ### State Management
+
 - **Zustand** (global state)
   - Lightweight
   - TypeScript support
@@ -41,6 +46,7 @@
   - Synchronization
 
 ### Form Handling
+
 - **React Hook Form**
   - Performance
   - Validation integration
@@ -54,23 +60,27 @@
 ## Backend
 
 ### Runtime
+
 - **Node.js 18+**
   - LTS version
   - ES modules support
 
 ### Database
+
 - **PostgreSQL 14+**
   - Relational database
   - ACID compliance
   - JSON support
 
 ### ORM
+
 - **Prisma**
   - Type-safe database client
   - Migration system
   - Query builder
 
 ### Authentication
+
 - **NextAuth.js v5**
   - Next.js integration
   - Multiple providers
@@ -79,6 +89,7 @@
 ## Development Tools
 
 ### Code Quality
+
 - **ESLint**
   - Code linting
   - Next.js config
@@ -90,6 +101,7 @@
   - Consistent style
 
 ### Git Hooks
+
 - **Husky**
   - Git hooks
   - Pre-commit checks
@@ -99,6 +111,7 @@
   - Format on commit
 
 ### Type Checking
+
 - **TypeScript**
   - Strict mode
   - Type safety
@@ -107,16 +120,19 @@
 ## Infrastructure
 
 ### Development
+
 - **Docker Compose**
   - Local PostgreSQL
   - Easy setup
 
 ### Production (TBD)
+
 - **Database**: Supabase / Neon / Railway
 - **Hosting**: Vercel / Railway
 - **Storage**: Local (Phase 1), Cloud (Phase 2)
 
 ### CI/CD
+
 - **GitHub Actions**
   - Automated testing
   - Deployment workflows
@@ -125,28 +141,33 @@
 ## Third-Party Services
 
 ### Payments
+
 - **Tap Payments**
   - Payment gateway
   - Webhook integration
   - Refund support
 
 ### Email
+
 - **Configurable SMTP**
   - Gmail
   - Hotmail/Outlook
   - Custom SMTP
 
 ### WhatsApp
+
 - **WhatsApp Cloud API**
   - Business messaging
   - Notifications
 
 ### Analytics (Phase 2)
+
 - **Google Tag Manager**
 - **Google Analytics 4**
 - **Meta Pixel**
 
 ### AI (Phase 2)
+
 - **OpenAI** (GPT-4)
 - **Google Gemini** (alternative)
 

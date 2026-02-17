@@ -126,9 +126,7 @@ export default function NotificationsPage() {
       const res = await fetch(`/api/notifications/${id}/read`, { method: 'PATCH' })
       if (!res.ok) throw new Error('Failed to mark as read')
       setNotifications((prev) =>
-        prev.map((n) =>
-          n.id === id ? { ...n, read: true, readAt: new Date().toISOString() } : n
-        )
+        prev.map((n) => (n.id === id ? { ...n, read: true, readAt: new Date().toISOString() } : n))
       )
       setUnreadCount((c) => Math.max(0, c - 1))
     } catch (error) {
@@ -151,23 +149,19 @@ export default function NotificationsPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold">الإشعارات</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             عرض وإدارة إشعاراتك من الحجوزات والمدفوعات والعقود
           </p>
         </div>
         <div className="flex items-center gap-2">
           {unreadCount > 0 && (
             <Button variant="outline" onClick={handleMarkAllRead} disabled={loading}>
-              <CheckCheck className="h-4 w-4 ml-2" />
+              <CheckCheck className="ml-2 h-4 w-4" />
               تعليم الكل كمقروء
             </Button>
           )}
-          <Button
-            variant="outline"
-            onClick={handleRefresh}
-            disabled={refreshing}
-          >
-            <RefreshCw className={cn('h-4 w-4 ml-2', refreshing && 'animate-spin')} />
+          <Button variant="outline" onClick={handleRefresh} disabled={refreshing}>
+            <RefreshCw className={cn('ml-2 h-4 w-4', refreshing && 'animate-spin')} />
             تحديث
           </Button>
         </div>
@@ -201,9 +195,7 @@ export default function NotificationsPage() {
         <CardHeader>
           <CardTitle>قائمة الإشعارات</CardTitle>
           <CardDescription>
-            {filter === 'unread'
-              ? `لديك ${unreadCount} إشعار غير مقروء`
-              : 'جميع إشعاراتك'}
+            {filter === 'unread' ? `لديك ${unreadCount} إشعار غير مقروء` : 'جميع إشعاراتك'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -215,9 +207,9 @@ export default function NotificationsPage() {
             </div>
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <Bell className="h-12 w-12 text-muted-foreground mb-4" />
+              <Bell className="mb-4 h-12 w-12 text-muted-foreground" />
               <h3 className="text-lg font-medium">لا توجد إشعارات</h3>
-              <p className="text-muted-foreground text-sm mt-1">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {filter === 'unread'
                   ? 'لا توجد إشعارات غير مقروءة'
                   : 'ستظهر إشعاراتك هنا عند استلامها'}
@@ -246,29 +238,20 @@ export default function NotificationsPage() {
                         n.read ? 'bg-muted' : 'bg-primary/10'
                       )}
                     >
-                      <TypeIcon className={cn('h-5 w-5', n.read ? 'text-muted-foreground' : 'text-primary')} />
+                      <TypeIcon
+                        className={cn('h-5 w-5', n.read ? 'text-muted-foreground' : 'text-primary')}
+                      />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <h4
-                            className={cn(
-                              'font-medium',
-                              !n.read && 'text-foreground'
-                            )}
-                          >
+                          <h4 className={cn('font-medium', !n.read && 'text-foreground')}>
                             {n.title}
                           </h4>
-                          <p className="text-sm text-muted-foreground mt-0.5">
-                            {n.message}
-                          </p>
+                          <p className="mt-0.5 text-sm text-muted-foreground">{n.message}</p>
                         </div>
                         {!n.read && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleMarkOneRead(n.id)}
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => handleMarkOneRead(n.id)}>
                             تعليم كمقروء
                           </Button>
                         )}

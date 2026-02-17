@@ -22,22 +22,22 @@ chmod +x scripts/test-specifications.ts
 في ملف `src/app/admin/(routes)/inventory/equipment/page.tsx`:
 
 ```tsx
-import { SpecificationsAuditDialog } from '@/components/admin/specifications/SpecificationsAuditDialog';
+import { SpecificationsAuditDialog } from '@/components/admin/specifications/SpecificationsAuditDialog'
 
 export default function EquipmentPage() {
   return (
     <div>
       {/* ... existing content ... */}
-      
+
       {/* Add this button next to other action buttons */}
       <div className="flex gap-2">
         <SpecificationsAuditDialog />
         {/* ... other buttons ... */}
       </div>
-      
+
       {/* ... rest of page ... */}
     </div>
-  );
+  )
 }
 ```
 
@@ -55,6 +55,7 @@ export default function EquipmentPage() {
 ### 4. اختبار النظام
 
 #### A. اختبار من الكود (CLI)
+
 ```bash
 # تشغيل الاختبار الشامل
 npm run test:specs
@@ -68,6 +69,7 @@ npm run test:specs
 ```
 
 #### B. اختبار من واجهة الإدارة
+
 ```bash
 # 1. شغّل المشروع
 npm run dev
@@ -86,6 +88,7 @@ http://localhost:3000/admin/inventory/equipment
 ### 5. التحويل الجماعي
 
 #### من الواجهة (موصى به):
+
 1. افتح dialog الفحص
 2. اذهب إلى تبويب "تحتاج تحويل"
 3. حدد المعدات المطلوبة (أو "تحديد الكل")
@@ -94,49 +97,49 @@ http://localhost:3000/admin/inventory/equipment
 6. أكّد التحويل
 
 #### من الكود (للأعداد الكبيرة):
+
 ```typescript
 // scripts/bulk-convert.ts
-import { prisma } from '@/lib/prisma';
-import { convertFlatToStructured } from '@/lib/specifications-utils';
+import { prisma } from '@/lib/prisma'
+import { convertFlatToStructured } from '@/lib/specifications-utils'
 
 async function bulkConvert() {
   const flatEquipment = await prisma.equipment.findMany({
     where: {
       deletedAt: null,
-      specifications: { not: null }
+      specifications: { not: null },
     },
-    include: { category: true }
-  });
+    include: { category: true },
+  })
 
-  let converted = 0;
-  let failed = 0;
+  let converted = 0
+  let failed = 0
 
   for (const item of flatEquipment) {
     if (isFlatSpecifications(item.specifications)) {
       try {
-        const structured = convertFlatToStructured(
-          item.specifications,
-          { categoryHint: item.category.name.toLowerCase() }
-        );
+        const structured = convertFlatToStructured(item.specifications, {
+          categoryHint: item.category.name.toLowerCase(),
+        })
 
         await prisma.equipment.update({
           where: { id: item.id },
-          data: { specifications: structured }
-        });
+          data: { specifications: structured },
+        })
 
-        converted++;
-        console.log(`✓ ${item.sku}`);
+        converted++
+        console.log(`✓ ${item.sku}`)
       } catch (error) {
-        failed++;
-        console.error(`✗ ${item.sku}: ${error.message}`);
+        failed++
+        console.error(`✗ ${item.sku}: ${error.message}`)
       }
     }
   }
 
-  console.log(`\nConverted: ${converted}, Failed: ${failed}`);
+  console.log(`\nConverted: ${converted}, Failed: ${failed}`)
 }
 
-bulkConvert();
+bulkConvert()
 ```
 
 ### 6. التحقق من النتائج
@@ -169,7 +172,9 @@ http://localhost:3000/equipment/[sku]
 ### 7. استكشاف الأخطاء
 
 #### المشكلة: بعض المعدات لم تتحول
+
 **الحل**:
+
 ```bash
 # 1. راجع تقرير الاختبار - سيظهر الأخطاء
 npm run test:specs
@@ -179,20 +184,24 @@ npm run test:specs
 ```
 
 #### المشكلة: المواصفات لا تظهر في الموقع
+
 **الحل**:
+
 1. افتح browser console للأخطاء
 2. تحقق من تثبيت `lucide-react`: `npm install lucide-react`
 3. تحقق من استيراد `SpecificationsDisplay` صحيح
 4. تحقق من تمرير الـ specifications prop
 
 #### المشكلة: التحويل بطيء
+
 **الحل**:
+
 ```typescript
 // قم بالتحويل على دفعات صغيرة
-const BATCH_SIZE = 10;
+const BATCH_SIZE = 10
 for (let i = 0; i < equipmentIds.length; i += BATCH_SIZE) {
-  const batch = equipmentIds.slice(i, i + BATCH_SIZE);
-  await convertBatch(batch);
+  const batch = equipmentIds.slice(i, i + BATCH_SIZE)
+  await convertBatch(batch)
 }
 ```
 
@@ -211,6 +220,7 @@ for (let i = 0; i < equipmentIds.length; i += BATCH_SIZE) {
 ### 9. الصيانة المستمرة
 
 #### فحص دوري
+
 ```bash
 # شغّل الفحص مرة في الأسبوع
 npm run test:specs
@@ -222,6 +232,7 @@ npm run test:specs
 ```
 
 #### تحديثات مستقبلية
+
 عند إضافة فئة معدات جديدة:
 
 1. أضف template في `categoryTemplates`

@@ -125,7 +125,7 @@ export function VendorEquipmentEditForm({ equipment }: VendorEquipmentEditFormPr
         />
       </div>
       <Button type="submit" disabled={loading}>
-        {loading && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+        {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
         حفظ التغييرات
       </Button>
     </form>

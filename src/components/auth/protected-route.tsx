@@ -105,7 +105,7 @@ export function ProtectedRoute({ children, permission, className }: ProtectedRou
   const required = permission ?? getRequiredPermission(pathname)
 
   if (loading) {
-    return <div className={cn('animate-pulse bg-muted/50 rounded-lg h-32', className)} />
+    return <div className={cn('h-32 animate-pulse rounded-lg bg-muted/50', className)} />
   }
 
   if (!required || hasPermission(required)) {
@@ -113,10 +113,13 @@ export function ProtectedRoute({ children, permission, className }: ProtectedRou
   }
 
   return (
-    <div className={cn('flex flex-col items-center justify-center min-h-[300px] gap-4', className)} dir="rtl">
+    <div
+      className={cn('flex min-h-[300px] flex-col items-center justify-center gap-4', className)}
+      dir="rtl"
+    >
       <ShieldX className="h-16 w-16 text-destructive" />
       <h2 className="text-xl font-semibold">غير مصرح</h2>
-      <p className="text-muted-foreground text-center">
+      <p className="text-center text-muted-foreground">
         ليس لديك صلاحية الوصول إلى هذه الصفحة. المطلوب: {required}
       </p>
       <Button variant="outline" asChild>

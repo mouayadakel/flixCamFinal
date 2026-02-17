@@ -12,7 +12,7 @@ description: Configures mutation testing (e.g. Stryker) to measure test quality.
 
 ## What to Do
 
-1. **Config**: Add Stryker (or similar) config: mutator (TypeScript), test runner (Jest/Vitest), files to mutate (exclude *.test.ts).
+1. **Config**: Add Stryker (or similar) config: mutator (TypeScript), test runner (Jest/Vitest), files to mutate (exclude \*.test.ts).
 2. **Thresholds**: Set high/low/break for mutation score; document what they mean.
 3. **Run**: Generate report; explain that surviving mutations mean tests didn’t catch that change (weak test or redundant code).
 4. **Focus**: Suggest improving tests for frequently surviving mutations first.

@@ -28,7 +28,12 @@ async function requireAuthAndRolesPermission() {
   }
   const canManage = await hasPermission(session.user.id, PERMISSIONS.SETTINGS_MANAGE_ROLES)
   if (!canManage) {
-    return { error: NextResponse.json({ error: 'Forbidden - Missing settings.manage_roles permission' }, { status: 403 }) }
+    return {
+      error: NextResponse.json(
+        { error: 'Forbidden - Missing settings.manage_roles permission' },
+        { status: 403 }
+      ),
+    }
   }
   return { session }
 }
@@ -103,7 +108,10 @@ export async function PATCH(
     return NextResponse.json({ success: true, data: role })
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validation error', details: error.errors }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Validation error', details: error.errors },
+        { status: 400 }
+      )
     }
     if ((error as Error).message?.includes('Cannot edit system')) {
       return NextResponse.json({ error: (error as Error).message }, { status: 400 })

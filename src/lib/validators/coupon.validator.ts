@@ -12,46 +12,46 @@ export const couponTypeSchema = z.enum(['percent', 'fixed'], {
   errorMap: () => ({ message: 'نوع الكوبون غير صالح' }),
 })
 
-export const couponStatusSchema = z.enum(
-  ['active', 'inactive', 'expired', 'scheduled'],
-  {
-    errorMap: () => ({ message: 'حالة الكوبون غير صالحة' }),
-  }
-)
+export const couponStatusSchema = z.enum(['active', 'inactive', 'expired', 'scheduled'], {
+  errorMap: () => ({ message: 'حالة الكوبون غير صالحة' }),
+})
 
-export const createCouponSchema = z.object({
-  code: z.string().min(3, 'رمز الكوبون يجب أن يكون 3 أحرف على الأقل').max(50, 'رمز الكوبون طويل جداً'),
-  type: couponTypeSchema,
-  value: z.number().min(0, 'القيمة يجب أن تكون أكبر من أو تساوي 0'),
-  minPurchaseAmount: z.number().min(0).optional(),
-  maxDiscountAmount: z.number().min(0).optional(),
-  usageLimit: z.number().int().min(1).optional(),
-  validFrom: z.coerce.date({
-    errorMap: () => ({ message: 'تاريخ البداية مطلوب' }),
-  }),
-  validUntil: z.coerce.date({
-    errorMap: () => ({ message: 'تاريخ الانتهاء مطلوب' }),
-  }),
-  applicableTo: z.array(z.string()).optional(),
-  description: z.string().optional(),
-}).refine(
-  (data) => {
-    if (data.type === 'percent') {
-      return data.value <= 100
+export const createCouponSchema = z
+  .object({
+    code: z
+      .string()
+      .min(3, 'رمز الكوبون يجب أن يكون 3 أحرف على الأقل')
+      .max(50, 'رمز الكوبون طويل جداً'),
+    type: couponTypeSchema,
+    value: z.number().min(0, 'القيمة يجب أن تكون أكبر من أو تساوي 0'),
+    minPurchaseAmount: z.number().min(0).optional(),
+    maxDiscountAmount: z.number().min(0).optional(),
+    usageLimit: z.number().int().min(1).optional(),
+    validFrom: z.coerce.date({
+      errorMap: () => ({ message: 'تاريخ البداية مطلوب' }),
+    }),
+    validUntil: z.coerce.date({
+      errorMap: () => ({ message: 'تاريخ الانتهاء مطلوب' }),
+    }),
+    applicableTo: z.array(z.string()).optional(),
+    description: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.type === 'percent') {
+        return data.value <= 100
+      }
+      return true
+    },
+    {
+      message: 'نسبة الخصم يجب أن تكون أقل من أو تساوي 100%',
+      path: ['value'],
     }
-    return true
-  },
-  {
-    message: 'نسبة الخصم يجب أن تكون أقل من أو تساوي 100%',
-    path: ['value'],
-  }
-).refine(
-  (data) => data.validUntil >= data.validFrom,
-  {
+  )
+  .refine((data) => data.validUntil >= data.validFrom, {
     message: 'تاريخ الانتهاء يجب أن يكون بعد تاريخ البداية',
     path: ['validUntil'],
-  }
-)
+  })
 
 export const updateCouponSchema = z.object({
   code: z.string().min(3).max(50).optional(),

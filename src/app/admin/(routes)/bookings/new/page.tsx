@@ -53,9 +53,16 @@ export default function NewBookingPage() {
   const [users, setUsers] = useState<User[]>([])
   const [equipment, setEquipment] = useState<Equipment[]>([])
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>([])
-  const [availabilityMap, setAvailabilityMap] = useState<Record<string, { available: boolean; quantityAvailable?: number }>>({})
+  const [availabilityMap, setAvailabilityMap] = useState<
+    Record<string, { available: boolean; quantityAvailable?: number }>
+  >({})
   const [availabilityLoading, setAvailabilityLoading] = useState(false)
-  const [costPreview, setCostPreview] = useState<{ subtotal: number; vatAmount: number; depositAmount: number; totalAmount: number } | null>(null)
+  const [costPreview, setCostPreview] = useState<{
+    subtotal: number
+    vatAmount: number
+    depositAmount: number
+    totalAmount: number
+  } | null>(null)
   const [costPreviewLoading, setCostPreviewLoading] = useState(false)
 
   const {
@@ -203,7 +210,11 @@ export default function NewBookingPage() {
       setAvailabilityMap(results)
       const anyUnavailable = Object.values(results).some((r) => !r.available)
       if (anyUnavailable) {
-        toast({ title: 'تنبيه', description: 'بعض المعدات غير متاحة للتواريخ المحددة', variant: 'destructive' })
+        toast({
+          title: 'تنبيه',
+          description: 'بعض المعدات غير متاحة للتواريخ المحددة',
+          variant: 'destructive',
+        })
       } else {
         toast({ title: 'تم', description: 'جميع المعدات متاحة' })
       }
@@ -250,18 +261,19 @@ export default function NewBookingPage() {
   // Block submit unless every selected item has been checked AND is available.
   // This prevents: (a) submitting without any check, (b) submitting with partial checks
   // after adding new equipment, and (c) submitting when any item is unavailable.
-  const hasUnavailable = selectedEquipment.length > 0
-    && !selectedEquipment.every((id) => availabilityMap[id]?.available === true)
+  const hasUnavailable =
+    selectedEquipment.length > 0 &&
+    !selectedEquipment.every((id) => availabilityMap[id]?.available === true)
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">حجز جديد</h1>
-          </div>
+        </div>
         <Button variant="outline" asChild>
           <Link href="/admin/bookings">
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="ml-2 h-4 w-4" />
             إلغاء
           </Link>
         </Button>
@@ -297,7 +309,7 @@ export default function NewBookingPage() {
             </div>
 
             {/* Dates */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="startDate">تاريخ البداية *</Label>
                 <Input
@@ -335,9 +347,7 @@ export default function NewBookingPage() {
                 placeholder="ملاحظات إضافية..."
                 className={errors.notes ? 'border-error-500' : ''}
               />
-              {errors.notes && (
-                <p className="text-sm text-error-500">{errors.notes.message}</p>
-              )}
+              {errors.notes && <p className="text-sm text-error-500">{errors.notes.message}</p>}
             </div>
           </CardContent>
         </Card>
@@ -361,7 +371,9 @@ export default function NewBookingPage() {
                         {eq.model && ` - ${eq.model}`}
                         {av !== undefined && (
                           <span className={av.available ? 'text-green-600' : 'text-red-600'}>
-                            {av.available ? ` (متاح${av.quantityAvailable != null ? ` ${av.quantityAvailable}` : ''})` : ' (غير متاح)'}
+                            {av.available
+                              ? ` (متاح${av.quantityAvailable != null ? ` ${av.quantityAvailable}` : ''})`
+                              : ' (غير متاح)'}
                           </span>
                         )}
                         <button
@@ -382,7 +394,11 @@ export default function NewBookingPage() {
                   onClick={checkAvailability}
                   disabled={availabilityLoading || !startDate || !endDate}
                 >
-                  {availabilityLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'التحقق من التوفر'}
+                  {availabilityLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    'التحقق من التوفر'
+                  )}
                 </Button>
               </div>
             )}
@@ -390,9 +406,9 @@ export default function NewBookingPage() {
             {/* Equipment List */}
             <div className="space-y-2">
               <Label>اختر المعدات *</Label>
-              <div className="border rounded-lg p-4 max-h-96 overflow-y-auto">
+              <div className="max-h-96 overflow-y-auto rounded-lg border p-4">
                 {equipment.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-4">
+                  <p className="py-4 text-center text-sm text-muted-foreground">
                     لا توجد معدات متاحة
                   </p>
                 ) : (
@@ -402,10 +418,8 @@ export default function NewBookingPage() {
                       return (
                         <div
                           key={eq.id}
-                          className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-colors ${
-                            isSelected
-                              ? 'bg-primary-50 border-primary-300'
-                              : 'hover:bg-neutral-50'
+                          className={`flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors ${
+                            isSelected ? 'border-primary-300 bg-primary-50' : 'hover:bg-neutral-50'
                           }`}
                           onClick={() => toggleEquipment(eq.id)}
                         >
@@ -439,7 +453,7 @@ export default function NewBookingPage() {
         </Card>
 
         {/* Cost preview & availability */}
-        {selectedEquipment.length > 0 && (startDate && endDate) && (
+        {selectedEquipment.length > 0 && startDate && endDate && (
           <Card>
             <CardHeader>
               <CardTitle>معاينة التكلفة والوديعة</CardTitle>
@@ -452,7 +466,11 @@ export default function NewBookingPage() {
                 onClick={loadCostPreview}
                 disabled={costPreviewLoading}
               >
-                {costPreviewLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'معاينة التكلفة'}
+                {costPreviewLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  'معاينة التكلفة'
+                )}
               </Button>
               {costPreview && (
                 <dl className="grid gap-2 text-sm">
@@ -468,7 +486,7 @@ export default function NewBookingPage() {
                     <dt>الوديعة (تقدير)</dt>
                     <dd>{costPreview.depositAmount.toLocaleString('ar-SA')} ر.س</dd>
                   </div>
-                  <div className="flex justify-between font-semibold border-t pt-2">
+                  <div className="flex justify-between border-t pt-2 font-semibold">
                     <dt>الإجمالي</dt>
                     <dd>{costPreview.totalAmount.toLocaleString('ar-SA')} ر.س</dd>
                   </div>
@@ -483,15 +501,18 @@ export default function NewBookingPage() {
           <Button type="button" variant="outline" asChild>
             <Link href="/admin/bookings">إلغاء</Link>
           </Button>
-          <Button type="submit" disabled={loading || selectedEquipment.length === 0 || hasUnavailable}>
+          <Button
+            type="submit"
+            disabled={loading || selectedEquipment.length === 0 || hasUnavailable}
+          >
             {loading ? (
               <>
-                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
                 جاري الحفظ...
               </>
             ) : (
               <>
-                <Plus className="h-4 w-4 ml-2" />
+                <Plus className="ml-2 h-4 w-4" />
                 إنشاء الحجز
               </>
             )}

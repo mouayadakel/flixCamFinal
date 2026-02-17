@@ -41,7 +41,17 @@ export default function LoginPage() {
     const hasEmail = searchParams.get('email')
     const hasPassword = searchParams.has('password')
     if (hasEmail || hasPassword) {
-      fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'login/page.tsx:useEffect:urlParams', message: 'login page loaded with email or password in URL', data: { hasEmail: !!hasEmail, hasPassword }, timestamp: Date.now(), hypothesisId: 'H1' }) }).catch(() => {})
+      fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'login/page.tsx:useEffect:urlParams',
+          message: 'login page loaded with email or password in URL',
+          data: { hasEmail: !!hasEmail, hasPassword },
+          timestamp: Date.now(),
+          hypothesisId: 'H1',
+        }),
+      }).catch(() => {})
     }
     // #endregion
     // Never leave password in URL (security + history). Strip it without reload.
@@ -53,7 +63,7 @@ export default function LoginPage() {
       window.history.replaceState(null, '', newUrl)
     }
     // Check for error in URL params
-      const errorParam = searchParams.get('error')
+    const errorParam = searchParams.get('error')
     if (errorParam) {
       const errorMessages: Record<string, string> = {
         Configuration: 'الإعدادات غير صحيحة. يرجى التحقق من إعدادات الخادم.',
@@ -78,7 +88,17 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true)
     // #region agent log
-    fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'login/page.tsx:onSubmit:entry', message: 'onSubmit called', data: { email: data.email, hasPassword: !!data.password }, timestamp: Date.now(), hypothesisId: 'H1' }) }).catch(() => {})
+    fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        location: 'login/page.tsx:onSubmit:entry',
+        message: 'onSubmit called',
+        data: { email: data.email, hasPassword: !!data.password },
+        timestamp: Date.now(),
+        hypothesisId: 'H1',
+      }),
+    }).catch(() => {})
     // #endregion
 
     try {
@@ -89,12 +109,32 @@ export default function LoginPage() {
       })
 
       // #region agent log
-      fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'login/page.tsx:onSubmit:afterSignIn', message: 'signIn result', data: { ok: result?.ok, error: result?.error, url: result?.url ?? null }, timestamp: Date.now(), hypothesisId: 'H2' }) }).catch(() => {})
+      fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'login/page.tsx:onSubmit:afterSignIn',
+          message: 'signIn result',
+          data: { ok: result?.ok, error: result?.error, url: result?.url ?? null },
+          timestamp: Date.now(),
+          hypothesisId: 'H2',
+        }),
+      }).catch(() => {})
       // #endregion
 
       if (result?.error) {
         // #region agent log
-        fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'login/page.tsx:onSubmit:branch', message: 'branch result.error', data: { branch: 'error' }, timestamp: Date.now(), hypothesisId: 'H2' }) }).catch(() => {})
+        fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'login/page.tsx:onSubmit:branch',
+            message: 'branch result.error',
+            data: { branch: 'error' },
+            timestamp: Date.now(),
+            hypothesisId: 'H2',
+          }),
+        }).catch(() => {})
         // #endregion
         toast({
           title: 'خطأ في تسجيل الدخول',
@@ -103,7 +143,17 @@ export default function LoginPage() {
         })
       } else if (result?.ok) {
         // #region agent log
-        fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'login/page.tsx:onSubmit:branch', message: 'branch result.ok', data: { branch: 'ok' }, timestamp: Date.now(), hypothesisId: 'H2' }) }).catch(() => {})
+        fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location: 'login/page.tsx:onSubmit:branch',
+            message: 'branch result.ok',
+            data: { branch: 'ok' },
+            timestamp: Date.now(),
+            hypothesisId: 'H2',
+          }),
+        }).catch(() => {})
         // #endregion
         toast({
           title: 'تم تسجيل الدخول بنجاح',
@@ -127,7 +177,17 @@ export default function LoginPage() {
       }
     } catch (error) {
       // #region agent log
-      fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'login/page.tsx:onSubmit:catch', message: 'onSubmit catch', data: { errorMessage: error instanceof Error ? error.message : String(error) }, timestamp: Date.now(), hypothesisId: 'H3' }) }).catch(() => {})
+      fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location: 'login/page.tsx:onSubmit:catch',
+          message: 'onSubmit catch',
+          data: { errorMessage: error instanceof Error ? error.message : String(error) },
+          timestamp: Date.now(),
+          hypothesisId: 'H3',
+        }),
+      }).catch(() => {})
       // #endregion
       console.error('Login error:', error)
       toast({
@@ -170,7 +230,10 @@ export default function LoginPage() {
   const t = translations[language]
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-50" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div
+      className="flex min-h-screen items-center justify-center bg-neutral-50"
+      dir={language === 'ar' ? 'rtl' : 'ltr'}
+    >
       <div className="w-full max-w-md space-y-8 rounded-xl bg-white p-8 shadow-lg">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -192,7 +255,17 @@ export default function LoginPage() {
           onSubmit={(e) => {
             // #region agent log
             const form = e.currentTarget
-            fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'login/page.tsx:form:onSubmit', message: 'form submit event', data: { method: form.method, action: form.action || '(current)' }, timestamp: Date.now(), hypothesisId: 'H1' }) }).catch(() => {})
+            fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                location: 'login/page.tsx:form:onSubmit',
+                message: 'form submit event',
+                data: { method: form.method, action: form.action || '(current)' },
+                timestamp: Date.now(),
+                hypothesisId: 'H1',
+              }),
+            }).catch(() => {})
             // #endregion
             handleSubmit(onSubmit)(e)
           }}
@@ -244,12 +317,7 @@ export default function LoginPage() {
           </div>
 
           {/* Submit Button */}
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isLoading}
-            aria-label={t.submit}
-          >
+          <Button type="submit" className="w-full" disabled={isLoading} aria-label={t.submit}>
             {isLoading ? (
               <>
                 <Loader2 className="ml-2 h-4 w-4 animate-spin" />

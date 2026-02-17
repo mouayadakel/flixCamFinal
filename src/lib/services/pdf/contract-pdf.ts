@@ -31,10 +31,7 @@ function formatAmount(value: number, locale: string): string {
 /**
  * Generate contract PDF buffer
  */
-export function generateContractPdf(
-  contract: Contract,
-  options: ContractPdfOptions = {}
-): Buffer {
+export function generateContractPdf(contract: Contract, options: ContractPdfOptions = {}): Buffer {
   const { locale = 'en' } = options
   const content = contract.contractContent as ContractContent
 

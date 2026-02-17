@@ -4,13 +4,15 @@
 
 **Root Cause**: Stale `.next` build cache
 
-**Fix Applied**: 
+**Fix Applied**:
+
 - ✅ Cleared `.next` directory
 - ✅ Build cache reset
 
 ## Next Steps
 
 1. **Restart the dev server**:
+
    ```bash
    # Stop the current dev server (Ctrl+C)
    # Then restart:
@@ -35,11 +37,13 @@
 If you still see 404 errors after restarting:
 
 1. **Check for build errors**:
+
    ```bash
    npm run build
    ```
 
 2. **Check TypeScript errors**:
+
    ```bash
    npm run type-check
    ```

@@ -27,10 +27,7 @@ export async function GET() {
 
   const vendor = await VendorService.getVendorByUserId(session.user.id)
   if (!vendor) {
-    return NextResponse.json(
-      { error: 'Vendor account not found or not approved' },
-      { status: 403 }
-    )
+    return NextResponse.json({ error: 'Vendor account not found or not approved' }, { status: 403 })
   }
 
   return NextResponse.json(vendor)
@@ -44,10 +41,7 @@ export async function PATCH(request: NextRequest) {
 
   const vendor = await VendorService.getVendorByUserId(session.user.id)
   if (!vendor) {
-    return NextResponse.json(
-      { error: 'Vendor account not found or not approved' },
-      { status: 403 }
-    )
+    return NextResponse.json({ error: 'Vendor account not found or not approved' }, { status: 403 })
   }
 
   let body: unknown
@@ -59,10 +53,7 @@ export async function PATCH(request: NextRequest) {
 
   const parsed = patchSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.flatten().fieldErrors },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 })
   }
 
   const data = Object.fromEntries(

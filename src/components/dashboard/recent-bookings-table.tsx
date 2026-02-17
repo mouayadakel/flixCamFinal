@@ -7,7 +7,14 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { format } from 'date-fns'
@@ -46,9 +53,7 @@ export function RecentBookingsTable({ bookings = [] }: RecentBookingsTableProps)
       </CardHeader>
       <CardContent>
         {bookings.length === 0 ? (
-          <div className="py-12 text-center text-neutral-500">
-            لا توجد حجوزات حديثة
-          </div>
+          <div className="py-12 text-center text-neutral-500">لا توجد حجوزات حديثة</div>
         ) : (
           <Table>
             <TableHeader>
@@ -64,8 +69,11 @@ export function RecentBookingsTable({ bookings = [] }: RecentBookingsTableProps)
             </TableHeader>
             <TableBody>
               {bookings.map((booking) => {
-                const stateConfig = STATE_CONFIG[booking.state] || { label: booking.state, color: '#6B7280' }
-                
+                const stateConfig = STATE_CONFIG[booking.state] || {
+                  label: booking.state,
+                  color: '#6B7280',
+                }
+
                 return (
                   <TableRow key={booking.id}>
                     <TableCell className="font-mono text-sm">{booking.booking_number}</TableCell>
@@ -94,7 +102,7 @@ export function RecentBookingsTable({ bookings = [] }: RecentBookingsTableProps)
                     <TableCell>
                       <Link
                         href={`/admin/bookings/${booking.id}`}
-                        className="text-primary-600 hover:text-primary-700 hover:underline text-sm"
+                        className="text-sm text-primary-600 hover:text-primary-700 hover:underline"
                       >
                         عرض
                       </Link>

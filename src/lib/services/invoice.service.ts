@@ -10,11 +10,7 @@
 import { prisma } from '@/lib/db/prisma'
 import { AuditService } from './audit.service'
 import { EventBus } from '@/lib/events/event-bus'
-import {
-  NotFoundError,
-  ValidationError,
-  ForbiddenError,
-} from '@/lib/errors'
+import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission } from '@/lib/auth/permissions'
 import type {
   Invoice,
@@ -24,12 +20,15 @@ import type {
   InvoiceUpdateInput,
   InvoicePaymentInput,
 } from '@/lib/types/invoice.types'
-import { InvoiceType as PrismaInvoiceType, InvoiceStatus as PrismaInvoiceStatus } from '@prisma/client'
+import {
+  InvoiceType as PrismaInvoiceType,
+  InvoiceStatus as PrismaInvoiceStatus,
+} from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 
 /**
  * Invoice Service
- * 
+ *
  * Uses the Invoice model for proper data storage
  */
 export class InvoiceService {
@@ -167,7 +166,7 @@ export class InvoiceService {
         items: input.items.map((item) => ({
           ...item,
           vatRate: item.vatRate || 15,
-          vatAmount: item.vatAmount || (item.total * 0.15),
+          vatAmount: item.vatAmount || item.total * 0.15,
         })) as any,
         notes: input.notes || null,
         paymentTerms: input.paymentTerms || null,
@@ -254,7 +253,11 @@ export class InvoiceService {
     }
 
     // Check if overdue
-    if (invoice.dueDate < new Date() && invoice.status !== 'PAID' && invoice.status !== 'CANCELLED') {
+    if (
+      invoice.dueDate < new Date() &&
+      invoice.status !== 'PAID' &&
+      invoice.status !== 'CANCELLED'
+    ) {
       if (invoice.status !== 'OVERDUE' && invoice.status !== 'PARTIALLY_PAID') {
         // Auto-update status if overdue
         await prisma.invoice.update({
@@ -413,7 +416,9 @@ export class InvoiceService {
       const vatAmount = subtotalAfterDiscount * 0.15
       updatedVatAmount = new Decimal(vatAmount)
       updatedTotalAmount = new Decimal(subtotalAfterDiscount + vatAmount)
-      updatedRemainingAmount = new Decimal(subtotalAfterDiscount + vatAmount - Number(existingInvoice.paidAmount))
+      updatedRemainingAmount = new Decimal(
+        subtotalAfterDiscount + vatAmount - Number(existingInvoice.paidAmount)
+      )
     }
 
     // Update invoice
@@ -426,12 +431,15 @@ export class InvoiceService {
         discount: input.discount !== undefined ? new Decimal(input.discount) : undefined,
         vatAmount: input.items || input.discount !== undefined ? updatedVatAmount : undefined,
         totalAmount: input.items || input.discount !== undefined ? updatedTotalAmount : undefined,
-        remainingAmount: input.items || input.discount !== undefined ? updatedRemainingAmount : undefined,
-        items: input.items ? input.items.map((item) => ({
-          ...item,
-          vatRate: item.vatRate || 15,
-          vatAmount: item.vatAmount || (item.total * 0.15),
-        })) as any : undefined,
+        remainingAmount:
+          input.items || input.discount !== undefined ? updatedRemainingAmount : undefined,
+        items: input.items
+          ? (input.items.map((item) => ({
+              ...item,
+              vatRate: item.vatRate || 15,
+              vatAmount: item.vatAmount || item.total * 0.15,
+            })) as any)
+          : undefined,
         notes: input.notes !== undefined ? input.notes : undefined,
         paymentTerms: input.paymentTerms !== undefined ? input.paymentTerms : undefined,
         status: input.status ? this.mapInvoiceStatus(input.status) : undefined,

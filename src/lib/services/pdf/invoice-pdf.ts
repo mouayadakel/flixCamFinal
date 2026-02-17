@@ -82,7 +82,11 @@ export async function generateInvoicePdf(
 
   // Invoice number & dates
   doc.setFontSize(10)
-  doc.text(`${locale === 'ar' ? 'رقم الفاتورة' : 'Invoice No'}: ${invoice.invoiceNumber}`, margin, y)
+  doc.text(
+    `${locale === 'ar' ? 'رقم الفاتورة' : 'Invoice No'}: ${invoice.invoiceNumber}`,
+    margin,
+    y
+  )
   doc.text(
     `${locale === 'ar' ? 'تاريخ الإصدار' : 'Issue Date'}: ${formatDate(invoice.issueDate, locale)}`,
     pageWidth - margin - 60,
@@ -110,9 +114,10 @@ export async function generateInvoicePdf(
 
   // Items table
   const colWidths = isRtl ? [25, 70, 20, 25, 25, 25] : [25, 70, 20, 25, 25, 25]
-  const headers = locale === 'ar'
-    ? ['الكمية', 'الوصف', 'السعر', 'الإجمالي', 'ض.ق.م', 'المجموع']
-    : ['Qty', 'Description', 'Price', 'Total', 'VAT', 'Amount']
+  const headers =
+    locale === 'ar'
+      ? ['الكمية', 'الوصف', 'السعر', 'الإجمالي', 'ض.ق.م', 'المجموع']
+      : ['Qty', 'Description', 'Price', 'Total', 'VAT', 'Amount']
 
   let colX = margin
   doc.setFontSize(10)

@@ -26,7 +26,11 @@ import { exportToCSV } from '@/lib/utils/export.utils'
 import { TablePagination } from '@/components/tables/table-pagination'
 import { useToast } from '@/hooks/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
-import type { MaintenanceStatus, MaintenanceType, MaintenancePriority } from '@/lib/types/maintenance.types'
+import type {
+  MaintenanceStatus,
+  MaintenanceType,
+  MaintenancePriority,
+} from '@/lib/types/maintenance.types'
 
 interface Maintenance {
   id: string
@@ -52,7 +56,10 @@ interface Maintenance {
   } | null
 }
 
-const STATUS_LABELS: Record<MaintenanceStatus, { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_LABELS: Record<
+  MaintenanceStatus,
+  { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   scheduled: { ar: 'مجدول', en: 'Scheduled', variant: 'secondary' },
   in_progress: { ar: 'قيد التنفيذ', en: 'In Progress', variant: 'default' },
   completed: { ar: 'مكتمل', en: 'Completed', variant: 'default' },
@@ -106,13 +113,7 @@ export default function MaintenancePage() {
     'calibration',
   ]
 
-  const priorities: Array<MaintenancePriority | 'all'> = [
-    'all',
-    'low',
-    'medium',
-    'high',
-    'urgent',
-  ]
+  const priorities: Array<MaintenancePriority | 'all'> = ['all', 'low', 'medium', 'high', 'urgent']
 
   useEffect(() => {
     loadMaintenance()
@@ -202,18 +203,21 @@ export default function MaintenancePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">الصيانة</h1>
-          <p className="text-muted-foreground mt-2">
-            إدارة طلبات صيانة المعدات
-          </p>
+          <p className="mt-2 text-muted-foreground">إدارة طلبات صيانة المعدات</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={filteredMaintenance.length === 0}>
-            <Download className="h-4 w-4 ml-2" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportCSV}
+            disabled={filteredMaintenance.length === 0}
+          >
+            <Download className="ml-2 h-4 w-4" />
             تصدير CSV
           </Button>
           <Button asChild>
             <Link href="/admin/maintenance/new">
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="ml-2 h-4 w-4" />
               طلب صيانة جديد
             </Link>
           </Button>
@@ -221,7 +225,7 @@ export default function MaintenancePage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 items-center flex-wrap">
+      <div className="flex flex-wrap items-center gap-4">
         <input
           type="date"
           value={dateFrom}
@@ -239,18 +243,20 @@ export default function MaintenancePage() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="rounded-lg border px-4 py-2"
         >
           {statuses.map((status) => (
             <option key={status} value={status}>
-              {status === 'all' ? 'جميع الحالات' : STATUS_LABELS[status as MaintenanceStatus]?.ar || status}
+              {status === 'all'
+                ? 'جميع الحالات'
+                : STATUS_LABELS[status as MaintenanceStatus]?.ar || status}
             </option>
           ))}
         </select>
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="rounded-lg border px-4 py-2"
         >
           {types.map((type) => (
             <option key={type} value={type}>
@@ -261,18 +267,20 @@ export default function MaintenancePage() {
         <select
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="rounded-lg border px-4 py-2"
         >
           {priorities.map((priority) => (
             <option key={priority} value={priority}>
-              {priority === 'all' ? 'جميع الأولويات' : PRIORITY_LABELS[priority as MaintenancePriority]?.ar || priority}
+              {priority === 'all'
+                ? 'جميع الأولويات'
+                : PRIORITY_LABELS[priority as MaintenancePriority]?.ar || priority}
             </option>
           ))}
         </select>
       </div>
 
       {/* Maintenance Table */}
-      <div className="border rounded-lg">
+      <div className="rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -301,7 +309,7 @@ export default function MaintenancePage() {
               </TableRow>
             ) : filteredMaintenance.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={10} className="py-8 text-center text-muted-foreground">
                   لا توجد طلبات صيانة
                 </TableCell>
               </TableRow>
@@ -324,7 +332,9 @@ export default function MaintenancePage() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded text-xs ${PRIORITY_LABELS[item.priority]?.color || ''}`}>
+                    <span
+                      className={`rounded px-2 py-1 text-xs ${PRIORITY_LABELS[item.priority]?.color || ''}`}
+                    >
                       {getPriorityLabel(item.priority)}
                     </span>
                   </TableCell>
@@ -338,15 +348,13 @@ export default function MaintenancePage() {
                     <div className="text-sm">
                       {formatDate(item.scheduledDate)}
                       {item.status === 'overdue' && (
-                        <AlertCircle className="h-3 w-3 inline-block ml-1 text-destructive" />
+                        <AlertCircle className="ml-1 inline-block h-3 w-3 text-destructive" />
                       )}
                     </div>
                   </TableCell>
                   <TableCell>
                     {item.technician ? (
-                      <div className="text-sm">
-                        {item.technician.name || item.technician.email}
-                      </div>
+                      <div className="text-sm">{item.technician.name || item.technician.email}</div>
                     ) : (
                       <span className="text-sm text-muted-foreground">غير محدد</span>
                     )}
@@ -354,7 +362,7 @@ export default function MaintenancePage() {
                   <TableCell>
                     <Link href={`/admin/maintenance/${item.id}`}>
                       <Button size="sm" variant="ghost">
-                        <Eye className="h-4 w-4 ml-1" />
+                        <Eye className="ml-1 h-4 w-4" />
                         عرض
                       </Button>
                     </Link>

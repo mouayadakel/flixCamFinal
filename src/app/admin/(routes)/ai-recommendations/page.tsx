@@ -8,14 +8,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import {
-  Sparkles,
-  Package,
-  RefreshCw,
-  AlertTriangle,
-  ArrowRight,
-  CheckCircle,
-} from 'lucide-react'
+import { Sparkles, Package, RefreshCw, AlertTriangle, ArrowRight, CheckCircle } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -139,11 +132,11 @@ export default function AIRecommendationsPage() {
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
+          <h1 className="flex items-center gap-2 text-3xl font-bold">
             <Sparkles className="h-8 w-8 text-primary" />
             توصيات الذكاء الاصطناعي
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             الحصول على بدائل معدات بناءً على الفئة والسعر
           </p>
         </div>
@@ -153,9 +146,7 @@ export default function AIRecommendationsPage() {
       <Card>
         <CardHeader>
           <CardTitle>بدائل المعدات</CardTitle>
-          <CardDescription>
-            اختر معدّة غير متاحة لرؤية بدائل مقترحة من نفس الفئة
-          </CardDescription>
+          <CardDescription>اختر معدّة غير متاحة لرؤية بدائل مقترحة من نفس الفئة</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {equipmentLoading ? (
@@ -164,16 +155,13 @@ export default function AIRecommendationsPage() {
             <div className="flex flex-col gap-2">
               <p className="text-sm text-destructive">{fetchError}</p>
               <Button variant="outline" onClick={loadEquipment}>
-                <RefreshCw className="h-4 w-4 ml-2" />
+                <RefreshCw className="ml-2 h-4 w-4" />
                 إعادة تحميل المعدات
               </Button>
             </div>
           ) : (
             <div className="flex flex-wrap items-center gap-4">
-              <Select
-                value={selectedEquipmentId}
-                onValueChange={setSelectedEquipmentId}
-              >
+              <Select value={selectedEquipmentId} onValueChange={setSelectedEquipmentId}>
                 <SelectTrigger className="w-[280px]">
                   <SelectValue placeholder="اختر معدّة..." />
                 </SelectTrigger>
@@ -185,18 +173,15 @@ export default function AIRecommendationsPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button
-                onClick={handleGetAlternatives}
-                disabled={loading || !selectedEquipmentId}
-              >
+              <Button onClick={handleGetAlternatives} disabled={loading || !selectedEquipmentId}>
                 {loading ? (
                   <>
-                    <RefreshCw className="h-4 w-4 ml-2 animate-spin" />
+                    <RefreshCw className="ml-2 h-4 w-4 animate-spin" />
                     جاري التحليل...
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4 ml-2" />
+                    <Sparkles className="ml-2 h-4 w-4" />
                     الحصول على البدائل
                   </>
                 )}
@@ -205,7 +190,7 @@ export default function AIRecommendationsPage() {
           )}
 
           {loadError && (
-            <div className="flex items-center gap-2 p-4 rounded-lg bg-destructive/10 text-destructive">
+            <div className="flex items-center gap-2 rounded-lg bg-destructive/10 p-4 text-destructive">
               <AlertTriangle className="h-5 w-5 shrink-0" />
               <span>{loadError}</span>
               <Button variant="outline" size="sm" onClick={handleGetAlternatives}>
@@ -215,15 +200,15 @@ export default function AIRecommendationsPage() {
           )}
 
           {!loading && !loadError && recommendations.length === 0 && selectedEquipmentId && (
-            <div className="text-center py-8 text-muted-foreground">
-              <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <div className="py-8 text-center text-muted-foreground">
+              <Package className="mx-auto mb-4 h-12 w-12 opacity-50" />
               <p className="font-medium">لا توجد بدائل</p>
               <p className="text-sm">جرّب معدّة أخرى أو شغّل &quot;الحصول على البدائل&quot;</p>
             </div>
           )}
 
           {!loading && recommendations.length > 0 && (
-            <div className="border rounded-lg overflow-hidden">
+            <div className="overflow-hidden rounded-lg border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -255,7 +240,7 @@ export default function AIRecommendationsPage() {
                           }
                         >
                           {rec.compatibility === 'exact' && (
-                            <CheckCircle className="h-3 w-3 ml-1" />
+                            <CheckCircle className="ml-1 h-3 w-3" />
                           )}
                           {compatibilityLabel[rec.compatibility] ?? rec.compatibility}
                         </Badge>
@@ -263,11 +248,12 @@ export default function AIRecommendationsPage() {
                       <TableCell>{rec.matchScore}%</TableCell>
                       <TableCell>
                         {rec.priceDifference != null
-                          ? (rec.priceDifference >= 0 ? '+' : '') + formatCurrency(rec.priceDifference)
+                          ? (rec.priceDifference >= 0 ? '+' : '') +
+                            formatCurrency(rec.priceDifference)
                           : '—'}
                       </TableCell>
                       <TableCell className="max-w-[200px]">
-                        <ul className="text-xs text-muted-foreground list-disc list-inside">
+                        <ul className="list-inside list-disc text-xs text-muted-foreground">
                           {rec.reasons.slice(0, 3).map((r, i) => (
                             <li key={i}>{r}</li>
                           ))}
@@ -277,7 +263,7 @@ export default function AIRecommendationsPage() {
                         <Link href={`/admin/inventory/equipment/${rec.equipmentId}`}>
                           <Button size="sm" variant="ghost">
                             عرض
-                            <ArrowRight className="h-4 w-4 mr-1" />
+                            <ArrowRight className="mr-1 h-4 w-4" />
                           </Button>
                         </Link>
                       </TableCell>

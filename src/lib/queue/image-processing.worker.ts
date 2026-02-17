@@ -66,8 +66,10 @@ export function createImageProcessingWorker() {
             if (product.galleryImages) {
               const galleryImages = product.galleryImages as string[]
               if (Array.isArray(galleryImages) && galleryImages.length > 0) {
-                const imageUrls = galleryImages.filter((url) => typeof url === 'string' && url.startsWith('http'))
-                
+                const imageUrls = galleryImages.filter(
+                  (url) => typeof url === 'string' && url.startsWith('http')
+                )
+
                 if (imageUrls.length > 0) {
                   const results = await processImagesBatch(imageUrls, 'products')
                   const processedUrls = results.map((r) => r.url)
@@ -87,7 +89,7 @@ export function createImageProcessingWorker() {
           }
 
           // Update progress
-          await job.updateProgress(Math.round((i + 1) / productIds.length * 100))
+          await job.updateProgress(Math.round(((i + 1) / productIds.length) * 100))
         }
 
         // Update import job status

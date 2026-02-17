@@ -136,11 +136,7 @@ export interface ImplementationSpecBooking {
 
 // --- PricingRule (Spec §3) ---
 
-export type PricingRuleTypeSpec =
-  | 'weekend'
-  | 'long_term'
-  | 'client_tier'
-  | 'manual_override'
+export type PricingRuleTypeSpec = 'weekend' | 'long_term' | 'client_tier' | 'manual_override'
 
 export interface ImplementationSpecPricingRule {
   id: string

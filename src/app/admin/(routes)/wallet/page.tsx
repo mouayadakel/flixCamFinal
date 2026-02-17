@@ -31,7 +31,15 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { formatCurrency, formatDate } from '@/lib/utils/format.utils'
-import { Eye, Loader2, RefreshCw, AlertCircle, Wallet, ArrowDownCircle, ArrowUpCircle } from 'lucide-react'
+import {
+  Eye,
+  Loader2,
+  RefreshCw,
+  AlertCircle,
+  Wallet,
+  ArrowDownCircle,
+  ArrowUpCircle,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useToast } from '@/hooks/use-toast'
 
@@ -120,7 +128,12 @@ export default function WalletPage() {
       const res = await fetch('/api/wallet', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user: addUser.trim(), type: addType, amount, note: addNote.trim() || undefined }),
+        body: JSON.stringify({
+          user: addUser.trim(),
+          type: addType,
+          amount,
+          note: addNote.trim() || undefined,
+        }),
       })
       if (!res.ok) {
         const err = await res.json()
@@ -130,7 +143,11 @@ export default function WalletPage() {
       await fetchWallet()
       toast({ title: 'تم', description: addType === 'credit' ? 'تمت إضافة رصيد' : 'تم خصم المبلغ' })
     } catch (e) {
-      toast({ title: 'خطأ', description: e instanceof Error ? e.message : 'فشل', variant: 'destructive' })
+      toast({
+        title: 'خطأ',
+        description: e instanceof Error ? e.message : 'فشل',
+        variant: 'destructive',
+      })
     } finally {
       setSubmitting(false)
     }
@@ -140,22 +157,22 @@ export default function WalletPage() {
 
   return (
     <div className="space-y-6" dir="rtl">
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">المحفظة</h1>
-          <p className="text-muted-foreground mt-1">معاملات الرصيد والائتمان</p>
+          <p className="mt-1 text-muted-foreground">معاملات الرصيد والائتمان</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="default" onClick={() => handleOpenAdd('credit')} disabled={loading}>
-            <ArrowDownCircle className="h-4 w-4 ml-2" />
+            <ArrowDownCircle className="ml-2 h-4 w-4" />
             إضافة رصيد
           </Button>
           <Button variant="outline" onClick={() => handleOpenAdd('debit')} disabled={loading}>
-            <ArrowUpCircle className="h-4 w-4 ml-2" />
+            <ArrowUpCircle className="ml-2 h-4 w-4" />
             خصم
           </Button>
           <Button variant="outline" onClick={fetchWallet} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 ml-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
         </div>
@@ -178,7 +195,9 @@ export default function WalletPage() {
               <ArrowDownCircle className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <span className="text-2xl font-bold text-green-600">{formatCurrency(summary.totalCredits)}</span>
+              <span className="text-2xl font-bold text-green-600">
+                {formatCurrency(summary.totalCredits)}
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -187,7 +206,9 @@ export default function WalletPage() {
               <ArrowUpCircle className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
-              <span className="text-2xl font-bold text-red-600">{formatCurrency(summary.totalDebits)}</span>
+              <span className="text-2xl font-bold text-red-600">
+                {formatCurrency(summary.totalDebits)}
+              </span>
             </CardContent>
           </Card>
         </div>
@@ -201,14 +222,14 @@ export default function WalletPage() {
           onStatusChange={setTypeFilter}
         />
         <div className="flex items-center gap-2">
-          <Label className="text-sm text-muted-foreground shrink-0">من تاريخ</Label>
+          <Label className="shrink-0 text-sm text-muted-foreground">من تاريخ</Label>
           <Input
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
             className="w-40"
           />
-          <Label className="text-sm text-muted-foreground shrink-0">إلى تاريخ</Label>
+          <Label className="shrink-0 text-sm text-muted-foreground">إلى تاريخ</Label>
           <Input
             type="date"
             value={dateTo}
@@ -219,8 +240,8 @@ export default function WalletPage() {
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 flex items-center gap-2">
-          <AlertCircle className="h-5 w-5 text-red-600 shrink-0" />
+        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
+          <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />
           <p className="text-red-800">{error}</p>
           <Button variant="outline" size="sm" onClick={fetchWallet}>
             إعادة المحاولة
@@ -245,14 +266,14 @@ export default function WalletPage() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground mt-2">جاري التحميل...</p>
+                <TableCell colSpan={8} className="py-12 text-center">
+                  <Loader2 className="mx-auto h-8 w-8 animate-spin text-muted-foreground" />
+                  <p className="mt-2 text-sm text-muted-foreground">جاري التحميل...</p>
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
+                <TableCell colSpan={8} className="py-12 text-center text-muted-foreground">
                   لا توجد معاملات
                 </TableCell>
               </TableRow>

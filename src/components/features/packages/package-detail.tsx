@@ -38,9 +38,7 @@ export function PackageDetail({ pkg }: PackageDetailProps) {
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold">{pkg.name}</h1>
-      {pkg.description && (
-        <p className="text-muted-foreground">{pkg.description}</p>
-      )}
+      {pkg.description && <p className="text-muted-foreground">{pkg.description}</p>}
       {pkg.discountPercent > 0 && (
         <p className="text-sm font-medium text-green-600 dark:text-green-400">
           {pkg.discountPercent}% discount applied
@@ -48,12 +46,12 @@ export function PackageDetail({ pkg }: PackageDetailProps) {
       )}
 
       <section>
-        <h2 className="font-semibold mb-4">Includes</h2>
+        <h2 className="mb-4 font-semibold">Includes</h2>
         <ul className="space-y-3">
           {pkg.items.map((item) => (
-            <li key={item.equipmentId} className="flex gap-4 items-center rounded border p-3">
+            <li key={item.equipmentId} className="flex items-center gap-4 rounded border p-3">
               {item.equipment.media[0]?.url && (
-                <div className="relative h-16 w-24 shrink-0 rounded overflow-hidden bg-muted">
+                <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded bg-muted">
                   <Image
                     src={item.equipment.media[0].url}
                     alt={item.equipment.model ?? item.equipment.sku}
@@ -79,7 +77,7 @@ export function PackageDetail({ pkg }: PackageDetailProps) {
         </ul>
       </section>
 
-      <div className="rounded-lg border bg-card p-4 space-y-2">
+      <div className="space-y-2 rounded-lg border bg-card p-4">
         {pkg.discountPercent > 0 && (
           <p className="text-sm text-muted-foreground">
             Subtotal: {pkg.subtotal.toLocaleString()} SAR

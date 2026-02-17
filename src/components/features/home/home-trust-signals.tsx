@@ -1,13 +1,30 @@
 /**
- * Homepage trust signals – animated stats with icons and trust badges.
- * Visual treatment: gradient accent, card-based layout.
+ * Homepage trust signals – stats, trust badges, and How It Works steps (merged).
  */
 
 'use client'
 
-import { Shield, HeadphonesIcon, Award, Camera, Users, CalendarCheck } from 'lucide-react'
+import {
+  HeadphonesIcon,
+  Award,
+  Camera,
+  Users,
+  CalendarCheck,
+  Search,
+  CreditCard,
+  Package,
+  RotateCcw,
+} from 'lucide-react'
 import { useLocale } from '@/hooks/use-locale'
 import { PublicContainer } from '@/components/public/public-container'
+
+const HOW_IT_WORKS_STEPS = [
+  { key: 'home.howItWorksStep1', Icon: Search },
+  { key: 'home.howItWorksStep2', Icon: CalendarCheck },
+  { key: 'home.howItWorksStep3', Icon: CreditCard },
+  { key: 'home.howItWorksStep4', Icon: Package },
+  { key: 'home.howItWorksStep5', Icon: RotateCcw },
+] as const
 
 export interface HomeTrustSignalsProps {
   equipmentCount: number
@@ -33,13 +50,12 @@ export function HomeTrustSignals({
   ]
 
   const badges = [
-    { Icon: Shield, label: t('home.trustInsured') },
     { Icon: HeadphonesIcon, label: t('home.trustSupport') },
     { Icon: Award, label: 'Verified' },
   ]
 
   return (
-    <section className="bg-white py-16 md:py-20 lg:py-24 border-t border-border-light/50">
+    <section className="border-t border-border-light/50 bg-white py-10 md:py-14">
       <PublicContainer>
         <h2 className="mb-12 text-center text-section-title text-text-heading">
           {t('home.trustTitle')}
@@ -50,7 +66,7 @@ export function HomeTrustSignals({
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="group flex flex-col items-center rounded-2xl border border-border-light/60 bg-surface-light/50 p-8 text-center transition-all duration-300 hover:bg-white hover:shadow-card-elevated hover:border-brand-primary/10 opacity-0 animate-fade-in-up"
+              className="group flex animate-fade-in-up flex-col items-center rounded-2xl border border-border-light/60 bg-surface-light/50 p-8 text-center opacity-0 transition-all duration-300 hover:border-brand-primary/10 hover:bg-white hover:shadow-card-elevated"
               style={{ animationDelay: `${0.1 * index}s` }}
             >
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-brand-primary/10 text-brand-primary transition-all duration-300 group-hover:bg-brand-primary group-hover:text-white group-hover:shadow-lg group-hover:shadow-brand-primary/20">
@@ -77,6 +93,26 @@ export function HomeTrustSignals({
               <span className="text-sm font-medium">{badge.label}</span>
             </div>
           ))}
+        </div>
+
+        {/* How It Works – compact row */}
+        <div className="mt-10 border-t border-border-light/50 pt-10">
+          <h3 className="mb-6 text-center text-lg font-semibold text-text-heading">
+            {t('home.howItWorksTitle')}
+          </h3>
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
+            {HOW_IT_WORKS_STEPS.map((step, i) => (
+              <div
+                key={step.key}
+                className="flex items-center gap-2 rounded-xl border border-border-light/60 bg-surface-light/50 px-3 py-2.5 sm:gap-2.5 sm:px-4 sm:py-3"
+              >
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-primary text-xs font-bold text-white sm:h-8 sm:w-8">
+                  {i + 1}
+                </span>
+                <span className="text-sm font-medium text-text-heading">{t(step.key)}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </PublicContainer>
     </section>

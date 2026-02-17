@@ -63,7 +63,12 @@ export default function RoleDetailPage() {
   const [forbidden, setForbidden] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  const [form, setForm] = useState({ displayName: '', displayNameAr: '', description: '', color: '' })
+  const [form, setForm] = useState({
+    displayName: '',
+    displayNameAr: '',
+    description: '',
+    color: '',
+  })
   const [selectedPermissionIds, setSelectedPermissionIds] = useState<Set<string>>(new Set())
 
   const id = params?.id as string
@@ -160,7 +165,7 @@ export default function RoleDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[280px]">
+      <div className="flex min-h-[280px] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
@@ -169,7 +174,7 @@ export default function RoleDetailPage() {
   if (forbidden) {
     return (
       <div className="space-y-4">
-        <p className="text-destructive font-medium">ليس لديك صلاحية عرض الأدوار والصلاحيات.</p>
+        <p className="font-medium text-destructive">ليس لديك صلاحية عرض الأدوار والصلاحيات.</p>
         <Button variant="outline" asChild>
           <Link href="/admin/settings/roles">العودة إلى الأدوار</Link>
         </Button>
@@ -191,7 +196,9 @@ export default function RoleDetailPage() {
   return (
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/admin/settings/roles" className="hover:text-foreground">الأدوار والصلاحيات</Link>
+        <Link href="/admin/settings/roles" className="hover:text-foreground">
+          الأدوار والصلاحيات
+        </Link>
         <ArrowRight className="h-4 w-4 rtl:rotate-180" />
         <span>{role.displayNameAr || role.displayName}</span>
       </div>
@@ -221,11 +228,15 @@ export default function RoleDetailPage() {
             )}
           </div>
         </div>
-        {!role.isSystem && (
-          editMode ? (
+        {!role.isSystem &&
+          (editMode ? (
             <div className="flex gap-2">
               <Button onClick={handleSave} disabled={submitting}>
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : <Save className="h-4 w-4 ml-2" />}
+                {submitting ? (
+                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="ml-2 h-4 w-4" />
+                )}
                 حفظ
               </Button>
               <Button variant="outline" onClick={() => setEditMode(false)}>
@@ -234,8 +245,7 @@ export default function RoleDetailPage() {
             </div>
           ) : (
             <Button onClick={() => setEditMode(true)}>تعديل</Button>
-          )
-        )}
+          ))}
       </div>
 
       <Card>
@@ -276,7 +286,7 @@ export default function RoleDetailPage() {
             </div>
             <Button asChild>
               <Link href={`/admin/settings/roles/${role.id}/users`}>
-                <UserPlus className="h-4 w-4 ml-2" />
+                <UserPlus className="ml-2 h-4 w-4" />
                 ربط مستخدم
               </Link>
             </Button>

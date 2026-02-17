@@ -37,10 +37,7 @@ function shapeBrand(b: {
 /**
  * GET /api/brands/:id - Get one brand
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()
@@ -70,10 +67,7 @@ export async function GET(
 /**
  * PATCH /api/brands/:id - Update brand
  */
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()
@@ -107,8 +101,10 @@ export async function PATCH(
         updateData.slug = newSlug
       }
     }
-    if (parsed.description !== undefined) updateData.description = parsed.description?.trim() ?? null
-    if (parsed.logoUrl !== undefined) updateData.logo = parsed.logoUrl && parsed.logoUrl !== '' ? parsed.logoUrl : null
+    if (parsed.description !== undefined)
+      updateData.description = parsed.description?.trim() ?? null
+    if (parsed.logoUrl !== undefined)
+      updateData.logo = parsed.logoUrl && parsed.logoUrl !== '' ? parsed.logoUrl : null
 
     const brand = await prisma.brand.update({
       where: { id },

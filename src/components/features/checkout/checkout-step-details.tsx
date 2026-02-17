@@ -12,7 +12,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
-import { checkoutDetailsSchema, type CheckoutDetailsInput } from '@/lib/validators/checkout.validator'
+import {
+  checkoutDetailsSchema,
+  type CheckoutDetailsInput,
+} from '@/lib/validators/checkout.validator'
 import {
   useCheckoutStore,
   type CheckoutDetails,
@@ -109,7 +112,7 @@ export function CheckoutStepDetails({ onSuccess }: CheckoutStepDetailsProps) {
 
   if (loadingProfile) {
     return (
-      <div className="rounded-lg border bg-card p-6 flex items-center justify-center min-h-[200px]">
+      <div className="flex min-h-[200px] items-center justify-center rounded-lg border bg-card p-6">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
@@ -135,7 +138,13 @@ export function CheckoutStepDetails({ onSuccess }: CheckoutStepDetailsProps) {
           </div>
           <div>
             <Label htmlFor="phone">{t('checkout.detailsPhone')}</Label>
-            <Input id="phone" dir="ltr" placeholder="05XXXXXXXX" {...form.register('phone')} className="mt-1" />
+            <Input
+              id="phone"
+              dir="ltr"
+              placeholder="05XXXXXXXX"
+              {...form.register('phone')}
+              className="mt-1"
+            />
             {form.formState.errors.phone && (
               <p className="mt-1 text-sm text-destructive">{form.formState.errors.phone.message}</p>
             )}
@@ -145,7 +154,7 @@ export function CheckoutStepDetails({ onSuccess }: CheckoutStepDetailsProps) {
         <div className="space-y-3">
           <Label>{t('checkout.deliveryMethod')}</Label>
           <div className="flex gap-4">
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex cursor-pointer items-center gap-2">
               <input
                 type="radio"
                 value="PICKUP"
@@ -154,7 +163,7 @@ export function CheckoutStepDetails({ onSuccess }: CheckoutStepDetailsProps) {
               />
               <span>{t('checkout.deliveryPickup')}</span>
             </label>
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex cursor-pointer items-center gap-2">
               <input
                 type="radio"
                 value="DELIVERY"
@@ -167,7 +176,7 @@ export function CheckoutStepDetails({ onSuccess }: CheckoutStepDetailsProps) {
         </div>
 
         {deliveryMethod === 'DELIVERY' && (
-          <div className="grid gap-4 rounded-md border p-4 bg-muted/30">
+          <div className="grid gap-4 rounded-md border bg-muted/30 p-4">
             <div>
               <Label htmlFor="deliveryCity">{t('checkout.deliveryCity')}</Label>
               <Input id="deliveryCity" {...form.register('deliveryCity')} className="mt-1" />

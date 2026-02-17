@@ -51,7 +51,14 @@ export default async function middleware(req: NextRequest) {
     secureCookie: process.env.NODE_ENV === 'production',
   })
   const session = token
-    ? { user: { id: token.id, email: token.email ?? '', name: token.name ?? undefined, role: token.role } }
+    ? {
+        user: {
+          id: token.id,
+          email: token.email ?? '',
+          name: token.name ?? undefined,
+          role: token.role,
+        },
+      }
     : null
 
   // Enforce read-only mode for write operations
@@ -100,10 +107,7 @@ export default async function middleware(req: NextRequest) {
 
     // Protected API routes require authentication
     if (!session) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
   }
 
@@ -133,7 +137,16 @@ export default async function middleware(req: NextRequest) {
     }
 
     // Admin routes - require admin, staff, or super_admin
-    if (!hasRoleAccess(userRole, ['super_admin', 'admin', 'staff', 'warehouse', 'driver', 'technician'])) {
+    if (
+      !hasRoleAccess(userRole, [
+        'super_admin',
+        'admin',
+        'staff',
+        'warehouse',
+        'driver',
+        'technician',
+      ])
+    ) {
       // Client users should be redirected to portal
       if (userRole === 'client') {
         return NextResponse.redirect(new URL('/portal/dashboard', req.url))

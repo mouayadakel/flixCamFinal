@@ -20,8 +20,9 @@ export default function AIPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">AI Features</h1>
-        <p className="text-muted-foreground mt-2">
-          Leverage AI for risk assessment, kit building, pricing optimization, demand forecasting, and customer support
+        <p className="mt-2 text-muted-foreground">
+          Leverage AI for risk assessment, kit building, pricing optimization, demand forecasting,
+          and customer support
         </p>
       </div>
 

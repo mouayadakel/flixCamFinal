@@ -31,8 +31,37 @@ interface ShootTypeFullConfig {
   sortOrder: number
   isActive: boolean
   questionnaire: unknown
-  categorySteps: { id: string; categoryId: string; categoryName: string; categorySlug: string; sortOrder: number; isRequired: boolean; minRecommended: number | null; maxRecommended: number | null; stepTitle: string | null; stepTitleAr: string | null; stepDescription: string | null; stepDescriptionAr: string | null }[]
-  recommendations: { id: string; equipmentId: string; budgetTier: string; reason: string | null; reasonAr: string | null; defaultQuantity: number; isAutoSelect: boolean; sortOrder: number; equipment: { id: string; sku: string; model: string | null; categoryId: string; category: { name: string; slug: string } } }[]
+  categorySteps: {
+    id: string
+    categoryId: string
+    categoryName: string
+    categorySlug: string
+    sortOrder: number
+    isRequired: boolean
+    minRecommended: number | null
+    maxRecommended: number | null
+    stepTitle: string | null
+    stepTitleAr: string | null
+    stepDescription: string | null
+    stepDescriptionAr: string | null
+  }[]
+  recommendations: {
+    id: string
+    equipmentId: string
+    budgetTier: string
+    reason: string | null
+    reasonAr: string | null
+    defaultQuantity: number
+    isAutoSelect: boolean
+    sortOrder: number
+    equipment: {
+      id: string
+      sku: string
+      model: string | null
+      categoryId: string
+      category: { name: string; slug: string }
+    }
+  }[]
 }
 
 export default function ShootTypeEditPage() {
@@ -52,7 +81,9 @@ export default function ShootTypeEditPage() {
         return res.json()
       })
       .then(setData)
-      .catch(() => toast({ title: 'Error', description: 'Failed to load shoot type', variant: 'destructive' }))
+      .catch(() =>
+        toast({ title: 'Error', description: 'Failed to load shoot type', variant: 'destructive' })
+      )
       .finally(() => setLoading(false))
   }, [id, toast])
 
@@ -110,13 +141,26 @@ export default function ShootTypeEditPage() {
             <ShootTypeGeneralTab shootType={data} onSaved={refresh} />
           </TabsContent>
           <TabsContent value="category-flow" className="mt-6">
-            <ShootTypeCategoryFlowTab shootTypeId={data.id} categorySteps={data.categorySteps} onSaved={refresh} />
+            <ShootTypeCategoryFlowTab
+              shootTypeId={data.id}
+              categorySteps={data.categorySteps}
+              onSaved={refresh}
+            />
           </TabsContent>
           <TabsContent value="recommendations" className="mt-6">
-            <ShootTypeRecommendationsTab shootTypeId={data.id} categorySteps={data.categorySteps} recommendations={data.recommendations} onSaved={refresh} />
+            <ShootTypeRecommendationsTab
+              shootTypeId={data.id}
+              categorySteps={data.categorySteps}
+              recommendations={data.recommendations}
+              onSaved={refresh}
+            />
           </TabsContent>
           <TabsContent value="questionnaire" className="mt-6">
-            <ShootTypeQuestionnaireTab shootTypeId={data.id} questionnaire={data.questionnaire} onSaved={refresh} />
+            <ShootTypeQuestionnaireTab
+              shootTypeId={data.id}
+              questionnaire={data.questionnaire}
+              onSaved={refresh}
+            />
           </TabsContent>
         </Tabs>
       )}

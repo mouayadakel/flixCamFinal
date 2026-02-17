@@ -50,11 +50,7 @@ export function generateQuotePdf(quote: Quote, options: QuotePdfOptions = {}): B
   y += 12
 
   doc.setFontSize(10)
-  doc.text(
-    `${locale === 'ar' ? 'رقم العرض' : 'Quote No'}: ${quote.quoteNumber}`,
-    margin,
-    y
-  )
+  doc.text(`${locale === 'ar' ? 'رقم العرض' : 'Quote No'}: ${quote.quoteNumber}`, margin, y)
   doc.text(
     `${locale === 'ar' ? 'صالح حتى' : 'Valid Until'}: ${formatDate(quote.validUntil, locale)}`,
     pageWidth - margin - 50,

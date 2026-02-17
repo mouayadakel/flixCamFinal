@@ -26,7 +26,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const parsed = previewNotificationTemplateSchema.parse(body)
 
-    let template: { subject: string | null; bodyText: string; bodyHtml: string | null } | null = null
+    let template: { subject: string | null; bodyText: string; bodyHtml: string | null } | null =
+      null
 
     if (parsed.templateId) {
       const t = await prisma.notificationTemplate.findUnique({
@@ -45,10 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!template) {
-      return NextResponse.json(
-        { error: 'Provide templateId or slug' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Provide templateId or slug' }, { status: 400 })
     }
 
     const data = (parsed.data ?? {}) as Record<string, unknown>

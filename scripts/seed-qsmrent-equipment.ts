@@ -12,10 +12,16 @@ const prisma = new PrismaClient()
 const SKU_PREFIX = 'QSM'
 
 async function main() {
-  const categories = await prisma.category.findMany({ where: { deletedAt: null }, select: { id: true, slug: true } })
+  const categories = await prisma.category.findMany({
+    where: { deletedAt: null },
+    select: { id: true, slug: true },
+  })
   const categoryBySlug = Object.fromEntries(categories.map((c) => [c.slug, c.id]))
 
-  const brands = await prisma.brand.findMany({ where: { deletedAt: null }, select: { id: true, slug: true } })
+  const brands = await prisma.brand.findMany({
+    where: { deletedAt: null },
+    select: { id: true, slug: true },
+  })
   const brandBySlug = Object.fromEntries(brands.map((b) => [b.slug, b.id]))
 
   let created = 0
@@ -32,7 +38,7 @@ async function main() {
       continue
     }
 
-    const brandId = item.brandSlug ? brandBySlug[item.brandSlug] ?? null : null
+    const brandId = item.brandSlug ? (brandBySlug[item.brandSlug] ?? null) : null
 
     await prisma.equipment.upsert({
       where: { sku },
@@ -71,8 +77,12 @@ async function main() {
     created++
   }
 
-  console.log(`✅ QSM Rent equipment seed: ${created} upserted, ${skipped} skipped (missing category)`)
-  console.log(`   Use these SKUs (e.g. QSM-001 … QSM-100) for testing equipment catalog, Build Your Kit, and AI assist.`)
+  console.log(
+    `✅ QSM Rent equipment seed: ${created} upserted, ${skipped} skipped (missing category)`
+  )
+  console.log(
+    `   Use these SKUs (e.g. QSM-001 … QSM-100) for testing equipment catalog, Build Your Kit, and AI assist.`
+  )
 }
 
 main()

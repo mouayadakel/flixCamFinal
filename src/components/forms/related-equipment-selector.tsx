@@ -153,15 +153,15 @@ export function RelatedEquipmentSelector({
       <Card>
         <CardContent className="pt-6">
           {loading ? (
-            <div className="text-center py-8 text-neutral-500">جاري التحميل...</div>
+            <div className="py-8 text-center text-neutral-500">جاري التحميل...</div>
           ) : filteredEquipment.length === 0 ? (
-            <div className="text-center py-8 text-neutral-500">لا توجد معدات</div>
+            <div className="py-8 text-center text-neutral-500">لا توجد معدات</div>
           ) : (
-            <div className="space-y-2 max-h-96 overflow-y-auto">
+            <div className="max-h-96 space-y-2 overflow-y-auto">
               {filteredEquipment.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center gap-3 p-3 rounded-lg border border-neutral-200 hover:bg-neutral-50 cursor-pointer"
+                  className="flex cursor-pointer items-center gap-3 rounded-lg border border-neutral-200 p-3 hover:bg-neutral-50"
                   onClick={() => handleToggle(item.id)}
                 >
                   <Checkbox
@@ -170,10 +170,8 @@ export function RelatedEquipmentSelector({
                   />
                   <Package className="h-4 w-4 text-neutral-400" />
                   <div className="flex-1">
-                    <p className="font-medium font-mono text-sm">{item.sku}</p>
-                    {item.model && (
-                      <p className="text-sm text-neutral-600">{item.model}</p>
-                    )}
+                    <p className="font-mono text-sm font-medium">{item.sku}</p>
+                    {item.model && <p className="text-sm text-neutral-600">{item.model}</p>}
                     <p className="text-xs text-neutral-500">{item.category.name}</p>
                   </div>
                 </div>

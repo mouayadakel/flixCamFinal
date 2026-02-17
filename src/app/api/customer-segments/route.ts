@@ -73,10 +73,13 @@ export async function POST(request: NextRequest) {
         name: parsed.name,
         slug: slug || parsed.name,
         description: parsed.description ?? null,
-        discountPercent: parsed.discountPercent != null ? new Decimal(parsed.discountPercent) : null,
+        discountPercent:
+          parsed.discountPercent != null ? new Decimal(parsed.discountPercent) : null,
         priorityBooking: parsed.priorityBooking ?? false,
         extendedTerms: parsed.extendedTerms ?? false,
-        autoAssignRules: (parsed.autoAssignRules == null ? Prisma.JsonNull : parsed.autoAssignRules) as Prisma.InputJsonValue,
+        autoAssignRules: (parsed.autoAssignRules == null
+          ? Prisma.JsonNull
+          : parsed.autoAssignRules) as Prisma.InputJsonValue,
       },
       include: { _count: { select: { users: true } } },
     })

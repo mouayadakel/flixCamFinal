@@ -54,10 +54,8 @@ export function StepCategory() {
   if (loading) {
     return (
       <div className="animate-fade-in">
-        <h2 className="text-section-title text-text-heading mb-1">
-          {t('kit.chooseCategory')}
-        </h2>
-        <p className="text-body-main text-text-muted mb-6">{t('kit.chooseCategoryDesc')}</p>
+        <h2 className="mb-1 text-section-title text-text-heading">{t('kit.chooseCategory')}</h2>
+        <p className="mb-6 text-body-main text-text-muted">{t('kit.chooseCategoryDesc')}</p>
         <CategorySkeleton count={6} />
       </div>
     )
@@ -66,16 +64,11 @@ export function StepCategory() {
   if (error) {
     return (
       <div className="animate-fade-in">
-        <h2 className="text-section-title text-text-heading mb-1">
-          {t('kit.chooseCategory')}
-        </h2>
-        <p className="text-body-main text-text-muted mb-6">{t('kit.chooseCategoryDesc')}</p>
+        <h2 className="mb-1 text-section-title text-text-heading">{t('kit.chooseCategory')}</h2>
+        <p className="mb-6 text-body-main text-text-muted">{t('kit.chooseCategoryDesc')}</p>
         <div className="rounded-xl border border-border-light bg-surface-light p-8 text-center">
-          <p className="text-text-body text-destructive mb-4">{error}</p>
-          <Button
-            variant="outline"
-            onClick={() => window.location.reload()}
-          >
+          <p className="mb-4 text-destructive text-text-body">{error}</p>
+          <Button variant="outline" onClick={() => window.location.reload()}>
             {t('common.retry')}
           </Button>
         </div>
@@ -86,12 +79,10 @@ export function StepCategory() {
   if (categories.length === 0) {
     return (
       <div className="animate-fade-in">
-        <h2 className="text-section-title text-text-heading mb-1">
-          {t('kit.chooseCategory')}
-        </h2>
-        <p className="text-body-main text-text-muted mb-6">{t('kit.chooseCategoryDesc')}</p>
+        <h2 className="mb-1 text-section-title text-text-heading">{t('kit.chooseCategory')}</h2>
+        <p className="mb-6 text-body-main text-text-muted">{t('kit.chooseCategoryDesc')}</p>
         <div className="flex flex-col items-center justify-center rounded-xl border border-border-light bg-surface-light p-12">
-          <FolderOpen className="h-12 w-12 text-text-muted mb-4" />
+          <FolderOpen className="mb-4 h-12 w-12 text-text-muted" />
           <p className="text-text-body text-text-muted">{t('kit.noCategories')}</p>
         </div>
       </div>
@@ -100,11 +91,9 @@ export function StepCategory() {
 
   return (
     <div className="animate-fade-in">
-      <h2 className="text-section-title text-text-heading mb-1">
-        {t('kit.chooseCategory')}
-      </h2>
-      <p className="text-body-main text-text-muted mb-6">{t('kit.chooseCategoryDesc')}</p>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+      <h2 className="mb-1 text-section-title text-text-heading">{t('kit.chooseCategory')}</h2>
+      <p className="mb-6 text-body-main text-text-muted">{t('kit.chooseCategoryDesc')}</p>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
         {categories.map((cat) => (
           <button
             key={cat.id}
@@ -112,9 +101,9 @@ export function StepCategory() {
             onClick={() => setCategory(cat.id)}
             className={cn(
               'flex flex-col items-start rounded-2xl border bg-white p-4 text-start shadow-card transition-all duration-300',
-              'hover:shadow-card-hover hover:border-brand-primary/20',
+              'hover:border-brand-primary/20 hover:shadow-card-hover',
               selectedCategoryId === cat.id
-                ? 'border-brand-primary ring-2 ring-brand-primary ring-offset-2 bg-brand-primary/5'
+                ? 'border-brand-primary bg-brand-primary/5 ring-2 ring-brand-primary ring-offset-2'
                 : 'border-border-light/60'
             )}
           >

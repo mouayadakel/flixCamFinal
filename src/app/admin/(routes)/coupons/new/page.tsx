@@ -29,7 +29,7 @@ export default function NewCouponPage() {
   const router = useRouter()
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
-  
+
   const [formData, setFormData] = useState({
     code: '',
     type: 'percent',
@@ -131,14 +131,14 @@ export default function NewCouponPage() {
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
+          <h1 className="flex items-center gap-2 text-3xl font-bold">
             <Tag className="h-8 w-8" />
             كوبون جديد
           </h1>
-          </div>
+        </div>
         <Button variant="outline" asChild>
           <Link href="/admin/coupons">
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="ml-2 h-4 w-4" />
             إلغاء
           </Link>
         </Button>
@@ -152,13 +152,15 @@ export default function NewCouponPage() {
             <CardDescription>رمز الكوبون ونوع الخصم</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>رمز الكوبون *</Label>
                 <div className="flex gap-2">
                   <Input
                     value={formData.code}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, code: e.target.value.toUpperCase() })
+                    }
                     placeholder="SUMMER2024"
                     className="font-mono uppercase"
                   />
@@ -222,7 +224,7 @@ export default function NewCouponPage() {
             <CardDescription>شروط تطبيق الخصم</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>الحد الأدنى للشراء (اختياري)</Label>
                 <Input
@@ -244,12 +246,12 @@ export default function NewCouponPage() {
                     type="number"
                     min="0"
                     value={formData.maxDiscountAmount}
-                    onChange={(e) => setFormData({ ...formData, maxDiscountAmount: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, maxDiscountAmount: e.target.value })
+                    }
                     placeholder="غير محدود"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    الحد الأقصى لمبلغ الخصم
-                  </p>
+                  <p className="text-xs text-muted-foreground">الحد الأقصى لمبلغ الخصم</p>
                 </div>
               )}
             </div>
@@ -262,7 +264,7 @@ export default function NewCouponPage() {
             <CardTitle>فترة الصلاحية</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>تاريخ البداية</Label>
                 <Input
@@ -319,12 +321,12 @@ export default function NewCouponPage() {
           <Button type="submit" disabled={loading}>
             {loading ? (
               <>
-                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
                 جاري الحفظ...
               </>
             ) : (
               <>
-                <Plus className="h-4 w-4 ml-2" />
+                <Plus className="ml-2 h-4 w-4" />
                 إنشاء الكوبون
               </>
             )}

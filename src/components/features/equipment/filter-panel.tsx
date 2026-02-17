@@ -152,7 +152,7 @@ function FilterContent({
             variant="ghost"
             size="sm"
             onClick={clearAll}
-            className="h-auto p-0 text-xs font-medium text-brand-primary hover:text-brand-primary-hover hover:bg-transparent"
+            className="h-auto p-0 text-xs font-medium text-brand-primary hover:bg-transparent hover:text-brand-primary-hover"
           >
             <X className="me-1 h-3 w-3" />
             {t('common.clear')}
@@ -194,7 +194,7 @@ function FilterContent({
             placeholder={t('common.search')}
             value={localQ}
             onChange={(e) => setLocalQ(e.target.value)}
-            className="w-full ps-9 pe-20 rounded-xl border-border-light bg-surface-light focus-visible:ring-brand-primary/20"
+            className="w-full rounded-xl border-border-light bg-surface-light pe-20 ps-9 focus-visible:ring-brand-primary/20"
           />
           <button
             type="submit"
@@ -206,10 +206,14 @@ function FilterContent({
       </form>
 
       {/* Collapsible filter sections */}
-      <Accordion type="multiple" defaultValue={['category', 'sort', 'dates', 'price', 'brands']} className="space-y-1">
+      <Accordion
+        type="multiple"
+        defaultValue={['category', 'sort', 'dates', 'price', 'brands']}
+        className="space-y-1"
+      >
         {/* Category */}
         <AccordionItem value="category" className="border-b-0">
-          <AccordionTrigger className="py-3 px-0 text-xs font-medium uppercase tracking-wider text-text-muted hover:text-text-heading hover:no-underline">
+          <AccordionTrigger className="px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-muted hover:text-text-heading hover:no-underline">
             {t('equipment.category')}
           </AccordionTrigger>
           <AccordionContent className="pb-3 pt-0">
@@ -223,7 +227,9 @@ function FilterContent({
               <SelectContent>
                 <SelectItem value="all">{t('common.viewAll')}</SelectItem>
                 {categories.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -232,7 +238,7 @@ function FilterContent({
 
         {/* Sort */}
         <AccordionItem value="sort" className="border-b-0">
-          <AccordionTrigger className="py-3 px-0 text-xs font-medium uppercase tracking-wider text-text-muted hover:text-text-heading hover:no-underline">
+          <AccordionTrigger className="px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-muted hover:text-text-heading hover:no-underline">
             <span className="flex items-center gap-1.5">
               <ArrowDownUp className="h-3.5 w-3.5" />
               {t('equipment.sortBy') ?? 'Sort by'}
@@ -256,7 +262,7 @@ function FilterContent({
 
         {/* Dates */}
         <AccordionItem value="dates" className="border-b-0">
-          <AccordionTrigger className="py-3 px-0 text-xs font-medium uppercase tracking-wider text-text-muted hover:text-text-heading hover:no-underline">
+          <AccordionTrigger className="px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-muted hover:text-text-heading hover:no-underline">
             Rental dates
           </AccordionTrigger>
           <AccordionContent className="pb-3 pt-0">
@@ -274,10 +280,10 @@ function FilterContent({
 
         {/* Price */}
         <AccordionItem value="price" className="border-b-0">
-          <AccordionTrigger className="py-3 px-0 text-xs font-medium uppercase tracking-wider text-text-muted hover:text-text-heading hover:no-underline">
+          <AccordionTrigger className="px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-muted hover:text-text-heading hover:no-underline">
             Price range
           </AccordionTrigger>
-          <AccordionContent className="pb-3 pt-0 space-y-3">
+          <AccordionContent className="space-y-3 pb-3 pt-0">
             <PriceRangeSlider
               min={priceMin}
               max={priceMax}
@@ -301,7 +307,7 @@ function FilterContent({
         {/* Brands */}
         {brandOptions.length > 0 && (
           <AccordionItem value="brands" className="border-b-0">
-            <AccordionTrigger className="py-3 px-0 text-xs font-medium uppercase tracking-wider text-text-muted hover:text-text-heading hover:no-underline">
+            <AccordionTrigger className="px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-muted hover:text-text-heading hover:no-underline">
               <span className="flex items-center gap-1.5">
                 <Tag className="h-3.5 w-3.5" />
                 {t('equipment.brands') ?? 'Brands'}
@@ -342,7 +348,13 @@ export function FilterPanel({ categories, brands, total, className }: FilterPane
   const endDateParam = searchParams?.get('endDate') ?? defaultDates.end
   const brandIdsParam = searchParams?.get('brandIds') ?? ''
   const brandIds = useMemo(
-    () => brandIdsParam ? brandIdsParam.split(',').map((s) => s.trim()).filter(Boolean) : [],
+    () =>
+      brandIdsParam
+        ? brandIdsParam
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : [],
     [brandIdsParam]
   )
 
@@ -421,10 +433,7 @@ export function FilterPanel({ categories, brands, total, className }: FilterPane
     (priceMaxParam && parseInt(priceMaxParam, 10) < DEFAULT_PRICE_MAX) ||
     brandIds.length > 0
 
-  const brandOptions = useMemo(
-    () => brands.map((b) => ({ id: b.id, label: b.name })),
-    [brands]
-  )
+  const brandOptions = useMemo(() => brands.map((b) => ({ id: b.id, label: b.name })), [brands])
 
   // Build active filter chips
   const activeChips = useMemo(() => {
@@ -451,12 +460,18 @@ export function FilterPanel({ categories, brands, total, className }: FilterPane
 
   const removeChip = useCallback(
     (key: string) => {
-      if (key === 'q') { setLocalQ(''); updateParams({ q: undefined }) }
-      else if (key === 'category') updateParams({ categoryId: undefined })
+      if (key === 'q') {
+        setLocalQ('')
+        updateParams({ q: undefined })
+      } else if (key === 'category') updateParams({ categoryId: undefined })
       else if (key === 'sort') updateParams({ sort: undefined })
-      else if (key === 'priceMin') { setPriceMin(DEFAULT_PRICE_MIN); updateParams({ priceMin: undefined }) }
-      else if (key === 'priceMax') { setPriceMax(DEFAULT_PRICE_MAX); updateParams({ priceMax: undefined }) }
-      else if (key.startsWith('brand:')) {
+      else if (key === 'priceMin') {
+        setPriceMin(DEFAULT_PRICE_MIN)
+        updateParams({ priceMin: undefined })
+      } else if (key === 'priceMax') {
+        setPriceMax(DEFAULT_PRICE_MAX)
+        updateParams({ priceMax: undefined })
+      } else if (key.startsWith('brand:')) {
         const bid = key.replace('brand:', '')
         const next = brandIds.filter((b) => b !== bid)
         updateParams({ brandIds: next.length ? next.join(',') : undefined })
@@ -501,12 +516,12 @@ export function FilterPanel({ categories, brands, total, className }: FilterPane
   return (
     <>
       {/* Mobile filter trigger */}
-      <div className="lg:hidden mb-4">
+      <div className="mb-4 lg:hidden">
         <Dialog open={mobileOpen} onOpenChange={setMobileOpen}>
           <DialogTrigger asChild>
             <Button
               variant="outline"
-              className="w-full rounded-xl border-border-light justify-between"
+              className="w-full justify-between rounded-xl border-border-light"
             >
               <span className="flex items-center gap-2">
                 <SlidersHorizontal className="h-4 w-4" />
@@ -519,7 +534,10 @@ export function FilterPanel({ categories, brands, total, className }: FilterPane
               )}
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-[400px]" aria-describedby={undefined}>
+          <DialogContent
+            className="max-h-[85vh] overflow-y-auto sm:max-w-[400px]"
+            aria-describedby={undefined}
+          >
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <SlidersHorizontal className="h-4 w-4 text-brand-primary" />
@@ -529,9 +547,9 @@ export function FilterPanel({ categories, brands, total, className }: FilterPane
             <div className="pt-2">
               <FilterContent {...filterContentProps} />
             </div>
-            <div className="sticky bottom-0 border-t border-border-light bg-white pt-3 mt-3">
+            <div className="sticky bottom-0 mt-3 border-t border-border-light bg-white pt-3">
               <Button
-                className="w-full rounded-xl bg-brand-primary hover:bg-brand-primary-hover font-semibold"
+                className="w-full rounded-xl bg-brand-primary font-semibold hover:bg-brand-primary-hover"
                 onClick={() => setMobileOpen(false)}
               >
                 Show {total} results
@@ -544,7 +562,7 @@ export function FilterPanel({ categories, brands, total, className }: FilterPane
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          'hidden lg:block rounded-2xl border border-border-light/60 bg-white p-5 shadow-card',
+          'hidden rounded-2xl border border-border-light/60 bg-white p-5 shadow-card lg:block',
           'lg:sticky lg:top-24 lg:self-start',
           className
         )}

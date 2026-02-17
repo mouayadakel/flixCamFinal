@@ -18,10 +18,7 @@ export async function POST(request: NextRequest) {
   const sessionId = getCartSessionId(request.headers.get('cookie') ?? null)
 
   try {
-    const cart = await CartService.getOrCreateCart(
-      session?.user?.id ?? null,
-      sessionId
-    )
+    const cart = await CartService.getOrCreateCart(session?.user?.id ?? null, sessionId)
     const updated = await CartService.revalidate(cart.id)
     return NextResponse.json(updated)
   } catch (e) {

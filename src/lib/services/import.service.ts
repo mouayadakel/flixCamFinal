@@ -57,7 +57,12 @@ export class ImportService {
     })
   }
 
-  static async markRow(jobId: string, rowNumber: number, status: ImportRowStatus, opts?: { error?: string; productId?: string }) {
+  static async markRow(
+    jobId: string,
+    rowNumber: number,
+    status: ImportRowStatus,
+    opts?: { error?: string; productId?: string }
+  ) {
     await prisma.importJobRow.updateMany({
       where: { jobId, rowNumber },
       data: {
@@ -68,7 +73,12 @@ export class ImportService {
     })
   }
 
-  static async bumpProgress(jobId: string, deltaProcessed: number, deltaSuccess: number, deltaError: number) {
+  static async bumpProgress(
+    jobId: string,
+    deltaProcessed: number,
+    deltaSuccess: number,
+    deltaError: number
+  ) {
     await prisma.importJob.update({
       where: { id: jobId },
       data: {

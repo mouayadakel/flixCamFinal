@@ -24,8 +24,8 @@ export default function ForbiddenPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-center text-sm text-neutral-600">
-            يبدو أنك تحاول الوصول إلى صفحة لا تملك الصلاحية لعرضها.
-            إذا كنت تعتقد أن هذا خطأ، يرجى الاتصال بالمسؤول.
+            يبدو أنك تحاول الوصول إلى صفحة لا تملك الصلاحية لعرضها. إذا كنت تعتقد أن هذا خطأ، يرجى
+            الاتصال بالمسؤول.
           </p>
           <div className="flex flex-col gap-2">
             <Button asChild className="w-full">

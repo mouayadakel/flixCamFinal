@@ -68,7 +68,9 @@ export function PricingTab() {
       <Card>
         <CardHeader>
           <CardTitle>AI Pricing Assistant</CardTitle>
-          <CardDescription>Get AI-powered pricing suggestions based on demand and market data</CardDescription>
+          <CardDescription>
+            Get AI-powered pricing suggestions based on demand and market data
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -109,12 +111,16 @@ export function PricingTab() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Current Price</Label>
-                <p className="text-2xl font-bold mt-1">{suggestion.currentPrice.toLocaleString()} SAR</p>
+                <p className="mt-1 text-2xl font-bold">
+                  {suggestion.currentPrice.toLocaleString()} SAR
+                </p>
               </div>
               <div>
                 <Label>Suggested Price</Label>
-                <div className="flex items-center gap-2 mt-1">
-                  <p className="text-2xl font-bold">{suggestion.suggestedPrice.toLocaleString()} SAR</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <p className="text-2xl font-bold">
+                    {suggestion.suggestedPrice.toLocaleString()} SAR
+                  </p>
                   {suggestion.change > 0 ? (
                     <TrendingUp className="h-5 w-5 text-green-500" />
                   ) : suggestion.change < 0 ? (
@@ -132,21 +138,21 @@ export function PricingTab() {
 
             <div>
               <Label>Reasoning:</Label>
-              <p className="text-sm text-muted-foreground mt-1">{suggestion.reasoning}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{suggestion.reasoning}</p>
             </div>
 
             <div>
               <Label>Factors:</Label>
               <div className="mt-2 space-y-2">
-                <div className="flex items-center justify-between p-2 bg-muted rounded">
+                <div className="flex items-center justify-between rounded bg-muted p-2">
                   <span>Demand Level</span>
                   <Badge variant="outline">{suggestion.factors.demandLevel}</Badge>
                 </div>
-                <div className="flex items-center justify-between p-2 bg-muted rounded">
+                <div className="flex items-center justify-between rounded bg-muted p-2">
                   <span>Utilization Rate</span>
                   <Badge variant="outline">{suggestion.factors.utilizationRate.toFixed(1)}%</Badge>
                 </div>
-                <div className="flex items-center justify-between p-2 bg-muted rounded">
+                <div className="flex items-center justify-between rounded bg-muted p-2">
                   <span>Confidence</span>
                   <Badge variant="outline">{suggestion.confidence}%</Badge>
                 </div>

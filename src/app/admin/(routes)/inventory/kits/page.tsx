@@ -65,7 +65,8 @@ export default function KitsPage() {
     setLoading(true)
     try {
       const params = new URLSearchParams()
-      if (isActiveFilter === 'true' || isActiveFilter === 'false') params.set('isActive', isActiveFilter)
+      if (isActiveFilter === 'true' || isActiveFilter === 'false')
+        params.set('isActive', isActiveFilter)
       const res = await fetch(`/api/kits?${params.toString()}`)
       if (!res.ok) throw new Error('فشل تحميل الحزم')
       const data = await res.json()
@@ -86,11 +87,11 @@ export default function KitsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">الحزم والمجموعات</h1>
-          <p className="text-muted-foreground mt-1">مجموعات معدات مع خصم اختياري</p>
+          <p className="mt-1 text-muted-foreground">مجموعات معدات مع خصم اختياري</p>
         </div>
         <Button asChild>
           <Link href="/admin/inventory/kits/new">
-            <Plus className="h-4 w-4 ml-2" />
+            <Plus className="ml-2 h-4 w-4" />
             حزمة جديدة
           </Link>
         </Button>
@@ -131,22 +132,42 @@ export default function KitsPage() {
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-12" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-12" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-12" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-20" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-20" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-12" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-16" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-12" />
+                  </TableCell>
                 </TableRow>
               ))
             ) : kits.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-12">
-                  <Package className="h-12 w-12 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-muted-foreground">لا توجد حزم. أنشئ حزمة جديدة لربط معدات مع خصم.</p>
+                <TableCell colSpan={9} className="py-12 text-center">
+                  <Package className="mx-auto mb-2 h-12 w-12 text-muted-foreground" />
+                  <p className="text-muted-foreground">
+                    لا توجد حزم. أنشئ حزمة جديدة لربط معدات مع خصم.
+                  </p>
                   <Button asChild className="mt-4">
                     <Link href="/admin/inventory/kits/new">حزمة جديدة</Link>
                   </Button>
@@ -157,9 +178,7 @@ export default function KitsPage() {
                 <TableRow key={kit.id}>
                   <TableCell className="font-medium">{kit.name}</TableCell>
                   <TableCell className="font-mono text-muted-foreground">{kit.slug}</TableCell>
-                  <TableCell>
-                    {kit.discountPercent ? `${kit.discountPercent}%` : '—'}
-                  </TableCell>
+                  <TableCell>{kit.discountPercent ? `${kit.discountPercent}%` : '—'}</TableCell>
                   <TableCell>{formatCurrency(kit.totalDailyRate)}</TableCell>
                   <TableCell>{formatCurrency(kit.finalDailyRate)}</TableCell>
                   <TableCell>{kit.items.reduce((s, i) => s + i.quantity, 0)}</TableCell>

@@ -18,15 +18,13 @@ export function StudiosListClient({ studios }: { studios: StudioItem[] }) {
 
   return (
     <>
-      <h1 className="text-2xl font-bold mb-6">{t('nav.studios')}</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <h1 className="mb-6 text-2xl font-bold">{t('nav.studios')}</h1>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {studios.map((studio) => (
           <StudioCard key={studio.id} studio={studio} />
         ))}
       </div>
-      {studios.length === 0 && (
-        <p className="text-muted-foreground">{t('common.noResults')}</p>
-      )}
+      {studios.length === 0 && <p className="text-muted-foreground">{t('common.noResults')}</p>}
     </>
   )
 }

@@ -8,25 +8,25 @@
 ## 1. Where the modal lives (global pattern)
 
 - **Provider:** `AuthModalProvider` in [src/components/auth/auth-modal-provider.tsx](src/components/auth/auth-modal-provider.tsx). Context holds `isOpen`, `tab` ('register' | 'login'), `openAuthModal(tab?)`, `closeAuthModal()`, and `setTab(tab)`.
-- **Mount:** The provider wraps only the public layout. [src/components/public/public-layout-client.tsx](src/components/public/public-layout-client.tsx) wraps `PublicHeader`, `main`, `PublicFooter`, `WhatsAppCta`, and `AuthModal` inside `AuthModalProvider`. [src/app/(public)/layout.tsx](src/app/(public)/layout.tsx) renders `PublicLayoutClient` (and the skip link).
+- **Mount:** The provider wraps only the public layout. [src/components/public/public-layout-client.tsx](src/components/public/public-layout-client.tsx) wraps `PublicHeader`, `main`, `PublicFooter`, `WhatsAppCta`, and `AuthModal` inside `AuthModalProvider`. [src/app/(public)/layout.tsx](<src/app/(public)/layout.tsx>) renders `PublicLayoutClient` (and the skip link).
 - **Triggers:** Header and mobile nav call `openAuthModal('login')` or `openAuthModal('register')` instead of linking to `/login` or `/register`.
 
 ---
 
 ## 2. Visual tokens (Tailwind / theme)
 
-| Token            | Usage                                              |
-|------------------|----------------------------------------------------|
-| Primary          | `bg-brand-primary` (#C92C37)                       |
-| Primary hover    | `hover:bg-brand-primary-hover` (#A8242D)            |
-| Text main        | `text-text-heading`                                 |
-| Text muted       | `text-text-muted`, `text-text-body`                |
-| Border           | `border-border-light`, `border-border-input`       |
-| Overlay          | Dimmed + blurred: `bg-black/50 backdrop-blur-md`   |
-| Card             | `bg-white`, `rounded-public-card` (8px), `shadow-modal` |
-| Input padding    | `px-4 py-3`                                        |
-| Label            | `text-sm font-medium`                              |
-| Active tab       | `border-b-2 border-brand-primary`                  |
+| Token         | Usage                                                   |
+| ------------- | ------------------------------------------------------- |
+| Primary       | `bg-brand-primary` (#C92C37)                            |
+| Primary hover | `hover:bg-brand-primary-hover` (#A8242D)                |
+| Text main     | `text-text-heading`                                     |
+| Text muted    | `text-text-muted`, `text-text-body`                     |
+| Border        | `border-border-light`, `border-border-input`            |
+| Overlay       | Dimmed + blurred: `bg-black/50 backdrop-blur-md`        |
+| Card          | `bg-white`, `rounded-public-card` (8px), `shadow-modal` |
+| Input padding | `px-4 py-3`                                             |
+| Label         | `text-sm font-medium`                                   |
+| Active tab    | `border-b-2 border-brand-primary`                       |
 
 Font: body uses `font-arabic` (Cairo) / RTL when locale is Arabic. Modal content uses `dir={isRtl ? 'rtl' : 'ltr'}`.
 
@@ -57,14 +57,14 @@ Optional: respect `callbackUrl` from URL when valid and allowed for that role.
 
 ## 5. Files (checklist)
 
-| Action | File |
-|--------|------|
-| Add | `src/components/auth/auth-modal-provider.tsx` – context + provider |
-| Add | `src/components/auth/auth-modal.tsx` – Dialog, tabs, Register/Login forms, blurred overlay |
-| Add | `src/components/public/public-layout-client.tsx` – client wrapper with AuthModalProvider + AuthModal |
-| Edit | `src/app/(public)/layout.tsx` – use PublicLayoutClient |
-| Edit | `src/components/public/public-header.tsx` – Login/Register open modal |
-| Edit | `src/components/public/mobile-nav.tsx` – Login/Register open modal, then close nav |
-| Edit | `src/components/ui/dialog.tsx` – optional `overlayClassName` on DialogContent |
+| Action | File                                                                                                 |
+| ------ | ---------------------------------------------------------------------------------------------------- |
+| Add    | `src/components/auth/auth-modal-provider.tsx` – context + provider                                   |
+| Add    | `src/components/auth/auth-modal.tsx` – Dialog, tabs, Register/Login forms, blurred overlay           |
+| Add    | `src/components/public/public-layout-client.tsx` – client wrapper with AuthModalProvider + AuthModal |
+| Edit   | `src/app/(public)/layout.tsx` – use PublicLayoutClient                                               |
+| Edit   | `src/components/public/public-header.tsx` – Login/Register open modal                                |
+| Edit   | `src/components/public/mobile-nav.tsx` – Login/Register open modal, then close nav                   |
+| Edit   | `src/components/ui/dialog.tsx` – optional `overlayClassName` on DialogContent                        |
 
-Existing auth pages [src/app/(auth)/login/page.tsx](src/app/(auth)/login/page.tsx) and [src/app/(auth)/register/page.tsx](src/app/(auth)/register/page.tsx) remain for direct URLs (e.g. middleware redirect with `callbackUrl`).
+Existing auth pages [src/app/(auth)/login/page.tsx](<src/app/(auth)/login/page.tsx>) and [src/app/(auth)/register/page.tsx](<src/app/(auth)/register/page.tsx>) remain for direct URLs (e.g. middleware redirect with `callbackUrl`).

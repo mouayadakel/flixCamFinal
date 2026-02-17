@@ -64,11 +64,12 @@ export function ProtectedRoute({ permission, children, fallback }: ProtectedRout
     }
 
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] p-6">
-        <AlertCircle className="h-16 w-16 text-destructive mb-4" />
-        <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
-        <p className="text-muted-foreground mb-6 text-center max-w-md">
-          You don&apos;t have permission to access this page. The required permission is: <code className="bg-muted px-2 py-1 rounded">{permission}</code>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center p-6">
+        <AlertCircle className="mb-4 h-16 w-16 text-destructive" />
+        <h1 className="mb-2 text-2xl font-bold">Access Denied</h1>
+        <p className="mb-6 max-w-md text-center text-muted-foreground">
+          You don&apos;t have permission to access this page. The required permission is:{' '}
+          <code className="rounded bg-muted px-2 py-1">{permission}</code>
         </p>
         <div className="flex gap-3">
           <Button variant="outline" onClick={() => router.back()}>

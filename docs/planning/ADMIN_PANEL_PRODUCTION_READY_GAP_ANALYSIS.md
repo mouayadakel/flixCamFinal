@@ -2,13 +2,14 @@
 
 **المشروع:** FlixCam.rent (Admin Panel)  
 **التاريخ:** 2026-01-30  
-**الغرض:** توثيق كل ما ينقص النظام ليصبح جاهزًا للإنتاج بالكامل—صفحات، ميزات، بيانات، APIs، أمان، أداء، تقارير، عمليات.  
+**الغرض:** توثيق كل ما ينقص النظام ليصبح جاهزًا للإنتاج بالكامل—صفحات، ميزات، بيانات، APIs، أمان، أداء، تقارير، عمليات.
 
 ---
 
 ## 1) الملخص التنفيذي
 
 ### الوضع الحالي (تقديريًا):
+
 - **Live صفحات:** ~25 (≈33%)
 - **Mock/Placeholder:** ~15 (≈20%)
 - **Missing صفحات:** ~35 (≈47%)
@@ -16,6 +17,7 @@
 - **الجاهزية الإنتاجية:** منخفضة → **تحتاج 4–6 أشهر عمل فعلي**
 
 ### الهدف الإنتاجي
+
 - **كل الروابط تعمل** (0 صفحات مفقودة)
 - **0 صفحات وهمية**
 - **كل القوائم تعمل على بيانات حقيقية** مع Pagination/Filter/Search
@@ -27,6 +29,7 @@
 ## 2) الفجوات الأساسية حسب مستوى النظام
 
 ### 2.1 الفجوات المعمارية (Critical)
+
 - ❌ لا يوجد **Service Layer موحّد** (Business Logic مبعثر)
 - ❌ لا يوجد **Repository/DAO Pattern** لإعادة استخدام الاستعلامات
 - ❌ لا يوجد **Data Access Layer** واحد للـ Reporting
@@ -34,18 +37,21 @@
 - ❌ لا يوجد **System‑wide error handling** موحّد
 
 ### 2.2 الأمان والصلاحيات
+
 - ❌ **Roles & Permissions** حاليًا Mock
 - ❌ لا يوجد **Audit Trail** كامل لكل العمليات الحساسة
 - ❌ لا يوجد MFA أو حماية للعمليات الخطرة (refund, override)
 - ❌ لا توجد IP/Rate Limits واضحة
 
 ### 2.3 الأداء والاعتمادية
+
 - ❌ Pagination غير موجودة في أغلب القوائم
 - ❌ لا يوجد Cache Strategy للـ dashboards والتقارير
 - ❌ لا توجد Jobs/Queues للمهام الثقيلة (exports، reports)
 - ❌ لا يوجد Observability (Logs/Tracing/Metrics)
 
 ### 2.4 تجربة المستخدم والعمليات
+
 - ❌ لا يوجد **Bulk Actions**
 - ❌ لا يوجد **Export CSV/Excel/PDF** في أغلب القوائم
 - ❌ لا يوجد **Saved Filters / Views**
@@ -56,6 +62,7 @@
 ## 3) الصفحات المفقودة (Must Build)
 
 **مطلوب إنشاء هذه الصفحات بالكامل:**
+
 - `/admin/action-center`
 - `/admin/approvals`
 - `/admin/live-ops`
@@ -112,20 +119,23 @@
 ---
 
 ## 5) متطلبات شاملة لكل صفحة قائمة (List Pages)
+
 **يجب أن تحتوي كل صفحة قائمة على التالي:**
-1) **KPI Strip** (إجمالي + مؤشرات فرعية)
-2) **Search + Filters** متقدمة
-3) **Pagination + Sort** حقيقي
-4) **Bulk Actions** (حذف/تصدير/تغيير حالة)
-5) **Export** (CSV/Excel/PDF)
-6) **Empty State** مع CTA
-7) **Last Updated** و Refresh
+
+1. **KPI Strip** (إجمالي + مؤشرات فرعية)
+2. **Search + Filters** متقدمة
+3. **Pagination + Sort** حقيقي
+4. **Bulk Actions** (حذف/تصدير/تغيير حالة)
+5. **Export** (CSV/Excel/PDF)
+6. **Empty State** مع CTA
+7. **Last Updated** و Refresh
 
 ---
 
 # ✅ القسم A: Dashboard & Analytics
 
 ## A1) /admin/dashboard (تحسينات إلزامية)
+
 - Date Range + Comparison (MoM/YoY)
 - KPIs حقيقية (Revenue/Bookings/Occupancy/New Clients)
 - Drill‑down لكل KPI
@@ -133,19 +143,24 @@
 - Quick Actions قابلة للتخصيص
 
 ## A2) /admin/dashboard/overview (Widget System)
+
 - Widgets قابلة للسحب والإفلات
 - Save layout per user
 
 ## A3) /admin/dashboard/revenue
+
 - Revenue analytics كاملة + charts + export
 
 ## A4) /admin/dashboard/activity
+
 - Activity Feed + realtime
 
 ## A5) /admin/dashboard/recent-bookings
+
 - Advanced table + bulk actions
 
 ## A6) /admin/dashboard/quick-actions
+
 - Command Center + Command Palette
 
 ---
@@ -153,14 +168,17 @@
 # ✅ القسم B: Action Center & Approvals
 
 ## B1) /admin/action-center
+
 - urgent tasks, approvals, alerts
 - SLA + assignment + escalation
 
 ## B2) /admin/approvals
+
 - Approvals system (discount/refund/overbooking)
 - audit + history
 
 ## B3) /admin/live-ops
+
 - realtime operations dashboard + map + timeline
 
 ---
@@ -168,18 +186,22 @@
 # ✅ القسم C: Booking Engine
 
 ## C1) Quotes
+
 - Quote wizard كامل
 - PDF / Email / Versioning
 
 ## C2) Bookings
+
 - Conflict detection
 - Late return automation
 - Change requests + extensions
 
 ## C3) Calendar
+
 - Full interactive calendar (day/week/month/timeline)
 
 ## C4) Availability
+
 - Dashboard للتوفر + rules
 
 ---
@@ -187,16 +209,20 @@
 # ✅ القسم D: Inventory & Assets
 
 ## D1) Equipment
+
 - Usage history + maintenance history
 - Bulk edits + export
 
 ## D2) Categories + Brands
+
 - CRUD حقيقي + hierarchy + stats
 
 ## D3) Import
+
 - History + rollback + templates
 
 ## D4) Products Review
+
 - قائمة products + AI review workflow
 
 ---
@@ -259,6 +285,7 @@
 ## 6) APIs المطلوبة (Skeleton)
 
 ### Required API groups:
+
 - `/api/dashboard/*` (KPIs, charts)
 - `/api/action-center/*`
 - `/api/approvals/*`
@@ -281,6 +308,7 @@
 ---
 
 ## 7) بيانات أساسية يجب إضافتها للـ DB
+
 - Brands
 - Categories hierarchy
 - Availability rules
@@ -295,6 +323,7 @@
 ## 8) الأولويات (P0/P1/P2)
 
 ### P0 (حرج جداً)
+
 - Action Center + Approvals
 - Calendar + Availability
 - Warehouse check‑in/out
@@ -303,6 +332,7 @@
 - Convert all Mock pages to Live
 
 ### P1 (مرتفع)
+
 - Dynamic pricing
 - Recommendations
 - Refunds flow
@@ -310,6 +340,7 @@
 - Audit log
 
 ### P2 (متوسط)
+
 - Advanced analytics
 - A/B testing
 - Automation rules
@@ -317,6 +348,7 @@
 ---
 
 ## 9) جاهزية الإنتاج النهائية (Checklist)
+
 - ✅ كل صفحة تعمل
 - ✅ كل رابط صحيح
 - ✅ CRUD كامل لكل كيان
@@ -328,6 +360,7 @@
 ---
 
 ## 10) الخلاصة النهائية
+
 لو تم تنفيذ البنود أعلاه، ستصبح لوحة التحكم **Production‑Ready 100%** بدون أي نقص في العمليات أو التقارير أو الأمان.
 
 ---

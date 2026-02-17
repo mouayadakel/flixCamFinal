@@ -55,12 +55,10 @@ export function Stepper({ steps, currentStep, className, onStepClick }: StepperP
                 <span
                   className={cn(
                     'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 text-sm font-semibold transition-colors',
-                    isCompleted &&
-                      'border-brand-primary bg-brand-primary text-white',
+                    isCompleted && 'border-brand-primary bg-brand-primary text-white',
                     isActive &&
                       'border-brand-primary bg-white text-brand-primary ring-2 ring-brand-primary ring-offset-2',
-                    isUpcoming &&
-                      'border-border-light bg-surface-light text-text-muted'
+                    isUpcoming && 'border-border-light bg-surface-light text-text-muted'
                   )}
                 >
                   {isCompleted ? <Check className="h-5 w-5" /> : index + 1}

@@ -7,7 +7,12 @@
 
 import { prisma } from '@/lib/db/prisma'
 import { TranslationLocale } from '@prisma/client'
-import { translateBatch, getTranslationCacheKey, getCachedTranslation, setCachedTranslation } from './translation.service'
+import {
+  translateBatch,
+  getTranslationCacheKey,
+  getCachedTranslation,
+  setCachedTranslation,
+} from './translation.service'
 import { generateSEOBatch } from './seo-generation.service'
 
 export type ProductData = {
@@ -39,7 +44,10 @@ export type AutofillResult = {
 /**
  * Autofill missing fields for a single product
  */
-export async function autofillProduct(productData: ProductData, provider?: 'openai' | 'gemini'): Promise<AutofillResult> {
+export async function autofillProduct(
+  productData: ProductData,
+  provider?: 'openai' | 'gemini'
+): Promise<AutofillResult> {
   const result: AutofillResult = {
     translations: {},
     seo: {
@@ -127,7 +135,11 @@ export async function autofillProduct(productData: ProductData, provider?: 'open
         let translatedLongDesc = productData.longDescription || ''
 
         if (productData.shortDescription) {
-          const shortDescKey = getTranslationCacheKey(productData.shortDescription, sourceLocale, targetLocale)
+          const shortDescKey = getTranslationCacheKey(
+            productData.shortDescription,
+            sourceLocale,
+            targetLocale
+          )
           const cachedShortDesc = getCachedTranslation(shortDescKey)
 
           if (cachedShortDesc) {
@@ -155,7 +167,11 @@ export async function autofillProduct(productData: ProductData, provider?: 'open
         }
 
         if (productData.longDescription) {
-          const longDescKey = getTranslationCacheKey(productData.longDescription, sourceLocale, targetLocale)
+          const longDescKey = getTranslationCacheKey(
+            productData.longDescription,
+            sourceLocale,
+            targetLocale
+          )
           const cachedLongDesc = getCachedTranslation(longDescKey)
 
           if (cachedLongDesc) {

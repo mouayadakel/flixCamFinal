@@ -9,7 +9,11 @@ const BASE = process.env.NEXTAUTH_URL || process.env.APP_URL || 'https://flixcam
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      { userAgent: '*', allow: '/', disallow: ['/admin/', '/api/', '/portal/', '/login', '/register'] },
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: ['/admin/', '/api/', '/portal/', '/login', '/register'],
+      },
     ],
     sitemap: `${BASE}/sitemap.xml`,
   }

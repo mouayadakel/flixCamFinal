@@ -52,7 +52,10 @@ const VERIFICATION_LABELS: Record<string, string> = {
   REJECTED: 'مرفوض',
 }
 
-const STATUS_LABELS: Record<ClientStatus, { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_LABELS: Record<
+  ClientStatus,
+  { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   active: { ar: 'نشط', en: 'Active', variant: 'default' },
   suspended: { ar: 'معلق', en: 'Suspended', variant: 'destructive' },
   inactive: { ar: 'غير نشط', en: 'Inactive', variant: 'secondary' },
@@ -68,12 +71,7 @@ export default function ClientsPage() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(50)
 
-  const statuses: Array<ClientStatus | 'all'> = [
-    'all',
-    'active',
-    'suspended',
-    'inactive',
-  ]
+  const statuses: Array<ClientStatus | 'all'> = ['all', 'active', 'suspended', 'inactive']
 
   useEffect(() => {
     loadClients()
@@ -125,7 +123,9 @@ export default function ClientsPage() {
       email: c.email,
       phone: c.phone ?? '',
       status: getStatusLabel(c.status),
-      verificationStatus: c.verificationStatus ? VERIFICATION_LABELS[c.verificationStatus] ?? c.verificationStatus : '',
+      verificationStatus: c.verificationStatus
+        ? (VERIFICATION_LABELS[c.verificationStatus] ?? c.verificationStatus)
+        : '',
       segmentName: c.segmentName ?? '',
       totalBookings: c.totalBookings ?? '',
       totalSpent: c.totalSpent != null ? formatCurrency(c.totalSpent) : '',
@@ -151,48 +151,53 @@ export default function ClientsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">العملاء</h1>
-          <p className="text-muted-foreground mt-2">
-            إدارة العملاء والمستخدمين
-          </p>
+          <p className="mt-2 text-muted-foreground">إدارة العملاء والمستخدمين</p>
         </div>
-<div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={filteredClients.length === 0}>
-              <Download className="h-4 w-4 ml-2" />
-              تصدير CSV
-            </Button>
-            <Button asChild>
-              <Link href="/admin/clients/new">
-                <Plus className="h-4 w-4 ml-2" />
-                عميل جديد
-              </Link>
-            </Button>
-          </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportCSV}
+            disabled={filteredClients.length === 0}
+          >
+            <Download className="ml-2 h-4 w-4" />
+            تصدير CSV
+          </Button>
+          <Button asChild>
+            <Link href="/admin/clients/new">
+              <Plus className="ml-2 h-4 w-4" />
+              عميل جديد
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 items-center flex-wrap">
+      <div className="flex flex-wrap items-center gap-4">
         <input
           type="text"
           placeholder="البحث بالاسم أو البريد الإلكتروني..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="px-4 py-2 border rounded-lg flex-1 min-w-[200px]"
+          className="min-w-[200px] flex-1 rounded-lg border px-4 py-2"
         />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="rounded-lg border px-4 py-2"
         >
           {statuses.map((status) => (
             <option key={status} value={status}>
-              {status === 'all' ? 'جميع الحالات' : STATUS_LABELS[status as ClientStatus]?.ar || status}
+              {status === 'all'
+                ? 'جميع الحالات'
+                : STATUS_LABELS[status as ClientStatus]?.ar || status}
             </option>
           ))}
         </select>
       </div>
 
       {/* Clients Table */}
-      <div className="border rounded-lg">
+      <div className="rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -223,16 +228,14 @@ export default function ClientsPage() {
               </TableRow>
             ) : filteredClients.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={12} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={12} className="py-8 text-center text-muted-foreground">
                   لا يوجد عملاء
                 </TableCell>
               </TableRow>
             ) : (
               filteredClients.map((client) => (
                 <TableRow key={client.id}>
-                  <TableCell className="font-medium">
-                    {client.name || '-'}
-                  </TableCell>
+                  <TableCell className="font-medium">{client.name || '-'}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4 text-muted-foreground" />
@@ -259,15 +262,14 @@ export default function ClientsPage() {
                   </TableCell>
                   <TableCell>
                     <span className="text-sm">
-                      {client.verificationStatus ? VERIFICATION_LABELS[client.verificationStatus] ?? client.verificationStatus : '—'}
+                      {client.verificationStatus
+                        ? (VERIFICATION_LABELS[client.verificationStatus] ??
+                          client.verificationStatus)
+                        : '—'}
                     </span>
                   </TableCell>
-                  <TableCell>
-                    {client.segmentName ?? '—'}
-                  </TableCell>
-                  <TableCell>
-                    {client.totalBookings || 0}
-                  </TableCell>
+                  <TableCell>{client.segmentName ?? '—'}</TableCell>
+                  <TableCell>{client.totalBookings || 0}</TableCell>
                   <TableCell>
                     {client.totalSpent ? formatCurrency(client.totalSpent) : '-'}
                   </TableCell>
@@ -286,7 +288,7 @@ export default function ClientsPage() {
                     <div className="flex gap-2">
                       <Link href={`/admin/clients/${client.id}`}>
                         <Button size="sm" variant="ghost">
-                          <Eye className="h-4 w-4 ml-1" />
+                          <Eye className="ml-1 h-4 w-4" />
                           عرض
                         </Button>
                       </Link>

@@ -9,10 +9,10 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { 
-  ArrowRight, 
-  CreditCard, 
-  DollarSign, 
+import {
+  ArrowRight,
+  CreditCard,
+  DollarSign,
   Calendar,
   User,
   CheckCircle,
@@ -20,7 +20,7 @@ import {
   AlertCircle,
   RefreshCw,
   RotateCcw,
-  FileText
+  FileText,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -72,7 +72,11 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }>
   SUCCESS: { label: 'ناجح', color: 'bg-green-100 text-green-800', icon: CheckCircle },
   FAILED: { label: 'فشل', color: 'bg-red-100 text-red-800', icon: AlertCircle },
   REFUNDED: { label: 'مسترد', color: 'bg-purple-100 text-purple-800', icon: RotateCcw },
-  PARTIALLY_REFUNDED: { label: 'مسترد جزئياً', color: 'bg-orange-100 text-orange-800', icon: RotateCcw },
+  PARTIALLY_REFUNDED: {
+    label: 'مسترد جزئياً',
+    color: 'bg-orange-100 text-orange-800',
+    icon: RotateCcw,
+  },
 }
 
 export default function PaymentDetailPage() {
@@ -150,7 +154,11 @@ export default function PaymentDetailPage() {
       }
 
       const result = await response.json()
-      const message = result.message || (result.data?.approval ? 'تم طلب الاسترداد. في انتظار الموافقة.' : 'تم استرداد المبلغ بنجاح')
+      const message =
+        result.message ||
+        (result.data?.approval
+          ? 'تم طلب الاسترداد. في انتظار الموافقة.'
+          : 'تم استرداد المبلغ بنجاح')
       toast({
         title: result.data?.approval ? 'طلب استرداد' : 'تم الاسترداد',
         description: message,
@@ -174,8 +182,10 @@ export default function PaymentDetailPage() {
     return (
       <div className="space-y-6" dir="rtl">
         <Skeleton className="h-8 w-64" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[1, 2, 3].map(i => <Skeleton key={i} className="h-24" />)}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-24" />
+          ))}
         </div>
         <Skeleton className="h-64" />
       </div>
@@ -184,8 +194,8 @@ export default function PaymentDetailPage() {
 
   if (!payment) {
     return (
-      <div className="text-center py-12" dir="rtl">
-        <AlertCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+      <div className="py-12 text-center" dir="rtl">
+        <AlertCircle className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
         <p className="text-lg font-medium">الدفعة غير موجودة</p>
         <Button asChild className="mt-4">
           <Link href="/admin/payments">العودة إلى المدفوعات</Link>
@@ -196,7 +206,8 @@ export default function PaymentDetailPage() {
 
   const statusConfig = STATUS_CONFIG[payment.status] || STATUS_CONFIG.PENDING
   const StatusIcon = statusConfig.icon
-  const canRefund = payment.status === 'SUCCESS' && (!payment.refundAmount || payment.refundAmount < payment.amount)
+  const canRefund =
+    payment.status === 'SUCCESS' && (!payment.refundAmount || payment.refundAmount < payment.amount)
   const refundableAmount = payment.amount - (payment.refundAmount || 0)
 
   return (
@@ -204,13 +215,13 @@ export default function PaymentDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <CreditCard className="h-8 w-8" />
             تفاصيل الدفعة
           </h1>
-          <div className="flex items-center gap-2 mt-2">
+          <div className="mt-2 flex items-center gap-2">
             <Badge className={statusConfig.color}>
-              <StatusIcon className="h-3 w-3 ml-1" />
+              <StatusIcon className="ml-1 h-3 w-3" />
               {statusConfig.label}
             </Badge>
             <span className="text-muted-foreground">•</span>
@@ -220,13 +231,13 @@ export default function PaymentDetailPage() {
         <div className="flex gap-2">
           <Button variant="outline" asChild>
             <Link href="/admin/payments">
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <ArrowRight className="ml-2 h-4 w-4" />
               العودة
             </Link>
           </Button>
           {canRefund && (
             <Button variant="destructive" onClick={() => setRefundDialogOpen(true)}>
-              <RotateCcw className="h-4 w-4 ml-2" />
+              <RotateCcw className="ml-2 h-4 w-4" />
               استرداد
             </Button>
           )}
@@ -234,7 +245,7 @@ export default function PaymentDetailPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
@@ -252,7 +263,9 @@ export default function PaymentDetailPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">المسترد</p>
-                  <p className="text-2xl font-bold text-red-600">-{formatCurrency(payment.refundAmount)}</p>
+                  <p className="text-2xl font-bold text-red-600">
+                    -{formatCurrency(payment.refundAmount)}
+                  </p>
                 </div>
                 <RotateCcw className="h-8 w-8 text-red-500 opacity-50" />
               </div>
@@ -274,7 +287,7 @@ export default function PaymentDetailPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Payment Details */}
         <Card>
           <CardHeader>
@@ -293,7 +306,7 @@ export default function PaymentDetailPage() {
               {payment.tapTransactionId && (
                 <div className="col-span-2">
                   <p className="text-sm text-muted-foreground">معرف المعاملة (Tap)</p>
-                  <p className="font-mono text-sm bg-muted p-2 rounded mt-1 break-all">
+                  <p className="mt-1 break-all rounded bg-muted p-2 font-mono text-sm">
                     {payment.tapTransactionId}
                   </p>
                 </div>
@@ -301,7 +314,7 @@ export default function PaymentDetailPage() {
               {payment.tapChargeId && (
                 <div className="col-span-2">
                   <p className="text-sm text-muted-foreground">معرف الشحن (Tap)</p>
-                  <p className="font-mono text-sm bg-muted p-2 rounded mt-1 break-all">
+                  <p className="mt-1 break-all rounded bg-muted p-2 font-mono text-sm">
                     {payment.tapChargeId}
                   </p>
                 </div>
@@ -309,7 +322,7 @@ export default function PaymentDetailPage() {
               {payment.refundReason && (
                 <div className="col-span-2">
                   <p className="text-sm text-muted-foreground">سبب الاسترداد</p>
-                  <p className="bg-red-50 p-2 rounded mt-1 text-red-800">{payment.refundReason}</p>
+                  <p className="mt-1 rounded bg-red-50 p-2 text-red-800">{payment.refundReason}</p>
                 </div>
               )}
             </div>
@@ -329,7 +342,7 @@ export default function PaymentDetailPage() {
               <>
                 <div>
                   <p className="text-sm text-muted-foreground">العميل</p>
-                  <Link 
+                  <Link
                     href={`/admin/clients/${payment.booking.customer.id}`}
                     className="font-medium text-primary hover:underline"
                   >
@@ -343,7 +356,9 @@ export default function PaymentDetailPage() {
                 {payment.booking.customer.phone && (
                   <div>
                     <p className="text-sm text-muted-foreground">الهاتف</p>
-                    <p className="font-medium" dir="ltr">{payment.booking.customer.phone}</p>
+                    <p className="font-medium" dir="ltr">
+                      {payment.booking.customer.phone}
+                    </p>
                   </div>
                 )}
               </>
@@ -351,14 +366,14 @@ export default function PaymentDetailPage() {
             {payment.booking && (
               <div className="border-t pt-4">
                 <p className="text-sm text-muted-foreground">الحجز المرتبط</p>
-                <Link 
+                <Link
                   href={`/admin/bookings/${payment.booking.id}`}
-                  className="flex items-center gap-2 font-medium text-primary hover:underline mt-1"
+                  className="mt-1 flex items-center gap-2 font-medium text-primary hover:underline"
                 >
                   <FileText className="h-4 w-4" />
                   {payment.booking.bookingNumber}
                 </Link>
-                <p className="text-sm text-muted-foreground mt-2">
+                <p className="mt-2 text-sm text-muted-foreground">
                   إجمالي الحجز: {formatCurrency(payment.booking.totalAmount)}
                 </p>
               </div>

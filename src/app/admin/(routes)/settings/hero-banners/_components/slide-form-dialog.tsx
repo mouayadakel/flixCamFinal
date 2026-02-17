@@ -17,7 +17,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Loader2 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import type { CreateSlideInput } from '@/lib/validators/hero-banner.validator'
@@ -147,7 +153,11 @@ export function SlideFormDialog({
 
   const handleSubmit = async () => {
     if (!form.imageUrl?.trim() || !form.titleAr?.trim() || !form.titleEn?.trim()) {
-      toast({ title: 'خطأ', description: 'الصورة والعنوان (عربي وإنجليزي) مطلوبة', variant: 'destructive' })
+      toast({
+        title: 'خطأ',
+        description: 'الصورة والعنوان (عربي وإنجليزي) مطلوبة',
+        variant: 'destructive',
+      })
       return
     }
     setSaving(true)
@@ -212,36 +222,36 @@ export function SlideFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto" dir="rtl">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'تحرير الشريحة' : 'إضافة شريحة'}</DialogTitle>
         </DialogHeader>
 
         {form.imageUrl && (
-          <div className="rounded-lg border overflow-hidden bg-muted/30">
-            <div className="aspect-video relative">
-              <img
-                src={form.imageUrl}
-                alt="Preview"
-                className="object-cover w-full h-full"
-              />
+          <div className="overflow-hidden rounded-lg border bg-muted/30">
+            <div className="relative aspect-video">
+              <img src={form.imageUrl} alt="Preview" className="h-full w-full object-cover" />
               <div
                 className="absolute inset-0 bg-black transition-opacity"
                 style={{ opacity: form.overlayOpacity }}
               />
               <div
                 className={`absolute inset-0 flex flex-col justify-center p-4 text-white ${
-                  form.textPosition === 'center' ? 'items-center text-center' : form.textPosition === 'end' ? 'items-end' : 'items-start'
+                  form.textPosition === 'center'
+                    ? 'items-center text-center'
+                    : form.textPosition === 'end'
+                      ? 'items-end'
+                      : 'items-start'
                 }`}
               >
                 {form.badgeTextAr && (
-                  <span className="text-xs font-medium px-2 py-0.5 rounded bg-white/20 mb-2">
+                  <span className="mb-2 rounded bg-white/20 px-2 py-0.5 text-xs font-medium">
                     {form.badgeTextAr || form.badgeTextEn}
                   </span>
                 )}
                 <h3 className="text-xl font-bold">{form.titleAr || form.titleEn}</h3>
                 {(form.subtitleAr || form.subtitleEn) && (
-                  <p className="text-sm opacity-90 mt-1">{form.subtitleAr || form.subtitleEn}</p>
+                  <p className="mt-1 text-sm opacity-90">{form.subtitleAr || form.subtitleEn}</p>
                 )}
               </div>
             </div>
@@ -297,35 +307,56 @@ export function SlideFormDialog({
               </div>
               <div className="space-y-2">
                 <Label>العنوان (صيني)</Label>
-                <Input value={form.titleZh ?? ''} onChange={(e) => update({ titleZh: e.target.value })} />
+                <Input
+                  value={form.titleZh ?? ''}
+                  onChange={(e) => update({ titleZh: e.target.value })}
+                />
               </div>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label>النص الفرعي (عربي)</Label>
-                <Input value={form.subtitleAr ?? ''} onChange={(e) => update({ subtitleAr: e.target.value })} />
+                <Input
+                  value={form.subtitleAr ?? ''}
+                  onChange={(e) => update({ subtitleAr: e.target.value })}
+                />
               </div>
               <div className="space-y-2">
                 <Label>النص الفرعي (إنجليزي)</Label>
-                <Input value={form.subtitleEn ?? ''} onChange={(e) => update({ subtitleEn: e.target.value })} />
+                <Input
+                  value={form.subtitleEn ?? ''}
+                  onChange={(e) => update({ subtitleEn: e.target.value })}
+                />
               </div>
               <div className="space-y-2">
                 <Label>النص الفرعي (صيني)</Label>
-                <Input value={form.subtitleZh ?? ''} onChange={(e) => update({ subtitleZh: e.target.value })} />
+                <Input
+                  value={form.subtitleZh ?? ''}
+                  onChange={(e) => update({ subtitleZh: e.target.value })}
+                />
               </div>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label>شارة (عربي)</Label>
-                <Input value={form.badgeTextAr ?? ''} onChange={(e) => update({ badgeTextAr: e.target.value })} />
+                <Input
+                  value={form.badgeTextAr ?? ''}
+                  onChange={(e) => update({ badgeTextAr: e.target.value })}
+                />
               </div>
               <div className="space-y-2">
                 <Label>شارة (إنجليزي)</Label>
-                <Input value={form.badgeTextEn ?? ''} onChange={(e) => update({ badgeTextEn: e.target.value })} />
+                <Input
+                  value={form.badgeTextEn ?? ''}
+                  onChange={(e) => update({ badgeTextEn: e.target.value })}
+                />
               </div>
               <div className="space-y-2">
                 <Label>شارة (صيني)</Label>
-                <Input value={form.badgeTextZh ?? ''} onChange={(e) => update({ badgeTextZh: e.target.value })} />
+                <Input
+                  value={form.badgeTextZh ?? ''}
+                  onChange={(e) => update({ badgeTextZh: e.target.value })}
+                />
               </div>
             </div>
           </TabsContent>
@@ -351,7 +382,12 @@ export function SlideFormDialog({
                   onChange={(e) => update({ ctaTextAr: e.target.value })}
                   placeholder="نص الزر (عربي)"
                 />
-                <Select value={form.ctaStyle} onValueChange={(v) => update({ ctaStyle: v as 'primary' | 'secondary' | 'outline' | 'ghost' })}>
+                <Select
+                  value={form.ctaStyle}
+                  onValueChange={(v) =>
+                    update({ ctaStyle: v as 'primary' | 'secondary' | 'outline' | 'ghost' })
+                  }
+                >
                   <SelectTrigger className="w-32">
                     <SelectValue />
                   </SelectTrigger>
@@ -405,7 +441,10 @@ export function SlideFormDialog({
             </div>
             <div className="space-y-2">
               <Label>موضع النص</Label>
-              <Select value={form.textPosition} onValueChange={(v) => update({ textPosition: v as 'start' | 'center' | 'end' })}>
+              <Select
+                value={form.textPosition}
+                onValueChange={(v) => update({ textPosition: v as 'start' | 'center' | 'end' })}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -423,15 +462,21 @@ export function SlideFormDialog({
               <Input
                 type="datetime-local"
                 value={form.publishAt ? new Date(form.publishAt).toISOString().slice(0, 16) : ''}
-                onChange={(e) => update({ publishAt: e.target.value ? new Date(e.target.value) : null })}
+                onChange={(e) =>
+                  update({ publishAt: e.target.value ? new Date(e.target.value) : null })
+                }
               />
             </div>
             <div className="space-y-2">
               <Label>تاريخ إلغاء النشر (اختياري)</Label>
               <Input
                 type="datetime-local"
-                value={form.unpublishAt ? new Date(form.unpublishAt).toISOString().slice(0, 16) : ''}
-                onChange={(e) => update({ unpublishAt: e.target.value ? new Date(e.target.value) : null })}
+                value={
+                  form.unpublishAt ? new Date(form.unpublishAt).toISOString().slice(0, 16) : ''
+                }
+                onChange={(e) =>
+                  update({ unpublishAt: e.target.value ? new Date(e.target.value) : null })
+                }
               />
             </div>
           </TabsContent>

@@ -44,14 +44,14 @@ export default function NewInvoicePage() {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [clients, setClients] = useState<Client[]>([])
-  
+
   const [formData, setFormData] = useState({
     customerId: searchParams?.get('customerId') || '',
     bookingId: searchParams?.get('bookingId') || '',
     dueDate: '',
     notes: '',
   })
-  
+
   const [items, setItems] = useState<InvoiceItem[]>([
     { id: '1', description: '', quantity: 1, unitPrice: 0 },
   ])
@@ -75,26 +75,21 @@ export default function NewInvoicePage() {
   }
 
   const addItem = () => {
-    setItems([
-      ...items,
-      { id: Date.now().toString(), description: '', quantity: 1, unitPrice: 0 },
-    ])
+    setItems([...items, { id: Date.now().toString(), description: '', quantity: 1, unitPrice: 0 }])
   }
 
   const removeItem = (id: string) => {
     if (items.length > 1) {
-      setItems(items.filter(item => item.id !== id))
+      setItems(items.filter((item) => item.id !== id))
     }
   }
 
   const updateItem = (id: string, field: keyof InvoiceItem, value: string | number) => {
-    setItems(items.map(item => 
-      item.id === id ? { ...item, [field]: value } : item
-    ))
+    setItems(items.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
   }
 
   const calculateTotals = () => {
-    const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
+    const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0)
     const vatAmount = subtotal * VAT_RATE
     const totalAmount = subtotal + vatAmount
     return { subtotal, vatAmount, totalAmount }
@@ -123,7 +118,7 @@ export default function NewInvoicePage() {
       return
     }
 
-    const validItems = items.filter(item => item.description && item.unitPrice > 0)
+    const validItems = items.filter((item) => item.description && item.unitPrice > 0)
     if (validItems.length === 0) {
       toast({
         title: 'خطأ',
@@ -145,7 +140,7 @@ export default function NewInvoicePage() {
           bookingId: formData.bookingId || null,
           dueDate: formData.dueDate,
           notes: formData.notes || null,
-          items: validItems.map(item => ({
+          items: validItems.map((item) => ({
             description: item.description,
             quantity: item.quantity,
             unitPrice: item.unitPrice,
@@ -185,14 +180,14 @@ export default function NewInvoicePage() {
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
+          <h1 className="flex items-center gap-2 text-3xl font-bold">
             <FileText className="h-8 w-8" />
             فاتورة جديدة
           </h1>
-          </div>
+        </div>
         <Button variant="outline" asChild>
           <Link href="/admin/invoices">
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="ml-2 h-4 w-4" />
             إلغاء
           </Link>
         </Button>
@@ -206,7 +201,7 @@ export default function NewInvoicePage() {
             <CardDescription>اختر العميل وحدد تاريخ الاستحقاق</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>العميل *</Label>
                 <Select
@@ -248,14 +243,14 @@ export default function NewInvoicePage() {
                 <CardDescription>أضف البنود والخدمات المطلوب فوترتها</CardDescription>
               </div>
               <Button type="button" variant="outline" onClick={addItem}>
-                <Plus className="h-4 w-4 ml-2" />
+                <Plus className="ml-2 h-4 w-4" />
                 إضافة بند
               </Button>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {items.map((item, index) => (
-              <div key={item.id} className="flex gap-4 items-start p-4 border rounded-lg">
+              <div key={item.id} className="flex items-start gap-4 rounded-lg border p-4">
                 <div className="flex-1 space-y-2">
                   <Label>الوصف</Label>
                   <Input
@@ -286,7 +281,7 @@ export default function NewInvoicePage() {
                 </div>
                 <div className="w-32 space-y-2">
                   <Label>الإجمالي</Label>
-                  <div className="h-10 flex items-center font-medium">
+                  <div className="flex h-10 items-center font-medium">
                     {formatCurrency(item.quantity * item.unitPrice)}
                   </div>
                 </div>
@@ -304,10 +299,10 @@ export default function NewInvoicePage() {
               </div>
             ))}
 
-            <div className="border-t my-4" />
+            <div className="my-4 border-t" />
 
             {/* Totals */}
-            <div className="space-y-2 max-w-sm mr-auto">
+            <div className="mr-auto max-w-sm space-y-2">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">المجموع الفرعي</span>
                 <span>{formatCurrency(subtotal)}</span>
@@ -316,7 +311,7 @@ export default function NewInvoicePage() {
                 <span className="text-muted-foreground">ضريبة القيمة المضافة (15%)</span>
                 <span>{formatCurrency(vatAmount)}</span>
               </div>
-              <div className="border-t my-2" />
+              <div className="my-2 border-t" />
               <div className="flex justify-between text-lg font-bold">
                 <span>الإجمالي</span>
                 <span>{formatCurrency(totalAmount)}</span>
@@ -348,12 +343,12 @@ export default function NewInvoicePage() {
           <Button type="submit" disabled={loading}>
             {loading ? (
               <>
-                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
                 جاري الحفظ...
               </>
             ) : (
               <>
-                <Plus className="h-4 w-4 ml-2" />
+                <Plus className="ml-2 h-4 w-4" />
                 إنشاء الفاتورة
               </>
             )}

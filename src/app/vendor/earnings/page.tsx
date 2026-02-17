@@ -39,8 +39,7 @@ export default async function VendorEarningsPage() {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
     const next = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59)
     const monthPayouts = payouts.filter(
-      (p) =>
-        new Date(p.createdAt) >= d && new Date(p.createdAt) <= next
+      (p) => new Date(p.createdAt) >= d && new Date(p.createdAt) <= next
     )
     const gross = monthPayouts.reduce((s, p) => s + Number(p.grossAmount), 0)
     const net = monthPayouts.reduce((s, p) => s + Number(p.netAmount), 0)
@@ -51,12 +50,10 @@ export default async function VendorEarningsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">الأرباح</h1>
-        <p className="text-muted-foreground mt-1">
-          ملخص أرباحك وعمولة المنصة
-        </p>
+        <p className="mt-1 text-muted-foreground">ملخص أرباحك وعمولة المنصة</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium">إجمالي الإيرادات</CardTitle>
@@ -71,7 +68,7 @@ export default async function VendorEarningsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(totals.commission)}</div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="mt-1 text-xs text-muted-foreground">
               نسبة {Number(vendor.commissionRate)}%
             </p>
           </CardContent>

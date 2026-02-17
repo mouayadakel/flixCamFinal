@@ -8,14 +8,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
 import { prisma } from '@/lib/db/prisma'
-import {
-  isStructuredSpecifications,
-  isFlatSpecifications,
-} from '@/lib/types/specifications.types'
-import {
-  convertFlatToStructured,
-  validateSpecifications,
-} from '@/lib/utils/specifications.utils'
+import { isStructuredSpecifications, isFlatSpecifications } from '@/lib/types/specifications.types'
+import { convertFlatToStructured, validateSpecifications } from '@/lib/utils/specifications.utils'
 
 // ============================================================================
 // Types
@@ -119,8 +113,7 @@ async function convertEquipmentSpecifications(
   }
 
   try {
-    const categoryHint =
-      equipment.category.slug ?? equipment.category.name ?? ''
+    const categoryHint = equipment.category.slug ?? equipment.category.name ?? ''
     const flatSpecs = equipment.specifications as Record<string, unknown>
     const structuredSpecs = convertFlatToStructured(flatSpecs, categoryHint)
 
@@ -133,10 +126,7 @@ async function convertEquipmentSpecifications(
 
     result.specsPreview = {
       groups: structuredSpecs.groups.length,
-      totalSpecs: structuredSpecs.groups.reduce(
-        (sum, g) => sum + g.specs.length,
-        0
-      ),
+      totalSpecs: structuredSpecs.groups.reduce((sum, g) => sum + g.specs.length, 0),
       highlights: structuredSpecs.highlights?.length ?? 0,
       quickSpecs: structuredSpecs.quickSpecs?.length ?? 0,
     }
@@ -152,8 +142,7 @@ async function convertEquipmentSpecifications(
     return result
   } catch (error) {
     result.result = 'failed'
-    result.error =
-      error instanceof Error ? error.message : 'Unknown conversion error'
+    result.error = error instanceof Error ? error.message : 'Unknown conversion error'
     return result
   }
 }
@@ -172,10 +161,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     if (!(await hasPermission(session.user.id, PERMISSIONS.EQUIPMENT_UPDATE))) {
-      return NextResponse.json(
-        { error: 'Forbidden - equipment.update required' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'Forbidden - equipment.update required' }, { status: 403 })
     }
 
     const body = (await request.json()) as ConversionRequest
@@ -210,18 +196,13 @@ export async function POST(request: NextRequest) {
 
     for (const equipmentId of body.equipmentIds) {
       try {
-        const itemResult = await convertEquipmentSpecifications(
-          equipmentId,
-          dryRun,
-          body.options
-        )
+        const itemResult = await convertEquipmentSpecifications(equipmentId, dryRun, body.options)
         results.push(itemResult)
         if (itemResult.result === 'failed') {
           errors.push(`${itemResult.sku}: ${itemResult.error}`)
         }
       } catch (error) {
-        const errorMsg =
-          error instanceof Error ? error.message : 'Unknown error'
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error'
         errors.push(`${equipmentId}: ${errorMsg}`)
         results.push({
           id: equipmentId,

@@ -13,15 +13,15 @@ The Build Your Kit feature is a multi-step wizard (shoot type → budget → que
 
 ### Overall Assessment
 
-| Dimension        | Score | Notes |
-|-----------------|-------|--------|
-| Architecture    | 7/10  | Clear store + steps; some steps still do raw fetch with no shared client cache. |
-| Accessibility   | 5/10  | Stepper is a11y-friendly; cards/buttons need consistent labels and semantics. |
-| Security        | 7/10  | Public APIs rate-limited and validated; one unhandled fetch in wizard. |
-| Performance     | 6/10  | Dynamic import + skeleton; duplicate fetches possible; no request dedup. |
-| API / Data      | 6/10  | Zod on kit-ai-suggest; shoot-types fetch in wizard has no .catch(). |
-| i18n            | 6/10  | Most UI uses t(); one hardcoded "Loading..." in step-category-equipment. |
-| Error handling  | 4/10  | StepShootType has retry UI; goNext fetch and category-equipment errors are weak. |
+| Dimension      | Score | Notes                                                                            |
+| -------------- | ----- | -------------------------------------------------------------------------------- |
+| Architecture   | 7/10  | Clear store + steps; some steps still do raw fetch with no shared client cache.  |
+| Accessibility  | 5/10  | Stepper is a11y-friendly; cards/buttons need consistent labels and semantics.    |
+| Security       | 7/10  | Public APIs rate-limited and validated; one unhandled fetch in wizard.           |
+| Performance    | 6/10  | Dynamic import + skeleton; duplicate fetches possible; no request dedup.         |
+| API / Data     | 6/10  | Zod on kit-ai-suggest; shoot-types fetch in wizard has no .catch().              |
+| i18n           | 6/10  | Most UI uses t(); one hardcoded "Loading..." in step-category-equipment.         |
+| Error handling | 4/10  | StepShootType has retry UI; goNext fetch and category-equipment errors are weak. |
 
 **Note:** A prior UX audit (BUILD_YOUR_KIT_UX_AUDIT.md) gave lower scores and listed 19 hardcoded strings; the current codebase has improved (e.g. Stepper in use, most copy via i18n). This report re-evaluates the current state and adds security/API/performance.
 
@@ -43,13 +43,13 @@ The Build Your Kit feature is a multi-step wizard (shoot type → budget → que
 
 ### 2.3 APIs Used
 
-| API | Method | Used in | Auth | Rate limit |
-|-----|--------|--------|------|------------|
-| `/api/public/shoot-types` | GET | step-shoot-type, kit-wizard (goNext) | No | Yes (public tier) |
-| `/api/public/shoot-types/[slug]` | GET | kit-wizard goNext | No | Yes |
-| `/api/public/equipment` | GET | step-category-equipment | No | Yes |
-| `/api/public/kit-compatibility` | POST | step-category-equipment (lenses) | No | Yes |
-| `/api/public/kit-ai-suggest` | POST | step-summary, kit-ai-assistant | No | Yes |
+| API                              | Method | Used in                              | Auth | Rate limit        |
+| -------------------------------- | ------ | ------------------------------------ | ---- | ----------------- |
+| `/api/public/shoot-types`        | GET    | step-shoot-type, kit-wizard (goNext) | No   | Yes (public tier) |
+| `/api/public/shoot-types/[slug]` | GET    | kit-wizard goNext                    | No   | Yes               |
+| `/api/public/equipment`          | GET    | step-category-equipment              | No   | Yes               |
+| `/api/public/kit-compatibility`  | POST   | step-category-equipment (lenses)     | No   | Yes               |
+| `/api/public/kit-ai-suggest`     | POST   | step-summary, kit-ai-assistant       | No   | Yes               |
 
 All are public; middleware allows `/build-your-kit` without auth.
 
@@ -93,7 +93,7 @@ All are public; middleware allows `/build-your-kit` without auth.
 
 - **Data exposure:** No sensitive data in store persistence; only kit-building state. No PII in URLs for this page.
 - **XSS:** React escapes output; no `dangerouslySetInnerHTML` in the reviewed components. API responses are rendered as text/attributes.
-- **goNext fetch (kit-wizard.tsx):** `fetch(\`/api/public/shoot-types/${shootTypeSlug}\`)` has `.catch(() => {})`, so errors are swallowed and the user gets no feedback. **Recommendation:** At least set a phase-local error state and show a retry or message.
+- **goNext fetch (kit-wizard.tsx):** `fetch(\`/api/public/shoot-types/${shootTypeSlug}\`)`has`.catch(() => {})`, so errors are swallowed and the user gets no feedback. **Recommendation:** At least set a phase-local error state and show a retry or message.
 
 ### 4.3 Summary
 
@@ -162,14 +162,14 @@ All are public; middleware allows `/build-your-kit` without auth.
 
 ## 8. Error Handling Summary
 
-| Location | Behavior | Recommendation |
-|----------|----------|-----------------|
-| StepShootType fetch | Shows error + retry | Keep; good pattern. |
-| kit-wizard goNext fetch | .catch(() => {}) | Add error state + retry or message. |
-| StepCategoryEquipment “other” fetch | .catch → empty list | Optional: “Could not load more” message. |
-| StepCategoryEquipment kit-compatibility | .catch → empty | Optional: message or fallback to non-compat list. |
-| StepSummary kit-ai-suggest | if (!res.ok) return | Show toast or inline error. |
-| StepDuration custom input | parseInt; setDuration(v) | Already guarded with !Number.isNaN(v). |
+| Location                                | Behavior                 | Recommendation                                    |
+| --------------------------------------- | ------------------------ | ------------------------------------------------- |
+| StepShootType fetch                     | Shows error + retry      | Keep; good pattern.                               |
+| kit-wizard goNext fetch                 | .catch(() => {})         | Add error state + retry or message.               |
+| StepCategoryEquipment “other” fetch     | .catch → empty list      | Optional: “Could not load more” message.          |
+| StepCategoryEquipment kit-compatibility | .catch → empty           | Optional: message or fallback to non-compat list. |
+| StepSummary kit-ai-suggest              | if (!res.ok) return      | Show toast or inline error.                       |
+| StepDuration custom input               | parseInt; setDuration(v) | Already guarded with !Number.isNaN(v).            |
 
 ---
 
@@ -202,22 +202,22 @@ All are public; middleware allows `/build-your-kit` without auth.
 
 ## 10. File Reference
 
-| Path | Purpose |
-|------|--------|
-| `src/app/(public)/build-your-kit/page.tsx` | Page wrapper, dynamic KitWizard, skeleton |
-| `src/components/features/build-your-kit/kit-wizard.tsx` | Main wizard, phases, nav, sidebar, mobile bar |
-| `src/components/features/build-your-kit/kit-summary-sidebar.tsx` | Sticky sidebar (desktop) |
-| `src/components/features/build-your-kit/kit-equipment-card.tsx` | Equipment card + qty |
-| `src/components/features/build-your-kit/kit-ai-assistant.tsx` | AI suggestions UI |
-| `src/components/features/build-your-kit/kit-prebuilt-comparison.tsx` | Prebuilt kit comparison |
-| `src/components/features/build-your-kit/steps/step-shoot-type.tsx` | Shoot type cards |
-| `src/components/features/build-your-kit/steps/step-budget-tier.tsx` | Budget tier |
-| `src/components/features/build-your-kit/steps/step-questionnaire.tsx` | Optional questionnaire |
-| `src/components/features/build-your-kit/steps/step-category-equipment.tsx` | Per-category equipment + “More” |
-| `src/components/features/build-your-kit/steps/step-duration.tsx` | Duration presets + custom input |
-| `src/components/features/build-your-kit/steps/step-summary.tsx` | Summary, add to cart, AI/prebuilt |
-| `src/lib/stores/kit-wizard.store.ts` | Zustand store (persisted) |
-| `src/components/ui/stepper.tsx` | Progress stepper (a11y) |
+| Path                                                                       | Purpose                                       |
+| -------------------------------------------------------------------------- | --------------------------------------------- |
+| `src/app/(public)/build-your-kit/page.tsx`                                 | Page wrapper, dynamic KitWizard, skeleton     |
+| `src/components/features/build-your-kit/kit-wizard.tsx`                    | Main wizard, phases, nav, sidebar, mobile bar |
+| `src/components/features/build-your-kit/kit-summary-sidebar.tsx`           | Sticky sidebar (desktop)                      |
+| `src/components/features/build-your-kit/kit-equipment-card.tsx`            | Equipment card + qty                          |
+| `src/components/features/build-your-kit/kit-ai-assistant.tsx`              | AI suggestions UI                             |
+| `src/components/features/build-your-kit/kit-prebuilt-comparison.tsx`       | Prebuilt kit comparison                       |
+| `src/components/features/build-your-kit/steps/step-shoot-type.tsx`         | Shoot type cards                              |
+| `src/components/features/build-your-kit/steps/step-budget-tier.tsx`        | Budget tier                                   |
+| `src/components/features/build-your-kit/steps/step-questionnaire.tsx`      | Optional questionnaire                        |
+| `src/components/features/build-your-kit/steps/step-category-equipment.tsx` | Per-category equipment + “More”               |
+| `src/components/features/build-your-kit/steps/step-duration.tsx`           | Duration presets + custom input               |
+| `src/components/features/build-your-kit/steps/step-summary.tsx`            | Summary, add to cart, AI/prebuilt             |
+| `src/lib/stores/kit-wizard.store.ts`                                       | Zustand store (persisted)                     |
+| `src/components/ui/stepper.tsx`                                            | Progress stepper (a11y)                       |
 
 ---
 
@@ -231,4 +231,4 @@ The audit was performed against the codebase and existing documentation. A live 
 
 ---
 
-*End of report.*
+_End of report._

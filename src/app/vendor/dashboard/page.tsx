@@ -8,13 +8,7 @@ import { prisma } from '@/lib/db/prisma'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import {
-  Package,
-  Calendar,
-  DollarSign,
-  TrendingUp,
-  ArrowLeft,
-} from 'lucide-react'
+import { Package, Calendar, DollarSign, TrendingUp, ArrowLeft } from 'lucide-react'
 import { formatCurrency, formatDate } from '@/lib/utils/format.utils'
 import { VendorDashboardClient } from './vendor-dashboard-client'
 
@@ -87,12 +81,10 @@ export default async function VendorDashboardPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">لوحة تحكم المورد</h1>
-        <p className="text-muted-foreground mt-2">
-          مرحباً، {vendor.companyName}
-        </p>
+        <p className="mt-2 text-muted-foreground">مرحباً، {vendor.companyName}</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">المعدات المدرجة</CardTitle>
@@ -100,7 +92,7 @@ export default async function VendorDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{equipmentCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">معدات نشطة</p>
+            <p className="mt-1 text-xs text-muted-foreground">معدات نشطة</p>
           </CardContent>
         </Card>
 
@@ -111,7 +103,7 @@ export default async function VendorDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{activeRentalsCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">الآن</p>
+            <p className="mt-1 text-xs text-muted-foreground">الآن</p>
           </CardContent>
         </Card>
 
@@ -122,7 +114,7 @@ export default async function VendorDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(monthNet)}</div>
-            <p className="text-xs text-muted-foreground mt-1">صافي بعد العمولة</p>
+            <p className="mt-1 text-xs text-muted-foreground">صافي بعد العمولة</p>
           </CardContent>
         </Card>
 
@@ -133,12 +125,12 @@ export default async function VendorDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(allTimeNet)}</div>
-            <p className="text-xs text-muted-foreground mt-1">كل الوقت</p>
+            <p className="mt-1 text-xs text-muted-foreground">كل الوقت</p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>الأرباح الشهرية</CardTitle>
@@ -165,7 +157,7 @@ export default async function VendorDashboardPage() {
                 {recentBookings.map((b) => (
                   <div
                     key={b.id}
-                    className="flex items-center justify-between py-2 border-b last:border-0"
+                    className="flex items-center justify-between border-b py-2 last:border-0"
                   >
                     <div>
                       <span className="font-medium">#{b.bookingNumber}</span>
@@ -173,9 +165,7 @@ export default async function VendorDashboardPage() {
                         {formatDate(b.startDate)} – {formatDate(b.endDate)}
                       </div>
                       <div className="text-xs">
-                        {b.equipment
-                          .map((be) => be.equipment.model || be.equipment.sku)
-                          .join(', ')}
+                        {b.equipment.map((be) => be.equipment.model || be.equipment.sku).join(', ')}
                       </div>
                     </div>
                     <span className="text-sm font-medium">
@@ -197,7 +187,7 @@ export default async function VendorDashboardPage() {
           <div className="flex flex-wrap gap-4">
             <Link href="/vendor/equipment/new">
               <Button>
-                <ArrowLeft className="h-4 w-4 ml-2" />
+                <ArrowLeft className="ml-2 h-4 w-4" />
                 إضافة معدات جديدة
               </Button>
             </Link>

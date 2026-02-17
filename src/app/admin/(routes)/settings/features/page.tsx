@@ -170,7 +170,7 @@ export default function FeaturesPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex min-h-[400px] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
@@ -180,7 +180,7 @@ export default function FeaturesPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Feature Controls</h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="mt-1 text-muted-foreground">
           Enable or disable features on the public website and control panel.
         </p>
       </div>
@@ -195,7 +195,7 @@ export default function FeaturesPage() {
         </TabsList>
 
         <TabsContent value="flags" className="space-y-6">
-          <div className="sticky top-0 z-10 bg-background/95 backdrop-blur py-2 -mx-1 px-1">
+          <div className="sticky top-0 z-10 -mx-1 bg-background/95 px-1 py-2 backdrop-blur">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -216,9 +216,9 @@ export default function FeaturesPage() {
               const labels = FEATURE_FLAG_GROUP_LABELS[group]
               return (
                 <section key={group} className="space-y-4">
-                  <h2 className="text-lg font-semibold border-b pb-2">
+                  <h2 className="border-b pb-2 text-lg font-semibold">
                     {labels.en} / {labels.ar}
-                    <span className="text-muted-foreground font-normal ml-2">
+                    <span className="ml-2 font-normal text-muted-foreground">
                       ({scopeFlags.length})
                     </span>
                   </h2>
@@ -227,8 +227,8 @@ export default function FeaturesPage() {
                       <Card key={flag.id}>
                         <CardHeader className="py-4">
                           <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1 min-w-0">
-                              <CardTitle className="text-base flex items-center gap-2">
+                            <div className="min-w-0 flex-1">
+                              <CardTitle className="flex items-center gap-2 text-base">
                                 {getFlagLabel(flag)}
                                 {flag.requiresApproval && (
                                   <Badge variant="secondary" className="text-xs">
@@ -240,7 +240,7 @@ export default function FeaturesPage() {
                                 {flag.description || 'No description'}
                               </CardDescription>
                             </div>
-                            <div className="flex items-center gap-2 shrink-0">
+                            <div className="flex shrink-0 items-center gap-2">
                               {toggling[flag.id] && (
                                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                               )}
@@ -251,7 +251,7 @@ export default function FeaturesPage() {
                                 aria-label={`Toggle ${getFlagLabel(flag)}`}
                               />
                               <span
-                                className={`text-sm font-medium w-14 ${flag.enabled ? 'text-green-600' : 'text-muted-foreground'}`}
+                                className={`w-14 text-sm font-medium ${flag.enabled ? 'text-green-600' : 'text-muted-foreground'}`}
                               >
                                 {flag.enabled ? 'On' : 'Off'}
                               </span>

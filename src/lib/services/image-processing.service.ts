@@ -78,7 +78,10 @@ function isValidImageUrl(url: string): boolean {
     }
 
     // If allowlist is configured, check it
-    if (ALLOWED_DOMAINS.length > 0 && !ALLOWED_DOMAINS.some((domain) => parsed.hostname.includes(domain))) {
+    if (
+      ALLOWED_DOMAINS.length > 0 &&
+      !ALLOWED_DOMAINS.some((domain) => parsed.hostname.includes(domain))
+    ) {
       // Allow if domain is not in allowlist but is a valid public domain
       // In production, you might want to be stricter
       return true
@@ -120,7 +123,10 @@ async function downloadImage(url: string, timeout: number = 10000): Promise<Buff
 /**
  * Upload image to Cloudinary
  */
-async function uploadToCloudinary(imageBuffer: Buffer, folder: string = 'products'): Promise<ImageProcessingResult> {
+async function uploadToCloudinary(
+  imageBuffer: Buffer,
+  folder: string = 'products'
+): Promise<ImageProcessingResult> {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
@@ -209,9 +215,7 @@ export async function processImagesBatch(
   imageUrls: string[],
   folder: string = 'products'
 ): Promise<ImageProcessingResult[]> {
-  const results = await Promise.allSettled(
-    imageUrls.map((url) => processImageFromUrl(url, folder))
-  )
+  const results = await Promise.allSettled(imageUrls.map((url) => processImageFromUrl(url, folder)))
 
   return results.map((result) => {
     if (result.status === 'fulfilled') {

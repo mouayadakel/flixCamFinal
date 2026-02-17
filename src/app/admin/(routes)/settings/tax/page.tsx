@@ -52,13 +52,16 @@ export default function SettingsTaxPage() {
           })
         }
       } catch {
-        if (!cancelled) setData({ vat_rate: 15, vat_number: '', tax_name: 'VAT', is_inclusive: false })
+        if (!cancelled)
+          setData({ vat_rate: 15, vat_number: '', tax_name: 'VAT', is_inclusive: false })
       } finally {
         if (!cancelled) setLoading(false)
       }
     }
     load()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const save = async () => {
@@ -73,7 +76,11 @@ export default function SettingsTaxPage() {
       toast({ title: 'تم', description: 'تم حفظ إعدادات الضريبة' })
       setData(form)
     } catch (e) {
-      toast({ title: 'خطأ', description: e instanceof Error ? e.message : 'فشل الحفظ', variant: 'destructive' })
+      toast({
+        title: 'خطأ',
+        description: e instanceof Error ? e.message : 'فشل الحفظ',
+        variant: 'destructive',
+      })
     } finally {
       setSaving(false)
     }
@@ -85,16 +92,16 @@ export default function SettingsTaxPage() {
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/admin/settings">
-              <ArrowLeft className="h-4 w-4 ml-1" />
+              <ArrowLeft className="ml-1 h-4 w-4" />
               الإعدادات
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
+            <h1 className="flex items-center gap-2 text-3xl font-bold">
               <Percent className="h-8 w-8" />
               الضريبة / ض.ق.م
             </h1>
-            <p className="text-muted-foreground mt-1">معدل الضريبة ورقم التسجيل وطريقة العرض</p>
+            <p className="mt-1 text-muted-foreground">معدل الضريبة ورقم التسجيل وطريقة العرض</p>
           </div>
         </div>
       </div>
@@ -102,13 +109,16 @@ export default function SettingsTaxPage() {
       <Card>
         <CardHeader>
           <CardTitle>إعدادات الضريبة</CardTitle>
-          <CardDescription>معدل ضريبة القيمة المضافة، الرقم الضريبي، والاسم. الأسعار يمكن أن تكون شاملة أو غير شاملة للضريبة.</CardDescription>
+          <CardDescription>
+            معدل ضريبة القيمة المضافة، الرقم الضريبي، والاسم. الأسعار يمكن أن تكون شاملة أو غير
+            شاملة للضريبة.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
             <Skeleton className="h-48 w-full" />
           ) : (
-            <div className="grid gap-6 max-w-md">
+            <div className="grid max-w-md gap-6">
               <div className="grid gap-2">
                 <Label>معدل الضريبة (%)</Label>
                 <Input
@@ -117,7 +127,9 @@ export default function SettingsTaxPage() {
                   max="100"
                   step="0.01"
                   value={form.vat_rate}
-                  onChange={(e) => setForm((f) => ({ ...f, vat_rate: parseFloat(e.target.value) || 0 }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, vat_rate: parseFloat(e.target.value) || 0 }))
+                  }
                 />
               </div>
               <div className="grid gap-2">
@@ -147,7 +159,7 @@ export default function SettingsTaxPage() {
                 <Label htmlFor="is_inclusive">الأسعار شاملة للضريبة</Label>
               </div>
               <Button onClick={save} disabled={saving}>
-                <Save className="h-4 w-4 ml-2" />
+                <Save className="ml-2 h-4 w-4" />
                 حفظ
               </Button>
             </div>

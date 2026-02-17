@@ -8,10 +8,10 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { 
-  Activity, 
-  Clock, 
-  MapPin, 
+import {
+  Activity,
+  Clock,
+  MapPin,
   Phone,
   Calendar,
   Package,
@@ -21,7 +21,7 @@ import {
   RefreshCw,
   Eye,
   User,
-  Timer
+  Timer,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -99,14 +99,22 @@ export default function LiveOpsPage() {
       if (activeRes?.ok) {
         const data = await activeRes.json()
         const activeData = data.data || []
-        
+
         activeData.forEach((booking: any) => {
           const startDate = new Date(booking.startDate)
           const endDate = new Date(booking.endDate)
-          const totalDays = Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)))
-          const daysElapsed = Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
+          const totalDays = Math.max(
+            1,
+            Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
+          )
+          const daysElapsed = Math.ceil(
+            (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+          )
           const progress = Math.min(100, Math.max(0, (daysElapsed / totalDays) * 100))
-          const daysRemaining = Math.max(0, Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
+          const daysRemaining = Math.max(
+            0,
+            Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+          )
           const isOverdue = endDate < now
 
           bookings.push({
@@ -134,11 +142,15 @@ export default function LiveOpsPage() {
       if (confirmedRes?.ok) {
         const data = await confirmedRes.json()
         const confirmedData = data.data || []
-        
+
         confirmedData.forEach((booking: any) => {
           const startDate = new Date(booking.startDate)
-          const startDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
-          
+          const startDay = new Date(
+            startDate.getFullYear(),
+            startDate.getMonth(),
+            startDate.getDate()
+          )
+
           if (startDay.getTime() === today.getTime()) {
             pickupsToday++
             bookings.push({
@@ -155,7 +167,9 @@ export default function LiveOpsPage() {
               equipmentCount: booking.equipment?.length || 0,
               totalAmount: Number(booking.totalAmount),
               progress: 0,
-              daysRemaining: Math.ceil((new Date(booking.endDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
+              daysRemaining: Math.ceil(
+                (new Date(booking.endDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+              ),
               isOverdue: false,
             })
           }
@@ -163,14 +177,14 @@ export default function LiveOpsPage() {
       }
 
       // Calculate returns today
-      const returnsToday = bookings.filter(b => {
+      const returnsToday = bookings.filter((b) => {
         const endDate = new Date(b.endDate)
         const endDay = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate())
         return endDay.getTime() === today.getTime()
       }).length
 
       // Calculate overdue
-      const overdueReturns = bookings.filter(b => b.isOverdue).length
+      const overdueReturns = bookings.filter((b) => b.isOverdue).length
 
       // Equipment stats
       let totalEquipment = 0
@@ -183,7 +197,8 @@ export default function LiveOpsPage() {
 
       setActiveBookings(bookings)
       setStats({
-        activeBookings: bookings.filter(b => b.status === 'ACTIVE' || b.status === 'OVERDUE').length,
+        activeBookings: bookings.filter((b) => b.status === 'ACTIVE' || b.status === 'OVERDUE')
+          .length,
         pickupsToday,
         returnsToday,
         overdueReturns,
@@ -218,26 +233,22 @@ export default function LiveOpsPage() {
     })
   }
 
-  const filteredBookings = activeTab === 'all' 
-    ? activeBookings 
-    : activeBookings.filter(b => b.status === activeTab)
+  const filteredBookings =
+    activeTab === 'all' ? activeBookings : activeBookings.filter((b) => b.status === activeTab)
 
-  const utilizationRate = stats.totalEquipment > 0 
-    ? Math.round((stats.equipmentOut / stats.totalEquipment) * 100) 
-    : 0
+  const utilizationRate =
+    stats.totalEquipment > 0 ? Math.round((stats.equipmentOut / stats.totalEquipment) * 100) : 0
 
   return (
     <div className="space-y-6" dir="rtl">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
+          <h1 className="flex items-center gap-2 text-3xl font-bold">
             <Activity className="h-8 w-8 text-green-500" />
             العمليات الحية
           </h1>
-          <p className="text-muted-foreground mt-1">
-            مراقبة العمليات النشطة في الوقت الفعلي
-          </p>
+          <p className="mt-1 text-muted-foreground">مراقبة العمليات النشطة في الوقت الفعلي</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="text-sm text-muted-foreground">
@@ -248,18 +259,18 @@ export default function LiveOpsPage() {
             size="sm"
             onClick={() => setAutoRefresh(!autoRefresh)}
           >
-            <Timer className="h-4 w-4 ml-1" />
+            <Timer className="ml-1 h-4 w-4" />
             {autoRefresh ? 'تحديث تلقائي' : 'تحديث يدوي'}
           </Button>
           <Button variant="outline" onClick={handleRefresh} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 ml-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
         </div>
       </div>
 
       {/* Live Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
         <Card className="border-l-4 border-l-green-500">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
@@ -335,57 +346,61 @@ export default function LiveOpsPage() {
       <Card>
         <CardHeader>
           <CardTitle>الحجوزات النشطة</CardTitle>
-          <CardDescription>
-            جميع الحجوزات الجارية حالياً
-          </CardDescription>
+          <CardDescription>جميع الحجوزات الجارية حالياً</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-4">
               <TabsTrigger value="all">الكل ({activeBookings.length})</TabsTrigger>
-              <TabsTrigger value="ACTIVE">نشط ({activeBookings.filter(b => b.status === 'ACTIVE').length})</TabsTrigger>
-              <TabsTrigger value="CONFIRMED">استلام اليوم ({activeBookings.filter(b => b.status === 'CONFIRMED').length})</TabsTrigger>
-              <TabsTrigger value="OVERDUE">متأخر ({activeBookings.filter(b => b.status === 'OVERDUE').length})</TabsTrigger>
+              <TabsTrigger value="ACTIVE">
+                نشط ({activeBookings.filter((b) => b.status === 'ACTIVE').length})
+              </TabsTrigger>
+              <TabsTrigger value="CONFIRMED">
+                استلام اليوم ({activeBookings.filter((b) => b.status === 'CONFIRMED').length})
+              </TabsTrigger>
+              <TabsTrigger value="OVERDUE">
+                متأخر ({activeBookings.filter((b) => b.status === 'OVERDUE').length})
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value={activeTab} className="mt-0">
               {loading ? (
                 <div className="space-y-3">
-                  {[1, 2, 3].map(i => (
+                  {[1, 2, 3].map((i) => (
                     <Skeleton key={i} className="h-24 w-full" />
                   ))}
                 </div>
               ) : filteredBookings.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-green-500" />
+                <div className="py-12 text-center text-muted-foreground">
+                  <CheckCircle2 className="mx-auto mb-4 h-12 w-12 text-green-500" />
                   <p className="text-lg font-medium">لا توجد حجوزات في هذه الفئة</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {filteredBookings.map((booking) => {
                     const statusConfig = STATUS_CONFIG[booking.status] || STATUS_CONFIG.ACTIVE
-                    
+
                     return (
                       <div
                         key={booking.id}
-                        className={`p-4 rounded-lg border ${booking.isOverdue ? 'border-red-300 bg-red-50' : 'bg-white'}`}
+                        className={`rounded-lg border p-4 ${booking.isOverdue ? 'border-red-300 bg-red-50' : 'bg-white'}`}
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
+                            <div className="mb-2 flex items-center gap-3">
                               <span className="font-mono font-bold">{booking.bookingNumber}</span>
                               <Badge className={`${statusConfig.bgColor} ${statusConfig.color}`}>
                                 {statusConfig.label}
                               </Badge>
                               {booking.isOverdue && (
                                 <Badge variant="destructive">
-                                  <AlertTriangle className="h-3 w-3 ml-1" />
+                                  <AlertTriangle className="ml-1 h-3 w-3" />
                                   متأخر
                                 </Badge>
                               )}
                             </div>
-                            
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+
+                            <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
                               <div className="flex items-center gap-2">
                                 <User className="h-4 w-4 text-muted-foreground" />
                                 <span>{booking.customer.name}</span>
@@ -398,7 +413,9 @@ export default function LiveOpsPage() {
                               )}
                               <div className="flex items-center gap-2">
                                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                                <span>{formatDate(booking.startDate)} - {formatDate(booking.endDate)}</span>
+                                <span>
+                                  {formatDate(booking.startDate)} - {formatDate(booking.endDate)}
+                                </span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Package className="h-4 w-4 text-muted-foreground" />
@@ -408,12 +425,12 @@ export default function LiveOpsPage() {
 
                             {booking.status === 'ACTIVE' && (
                               <div className="mt-3">
-                                <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                                <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
                                   <span>تقدم الإيجار</span>
                                   <span>{booking.daysRemaining} يوم متبقي</span>
                                 </div>
-                                <Progress 
-                                  value={booking.progress} 
+                                <Progress
+                                  value={booking.progress}
                                   className={`h-2 ${booking.isOverdue ? 'bg-red-200' : ''}`}
                                 />
                               </div>
@@ -421,10 +438,12 @@ export default function LiveOpsPage() {
                           </div>
 
                           <div className="flex flex-col items-end gap-2">
-                            <span className="font-bold text-lg">{formatCurrency(booking.totalAmount)}</span>
+                            <span className="text-lg font-bold">
+                              {formatCurrency(booking.totalAmount)}
+                            </span>
                             <Link href={`/admin/bookings/${booking.id}`}>
                               <Button size="sm" variant="outline">
-                                <Eye className="h-4 w-4 ml-1" />
+                                <Eye className="ml-1 h-4 w-4" />
                                 عرض
                               </Button>
                             </Link>

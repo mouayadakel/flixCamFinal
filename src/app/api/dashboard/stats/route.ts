@@ -26,7 +26,7 @@ export async function GET() {
     ] = await Promise.all([
       // Total bookings
       prisma.booking.count(),
-      
+
       // Active bookings (CONFIRMED or ACTIVE status)
       prisma.booking.count({
         where: {
@@ -35,20 +35,20 @@ export async function GET() {
           },
         },
       }),
-      
+
       // Total products
       prisma.product.count({
         where: { status: 'ACTIVE' },
       }),
-      
+
       // Available products (simplified count)
       prisma.product.count({
         where: { status: 'ACTIVE' },
       }),
-      
+
       // Total clients (all users - adjust based on your needs)
       prisma.user.count(),
-      
+
       // New clients this month
       prisma.user.count({
         where: {
@@ -57,13 +57,13 @@ export async function GET() {
           },
         },
       }),
-      
+
       // Successful payments total
       prisma.payment.aggregate({
         where: { status: 'SUCCESS' },
         _sum: { amount: true },
       }),
-      
+
       // Pending payments total
       prisma.payment.aggregate({
         where: { status: 'PENDING' },
@@ -86,9 +86,6 @@ export async function GET() {
     })
   } catch (error) {
     console.error('Dashboard stats error:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch dashboard stats' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to fetch dashboard stats' }, { status: 500 })
   }
 }

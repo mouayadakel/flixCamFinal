@@ -103,7 +103,10 @@ export default function NewRecurringBookingPage() {
       toast({ title: 'تنبيه', description: 'المعدات مضافة مسبقاً', variant: 'destructive' })
       return
     }
-    setTemplateItems((prev) => [...prev, { equipmentId: eq.id, quantity: selectedQuantity, equipment: eq }])
+    setTemplateItems((prev) => [
+      ...prev,
+      { equipmentId: eq.id, quantity: selectedQuantity, equipment: eq },
+    ])
     setSelectedEquipment('')
     setSelectedQuantity(1)
   }
@@ -145,7 +148,10 @@ export default function NewRecurringBookingPage() {
         endDate: endType === 'date' && endDate ? new Date(endDate).toISOString() : null,
         occurrenceCount: endType === 'count' ? occurrenceCount : null,
         template: {
-          equipmentIds: templateItems.map((i) => ({ equipmentId: i.equipmentId, quantity: i.quantity })),
+          equipmentIds: templateItems.map((i) => ({
+            equipmentId: i.equipmentId,
+            quantity: i.quantity,
+          })),
           studioId: studioId || null,
           notes: notes.trim() || null,
         },
@@ -160,7 +166,10 @@ export default function NewRecurringBookingPage() {
         throw new Error(err.error ?? 'فشل إنشاء السلسلة')
       }
       const data = await res.json()
-      toast({ title: 'تم', description: `تم إنشاء السلسلة و${data.generatedBookingIds?.length ?? 0} حجز` })
+      toast({
+        title: 'تم',
+        description: `تم إنشاء السلسلة و${data.generatedBookingIds?.length ?? 0} حجز`,
+      })
       router.push(`/admin/recurring-bookings/${data.series?.id ?? ''}`)
     } catch (error) {
       toast({
@@ -176,7 +185,9 @@ export default function NewRecurringBookingPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/admin/recurring-bookings" className="hover:text-foreground">الحجوزات المتكررة</Link>
+        <Link href="/admin/recurring-bookings" className="hover:text-foreground">
+          الحجوزات المتكررة
+        </Link>
         <ArrowRight className="h-4 w-4 rtl:rotate-180" />
         <span>سلسلة جديدة</span>
       </div>
@@ -189,7 +200,7 @@ export default function NewRecurringBookingPage() {
             <CardDescription>اسم السلسلة والعميل والتكرار</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="name">اسم السلسلة</Label>
                 <Input
@@ -215,10 +226,13 @@ export default function NewRecurringBookingPage() {
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>التكرار</Label>
-                <Select value={frequency} onValueChange={(v) => setFrequency(v as 'DAILY' | 'WEEKLY' | 'MONTHLY')}>
+                <Select
+                  value={frequency}
+                  onValueChange={(v) => setFrequency(v as 'DAILY' | 'WEEKLY' | 'MONTHLY')}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -239,12 +253,10 @@ export default function NewRecurringBookingPage() {
                   value={interval}
                   onChange={(e) => setInterval(parseInt(e.target.value, 10) || 1)}
                 />
-                <p className="text-xs text-muted-foreground">
-                  مثلاً: 2 مع أسبوعي = كل أسبوعين
-                </p>
+                <p className="text-xs text-muted-foreground">مثلاً: 2 مع أسبوعي = كل أسبوعين</p>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>نهاية السلسلة</Label>
                 <Select value={endType} onValueChange={(v) => setEndType(v as 'date' | 'count')}>
@@ -314,14 +326,17 @@ export default function NewRecurringBookingPage() {
                 onChange={(e) => setSelectedQuantity(parseInt(e.target.value, 10) || 1)}
               />
               <Button type="button" variant="secondary" onClick={addEquipment}>
-                <Plus className="h-4 w-4 ml-1" />
+                <Plus className="ml-1 h-4 w-4" />
                 إضافة
               </Button>
             </div>
             {templateItems.length > 0 && (
-              <ul className="border rounded-md divide-y">
+              <ul className="divide-y rounded-md border">
                 {templateItems.map((item) => (
-                  <li key={item.equipmentId} className="flex items-center justify-between px-3 py-2">
+                  <li
+                    key={item.equipmentId}
+                    className="flex items-center justify-between px-3 py-2"
+                  >
                     <span>
                       {item.equipment?.sku ?? item.equipmentId} — كمية: {item.quantity}
                     </span>
@@ -355,14 +370,19 @@ export default function NewRecurringBookingPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="notes">ملاحظات (اختياري)</Label>
-              <Textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
+              <Textarea
+                id="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={2}
+              />
             </div>
           </CardContent>
         </Card>
 
         <div className="mt-6 flex gap-2">
           <Button type="submit" disabled={loading}>
-            {loading && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+            {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
             إنشاء السلسلة والحجوزات
           </Button>
           <Button type="button" variant="outline" asChild>

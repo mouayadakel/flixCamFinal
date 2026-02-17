@@ -21,10 +21,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   if (!(await hasPermission(session.user.id, PERMISSIONS.EQUIPMENT_UPDATE))) {
-    return NextResponse.json(
-      { error: 'Forbidden - equipment.update required' },
-      { status: 403 }
-    )
+    return NextResponse.json({ error: 'Forbidden - equipment.update required' }, { status: 403 })
   }
 
   const equipment = await prisma.equipment.findMany({
@@ -59,10 +56,7 @@ export async function POST(request: NextRequest) {
 
     const categoryHint = eq.category?.slug ?? eq.category?.name ?? undefined
     try {
-      const structured = convertFlatToStructured(
-        specs as Record<string, unknown>,
-        categoryHint
-      )
+      const structured = convertFlatToStructured(specs as Record<string, unknown>, categoryHint)
       await prisma.equipment.update({
         where: { id: eq.id },
         data: { specifications: structured as object },

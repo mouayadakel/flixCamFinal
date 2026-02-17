@@ -5,9 +5,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
 import { AlertCircle, UploadCloud, Loader2, CheckCircle2, XCircle, Sparkles } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import { ProgressTracker } from '@/components/features/import/progress-tracker'
@@ -59,13 +70,14 @@ const getRowNameValue = (row: Record<string, any>) => {
   return ''
 }
 
-
 export default function ImportPage() {
   const [lookups, setLookups] = useState<Lookup | null>(null)
   const [file, setFile] = useState<File | null>(null)
   const [sheetsMetadata, setSheetsMetadata] = useState<SheetMetadata[]>([])
   const [mapping, setMapping] = useState<SheetMapping[]>([])
-  const [validationResults, setValidationResults] = useState<Record<string, ValidationWarning[]>>({})
+  const [validationResults, setValidationResults] = useState<Record<string, ValidationWarning[]>>(
+    {}
+  )
   const [jobId, setJobId] = useState<string>('')
   const [loadingLookups, setLoadingLookups] = useState(false)
   const [parsing, setParsing] = useState(false)
@@ -85,7 +97,11 @@ export default function ImportPage() {
         const data = await res.json()
         setLookups({ categories: data.categories })
       } catch (err: any) {
-        toast({ title: 'Failed to load categories', description: err.message, variant: 'destructive' })
+        toast({
+          title: 'Failed to load categories',
+          description: err.message,
+          variant: 'destructive',
+        })
       } finally {
         setLoadingLookups(false)
       }
@@ -93,12 +109,15 @@ export default function ImportPage() {
     load()
   }, [])
 
-  const rootCategories = useMemo(() => lookups?.categories.filter((c) => !c.parentId) ?? [], [lookups])
+  const rootCategories = useMemo(
+    () => lookups?.categories.filter((c) => !c.parentId) ?? [],
+    [lookups]
+  )
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0]
     if (!selected) return
-    
+
     setFile(selected)
     setParsing(true)
     setSheetsMetadata([])
@@ -122,7 +141,7 @@ export default function ImportPage() {
 
       const data = await res.json()
       setSheetsMetadata(data.sheets || [])
-      
+
       // Initialize mapping for all sheets (only one selected at a time)
       setMapping(
         (data.sheets || []).map((sheet: SheetMetadata, index: number) => ({
@@ -158,14 +177,10 @@ export default function ImportPage() {
       for (const sheet of sheets) {
         for (const [index, row] of sheet.previewRows.entries()) {
           const excelRowNumber =
-            (row as Record<string, any> & { rowNumber?: number }).rowNumber ??
-            index + 1
+            (row as Record<string, any> & { rowNumber?: number }).rowNumber ?? index + 1
           const name = getRowNameValue(row)
           if (!name) {
-            skippedRows[sheet.name] = [
-              ...(skippedRows[sheet.name] ?? []),
-              excelRowNumber,
-            ]
+            skippedRows[sheet.name] = [...(skippedRows[sheet.name] ?? []), excelRowNumber]
             continue
           }
 
@@ -266,12 +281,15 @@ export default function ImportPage() {
         const sheet = sheetsMetadata.find((s) => s.name === m.sheetName)
         if (!sheet) return
 
-        const rowsToPreview = m.selectedRows.length === 0
-          ? sheet.previewRows.slice(0, 5) // First 5 rows if all selected
-          : sheet.previewRows.filter((row) => {
-              const excelRowNum = row.rowNumber ?? sheet.previewRows.indexOf(row) + 2
-              return m.selectedRows.includes(excelRowNum)
-            }).slice(0, 5)
+        const rowsToPreview =
+          m.selectedRows.length === 0
+            ? sheet.previewRows.slice(0, 5) // First 5 rows if all selected
+            : sheet.previewRows
+                .filter((row) => {
+                  const excelRowNum = row.rowNumber ?? sheet.previewRows.indexOf(row) + 2
+                  return m.selectedRows.includes(excelRowNum)
+                })
+                .slice(0, 5)
 
         rowsToPreview.forEach((row) => {
           previewRows.push({
@@ -325,7 +343,7 @@ export default function ImportPage() {
     try {
       const selectedMappings = mapping.filter((m) => m.selected)
       const selectedSheetNames = selectedMappings.map((m) => m.sheetName)
-      
+
       // Build selectedRows object: { sheetName: [rowNumbers] }
       const selectedRowsMap: Record<string, number[]> = {}
       selectedMappings.forEach((m) => {
@@ -342,7 +360,8 @@ export default function ImportPage() {
           selectedMappings.map((m) => ({
             sheetName: m.sheetName,
             categoryId: m.categoryId,
-            subCategoryId: m.subCategoryId && m.subCategoryId !== '__none__' ? m.subCategoryId : null,
+            subCategoryId:
+              m.subCategoryId && m.subCategoryId !== '__none__' ? m.subCategoryId : null,
           }))
         )
       )
@@ -365,10 +384,7 @@ export default function ImportPage() {
 
       const data = await res.json()
       setJobId(data.jobId)
-      const descriptionParts = [
-        `Job: ${data.jobId}`,
-        `rows: ${data.totalRows}`
-      ]
+      const descriptionParts = [`Job: ${data.jobId}`, `rows: ${data.totalRows}`]
       if (data.skippedRowsCount) {
         descriptionParts.push(`Skipped ${data.skippedRowsCount} unnamed row(s)`)
       }
@@ -411,7 +427,7 @@ export default function ImportPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Import Equipment (Excel)</h1>
-          </div>
+        </div>
       </div>
 
       <Card>
@@ -459,7 +475,7 @@ export default function ImportPage() {
         <Card>
           <CardHeader>
             <CardTitle>Sheet → Category Mapping</CardTitle>
-            <p className="text-sm text-muted-foreground mt-2">
+            <p className="mt-2 text-sm text-muted-foreground">
               Map each sheet to a category. All sheets must be mapped before import.
             </p>
           </CardHeader>
@@ -475,7 +491,7 @@ export default function ImportPage() {
                 return (
                   <AccordionItem key={sheet.name} value={sheet.name}>
                     <AccordionTrigger className="hover:no-underline">
-                      <div className="flex items-center gap-3 flex-1">
+                      <div className="flex flex-1 items-center gap-3">
                         <input
                           type="checkbox"
                           checked={sheetMapping?.selected ?? false}
@@ -496,32 +512,35 @@ export default function ImportPage() {
                         ) : (
                           <XCircle className="h-4 w-4 text-red-600" />
                         )}
-                        {hasErrors && (
-                          <Badge variant="destructive">{errors.length} errors</Badge>
-                        )}
+                        {hasErrors && <Badge variant="destructive">{errors.length} errors</Badge>}
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
                       <div className="space-y-4 pt-2">
                         {/* Validation Warnings */}
                         {warnings.length > 0 && (
-                          <div className="rounded-md border p-3 space-y-2">
+                          <div className="space-y-2 rounded-md border p-3">
                             <div className="flex items-center gap-2 text-sm font-medium">
                               <AlertCircle className="h-4 w-4" />
                               Validation Issues ({warnings.length})
                             </div>
-                            <div className="space-y-1 max-h-32 overflow-y-auto">
+                            <div className="max-h-32 space-y-1 overflow-y-auto">
                               {warnings.slice(0, 10).map((warning, idx) => {
                                 const rowLabel = warning.excelRowNumber ?? warning.rowNumber
-                                const sheetLabel = warning.sheetName ? ` (${warning.sheetName})` : ''
+                                const sheetLabel = warning.sheetName
+                                  ? ` (${warning.sheetName})`
+                                  : ''
                                 return (
                                   <div
                                     key={idx}
                                     className={`text-xs ${
-                                      warning.severity === 'error' ? 'text-red-600' : 'text-yellow-600'
+                                      warning.severity === 'error'
+                                        ? 'text-red-600'
+                                        : 'text-yellow-600'
                                     }`}
                                   >
-                                    Row {rowLabel}{sheetLabel}: {warning.field} - {warning.message}
+                                    Row {rowLabel}
+                                    {sheetLabel}: {warning.field} - {warning.message}
                                   </div>
                                 )
                               })}
@@ -535,14 +554,17 @@ export default function ImportPage() {
                         )}
 
                         {skippedNameRows[sheet.name]?.length > 0 && (
-                          <div className="rounded-md border border-amber-200 bg-amber-50 text-xs text-amber-900 p-3 space-y-1">
+                          <div className="space-y-1 rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
                             <span className="font-medium">Ignored rows (missing Name)</span>
-                            <span>Rows {skippedNameRows[sheet.name].join(', ')} were excluded from upload and validation.</span>
+                            <span>
+                              Rows {skippedNameRows[sheet.name].join(', ')} were excluded from
+                              upload and validation.
+                            </span>
                           </div>
                         )}
 
                         {/* Category Mapping */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                           <div className="space-y-1">
                             <Label>Category *</Label>
                             <Select
@@ -551,7 +573,9 @@ export default function ImportPage() {
                               disabled={loadingLookups}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder={loadingLookups ? 'Loading...' : 'Select category'} />
+                                <SelectValue
+                                  placeholder={loadingLookups ? 'Loading...' : 'Select category'}
+                                />
                               </SelectTrigger>
                               <SelectContent>
                                 {rootCategories.map((c) => (
@@ -593,7 +617,7 @@ export default function ImportPage() {
                           </div>
                           <div className="space-y-1">
                             <Label>Columns ({sheet.columns.length})</Label>
-                            <div className="text-xs text-muted-foreground flex flex-wrap gap-1">
+                            <div className="flex flex-wrap gap-1 text-xs text-muted-foreground">
                               {sheet.columns.slice(0, 5).map((col) => (
                                 <Badge key={col} variant="outline" className="text-xs">
                                   {col}
@@ -639,21 +663,24 @@ export default function ImportPage() {
                         {/* Preview Rows */}
                         {sheet.previewRows.length > 0 && (
                           <div className="space-y-2">
-                            <Label>Preview (first {Math.min(10, sheet.previewRows.length)} rows)</Label>
-                            <div className="overflow-x-auto rounded-md border max-h-64 overflow-y-auto">
+                            <Label>
+                              Preview (first {Math.min(10, sheet.previewRows.length)} rows)
+                            </Label>
+                            <div className="max-h-64 overflow-x-auto overflow-y-auto rounded-md border">
                               <table className="w-full text-xs">
-                                <thead className="bg-muted/40 sticky top-0">
+                                <thead className="sticky top-0 bg-muted/40">
                                   <tr>
-                                    <th className="p-2 w-8">
+                                    <th className="w-8 p-2">
                                       <Checkbox
                                         checked={
                                           sheetMapping?.selectedRows.length === 0 ||
-                                          sheet.previewRows
-                                            .slice(0, 10)
-                                            .every((row) => {
-                                              const excelRowNum = row.rowNumber ?? sheet.previewRows.indexOf(row) + 2
-                                              return (sheetMapping?.selectedRows || []).includes(excelRowNum)
-                                            })
+                                          sheet.previewRows.slice(0, 10).every((row) => {
+                                            const excelRowNum =
+                                              row.rowNumber ?? sheet.previewRows.indexOf(row) + 2
+                                            return (sheetMapping?.selectedRows || []).includes(
+                                              excelRowNum
+                                            )
+                                          })
                                         }
                                         onCheckedChange={(checked) => {
                                           if (checked) {
@@ -682,11 +709,16 @@ export default function ImportPage() {
                                       sheetMapping?.selectedRows.length === 0 ||
                                       (sheetMapping?.selectedRows || []).includes(excelRowNumber)
                                     return (
-                                      <tr key={idx} className={`border-t ${isSelected ? '' : 'opacity-50'}`}>
+                                      <tr
+                                        key={idx}
+                                        className={`border-t ${isSelected ? '' : 'opacity-50'}`}
+                                      >
                                         <td className="p-2">
                                           <Checkbox
                                             checked={isSelected}
-                                            onCheckedChange={() => toggleRowSelection(sheet.name, excelRowNumber)}
+                                            onCheckedChange={() =>
+                                              toggleRowSelection(sheet.name, excelRowNumber)
+                                            }
                                           />
                                         </td>
                                         <td className="p-2 font-medium">{excelRowNumber}</td>
@@ -715,13 +747,13 @@ export default function ImportPage() {
             </Accordion>
 
             {!allSheetsMapped && (
-              <div className="flex items-center gap-2 text-sm text-red-600 p-3 rounded-md bg-red-50 border border-red-200">
+              <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
                 <AlertCircle className="h-4 w-4" />
                 <span>All selected sheets must be mapped to categories before importing.</span>
               </div>
             )}
 
-            <div className="flex justify-between items-center pt-4 border-t">
+            <div className="flex items-center justify-between border-t pt-4">
               <div className="text-sm text-muted-foreground">
                 {selectedSheetsCount} of {sheetsMetadata.length} sheets selected
               </div>
@@ -734,7 +766,10 @@ export default function ImportPage() {
                   <Sparkles className="mr-2 h-4 w-4" />
                   Preview AI
                 </Button>
-                <Button onClick={onSubmit} disabled={submitting || !allSheetsMapped || selectedSheetsCount === 0}>
+                <Button
+                  onClick={onSubmit}
+                  disabled={submitting || !allSheetsMapped || selectedSheetsCount === 0}
+                >
                   {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Start Import
                 </Button>

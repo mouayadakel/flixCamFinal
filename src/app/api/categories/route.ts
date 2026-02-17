@@ -10,6 +10,7 @@ import { prisma } from '@/lib/db/prisma'
 import { createCategorySchema } from '@/lib/validators/category.validator'
 import { handleApiError } from '@/lib/utils/api-helpers'
 import { UnauthorizedError } from '@/lib/errors'
+import { cacheDelete } from '@/lib/cache'
 
 /**
  * GET /api/categories – Get all categories (flat list with equipment count for admin UI)
@@ -116,8 +117,7 @@ export async function POST(request: NextRequest) {
     if (existing) {
       return NextResponse.json(
         {
-          error:
-            existing.slug === slug ? 'Slug already in use' : 'Category name already exists',
+          error: existing.slug === slug ? 'Slug already in use' : 'Category name already exists',
         },
         { status: 409 }
       )
@@ -141,6 +141,8 @@ export async function POST(request: NextRequest) {
         _count: { select: { equipment: true, children: true } },
       },
     })
+
+    await cacheDelete('websiteContent', 'categories')
 
     return NextResponse.json({
       category: {

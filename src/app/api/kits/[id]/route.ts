@@ -52,10 +52,7 @@ function shapeKit(kit: {
   }
 }
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()
@@ -78,10 +75,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()
@@ -99,7 +93,9 @@ export async function PATCH(
           ...(parsed.name !== undefined && { name: parsed.name }),
           ...(parsed.slug !== undefined && { slug: parsed.slug }),
           ...(parsed.description !== undefined && { description: parsed.description }),
-          ...(parsed.discountPercent != null && { discountPercent: new Decimal(parsed.discountPercent) }),
+          ...(parsed.discountPercent != null && {
+            discountPercent: new Decimal(parsed.discountPercent),
+          }),
           ...(parsed.isActive !== undefined && { isActive: parsed.isActive }),
           updatedBy: session.user!.id,
         },

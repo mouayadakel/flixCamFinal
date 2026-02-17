@@ -117,9 +117,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Calculate average order value
-    const averageOrderValue = totalBookingsThisPeriod > 0 
-      ? thisMonthRevenue / totalBookingsThisPeriod 
-      : 0
+    const averageOrderValue =
+      totalBookingsThisPeriod > 0 ? thisMonthRevenue / totalBookingsThisPeriod : 0
 
     return NextResponse.json({
       totalRevenue: thisMonthRevenue,
@@ -133,9 +132,6 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error('Dashboard revenue error:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch revenue stats' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to fetch revenue stats' }, { status: 500 })
   }
 }

@@ -43,7 +43,10 @@ interface TechnicianDetail {
   }>
 }
 
-const STATUS_LABELS: Record<string, { ar: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_LABELS: Record<
+  string,
+  { ar: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   active: { ar: 'نشط', variant: 'default' },
   inactive: { ar: 'غير نشط', variant: 'secondary' },
   'on-leave': { ar: 'إجازة', variant: 'outline' },
@@ -91,30 +94,33 @@ export default function TechnicianDetailPage() {
     )
   }
 
-  const statusConfig = STATUS_LABELS[tech.status] ?? { ar: tech.status, variant: 'outline' as const }
+  const statusConfig = STATUS_LABELS[tech.status] ?? {
+    ar: tech.status,
+    variant: 'outline' as const,
+  }
 
   return (
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <User className="h-8 w-8" />
             {tech.name}
           </h1>
-          <div className="flex items-center gap-2 mt-2">
+          <div className="mt-2 flex items-center gap-2">
             <Badge variant={statusConfig.variant}>{statusConfig.ar}</Badge>
             <span className="text-muted-foreground">• إجمالي المهام: {tech.totalJobs}</span>
           </div>
         </div>
         <Button variant="outline" asChild>
           <Link href="/admin/technicians">
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="ml-2 h-4 w-4" />
             العودة
           </Link>
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>معلومات الاتصال</CardTitle>
@@ -134,7 +140,9 @@ export default function TechnicianDetailPage() {
                 <Phone className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <p className="text-sm text-muted-foreground">الهاتف</p>
-                  <p className="font-medium" dir="ltr">{tech.phone}</p>
+                  <p className="font-medium" dir="ltr">
+                    {tech.phone}
+                  </p>
                 </div>
               </div>
             )}
@@ -169,7 +177,7 @@ export default function TechnicianDetailPage() {
         </CardHeader>
         <CardContent>
           {tech.maintenance.length === 0 ? (
-            <p className="text-muted-foreground py-4">لا توجد مهام صيانة</p>
+            <p className="py-4 text-muted-foreground">لا توجد مهام صيانة</p>
           ) : (
             <Table>
               <TableHeader>

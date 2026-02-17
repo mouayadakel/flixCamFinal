@@ -10,11 +10,7 @@
 import { prisma } from '@/lib/db/prisma'
 import { AuditService } from './audit.service'
 import { EventBus } from '@/lib/events/event-bus'
-import {
-  NotFoundError,
-  ValidationError,
-  ForbiddenError,
-} from '@/lib/errors'
+import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission } from '@/lib/auth/permissions'
 import type {
   Coupon,
@@ -188,10 +184,7 @@ export class CouponService {
       where.validFrom = { lte: now }
       where.validUntil = { gte: now }
     } else if (filters.active === false) {
-      where.OR = [
-        { status: { not: 'ACTIVE' } },
-        { validUntil: { lt: new Date() } },
-      ]
+      where.OR = [{ status: { not: 'ACTIVE' } }, { validUntil: { lt: new Date() } }]
     }
 
     const [coupons, total] = await Promise.all([
@@ -261,14 +254,35 @@ export class CouponService {
         code: input.code ? input.code.toUpperCase().trim() : undefined,
         name: input.code ? input.code : undefined,
         type: input.type ? this.mapCouponType(input.type) : undefined,
-        discountValue: input.type === 'fixed' && input.value !== undefined ? new Decimal(input.value) : input.type === 'percent' ? null : undefined,
-        discountPercentage: input.type === 'percent' && input.value !== undefined ? new Decimal(input.value) : input.type === 'fixed' ? null : undefined,
-        minimumAmount: input.minPurchaseAmount !== undefined ? (input.minPurchaseAmount ? new Decimal(input.minPurchaseAmount) : null) : undefined,
-        maximumDiscount: input.maxDiscountAmount !== undefined ? (input.maxDiscountAmount ? new Decimal(input.maxDiscountAmount) : null) : undefined,
+        discountValue:
+          input.type === 'fixed' && input.value !== undefined
+            ? new Decimal(input.value)
+            : input.type === 'percent'
+              ? null
+              : undefined,
+        discountPercentage:
+          input.type === 'percent' && input.value !== undefined
+            ? new Decimal(input.value)
+            : input.type === 'fixed'
+              ? null
+              : undefined,
+        minimumAmount:
+          input.minPurchaseAmount !== undefined
+            ? input.minPurchaseAmount
+              ? new Decimal(input.minPurchaseAmount)
+              : null
+            : undefined,
+        maximumDiscount:
+          input.maxDiscountAmount !== undefined
+            ? input.maxDiscountAmount
+              ? new Decimal(input.maxDiscountAmount)
+              : null
+            : undefined,
         usageLimit: input.usageLimit !== undefined ? input.usageLimit : undefined,
         validFrom: input.validFrom,
         validUntil: input.validUntil,
-        applicableEquipmentIds: input.applicableTo !== undefined ? (input.applicableTo as any) : undefined,
+        applicableEquipmentIds:
+          input.applicableTo !== undefined ? (input.applicableTo as any) : undefined,
         description: input.description !== undefined ? input.description : undefined,
         status,
         updatedBy: userId,
@@ -312,12 +326,20 @@ export class CouponService {
       return { valid: false, discountAmount: 0, error: 'تم استخدام الكوبون بالكامل' }
     }
     if (coupon.minPurchaseAmount != null && amount < coupon.minPurchaseAmount) {
-      return { valid: false, discountAmount: 0, error: `الحد الأدنى للشراء: ${coupon.minPurchaseAmount} ريال` }
+      return {
+        valid: false,
+        discountAmount: 0,
+        error: `الحد الأدنى للشراء: ${coupon.minPurchaseAmount} ريال`,
+      }
     }
     if (coupon.applicableTo && equipmentIds && equipmentIds.length > 0) {
       const applicable = equipmentIds.some((id) => coupon.applicableTo?.includes(id))
       if (!applicable) {
-        return { valid: false, discountAmount: 0, error: 'الكوبون غير قابل للتطبيق على هذه المعدات' }
+        return {
+          valid: false,
+          discountAmount: 0,
+          error: 'الكوبون غير قابل للتطبيق على هذه المعدات',
+        }
       }
     }
 
@@ -400,9 +422,8 @@ export class CouponService {
   }
 
   private static transformToCoupon(row: any): Coupon {
-    const value = row.type === 'PERCENT'
-      ? Number(row.discountPercentage ?? 0)
-      : Number(row.discountValue ?? 0)
+    const value =
+      row.type === 'PERCENT' ? Number(row.discountPercentage ?? 0) : Number(row.discountValue ?? 0)
     let status = this.mapFromPrismaStatus(row.status)
     const now = new Date()
     if (row.validUntil < now && status !== 'expired') status = 'expired'

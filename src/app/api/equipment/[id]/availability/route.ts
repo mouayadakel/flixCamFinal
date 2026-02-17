@@ -11,10 +11,7 @@ import { EquipmentService } from '@/lib/services/equipment.service'
 /**
  * GET /api/equipment/[id]/availability - Check equipment availability
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
 
@@ -28,10 +25,7 @@ export async function GET(
     const excludeBookingId = searchParams.get('excludeBookingId') || undefined
 
     if (!startDate || !endDate) {
-      return NextResponse.json(
-        { error: 'startDate and endDate are required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'startDate and endDate are required' }, { status: 400 })
     }
 
     const availability = await EquipmentService.checkAvailability(

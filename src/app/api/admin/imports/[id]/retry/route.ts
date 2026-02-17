@@ -17,10 +17,7 @@ export const dynamic = 'force-dynamic'
  * POST /api/admin/imports/[id]/retry
  * Retry failed rows only
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   const rateLimit = rateLimitAPI(request)
   if (!rateLimit.allowed) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 })

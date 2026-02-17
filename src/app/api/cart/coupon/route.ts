@@ -54,9 +54,6 @@ export async function DELETE(request: NextRequest) {
     const updated = await CartService.removeCoupon(cart.id)
     return NextResponse.json(updated)
   } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : 'Failed' },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: e instanceof Error ? e.message : 'Failed' }, { status: 400 })
   }
 }

@@ -12,11 +12,7 @@ import { AuditService } from './audit.service'
 import { BookingService, BookingCreateInput } from './booking.service'
 import { PricingService } from './pricing.service'
 import { EventBus } from '@/lib/events/event-bus'
-import {
-  NotFoundError,
-  ValidationError,
-  ForbiddenError,
-} from '@/lib/errors'
+import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission } from '@/lib/auth/permissions'
 import type {
   Quote,
@@ -29,7 +25,7 @@ import { Decimal } from '@prisma/client/runtime/library'
 
 /**
  * Quote Service
- * 
+ *
  * Uses the Quote model for proper data storage
  */
 export class QuoteService {
@@ -455,10 +451,12 @@ export class QuoteService {
         throw new ValidationError('Some equipment not found')
       }
 
-      const finalEquipment = input.equipment || existingQuote.equipmentItems.map((qe) => ({
-        equipmentId: qe.equipmentId,
-        quantity: qe.quantity,
-      }))
+      const finalEquipment =
+        input.equipment ||
+        existingQuote.equipmentItems.map((qe) => ({
+          equipmentId: qe.equipmentId,
+          quantity: qe.quantity,
+        }))
 
       const pricing = await PricingService.generateQuote({
         equipment: finalEquipment,
@@ -471,7 +469,7 @@ export class QuoteService {
 
       // Apply discount if provided
       if (input.discount !== undefined) {
-        const sub = Number(pricing.subtotal) * (1 - (input.discount / 100))
+        const sub = Number(pricing.subtotal) * (1 - input.discount / 100)
         updatedSubtotal = new Decimal(sub)
         updatedTotalAmount = new Decimal(sub + Number(pricing.vatAmount))
       } else {
@@ -484,7 +482,9 @@ export class QuoteService {
 
       // Update equipment data
       updatedEquipment = finalEquipment.map((eq) => {
-        const eqData = equipment.find((e) => e.id === eq.equipmentId) || existingQuote.equipmentItems.find((qe) => qe.equipmentId === eq.equipmentId)?.equipment
+        const eqData =
+          equipment.find((e) => e.id === eq.equipmentId) ||
+          existingQuote.equipmentItems.find((qe) => qe.equipmentId === eq.equipmentId)?.equipment
         const days = Math.ceil(
           (updatedEndDate.getTime() - updatedStartDate.getTime()) / (1000 * 60 * 60 * 24)
         )
@@ -507,10 +507,15 @@ export class QuoteService {
         endDate: updatedEndDate,
         validUntil: input.validUntil || existingQuote.validUntil,
         studioId: input.studioId !== undefined ? input.studioId : existingQuote.studioId,
-        studioStartTime: input.studioStartTime !== undefined ? input.studioStartTime : existingQuote.studioStartTime,
-        studioEndTime: input.studioEndTime !== undefined ? input.studioEndTime : existingQuote.studioEndTime,
+        studioStartTime:
+          input.studioStartTime !== undefined
+            ? input.studioStartTime
+            : existingQuote.studioStartTime,
+        studioEndTime:
+          input.studioEndTime !== undefined ? input.studioEndTime : existingQuote.studioEndTime,
         subtotal: updatedSubtotal,
-        discount: input.discount !== undefined ? new Decimal(input.discount) : existingQuote.discount,
+        discount:
+          input.discount !== undefined ? new Decimal(input.discount) : existingQuote.discount,
         vatAmount: updatedVatAmount,
         totalAmount: updatedTotalAmount,
         depositAmount: updatedDepositAmount,

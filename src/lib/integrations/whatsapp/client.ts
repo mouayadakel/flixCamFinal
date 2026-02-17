@@ -55,46 +55,39 @@ export class WhatsAppClient {
    * @param params - Template message parameters
    * @returns Message response
    */
-  async sendTemplate(
-    params: WhatsAppTemplateParams
-  ): Promise<WhatsAppMessageResponse> {
+  async sendTemplate(params: WhatsAppTemplateParams): Promise<WhatsAppMessageResponse> {
     try {
-      const response = await fetch(
-        `${this.baseUrl}/${this.phoneNumberId}/messages`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${this.accessToken}`,
-            'Content-Type': 'application/json',
+      const response = await fetch(`${this.baseUrl}/${this.phoneNumberId}/messages`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messaging_product: 'whatsapp',
+          to: params.to,
+          type: 'template',
+          template: {
+            name: params.templateName,
+            language: { code: params.language },
+            components: [
+              {
+                type: 'body',
+                parameters: params.parameters.map((param) => ({
+                  type: 'text',
+                  text: param,
+                })),
+              },
+            ],
           },
-          body: JSON.stringify({
-            messaging_product: 'whatsapp',
-            to: params.to,
-            type: 'template',
-            template: {
-              name: params.templateName,
-              language: { code: params.language },
-              components: [
-                {
-                  type: 'body',
-                  parameters: params.parameters.map((param) => ({
-                    type: 'text',
-                    text: param,
-                  })),
-                },
-              ],
-            },
-          }),
-        }
-      )
+        }),
+      })
 
       const data = await response.json()
 
       if (!response.ok) {
         const error = data as WhatsAppError
-        throw new Error(
-          `WhatsApp API error: ${error.error.message} (Code: ${error.error.code})`
-        )
+        throw new Error(`WhatsApp API error: ${error.error.message} (Code: ${error.error.code})`)
       }
 
       return data as WhatsAppMessageResponse
@@ -121,9 +114,7 @@ export class WhatsAppClient {
     totalAmount: string,
     language: 'ar' | 'en' = 'ar'
   ): Promise<WhatsAppMessageResponse> {
-    const templateName = language === 'ar' 
-      ? 'booking_confirmation_ar' 
-      : 'booking_confirmation_en'
+    const templateName = language === 'ar' ? 'booking_confirmation_ar' : 'booking_confirmation_en'
 
     return this.sendTemplate({
       to: phoneNumber,
@@ -148,9 +139,7 @@ export class WhatsAppClient {
     dueDate: string,
     language: 'ar' | 'en' = 'ar'
   ): Promise<WhatsAppMessageResponse> {
-    const templateName = language === 'ar' 
-      ? 'payment_reminder_ar' 
-      : 'payment_reminder_en'
+    const templateName = language === 'ar' ? 'payment_reminder_ar' : 'payment_reminder_en'
 
     return this.sendTemplate({
       to: phoneNumber,
@@ -173,9 +162,7 @@ export class WhatsAppClient {
     returnDate: string,
     language: 'ar' | 'en' = 'ar'
   ): Promise<WhatsAppMessageResponse> {
-    const templateName = language === 'ar' 
-      ? 'return_reminder_ar' 
-      : 'return_reminder_en'
+    const templateName = language === 'ar' ? 'return_reminder_ar' : 'return_reminder_en'
 
     return this.sendTemplate({
       to: phoneNumber,
@@ -193,7 +180,7 @@ export class WhatsAppClient {
   static validatePhoneNumber(phoneNumber: string): boolean {
     // Remove all non-digit characters
     const cleaned = phoneNumber.replace(/\D/g, '')
-    
+
     // Check if it's a valid international format (with country code)
     // Saudi Arabia: +966XXXXXXXXX (12 digits total)
     // International: 1-15 digits
@@ -208,22 +195,22 @@ export class WhatsAppClient {
   static formatPhoneNumber(phoneNumber: string): string {
     // Remove all non-digit characters
     let cleaned = phoneNumber.replace(/\D/g, '')
-    
+
     // If it starts with 0 (Saudi local format), remove the 0
     if (cleaned.startsWith('0') && cleaned.length === 10) {
       cleaned = cleaned.substring(1)
     }
-    
+
     // If it doesn't start with country code, assume Saudi Arabia (+966)
     if (!cleaned.startsWith('966') && cleaned.length === 9) {
       return `966${cleaned}`
     }
-    
+
     // If it already has country code, return as is
     if (cleaned.startsWith('966')) {
       return cleaned
     }
-    
+
     return cleaned
   }
 }

@@ -36,10 +36,7 @@ export async function POST(req: NextRequest) {
     })
   } catch (error: any) {
     if (error instanceof ValidationError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     if (error.name === 'ZodError') {
@@ -50,9 +47,6 @@ export async function POST(req: NextRequest) {
     }
 
     console.error('Validate coupon error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

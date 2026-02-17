@@ -13,10 +13,7 @@ import { InvoicePolicy } from '@/lib/policies/invoice.policy'
 import { PdfService } from '@/lib/services/pdf.service'
 import { ForbiddenError } from '@/lib/errors'
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
 
@@ -27,10 +24,7 @@ export async function GET(
     const userId = session.user.id
     const policy = await InvoicePolicy.canView(userId, params.id)
     if (!policy.allowed) {
-      return NextResponse.json(
-        { error: policy.reason || 'Forbidden' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: policy.reason || 'Forbidden' }, { status: 403 })
     }
 
     const invoice = await InvoiceService.getById(params.id, userId)
@@ -53,15 +47,9 @@ export async function GET(
     })
   } catch (error: any) {
     if (error instanceof ForbiddenError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 403 })
     }
     console.error('Invoice PDF error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

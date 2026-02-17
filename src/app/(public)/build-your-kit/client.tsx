@@ -18,7 +18,7 @@ const KitBuilderFlow = dynamic(
   {
     ssr: true,
     loading: () => (
-      <div className="min-h-[400px] space-y-6 animate-fade-in">
+      <div className="min-h-[400px] animate-fade-in space-y-6">
         <Skeleton className="h-8 w-48 rounded-lg" />
         <Skeleton className="h-4 w-full max-w-md rounded-lg" />
         <div className="grid grid-cols-4 gap-2">
@@ -37,12 +37,8 @@ export function BuildYourKitClient() {
   return (
     <main className="py-8">
       <PublicContainer>
-        <h1 className="text-section-title text-text-heading mb-2">
-          {t('kit.title')}
-        </h1>
-        <p className="text-body-main text-text-muted mb-8">
-          {t('kit.subtitle')}
-        </p>
+        <h1 className="mb-2 text-section-title text-text-heading">{t('kit.title')}</h1>
+        <p className="mb-8 text-body-main text-text-muted">{t('kit.subtitle')}</p>
         <KitBuilderFlow />
       </PublicContainer>
     </main>

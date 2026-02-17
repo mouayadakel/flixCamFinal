@@ -55,13 +55,13 @@ export default function NewQuotePage() {
   const [loading, setLoading] = useState(false)
   const [clients, setClients] = useState<Client[]>([])
   const [equipment, setEquipment] = useState<Equipment[]>([])
-  
+
   const [formData, setFormData] = useState({
     customerId: searchParams?.get('customerId') || '',
     validUntil: '',
     notes: '',
   })
-  
+
   const [items, setItems] = useState<QuoteItem[]>([])
   const [selectedEquipment, setSelectedEquipment] = useState('')
 
@@ -94,12 +94,12 @@ export default function NewQuotePage() {
 
   const addItem = () => {
     if (!selectedEquipment) return
-    
-    const eq = equipment.find(e => e.id === selectedEquipment)
+
+    const eq = equipment.find((e) => e.id === selectedEquipment)
     if (!eq) return
 
     // Check if already added
-    if (items.some(i => i.equipmentId === selectedEquipment)) {
+    if (items.some((i) => i.equipmentId === selectedEquipment)) {
       toast({
         title: 'تنبيه',
         description: 'هذه المعدات مضافة بالفعل',
@@ -122,18 +122,19 @@ export default function NewQuotePage() {
   }
 
   const removeItem = (equipmentId: string) => {
-    setItems(items.filter(i => i.equipmentId !== equipmentId))
+    setItems(items.filter((i) => i.equipmentId !== equipmentId))
   }
 
   const updateItem = (equipmentId: string, field: 'quantity' | 'days', value: number) => {
-    setItems(items.map(item => 
-      item.equipmentId === equipmentId ? { ...item, [field]: value } : item
-    ))
+    setItems(
+      items.map((item) => (item.equipmentId === equipmentId ? { ...item, [field]: value } : item))
+    )
   }
 
   const calculateTotals = () => {
-    const subtotal = items.reduce((sum, item) => 
-      sum + (item.quantity * item.days * item.unitPrice), 0
+    const subtotal = items.reduce(
+      (sum, item) => sum + item.quantity * item.days * item.unitPrice,
+      0
     )
     const vatAmount = subtotal * VAT_RATE
     const totalAmount = subtotal + vatAmount
@@ -183,7 +184,7 @@ export default function NewQuotePage() {
           customerId: formData.customerId,
           validUntil: formData.validUntil,
           notes: formData.notes || null,
-          items: items.map(item => ({
+          items: items.map((item) => ({
             equipmentId: item.equipmentId,
             quantity: item.quantity,
             days: item.days,
@@ -224,14 +225,14 @@ export default function NewQuotePage() {
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
+          <h1 className="flex items-center gap-2 text-3xl font-bold">
             <FileText className="h-8 w-8" />
             عرض سعر جديد
           </h1>
-          </div>
+        </div>
         <Button variant="outline" asChild>
           <Link href="/admin/quotes">
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="ml-2 h-4 w-4" />
             إلغاء
           </Link>
         </Button>
@@ -244,7 +245,7 @@ export default function NewQuotePage() {
             <CardTitle>معلومات عرض السعر</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>العميل *</Label>
                 <Select
@@ -290,36 +291,37 @@ export default function NewQuotePage() {
           <CardContent className="space-y-4">
             {/* Add Equipment */}
             <div className="flex gap-2">
-              <Select
-                value={selectedEquipment}
-                onValueChange={setSelectedEquipment}
-              >
+              <Select value={selectedEquipment} onValueChange={setSelectedEquipment}>
                 <SelectTrigger className="flex-1">
                   <SelectValue placeholder="اختر معدات لإضافتها" />
                 </SelectTrigger>
                 <SelectContent>
                   {equipment.map((eq) => (
                     <SelectItem key={eq.id} value={eq.id}>
-                      {eq.sku} {eq.model && `- ${eq.model}`} ({formatCurrency(Number(eq.dailyPrice))}/يوم)
+                      {eq.sku} {eq.model && `- ${eq.model}`} (
+                      {formatCurrency(Number(eq.dailyPrice))}/يوم)
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               <Button type="button" onClick={addItem} disabled={!selectedEquipment}>
-                <Plus className="h-4 w-4 ml-2" />
+                <Plus className="ml-2 h-4 w-4" />
                 إضافة
               </Button>
             </div>
 
             {/* Items List */}
             {items.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground border rounded-lg">
+              <div className="rounded-lg border py-8 text-center text-muted-foreground">
                 لم يتم إضافة معدات بعد
               </div>
             ) : (
               <div className="space-y-3">
                 {items.map((item) => (
-                  <div key={item.equipmentId} className="flex gap-4 items-center p-4 border rounded-lg">
+                  <div
+                    key={item.equipmentId}
+                    className="flex items-center gap-4 rounded-lg border p-4"
+                  >
                     <div className="flex-1">
                       <p className="font-medium">{item.equipment?.sku}</p>
                       <p className="text-sm text-muted-foreground">{item.equipment?.model}</p>
@@ -333,7 +335,9 @@ export default function NewQuotePage() {
                         type="number"
                         min="1"
                         value={item.quantity}
-                        onChange={(e) => updateItem(item.equipmentId, 'quantity', Number(e.target.value))}
+                        onChange={(e) =>
+                          updateItem(item.equipmentId, 'quantity', Number(e.target.value))
+                        }
                       />
                     </div>
                     <div className="w-20 space-y-1">
@@ -342,7 +346,9 @@ export default function NewQuotePage() {
                         type="number"
                         min="1"
                         value={item.days}
-                        onChange={(e) => updateItem(item.equipmentId, 'days', Number(e.target.value))}
+                        onChange={(e) =>
+                          updateItem(item.equipmentId, 'days', Number(e.target.value))
+                        }
                       />
                     </div>
                     <div className="w-28 text-left">
@@ -363,7 +369,7 @@ export default function NewQuotePage() {
                 ))}
 
                 {/* Totals */}
-                <div className="border-t pt-4 space-y-2 max-w-sm mr-auto">
+                <div className="mr-auto max-w-sm space-y-2 border-t pt-4">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">المجموع الفرعي</span>
                     <span>{formatCurrency(subtotal)}</span>
@@ -372,7 +378,7 @@ export default function NewQuotePage() {
                     <span className="text-muted-foreground">ضريبة القيمة المضافة (15%)</span>
                     <span>{formatCurrency(vatAmount)}</span>
                   </div>
-                  <div className="border-t pt-2 flex justify-between text-lg font-bold">
+                  <div className="flex justify-between border-t pt-2 text-lg font-bold">
                     <span>الإجمالي</span>
                     <span>{formatCurrency(totalAmount)}</span>
                   </div>
@@ -405,12 +411,12 @@ export default function NewQuotePage() {
           <Button type="submit" disabled={loading || items.length === 0}>
             {loading ? (
               <>
-                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
                 جاري الحفظ...
               </>
             ) : (
               <>
-                <Plus className="h-4 w-4 ml-2" />
+                <Plus className="ml-2 h-4 w-4" />
                 إنشاء عرض السعر
               </>
             )}

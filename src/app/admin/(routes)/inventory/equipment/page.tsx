@@ -12,9 +12,22 @@ import { Plus, Search, Package, RefreshCw, Loader2 } from 'lucide-react'
 import { SpecificationsAuditDialog } from '@/components/admin/specifications/SpecificationsAuditDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Card, CardContent } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -187,9 +200,7 @@ export default function EquipmentPage() {
         <div className="flex gap-3">
           <SpecificationsAuditDialog />
           <Button variant="outline" asChild>
-            <Link href="/admin/inventory/import">
-              استيراد Excel
-            </Link>
+            <Link href="/admin/inventory/import">استيراد Excel</Link>
           </Button>
           <Button
             type="button"
@@ -284,9 +295,7 @@ export default function EquipmentPage() {
               ))}
             </div>
           ) : filteredEquipment.length === 0 ? (
-            <div className="py-12 text-center text-neutral-500">
-              لا توجد معدات
-            </div>
+            <div className="py-12 text-center text-neutral-500">لا توجد معدات</div>
           ) : (
             <Table>
               <TableHeader>
@@ -311,7 +320,7 @@ export default function EquipmentPage() {
                     <TableRow key={item.id}>
                       <TableCell>
                         {featuredImage ? (
-                          <div className="relative h-12 w-12 rounded border border-neutral-200 overflow-hidden">
+                          <div className="relative h-12 w-12 overflow-hidden rounded border border-neutral-200">
                             <Image
                               src={featuredImage}
                               alt={item.sku}
@@ -321,7 +330,7 @@ export default function EquipmentPage() {
                             />
                           </div>
                         ) : (
-                          <div className="h-12 w-12 rounded border border-neutral-200 bg-neutral-100 flex items-center justify-center">
+                          <div className="flex h-12 w-12 items-center justify-center rounded border border-neutral-200 bg-neutral-100">
                             <Package className="h-5 w-5 text-neutral-400" />
                           </div>
                         )}
@@ -359,14 +368,10 @@ export default function EquipmentPage() {
                       <TableCell>
                         <div className="flex gap-2">
                           <Button variant="ghost" size="sm" asChild>
-                            <Link href={`/admin/inventory/equipment/${item.id}`}>
-                              عرض
-                            </Link>
+                            <Link href={`/admin/inventory/equipment/${item.id}`}>عرض</Link>
                           </Button>
                           <Button variant="ghost" size="sm" asChild>
-                            <Link href={`/admin/inventory/equipment/${item.id}/edit`}>
-                              تعديل
-                            </Link>
+                            <Link href={`/admin/inventory/equipment/${item.id}/edit`}>تعديل</Link>
                           </Button>
                           <Button
                             variant="ghost"

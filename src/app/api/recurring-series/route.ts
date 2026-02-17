@@ -69,7 +69,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const parsed = createRecurringSeriesSchema.parse(body)
 
-    const template = parsed.template as { equipmentIds: Array<{ equipmentId: string; quantity: number }>; studioId?: string; notes?: string }
+    const template = parsed.template as {
+      equipmentIds: Array<{ equipmentId: string; quantity: number }>
+      studioId?: string
+      notes?: string
+    }
     const endDate = parsed.endDate ? new Date(parsed.endDate) : null
     const maxOccurrences = parsed.occurrenceCount ?? (endDate ? 365 : 12)
 

@@ -12,10 +12,7 @@ import type { Locale } from '@/lib/i18n/locales'
 export function useLocale() {
   const { locale, dir, setLocale } = useLocaleStore()
 
-  const t = useCallback(
-    (key: string) => tFn(locale, key),
-    [locale]
-  )
+  const t = useCallback((key: string) => tFn(locale, key), [locale])
 
   return {
     locale,

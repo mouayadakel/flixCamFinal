@@ -6,6 +6,7 @@
 ## Overview
 
 This guide will help you set up Supabase for the FlixCam.rent project. Supabase will be used for:
+
 - Authentication (replacing NextAuth)
 - Database (PostgreSQL with Row Level Security)
 - Storage (for equipment images, contracts, etc.)
@@ -72,6 +73,7 @@ ALTER TABLE contracts ENABLE ROW LEVEL SECURITY;
 Run the RLS policies from `supabase/rls-policies.sql` (we'll create this).
 
 These policies will:
+
 - Allow authenticated users to read their own data
 - Allow admins to read/write all data
 - Restrict access based on user roles
@@ -81,11 +83,13 @@ These policies will:
 ## Step 6: Configure Environment Variables
 
 1. Copy `.env.example` to `.env.local`:
+
    ```bash
    cp .env.example .env.local
    ```
 
 2. Add your Supabase credentials to `.env.local`:
+
    ```env
    # Supabase
    NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
@@ -125,7 +129,7 @@ These policies will:
    ```sql
    -- Assign super_admin role to the user
    INSERT INTO user_roles (user_id, role_id)
-   SELECT 
+   SELECT
      'USER_UUID_HERE', -- Replace with actual user ID
      id
    FROM roles
@@ -137,6 +141,7 @@ These policies will:
 ## Step 9: Verify Setup
 
 1. Test connection:
+
    ```bash
    npm run dev
    ```
@@ -150,21 +155,25 @@ These policies will:
 ## Troubleshooting
 
 ### "Invalid API key"
+
 - Double-check your `.env.local` file
 - Make sure you copied the full key (they're long!)
 - Restart your dev server after changing `.env.local`
 
 ### "Table does not exist"
+
 - Make sure you ran the schema SQL file completely
 - Check SQL Editor for any errors
 - Verify tables exist in **Table Editor**
 
 ### "RLS policy violation"
+
 - Make sure RLS policies are created
 - Check user role assignments
 - Verify user is authenticated
 
 ### "Connection refused"
+
 - Check your Supabase project is active (not paused)
 - Verify the project URL is correct
 - Check your internet connection
@@ -174,6 +183,7 @@ These policies will:
 ## Next Steps
 
 After Supabase is set up:
+
 1. ✅ Phase 0 is complete
 2. ⏭️ Proceed to Phase 1: Authentication & RBAC
 3. Test login/logout functionality

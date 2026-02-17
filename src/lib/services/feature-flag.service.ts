@@ -33,10 +33,7 @@ export class FeatureFlagService {
       where: {
         deletedAt: null,
       },
-      orderBy: [
-        { scope: 'asc' },
-        { name: 'asc' },
-      ],
+      orderBy: [{ scope: 'asc' }, { name: 'asc' }],
     })
   }
 
@@ -118,7 +115,8 @@ export class FeatureFlagService {
       data: {
         enabled: input.enabled !== undefined ? input.enabled : existing.enabled,
         description: input.description !== undefined ? input.description : existing.description,
-        requiresApproval: input.requiresApproval !== undefined ? input.requiresApproval : existing.requiresApproval,
+        requiresApproval:
+          input.requiresApproval !== undefined ? input.requiresApproval : existing.requiresApproval,
         updatedBy: input.userId,
       },
     })
@@ -131,9 +129,16 @@ export class FeatureFlagService {
       metadata: {
         name: flag.name,
         changes: {
-          enabled: input.enabled !== undefined ? { from: existing.enabled, to: input.enabled } : undefined,
-          description: input.description !== undefined ? { from: existing.description, to: input.description } : undefined,
-          requiresApproval: input.requiresApproval !== undefined ? { from: existing.requiresApproval, to: input.requiresApproval } : undefined,
+          enabled:
+            input.enabled !== undefined ? { from: existing.enabled, to: input.enabled } : undefined,
+          description:
+            input.description !== undefined
+              ? { from: existing.description, to: input.description }
+              : undefined,
+          requiresApproval:
+            input.requiresApproval !== undefined
+              ? { from: existing.requiresApproval, to: input.requiresApproval }
+              : undefined,
         },
       },
     })

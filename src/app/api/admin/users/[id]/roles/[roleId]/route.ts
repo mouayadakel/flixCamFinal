@@ -30,7 +30,10 @@ export async function DELETE(
     }
     const canAssign = await hasPermission(session.user.id, PERMISSIONS.USER_ASSIGN_ROLE)
     if (!canAssign) {
-      return NextResponse.json({ error: 'Forbidden - Missing user.assign_role permission' }, { status: 403 })
+      return NextResponse.json(
+        { error: 'Forbidden - Missing user.assign_role permission' },
+        { status: 403 }
+      )
     }
 
     const p = await Promise.resolve(params)

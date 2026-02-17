@@ -117,7 +117,13 @@ interface KitWizardState {
     equipmentId: string,
     qty: number,
     dailyPrice: number,
-    display?: { model?: string; imageUrl?: string; categoryId?: string; isRecommended?: boolean; budgetTier?: BudgetTier }
+    display?: {
+      model?: string
+      imageUrl?: string
+      categoryId?: string
+      isRecommended?: boolean
+      budgetTier?: BudgetTier
+    }
   ) => void
   removeEquipment: (equipmentId: string) => void
   setQty: (equipmentId: string, qty: number) => void
@@ -160,14 +166,18 @@ export const useKitWizardStore = create<KitWizardState>()(
       setStep: (step) => set({ step }),
 
       setShootType: (id, slug) => set({ shootTypeId: id, shootTypeSlug: slug }),
-      setShootTypeData: (data) => set({ shootTypeData: data, categorySteps: data?.categorySteps ?? [] }),
+      setShootTypeData: (data) =>
+        set({ shootTypeData: data, categorySteps: data?.categorySteps ?? [] }),
       setBudgetTier: (budgetTier) => set({ budgetTier }),
       setAnswer: (questionId, value) =>
         set((state) => ({ answers: { ...state.answers, [questionId]: value } })),
       setCategorySteps: (categorySteps) => set({ categorySteps, currentCategoryIndex: 0 }),
       nextCategory: () =>
         set((state) => ({
-          currentCategoryIndex: Math.min(state.currentCategoryIndex + 1, state.categorySteps.length - 1),
+          currentCategoryIndex: Math.min(
+            state.currentCategoryIndex + 1,
+            state.categorySteps.length - 1
+          ),
           selectedCategoryId: state.categorySteps[state.currentCategoryIndex + 1]?.categoryId ?? '',
         })),
       prevCategory: () =>
@@ -180,8 +190,13 @@ export const useKitWizardStore = create<KitWizardState>()(
         }),
       skipCategory: (categoryId) =>
         set((state) => ({
-          skippedCategories: state.skippedCategories.includes(categoryId) ? state.skippedCategories : [...state.skippedCategories, categoryId],
-          currentCategoryIndex: Math.min(state.currentCategoryIndex + 1, state.categorySteps.length - 1),
+          skippedCategories: state.skippedCategories.includes(categoryId)
+            ? state.skippedCategories
+            : [...state.skippedCategories, categoryId],
+          currentCategoryIndex: Math.min(
+            state.currentCategoryIndex + 1,
+            state.categorySteps.length - 1
+          ),
           selectedCategoryId: state.categorySteps[state.currentCategoryIndex + 1]?.categoryId ?? '',
         })),
       setCategory: (selectedCategoryId) => set({ selectedCategoryId }),

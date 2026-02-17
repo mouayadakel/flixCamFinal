@@ -35,7 +35,7 @@ export function DateRangePicker({
 }: DateRangePickerProps) {
   return (
     <div className={cn('space-y-3', className)}>
-      <Label className="text-xs font-medium uppercase tracking-wider text-text-muted flex items-center gap-1.5">
+      <Label className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-text-muted">
         <Calendar className="h-3.5 w-3.5" />
         Rental dates
       </Label>

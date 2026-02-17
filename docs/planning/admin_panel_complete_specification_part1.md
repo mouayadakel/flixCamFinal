@@ -6,13 +6,13 @@
 
 ## 📊 الوضع الحالي vs المطلوب
 
-| المؤشر | الحالي | المطلوب | الفجوة |
-|--------|--------|---------|--------|
-| صفحات Live | 25 | 75+ | 50 صفحة |
-| صفحات Mock | 15 | 0 | -15 صفحة |
-| صفحات Missing | 35 | 0+ | 35 صفحة |
-| APIs مكتملة | ~40% | 100% | +60% |
-| Features كاملة | 33% | 100% | +67% |
+| المؤشر         | الحالي | المطلوب | الفجوة   |
+| -------------- | ------ | ------- | -------- |
+| صفحات Live     | 25     | 75+     | 50 صفحة  |
+| صفحات Mock     | 15     | 0       | -15 صفحة |
+| صفحات Missing  | 35     | 0+      | 35 صفحة  |
+| APIs مكتملة    | ~40%   | 100%    | +60%     |
+| Features كاملة | 33%    | 100%    | +67%     |
 
 ---
 
@@ -21,6 +21,7 @@
 ## 1.1 `/admin/dashboard` (تحسينات حرجة)
 
 ### **الوضع الحالي:**
+
 - ✅ KPIs أساسية موجودة
 - ⚠️ المقارنات hardcoded (+12%, -5%)
 - ❌ لا يوجد date range selector
@@ -52,6 +53,7 @@ DateRangeSelector {
 ```
 
 **UI Elements:**
+
 - DatePicker component مع Presets
 - زر "Compare to" مع Dropdown
 - Badge يظهر الفترة المختارة
@@ -60,6 +62,7 @@ DateRangeSelector {
 #### 2. KPI Cards - تحسينات
 
 **Revenue Card:**
+
 ```typescript
 RevenueKPI {
   current: number // من DB فعلي
@@ -84,6 +87,7 @@ RevenueKPI {
 ```
 
 **UI Elements:**
+
 - رقم أكبر للقيمة الحالية
 - Arrow icon (up/down) مع اللون المناسب
 - Tooltip عند hover يظهر breakdown
@@ -91,6 +95,7 @@ RevenueKPI {
 - زر "View Details" يفتح modal أو ينقل لصفحة Revenue
 
 **Bookings Card:**
+
 ```typescript
 BookingsKPI {
   total: number
@@ -111,6 +116,7 @@ BookingsKPI {
 ```
 
 **Occupancy Card:**
+
 ```typescript
 OccupancyKPI {
   equipment: {
@@ -129,6 +135,7 @@ OccupancyKPI {
 ```
 
 **New Clients Card:**
+
 ```typescript
 NewClientsKPI {
   thisMonth: number
@@ -147,6 +154,7 @@ NewClientsKPI {
 #### 3. Charts - تحسينات
 
 **Revenue Chart:**
+
 ```typescript
 RevenueChart {
   type: "line" | "bar" | "area"
@@ -177,6 +185,7 @@ RevenueChart {
 ```
 
 **UI Elements:**
+
 - Tabs للتبديل بين Line/Bar/Area
 - Dropdown لاختيار Granularity
 - Legend مع checkboxes للإظهار/الإخفاء
@@ -185,6 +194,7 @@ RevenueChart {
 - Tooltip يظهر التفاصيل
 
 **Booking Status Chart:**
+
 ```typescript
 BookingStatusChart {
   type: "donut" | "pie" | "bar"
@@ -366,6 +376,7 @@ RevenueForecast {
 ## 1.2 `/admin/dashboard/overview` (تحويل من Placeholder)
 
 ### **المطلوب:**
+
 صفحة Overview شاملة مع widgets قابلة للتخصيص
 
 ```typescript
@@ -418,6 +429,7 @@ DashboardOverview {
 ```
 
 **UI Elements:**
+
 - زر "Customize Dashboard"
 - Drag & Drop لإعادة ترتيب الـ Widgets
 - زر "+" لإضافة widget جديد
@@ -431,6 +443,7 @@ DashboardOverview {
 ## 1.3 `/admin/dashboard/revenue` (تحويل من Placeholder)
 
 ### **المطلوب:**
+
 صفحة تحليلات إيرادات متقدمة
 
 ```typescript
@@ -441,7 +454,7 @@ RevenueDashboard {
     groupBy: "day" | "week" | "month" | "quarter"
     revenueType: "all" | "equipment" | "studio" | "packages"
   }
-  
+
   metrics: {
     totalRevenue: {
       current: number
@@ -465,7 +478,7 @@ RevenueDashboard {
       rate: number
     }
   }
-  
+
   charts: {
     revenueOverTime: {
       type: "line" | "bar" | "area"
@@ -486,7 +499,7 @@ RevenueDashboard {
       data: SourceData[]
     }
   }
-  
+
   tables: {
     topEquipment: {
       columns: ["Equipment", "Rentals", "Revenue", "Growth"]
@@ -503,7 +516,7 @@ RevenueDashboard {
       data: MonthlyRevenueData[]
     }
   }
-  
+
   insights: {
     aiPowered: true
     items: [
@@ -523,7 +536,7 @@ RevenueDashboard {
       }
     ]
   }
-  
+
   export: {
     formats: ["PDF", "Excel", "CSV"]
     templates: ["Summary", "Detailed", "Executive"]
@@ -537,6 +550,7 @@ RevenueDashboard {
 ```
 
 **UI Elements:**
+
 - Filter bar في الأعلى
 - Grid من KPI cards
 - Section للـ Charts (2-3 charts)
@@ -551,6 +565,7 @@ RevenueDashboard {
 ## 1.4 `/admin/dashboard/activity` (تحويل من Placeholder)
 
 ### **المطلوب:**
+
 Activity Feed للنظام
 
 ```typescript
@@ -561,12 +576,12 @@ ActivityDashboard {
     user: string // filter by user
     entity: string // filter by booking/equipment/etc
   }
-  
+
   feed: {
     items: ActivityItem[]
     grouping: "none" | "by-hour" | "by-day"
     realtime: boolean // live updates
-    
+
     ActivityItem: {
       id: string
       timestamp: Date
@@ -589,14 +604,14 @@ ActivityDashboard {
       color: string
     }
   }
-  
+
   stats: {
     totalActivities: number
     byType: { type: string, count: number }[]
     byUser: { user: string, count: number }[]
     busyHours: { hour: number, count: number }[]
   }
-  
+
   realTimeIndicator: {
     enabled: true
     lastUpdate: Date
@@ -606,6 +621,7 @@ ActivityDashboard {
 ```
 
 **أمثلة على Activities:**
+
 ```typescript
 [
   {
@@ -649,6 +665,7 @@ ActivityDashboard {
 ```
 
 **UI Elements:**
+
 - Live indicator badge (🟢 Live)
 - Filter dropdown
 - Timeline-style feed
@@ -663,6 +680,7 @@ ActivityDashboard {
 ## 1.5 `/admin/dashboard/recent-bookings` (تحويل من Placeholder)
 
 ### **المطلوب:**
+
 قائمة متقدمة للحجوزات الأخيرة
 
 ```typescript
@@ -674,14 +692,14 @@ RecentBookingsDashboard {
     sortBy: "created" | "start_date" | "amount"
     sortOrder: "asc" | "desc"
   }
-  
+
   summary: {
     total: number
     totalValue: number
     byStatus: { status: string, count: number, value: number }[]
     byType: { type: string, count: number, value: number }[]
   }
-  
+
   table: {
     columns: [
       {
@@ -749,7 +767,7 @@ RecentBookingsDashboard {
       "Send Messages"
     ]
   }
-  
+
   quickStats: {
     todayBookings: number
     activeNow: number
@@ -760,6 +778,7 @@ RecentBookingsDashboard {
 ```
 
 **UI Elements:**
+
 - Summary cards في الأعلى
 - Filter bar
 - Table مع checkboxes للـ bulk actions
@@ -774,6 +793,7 @@ RecentBookingsDashboard {
 ## 1.6 `/admin/dashboard/quick-actions` (تحويل من Placeholder)
 
 ### **المطلوب:**
+
 Command Center للإجراءات السريعة
 
 ```typescript
@@ -902,18 +922,18 @@ QuickActionsDashboard {
       ]
     }
   ]
-  
+
   recentActions: {
     enabled: true
     items: Action[] // last 10 actions by user
   }
-  
+
   favoriteActions: {
     enabled: true
     customizable: true
     items: Action[] // user favorites
   }
-  
+
   commandPalette: {
     enabled: true
     shortcut: "Ctrl+K"
@@ -924,6 +944,7 @@ QuickActionsDashboard {
 ```
 
 **UI Elements:**
+
 - Grid layout للـ sections
 - Cards للـ actions مع icons كبيرة
 - Badge indicators للـ counts
@@ -934,4 +955,3 @@ QuickActionsDashboard {
 - Keyboard shortcuts overlay (?)
 
 ---
-

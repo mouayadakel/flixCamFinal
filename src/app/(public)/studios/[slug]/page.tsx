@@ -24,11 +24,7 @@ async function getStudio(slug: string) {
   }
 }
 
-export default async function StudioDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
+export default async function StudioDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const enabled = await FeatureFlagService.isEnabled('enable_studios')
   if (!enabled) redirect('/')
   const { slug } = await params
@@ -36,7 +32,7 @@ export default async function StudioDetailPage({
   if (!studio) notFound()
 
   return (
-    <main className="container py-8 px-4">
+    <main className="container px-4 py-8">
       <StudioDetail studio={studio} />
     </main>
   )

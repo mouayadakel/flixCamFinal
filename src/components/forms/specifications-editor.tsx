@@ -30,7 +30,7 @@ import {
   Sun,
   Gauge,
   Link2,
-  Loader2
+  Loader2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -49,13 +49,10 @@ import type {
   SpecGroup,
   SpecHighlight,
   QuickSpec,
-  StructuredSpecifications
+  StructuredSpecifications,
 } from '@/lib/types/specifications.types'
 import { isStructuredSpecifications } from '@/lib/types/specifications.types'
-import {
-  convertFlatToStructured,
-  categoryTemplates
-} from '@/lib/utils/specifications.utils'
+import { convertFlatToStructured, categoryTemplates } from '@/lib/utils/specifications.utils'
 import { SpecificationsDisplay } from '@/components/features/equipment/specifications-display'
 
 const ICON_OPTIONS = [
@@ -69,13 +66,11 @@ const ICON_OPTIONS = [
   { value: 'camera', label: 'Camera' },
   { value: 'sun', label: 'Sun' },
   { value: 'gauge', label: 'Gauge' },
-  { value: 'info', label: 'Info' }
+  { value: 'info', label: 'Info' },
 ]
 
 const DEFAULT_STRUCTURED: StructuredSpecifications = {
-  groups: [
-    { label: 'Specifications', labelAr: 'المواصفات', icon: 'star', priority: 1, specs: [] }
-  ]
+  groups: [{ label: 'Specifications', labelAr: 'المواصفات', icon: 'star', priority: 1, specs: [] }],
 }
 
 export interface SpecificationsEditorProps {
@@ -98,18 +93,18 @@ function normalizeValue(
 function SpecItemEditor({
   spec,
   onChange,
-  onDelete
+  onDelete,
 }: {
   spec: SpecItem
   onChange: (s: SpecItem) => void
   onDelete: () => void
 }) {
   return (
-    <div className="group relative rounded-lg border border-border-light bg-white p-4 space-y-3 hover:border-brand-primary/30 hover:shadow-sm transition-all">
-      <div className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+    <div className="group relative space-y-3 rounded-lg border border-border-light bg-white p-4 transition-all hover:border-brand-primary/30 hover:shadow-sm">
+      <div className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
         <GripVertical className="h-4 w-4 text-text-muted" />
       </div>
-      <div className="pl-6 space-y-3">
+      <div className="space-y-3 pl-6">
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label className="text-xs font-medium text-text-muted">Key *</Label>
@@ -156,9 +151,7 @@ function SpecItemEditor({
             <Label className="text-xs font-medium text-text-muted">Type</Label>
             <select
               value={spec.type ?? 'text'}
-              onChange={(e) =>
-                onChange({ ...spec, type: e.target.value as SpecItem['type'] })
-              }
+              onChange={(e) => onChange({ ...spec, type: e.target.value as SpecItem['type'] })}
               className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               aria-label="Specification type"
             >
@@ -176,15 +169,13 @@ function SpecItemEditor({
                 min={0}
                 max={100}
                 value={spec.rangePercent ?? 70}
-                onChange={(e) =>
-                  onChange({ ...spec, rangePercent: parseInt(e.target.value, 10) })
-                }
+                onChange={(e) => onChange({ ...spec, rangePercent: parseInt(e.target.value, 10) })}
                 className="mt-1"
               />
             </div>
           )}
           <div className="flex items-end gap-2">
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex cursor-pointer items-center gap-2">
               <input
                 type="checkbox"
                 checked={spec.highlight ?? false}
@@ -199,7 +190,7 @@ function SpecItemEditor({
       <button
         type="button"
         onClick={onDelete}
-        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-all"
+        className="absolute right-3 top-3 rounded-lg p-1.5 text-red-500 opacity-0 transition-all hover:bg-red-50 group-hover:opacity-100"
         aria-label="Delete spec"
       >
         <Trash2 className="h-4 w-4" />
@@ -215,7 +206,7 @@ function GroupEditor({
   onMoveUp,
   onMoveDown,
   canMoveUp,
-  canMoveDown
+  canMoveDown,
 }: {
   group: SpecGroup
   onChange: (g: SpecGroup) => void
@@ -230,20 +221,17 @@ function GroupEditor({
   const addSpec = () => {
     onChange({
       ...group,
-      specs: [
-        ...group.specs,
-        { key: '', label: '', value: '', type: 'text' }
-      ]
+      specs: [...group.specs, { key: '', label: '', value: '', type: 'text' }],
     })
   }
 
   return (
-    <div className="rounded-xl border-2 border-border-light bg-surface-light/30 overflow-hidden">
-      <div className="flex items-center gap-3 bg-white border-b border-border-light p-4">
+    <div className="overflow-hidden rounded-xl border-2 border-border-light bg-surface-light/30">
+      <div className="flex items-center gap-3 border-b border-border-light bg-white p-4">
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
-          className="p-1 hover:bg-surface-light rounded transition-colors"
+          className="rounded p-1 transition-colors hover:bg-surface-light"
           aria-label={expanded ? 'Collapse group' : 'Expand group'}
         >
           {expanded ? (
@@ -301,12 +289,19 @@ function GroupEditor({
             <ChevronDown className="h-4 w-4" />
           </Button>
         </div>
-        <Button type="button" variant="ghost" size="icon" onClick={onDelete} className="h-8 w-8 text-red-500 hover:bg-red-50" aria-label="Delete group">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onDelete}
+          className="h-8 w-8 text-red-500 hover:bg-red-50"
+          aria-label="Delete group"
+        >
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>
       {expanded && (
-        <div className="p-4 space-y-3">
+        <div className="space-y-3 p-4">
           {group.specs.map((spec, idx) => (
             <SpecItemEditor
               key={`${spec.key}-${idx}`}
@@ -319,7 +314,7 @@ function GroupEditor({
               onDelete={() =>
                 onChange({
                   ...group,
-                  specs: group.specs.filter((_, i) => i !== idx)
+                  specs: group.specs.filter((_, i) => i !== idx),
                 })
               }
             />
@@ -330,7 +325,7 @@ function GroupEditor({
             className="w-full border-2 border-dashed"
             onClick={addSpec}
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="mr-2 h-4 w-4" />
             Add Specification
           </Button>
         </div>
@@ -344,12 +339,9 @@ export function SpecificationsEditor({
   onChange,
   label = 'Specifications',
   className,
-  categoryHint
+  categoryHint,
 }: SpecificationsEditorProps) {
-  const normalized = useMemo(
-    () => normalizeValue(value, categoryHint),
-    [value, categoryHint]
-  )
+  const normalized = useMemo(() => normalizeValue(value, categoryHint), [value, categoryHint])
   const [state, setState] = useState<StructuredSpecifications>(normalized)
   const [viewMode, setViewMode] = useState<'edit' | 'preview' | 'json'>('edit')
   const [copied, setCopied] = useState(false)
@@ -362,7 +354,12 @@ export function SpecificationsEditor({
   useEffect(() => {
     const next = normalizeValue(value, categoryHint)
     setState(next)
-    if (!isStructuredSpecifications(value) && value && typeof value === 'object' && Object.keys(value).length > 0) {
+    if (
+      !isStructuredSpecifications(value) &&
+      value &&
+      typeof value === 'object' &&
+      Object.keys(value).length > 0
+    ) {
       if (lastSyncedFlatRef.current !== value) {
         lastSyncedFlatRef.current = value as Record<string, unknown>
         onChange(next)
@@ -385,10 +382,7 @@ export function SpecificationsEditor({
     const newPriority = state.groups.length + 1
     syncChange({
       ...state,
-      groups: [
-        ...state.groups,
-        { label: '', icon: 'star', priority: newPriority, specs: [] }
-      ]
+      groups: [...state.groups, { label: '', icon: 'star', priority: newPriority, specs: [] }],
     })
   }
 
@@ -396,7 +390,7 @@ export function SpecificationsEditor({
     if (!template?.groups?.length) return
     syncChange({
       ...state,
-      groups: template.groups as SpecGroup[]
+      groups: template.groups as SpecGroup[],
     })
   }
 
@@ -480,7 +474,7 @@ export function SpecificationsEditor({
             size="sm"
             onClick={() => setViewMode('preview')}
           >
-            <Eye className="h-4 w-4 ml-1.5" />
+            <Eye className="ml-1.5 h-4 w-4" />
             Preview
           </Button>
           <Button
@@ -489,7 +483,7 @@ export function SpecificationsEditor({
             size="sm"
             onClick={() => setViewMode('json')}
           >
-            <Code className="h-4 w-4 ml-1.5" />
+            <Code className="ml-1.5 h-4 w-4" />
             JSON
           </Button>
         </div>
@@ -500,7 +494,7 @@ export function SpecificationsEditor({
             onClick={loadTemplate}
             className="bg-brand-primary hover:bg-brand-primary/90"
           >
-            <Sparkles className="h-4 w-4 ml-1.5" />
+            <Sparkles className="ml-1.5 h-4 w-4" />
             Load {categoryHint} Template
           </Button>
         )}
@@ -514,7 +508,7 @@ export function SpecificationsEditor({
             setFetchDialogOpen(true)
           }}
         >
-          <Link2 className="h-4 w-4 ml-1.5" />
+          <Link2 className="ml-1.5 h-4 w-4" />
           جلب المواصفات من رابط
         </Button>
       </div>
@@ -559,19 +553,15 @@ export function SpecificationsEditor({
             >
               إلغاء
             </Button>
-            <Button
-              type="button"
-              onClick={handleFetchFromUrl}
-              disabled={fetchLoading}
-            >
+            <Button type="button" onClick={handleFetchFromUrl} disabled={fetchLoading}>
               {fetchLoading ? (
                 <>
-                  <Loader2 className="h-4 w-4 ml-1.5 animate-spin" />
+                  <Loader2 className="ml-1.5 h-4 w-4 animate-spin" />
                   جاري الجلب...
                 </>
               ) : (
                 <>
-                  <Link2 className="h-4 w-4 ml-1.5" />
+                  <Link2 className="ml-1.5 h-4 w-4" />
                   جلب المواصفات
                 </>
               )}
@@ -584,10 +574,17 @@ export function SpecificationsEditor({
         <div className="space-y-6">
           <Card>
             <CardContent className="pt-6">
-              <h4 className="text-sm font-semibold text-text-heading mb-3">Hero Highlights (optional)</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <h4 className="mb-3 text-sm font-semibold text-text-heading">
+                Hero Highlights (optional)
+              </h4>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {[0, 1, 2, 3].map((idx) => {
-                  const h = (state.highlights ?? [])[idx] ?? { icon: 'star', label: '', value: '', sublabel: '' }
+                  const h = (state.highlights ?? [])[idx] ?? {
+                    icon: 'star',
+                    label: '',
+                    value: '',
+                    sublabel: '',
+                  }
                   return (
                     <div key={idx} className="space-y-2">
                       <Input
@@ -595,7 +592,8 @@ export function SpecificationsEditor({
                         value={h.icon}
                         onChange={(e) => {
                           const list = [...(state.highlights ?? [])]
-                          while (list.length <= idx) list.push({ icon: 'star', label: '', value: '' })
+                          while (list.length <= idx)
+                            list.push({ icon: 'star', label: '', value: '' })
                           list[idx] = { ...list[idx], icon: e.target.value }
                           updateHighlights(list)
                         }}
@@ -605,7 +603,8 @@ export function SpecificationsEditor({
                         value={h.label}
                         onChange={(e) => {
                           const list = [...(state.highlights ?? [])]
-                          while (list.length <= idx) list.push({ icon: 'star', label: '', value: '' })
+                          while (list.length <= idx)
+                            list.push({ icon: 'star', label: '', value: '' })
                           list[idx] = { ...list[idx], label: e.target.value }
                           updateHighlights(list)
                         }}
@@ -615,7 +614,8 @@ export function SpecificationsEditor({
                         value={h.value}
                         onChange={(e) => {
                           const list = [...(state.highlights ?? [])]
-                          while (list.length <= idx) list.push({ icon: 'star', label: '', value: '' })
+                          while (list.length <= idx)
+                            list.push({ icon: 'star', label: '', value: '' })
                           list[idx] = { ...list[idx], value: e.target.value }
                           updateHighlights(list)
                         }}
@@ -625,7 +625,8 @@ export function SpecificationsEditor({
                         value={h.sublabel ?? ''}
                         onChange={(e) => {
                           const list = [...(state.highlights ?? [])]
-                          while (list.length <= idx) list.push({ icon: 'star', label: '', value: '' })
+                          while (list.length <= idx)
+                            list.push({ icon: 'star', label: '', value: '' })
                           list[idx] = { ...list[idx], sublabel: e.target.value }
                           updateHighlights(list)
                         }}
@@ -639,7 +640,9 @@ export function SpecificationsEditor({
 
           <Card>
             <CardContent className="pt-6">
-              <h4 className="text-sm font-semibold text-text-heading mb-3">Quick Spec Pills (optional)</h4>
+              <h4 className="mb-3 text-sm font-semibold text-text-heading">
+                Quick Spec Pills (optional)
+              </h4>
               <div className="space-y-2">
                 {[0, 1, 2, 3, 4, 5].map((idx) => {
                   const q = (state.quickSpecs ?? [])[idx] ?? { icon: 'star', label: '', value: '' }
@@ -650,7 +653,8 @@ export function SpecificationsEditor({
                         value={q.icon}
                         onChange={(e) => {
                           const list = [...(state.quickSpecs ?? [])]
-                          while (list.length <= idx) list.push({ icon: 'star', label: '', value: '' })
+                          while (list.length <= idx)
+                            list.push({ icon: 'star', label: '', value: '' })
                           list[idx] = { ...list[idx], icon: e.target.value }
                           updateQuickSpecs(list)
                         }}
@@ -661,7 +665,8 @@ export function SpecificationsEditor({
                         value={q.label}
                         onChange={(e) => {
                           const list = [...(state.quickSpecs ?? [])]
-                          while (list.length <= idx) list.push({ icon: 'star', label: '', value: '' })
+                          while (list.length <= idx)
+                            list.push({ icon: 'star', label: '', value: '' })
                           list[idx] = { ...list[idx], label: e.target.value }
                           updateQuickSpecs(list)
                         }}
@@ -672,7 +677,8 @@ export function SpecificationsEditor({
                         value={q.value}
                         onChange={(e) => {
                           const list = [...(state.quickSpecs ?? [])]
-                          while (list.length <= idx) list.push({ icon: 'star', label: '', value: '' })
+                          while (list.length <= idx)
+                            list.push({ icon: 'star', label: '', value: '' })
                           list[idx] = { ...list[idx], value: e.target.value }
                           updateQuickSpecs(list)
                         }}
@@ -699,7 +705,7 @@ export function SpecificationsEditor({
                 onDelete={() =>
                   syncChange({
                     ...state,
-                    groups: state.groups.filter((_, i) => i !== idx)
+                    groups: state.groups.filter((_, i) => i !== idx),
                   })
                 }
                 onMoveUp={() => moveGroup(idx, 'up')}
@@ -714,7 +720,7 @@ export function SpecificationsEditor({
               className="w-full border-2 border-dashed"
               onClick={addGroup}
             >
-              <Plus className="h-5 w-5 ml-2" />
+              <Plus className="ml-2 h-5 w-5" />
               Add Group
             </Button>
           </div>
@@ -723,11 +729,7 @@ export function SpecificationsEditor({
 
       {viewMode === 'preview' && (
         <div className="rounded-2xl border border-border-light/60 bg-white p-6">
-          <SpecificationsDisplay
-            specifications={state}
-            locale="ar"
-            showQuickSpecPills={true}
-          />
+          <SpecificationsDisplay specifications={state} locale="ar" showQuickSpecPills={true} />
         </div>
       )}
 
@@ -737,22 +739,22 @@ export function SpecificationsEditor({
             type="button"
             variant="secondary"
             size="sm"
-            className="absolute top-3 right-3"
+            className="absolute right-3 top-3"
             onClick={copyJson}
           >
             {copied ? (
               <>
-                <Check className="h-4 w-4 ml-1.5 text-emerald-500" />
+                <Check className="ml-1.5 h-4 w-4 text-emerald-500" />
                 Copied!
               </>
             ) : (
               <>
-                <Copy className="h-4 w-4 ml-1.5" />
+                <Copy className="ml-1.5 h-4 w-4" />
                 Copy
               </>
             )}
           </Button>
-          <pre className="p-4 bg-neutral-900 text-emerald-400 rounded-xl text-xs overflow-x-auto min-h-[200px]">
+          <pre className="min-h-[200px] overflow-x-auto rounded-xl bg-neutral-900 p-4 text-xs text-emerald-400">
             {JSON.stringify(state, null, 2)}
           </pre>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   Plus,
   Trash2,
@@ -18,55 +18,55 @@ import {
   ChevronUp,
   Sparkles,
   Copy,
-  Check
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  Check,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 // ============================================================================
 // Types
 // ============================================================================
 
 interface SpecItem {
-  key: string;
-  label: string;
-  labelAr?: string;
-  value: string;
-  type?: 'text' | 'boolean' | 'range' | 'colorTemp';
-  highlight?: boolean;
-  rangePercent?: number;
+  key: string
+  label: string
+  labelAr?: string
+  value: string
+  type?: 'text' | 'boolean' | 'range' | 'colorTemp'
+  highlight?: boolean
+  rangePercent?: number
 }
 
 interface SpecGroup {
-  label: string;
-  labelAr?: string;
-  icon: string;
-  priority: number;
-  specs: SpecItem[];
+  label: string
+  labelAr?: string
+  icon: string
+  priority: number
+  specs: SpecItem[]
 }
 
 interface SpecHighlight {
-  icon: string;
-  label: string;
-  value: string;
-  sublabel?: string;
+  icon: string
+  label: string
+  value: string
+  sublabel?: string
 }
 
 interface QuickSpec {
-  icon: string;
-  label: string;
-  value: string;
+  icon: string
+  label: string
+  value: string
 }
 
 interface StructuredSpecifications {
-  highlights?: SpecHighlight[];
-  quickSpecs?: QuickSpec[];
-  groups: SpecGroup[];
+  highlights?: SpecHighlight[]
+  quickSpecs?: QuickSpec[]
+  groups: SpecGroup[]
 }
 
 interface SpecificationsEditorProps {
-  value: StructuredSpecifications;
-  onChange: (value: StructuredSpecifications) => void;
-  categoryHint?: string;
+  value: StructuredSpecifications
+  onChange: (value: StructuredSpecifications) => void
+  categoryHint?: string
 }
 
 // ============================================================================
@@ -82,8 +82,8 @@ const iconOptions = [
   { value: 'cable', label: 'Cable', icon: Cable },
   { value: 'monitor', label: 'Display', icon: Monitor },
   { value: 'camera', label: 'Camera', icon: Camera },
-  { value: 'info', label: 'Info', icon: Info }
-];
+  { value: 'info', label: 'Info', icon: Info },
+]
 
 // ============================================================================
 // Preset Templates by Category
@@ -101,8 +101,8 @@ const categoryTemplates: Record<string, Partial<StructuredSpecifications>> = {
           { key: 'sensor', label: 'Sensor', labelAr: 'المستشعر', value: '', highlight: true },
           { key: 'video', label: 'Video', labelAr: 'الفيديو', value: '', highlight: true },
           { key: 'iso', label: 'ISO Range', labelAr: 'نطاق ISO', value: '' },
-          { key: 'autofocus', label: 'Autofocus', labelAr: 'التركيز التلقائي', value: '' }
-        ]
+          { key: 'autofocus', label: 'Autofocus', labelAr: 'التركيز التلقائي', value: '' },
+        ],
       },
       {
         label: 'Body & Display',
@@ -112,10 +112,10 @@ const categoryTemplates: Record<string, Partial<StructuredSpecifications>> = {
         specs: [
           { key: 'weight', label: 'Weight', labelAr: 'الوزن', value: '' },
           { key: 'display', label: 'Display', labelAr: 'الشاشة', value: '' },
-          { key: 'evf', label: 'EVF', labelAr: 'المنظار الإلكتروني', value: '' }
-        ]
-      }
-    ]
+          { key: 'evf', label: 'EVF', labelAr: 'المنظار الإلكتروني', value: '' },
+        ],
+      },
+    ],
   },
   lighting: {
     groups: [
@@ -126,10 +126,17 @@ const categoryTemplates: Record<string, Partial<StructuredSpecifications>> = {
         priority: 1,
         specs: [
           { key: 'type', label: 'Type', labelAr: 'النوع', value: '', highlight: true },
-          { key: 'colorTemp', label: 'Color Temperature', labelAr: 'درجة اللون', value: '', type: 'colorTemp', highlight: true },
+          {
+            key: 'colorTemp',
+            label: 'Color Temperature',
+            labelAr: 'درجة اللون',
+            value: '',
+            type: 'colorTemp',
+            highlight: true,
+          },
           { key: 'cri', label: 'CRI / TLCI', labelAr: 'دقة الألوان', value: '', highlight: true },
-          { key: 'beamAngle', label: 'Beam Angle', labelAr: 'زاوية الإضاءة', value: '' }
-        ]
+          { key: 'beamAngle', label: 'Beam Angle', labelAr: 'زاوية الإضاءة', value: '' },
+        ],
       },
       {
         label: 'Power & I/O',
@@ -137,36 +144,42 @@ const categoryTemplates: Record<string, Partial<StructuredSpecifications>> = {
         icon: 'zap',
         priority: 2,
         specs: [
-          { key: 'power', label: 'Power Consumption', labelAr: 'استهلاك الطاقة', value: '', highlight: true },
+          {
+            key: 'power',
+            label: 'Power Consumption',
+            labelAr: 'استهلاك الطاقة',
+            value: '',
+            highlight: true,
+          },
           { key: 'acInput', label: 'AC Input', labelAr: 'مدخل الكهرباء', value: '' },
-          { key: 'battery', label: 'Battery', labelAr: 'البطارية', value: '' }
-        ]
-      }
-    ]
-  }
-};
+          { key: 'battery', label: 'Battery', labelAr: 'البطارية', value: '' },
+        ],
+      },
+    ],
+  },
+}
 
 // ============================================================================
 // Spec Item Editor
 // ============================================================================
 
 const SpecItemEditor: React.FC<{
-  spec: SpecItem;
-  onChange: (spec: SpecItem) => void;
-  onDelete: () => void;
+  spec: SpecItem
+  onChange: (spec: SpecItem) => void
+  onDelete: () => void
 }> = ({ spec, onChange, onDelete }) => {
   return (
-    <div className="group relative rounded-lg border border-border-light bg-white p-4 space-y-3 hover:border-brand-primary/30 hover:shadow-sm transition-all">
+    <div className="group relative space-y-3 rounded-lg border border-border-light bg-white p-4 transition-all hover:border-brand-primary/30 hover:shadow-sm">
       {/* Drag Handle */}
-      <div className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
         <GripVertical className="h-4 w-4 text-text-muted" />
       </div>
 
-      <div className="pl-6 space-y-3">
+      <div className="space-y-3 pl-6">
         {/* Key & Label Row */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs font-medium text-text-muted mb-1 block">
+            <label className="mb-1 block text-xs font-medium text-text-muted">
               Key <span className="text-red-500">*</span>
             </label>
             <input
@@ -174,11 +187,11 @@ const SpecItemEditor: React.FC<{
               value={spec.key}
               onChange={(e) => onChange({ ...spec, key: e.target.value })}
               placeholder="e.g., sensor"
-              className="w-full px-3 py-1.5 text-sm border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
+              className="w-full rounded-lg border border-border-light px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-text-muted mb-1 block">
+            <label className="mb-1 block text-xs font-medium text-text-muted">
               Label (EN) <span className="text-red-500">*</span>
             </label>
             <input
@@ -186,7 +199,7 @@ const SpecItemEditor: React.FC<{
               value={spec.label}
               onChange={(e) => onChange({ ...spec, label: e.target.value })}
               placeholder="e.g., Sensor"
-              className="w-full px-3 py-1.5 text-sm border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
+              className="w-full rounded-lg border border-border-light px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
             />
           </div>
         </div>
@@ -194,7 +207,7 @@ const SpecItemEditor: React.FC<{
         {/* Value & Label AR Row */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs font-medium text-text-muted mb-1 block">
+            <label className="mb-1 block text-xs font-medium text-text-muted">
               Value <span className="text-red-500">*</span>
             </label>
             <input
@@ -202,19 +215,17 @@ const SpecItemEditor: React.FC<{
               value={spec.value}
               onChange={(e) => onChange({ ...spec, value: e.target.value })}
               placeholder="e.g., 12.1MP Full-Frame"
-              className="w-full px-3 py-1.5 text-sm border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
+              className="w-full rounded-lg border border-border-light px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-text-muted mb-1 block">
-              Label (AR)
-            </label>
+            <label className="mb-1 block text-xs font-medium text-text-muted">Label (AR)</label>
             <input
               type="text"
               value={spec.labelAr || ''}
               onChange={(e) => onChange({ ...spec, labelAr: e.target.value })}
               placeholder="e.g., المستشعر"
-              className="w-full px-3 py-1.5 text-sm border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
+              className="w-full rounded-lg border border-border-light px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
               dir="rtl"
             />
           </div>
@@ -223,13 +234,11 @@ const SpecItemEditor: React.FC<{
         {/* Type & Options Row */}
         <div className="grid grid-cols-3 gap-3">
           <div>
-            <label className="text-xs font-medium text-text-muted mb-1 block">
-              Type
-            </label>
+            <label className="mb-1 block text-xs font-medium text-text-muted">Type</label>
             <select
               value={spec.type || 'text'}
               onChange={(e) => onChange({ ...spec, type: e.target.value as any })}
-              className="w-full px-3 py-1.5 text-sm border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
+              className="w-full rounded-lg border border-border-light px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
             >
               <option value="text">Text</option>
               <option value="boolean">Yes/No</option>
@@ -240,22 +249,20 @@ const SpecItemEditor: React.FC<{
 
           {spec.type === 'range' && (
             <div>
-              <label className="text-xs font-medium text-text-muted mb-1 block">
-                Range %
-              </label>
+              <label className="mb-1 block text-xs font-medium text-text-muted">Range %</label>
               <input
                 type="number"
                 min="0"
                 max="100"
                 value={spec.rangePercent || 70}
                 onChange={(e) => onChange({ ...spec, rangePercent: parseInt(e.target.value) })}
-                className="w-full px-3 py-1.5 text-sm border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
+                className="w-full rounded-lg border border-border-light px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
               />
             </div>
           )}
 
           <div className="flex items-end gap-2">
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex cursor-pointer items-center gap-2">
               <input
                 type="checkbox"
                 checked={spec.highlight || false}
@@ -271,28 +278,28 @@ const SpecItemEditor: React.FC<{
       {/* Delete Button */}
       <button
         onClick={onDelete}
-        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-all"
+        className="absolute right-3 top-3 rounded-lg p-1.5 text-red-500 opacity-0 transition-all hover:bg-red-50 group-hover:opacity-100"
       >
         <Trash2 className="h-4 w-4" />
       </button>
     </div>
-  );
-};
+  )
+}
 
 // ============================================================================
 // Group Editor
 // ============================================================================
 
 const GroupEditor: React.FC<{
-  group: SpecGroup;
-  onChange: (group: SpecGroup) => void;
-  onDelete: () => void;
-  onMoveUp?: () => void;
-  onMoveDown?: () => void;
-  canMoveUp: boolean;
-  canMoveDown: boolean;
+  group: SpecGroup
+  onChange: (group: SpecGroup) => void
+  onDelete: () => void
+  onMoveUp?: () => void
+  onMoveDown?: () => void
+  canMoveUp: boolean
+  canMoveDown: boolean
 }> = ({ group, onChange, onDelete, onMoveUp, onMoveDown, canMoveUp, canMoveDown }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(true)
 
   const addSpec = () => {
     onChange({
@@ -303,20 +310,20 @@ const GroupEditor: React.FC<{
           key: '',
           label: '',
           value: '',
-          type: 'text'
-        }
-      ]
-    });
-  };
+          type: 'text',
+        },
+      ],
+    })
+  }
 
   return (
-    <div className="rounded-xl border-2 border-border-light bg-surface-light/30 overflow-hidden">
+    <div className="overflow-hidden rounded-xl border-2 border-border-light bg-surface-light/30">
       {/* Group Header */}
-      <div className="flex items-center gap-3 bg-white border-b border-border-light p-4">
+      <div className="flex items-center gap-3 border-b border-border-light bg-white p-4">
         {/* Expand/Collapse */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="p-1 hover:bg-surface-light rounded transition-colors"
+          className="rounded p-1 transition-colors hover:bg-surface-light"
         >
           {isExpanded ? (
             <ChevronDown className="h-4 w-4 text-text-muted" />
@@ -329,7 +336,7 @@ const GroupEditor: React.FC<{
         <select
           value={group.icon}
           onChange={(e) => onChange({ ...group, icon: e.target.value })}
-          className="px-2 py-1 text-sm border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
+          className="rounded-lg border border-border-light px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
         >
           {iconOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -344,7 +351,7 @@ const GroupEditor: React.FC<{
           value={group.label}
           onChange={(e) => onChange({ ...group, label: e.target.value })}
           placeholder="Group Label (EN)"
-          className="flex-1 px-3 py-1.5 text-sm font-medium border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
+          className="flex-1 rounded-lg border border-border-light px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
         />
 
         {/* Arabic Label */}
@@ -353,7 +360,7 @@ const GroupEditor: React.FC<{
           value={group.labelAr || ''}
           onChange={(e) => onChange({ ...group, labelAr: e.target.value })}
           placeholder="التسمية (AR)"
-          className="flex-1 px-3 py-1.5 text-sm border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
+          className="flex-1 rounded-lg border border-border-light px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
           dir="rtl"
         />
 
@@ -363,8 +370,10 @@ const GroupEditor: React.FC<{
             onClick={onMoveUp}
             disabled={!canMoveUp}
             className={cn(
-              "p-1.5 rounded transition-colors",
-              canMoveUp ? "hover:bg-surface-light text-text-body" : "text-text-muted/30 cursor-not-allowed"
+              'rounded p-1.5 transition-colors',
+              canMoveUp
+                ? 'text-text-body hover:bg-surface-light'
+                : 'cursor-not-allowed text-text-muted/30'
             )}
           >
             <ChevronUp className="h-4 w-4" />
@@ -373,8 +382,10 @@ const GroupEditor: React.FC<{
             onClick={onMoveDown}
             disabled={!canMoveDown}
             className={cn(
-              "p-1.5 rounded transition-colors",
-              canMoveDown ? "hover:bg-surface-light text-text-body" : "text-text-muted/30 cursor-not-allowed"
+              'rounded p-1.5 transition-colors',
+              canMoveDown
+                ? 'text-text-body hover:bg-surface-light'
+                : 'cursor-not-allowed text-text-muted/30'
             )}
           >
             <ChevronDown className="h-4 w-4" />
@@ -384,7 +395,7 @@ const GroupEditor: React.FC<{
         {/* Delete Group */}
         <button
           onClick={onDelete}
-          className="p-1.5 rounded hover:bg-red-50 text-red-500 transition-colors"
+          className="rounded p-1.5 text-red-500 transition-colors hover:bg-red-50"
         >
           <Trash2 className="h-4 w-4" />
         </button>
@@ -392,28 +403,28 @@ const GroupEditor: React.FC<{
 
       {/* Group Content */}
       {isExpanded && (
-        <div className="p-4 space-y-3">
+        <div className="space-y-3 p-4">
           {group.specs.map((spec, idx) => (
             <SpecItemEditor
               key={idx}
               spec={spec}
               onChange={(updatedSpec) => {
-                const newSpecs = [...group.specs];
-                newSpecs[idx] = updatedSpec;
-                onChange({ ...group, specs: newSpecs });
+                const newSpecs = [...group.specs]
+                newSpecs[idx] = updatedSpec
+                onChange({ ...group, specs: newSpecs })
               }}
               onDelete={() => {
                 onChange({
                   ...group,
-                  specs: group.specs.filter((_, i) => i !== idx)
-                });
+                  specs: group.specs.filter((_, i) => i !== idx),
+                })
               }}
             />
           ))}
 
           <button
             onClick={addSpec}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-border-light rounded-lg text-sm font-medium text-text-muted hover:border-brand-primary hover:text-brand-primary hover:bg-brand-primary/5 transition-all"
+            className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border-light px-4 py-2.5 text-sm font-medium text-text-muted transition-all hover:border-brand-primary hover:bg-brand-primary/5 hover:text-brand-primary"
           >
             <Plus className="h-4 w-4" />
             Add Specification
@@ -421,8 +432,8 @@ const GroupEditor: React.FC<{
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
 // ============================================================================
 // Main Editor Component
@@ -431,13 +442,13 @@ const GroupEditor: React.FC<{
 export const SpecificationsEditor: React.FC<SpecificationsEditorProps> = ({
   value,
   onChange,
-  categoryHint
+  categoryHint,
 }) => {
-  const [viewMode, setViewMode] = useState<'edit' | 'preview' | 'json'>('edit');
-  const [copied, setCopied] = useState(false);
+  const [viewMode, setViewMode] = useState<'edit' | 'preview' | 'json'>('edit')
+  const [copied, setCopied] = useState(false)
 
   const addGroup = () => {
-    const newPriority = value.groups.length + 1;
+    const newPriority = value.groups.length + 1
     onChange({
       ...value,
       groups: [
@@ -446,45 +457,43 @@ export const SpecificationsEditor: React.FC<SpecificationsEditorProps> = ({
           label: '',
           icon: 'star',
           priority: newPriority,
-          specs: []
-        }
-      ]
-    });
-  };
+          specs: [],
+        },
+      ],
+    })
+  }
 
   const loadTemplate = () => {
-    const template = categoryHint && categoryTemplates[categoryHint.toLowerCase()];
+    const template = categoryHint && categoryTemplates[categoryHint.toLowerCase()]
     if (template) {
       onChange({
         ...value,
         ...template,
-        groups: template.groups || []
-      });
+        groups: template.groups || [],
+      })
     }
-  };
+  }
 
   const moveGroup = (index: number, direction: 'up' | 'down') => {
-    const newGroups = [...value.groups];
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    
-    if (targetIndex < 0 || targetIndex >= newGroups.length) return;
+    const newGroups = [...value.groups]
+    const targetIndex = direction === 'up' ? index - 1 : index + 1
 
-    // Swap
-    [newGroups[index], newGroups[targetIndex]] = [newGroups[targetIndex], newGroups[index]];
-    
+    if (targetIndex < 0 || targetIndex >= newGroups.length) return // Swap
+    ;[newGroups[index], newGroups[targetIndex]] = [newGroups[targetIndex], newGroups[index]]
+
     // Update priorities
     newGroups.forEach((group, idx) => {
-      group.priority = idx + 1;
-    });
+      group.priority = idx + 1
+    })
 
-    onChange({ ...value, groups: newGroups });
-  };
+    onChange({ ...value, groups: newGroups })
+  }
 
   const copyJSON = () => {
-    navigator.clipboard.writeText(JSON.stringify(value, null, 2));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+    navigator.clipboard.writeText(JSON.stringify(value, null, 2))
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   return (
     <div className="space-y-4">
@@ -494,10 +503,10 @@ export const SpecificationsEditor: React.FC<SpecificationsEditorProps> = ({
           <button
             onClick={() => setViewMode('edit')}
             className={cn(
-              "px-3 py-1.5 text-sm font-medium rounded-lg transition-colors",
+              'rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
               viewMode === 'edit'
-                ? "bg-brand-primary text-white"
-                : "bg-surface-light text-text-body hover:bg-surface-light/80"
+                ? 'bg-brand-primary text-white'
+                : 'bg-surface-light text-text-body hover:bg-surface-light/80'
             )}
           >
             Edit
@@ -505,10 +514,10 @@ export const SpecificationsEditor: React.FC<SpecificationsEditorProps> = ({
           <button
             onClick={() => setViewMode('preview')}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors",
+              'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
               viewMode === 'preview'
-                ? "bg-brand-primary text-white"
-                : "bg-surface-light text-text-body hover:bg-surface-light/80"
+                ? 'bg-brand-primary text-white'
+                : 'bg-surface-light text-text-body hover:bg-surface-light/80'
             )}
           >
             <Eye className="h-4 w-4" />
@@ -517,10 +526,10 @@ export const SpecificationsEditor: React.FC<SpecificationsEditorProps> = ({
           <button
             onClick={() => setViewMode('json')}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors",
+              'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
               viewMode === 'json'
-                ? "bg-brand-primary text-white"
-                : "bg-surface-light text-text-body hover:bg-surface-light/80"
+                ? 'bg-brand-primary text-white'
+                : 'bg-surface-light text-text-body hover:bg-surface-light/80'
             )}
           >
             <Code className="h-4 w-4" />
@@ -531,7 +540,7 @@ export const SpecificationsEditor: React.FC<SpecificationsEditorProps> = ({
         {categoryHint && categoryTemplates[categoryHint.toLowerCase()] && (
           <button
             onClick={loadTemplate}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-brand-primary to-brand-primary/80 text-white text-sm font-medium rounded-lg hover:shadow-lg transition-all"
+            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-brand-primary to-brand-primary/80 px-4 py-2 text-sm font-medium text-white transition-all hover:shadow-lg"
           >
             <Sparkles className="h-4 w-4" />
             Load {categoryHint} Template
@@ -547,15 +556,15 @@ export const SpecificationsEditor: React.FC<SpecificationsEditorProps> = ({
               key={idx}
               group={group}
               onChange={(updatedGroup) => {
-                const newGroups = [...value.groups];
-                newGroups[idx] = updatedGroup;
-                onChange({ ...value, groups: newGroups });
+                const newGroups = [...value.groups]
+                newGroups[idx] = updatedGroup
+                onChange({ ...value, groups: newGroups })
               }}
               onDelete={() => {
                 onChange({
                   ...value,
-                  groups: value.groups.filter((_, i) => i !== idx)
-                });
+                  groups: value.groups.filter((_, i) => i !== idx),
+                })
               }}
               onMoveUp={() => moveGroup(idx, 'up')}
               onMoveDown={() => moveGroup(idx, 'down')}
@@ -566,7 +575,7 @@ export const SpecificationsEditor: React.FC<SpecificationsEditorProps> = ({
 
           <button
             onClick={addGroup}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-border-light rounded-xl text-sm font-semibold text-text-muted hover:border-brand-primary hover:text-brand-primary hover:bg-brand-primary/5 transition-all"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border-light px-4 py-3 text-sm font-semibold text-text-muted transition-all hover:border-brand-primary hover:bg-brand-primary/5 hover:text-brand-primary"
           >
             <Plus className="h-5 w-5" />
             Add Group
@@ -578,7 +587,7 @@ export const SpecificationsEditor: React.FC<SpecificationsEditorProps> = ({
         <div className="relative">
           <button
             onClick={copyJSON}
-            className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 bg-surface-light/80 backdrop-blur rounded-lg text-sm font-medium hover:bg-surface-light transition-colors"
+            className="absolute right-3 top-3 flex items-center gap-1.5 rounded-lg bg-surface-light/80 px-3 py-1.5 text-sm font-medium backdrop-blur transition-colors hover:bg-surface-light"
           >
             {copied ? (
               <>
@@ -592,13 +601,13 @@ export const SpecificationsEditor: React.FC<SpecificationsEditorProps> = ({
               </>
             )}
           </button>
-          <pre className="p-4 bg-neutral-900 text-emerald-400 rounded-xl text-xs overflow-x-auto">
+          <pre className="overflow-x-auto rounded-xl bg-neutral-900 p-4 text-xs text-emerald-400">
             {JSON.stringify(value, null, 2)}
           </pre>
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default SpecificationsEditor;
+export default SpecificationsEditor

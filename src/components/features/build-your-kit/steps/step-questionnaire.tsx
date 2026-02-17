@@ -32,7 +32,9 @@ export function StepQuestionnaire() {
   const answers = useKitWizardStore((s) => s.answers)
   const setAnswer = useKitWizardStore((s) => s.setAnswer)
 
-  const questions = (Array.isArray(shootTypeData?.questionnaire) ? shootTypeData!.questionnaire : []) as QuestionnaireQuestion[]
+  const questions = (
+    Array.isArray(shootTypeData?.questionnaire) ? shootTypeData!.questionnaire : []
+  ) as QuestionnaireQuestion[]
   const [currentIndex, setCurrentIndex] = useState(0)
   const currentQ = questions[currentIndex]
   const isRtl = typeof document !== 'undefined' && document.documentElement.dir === 'rtl'
@@ -53,7 +55,9 @@ export function StepQuestionnaire() {
       }
     } else {
       const current = (answers[currentQ.id] as string[] | undefined) ?? []
-      const next = current.includes(optionId) ? current.filter((x) => x !== optionId) : [...current, optionId]
+      const next = current.includes(optionId)
+        ? current.filter((x) => x !== optionId)
+        : [...current, optionId]
       setAnswer(currentQ.id, next)
     }
   }
@@ -86,12 +90,13 @@ export function StepQuestionnaire() {
           {isRtl ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </Button>
       </div>
-      <h2 className="text-section-title text-text-heading mb-2">
-        {currentQ.question}
-      </h2>
+      <h2 className="mb-2 text-section-title text-text-heading">{currentQ.question}</h2>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {currentQ.options.map((opt) => {
-          const selected = currentQ.type === 'single_choice' ? currentValue === opt.id : currentArr.includes(opt.id)
+          const selected =
+            currentQ.type === 'single_choice'
+              ? currentValue === opt.id
+              : currentArr.includes(opt.id)
           return (
             <button
               key={opt.id}

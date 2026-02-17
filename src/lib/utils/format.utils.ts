@@ -15,7 +15,7 @@ export function formatCurrency(amount: number, currency: string = 'SAR'): string
 
 export function formatDate(date: string | Date, format: 'short' | 'long' = 'short'): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date
-  
+
   if (format === 'long') {
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
@@ -24,7 +24,7 @@ export function formatDate(date: string | Date, format: 'short' | 'long' = 'shor
       timeZone: 'UTC',
     }).format(dateObj)
   }
-  
+
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'short',
@@ -64,6 +64,6 @@ export function getStatusColor(status: string): string {
     cancelled: 'bg-red-100 text-red-800',
     maintenance: 'bg-yellow-100 text-yellow-800',
   }
-  
+
   return statusColors[status.toLowerCase()] || 'bg-gray-100 text-gray-800'
 }

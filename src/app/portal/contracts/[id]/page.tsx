@@ -17,11 +17,7 @@ import { formatDate } from '@/lib/utils/format.utils'
 import { ArrowRight, FileText, Download } from 'lucide-react'
 import { notFound } from 'next/navigation'
 
-export default async function PortalContractDetailPage({
-  params,
-}: {
-  params: { id: string }
-}) {
+export default async function PortalContractDetailPage({ params }: { params: { id: string } }) {
   const session = await auth()
 
   if (!session?.user?.id) {
@@ -64,32 +60,21 @@ export default async function PortalContractDetailPage({
     notFound()
   }
 
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <Link
             href="/portal/contracts"
-            className="text-sm text-muted-foreground hover:text-foreground mb-2 inline-flex items-center gap-1"
+            className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowRight className="h-4 w-4" />
             العودة إلى العقود
           </Link>
-          <h1 className="text-3xl font-bold">
-            عقد #{contract.id.slice(0, 8)}
-          </h1>
+          <h1 className="text-3xl font-bold">عقد #{contract.id.slice(0, 8)}</h1>
         </div>
-        <Badge
-          variant={
-            contract.signedAt
-              ? 'default'
-              : 'secondary'
-          }
-        >
-          {contract.signedAt
-            ? 'موقع'
-            : 'في انتظار التوقيع'}
+        <Badge variant={contract.signedAt ? 'default' : 'secondary'}>
+          {contract.signedAt ? 'موقع' : 'في انتظار التوقيع'}
         </Badge>
       </div>
 
@@ -104,9 +89,7 @@ export default async function PortalContractDetailPage({
         <CardContent className="space-y-4">
           <div>
             <div className="text-sm text-muted-foreground">رقم الحجز</div>
-            <div className="font-medium">
-              #{contract.booking.bookingNumber}
-            </div>
+            <div className="font-medium">#{contract.booking.bookingNumber}</div>
           </div>
           <div>
             <div className="text-sm text-muted-foreground">تاريخ الإنشاء</div>
@@ -120,11 +103,7 @@ export default async function PortalContractDetailPage({
           )}
           <div>
             <div className="text-sm text-muted-foreground">الحالة</div>
-            <div className="font-medium">
-              {contract.signedAt
-                ? 'موقع'
-                : 'في انتظار التوقيع'}
-            </div>
+            <div className="font-medium">{contract.signedAt ? 'موقع' : 'في انتظار التوقيع'}</div>
           </div>
         </CardContent>
       </Card>
@@ -139,15 +118,16 @@ export default async function PortalContractDetailPage({
             {contract.contractContent ? (
               <div
                 dangerouslySetInnerHTML={{
-                  __html: typeof contract.contractContent === 'string' 
-                    ? contract.contractContent 
-                    : (contract.contractContent as any)?.html || (contract.contractContent as any)?.text || '',
+                  __html:
+                    typeof contract.contractContent === 'string'
+                      ? contract.contractContent
+                      : (contract.contractContent as any)?.html ||
+                        (contract.contractContent as any)?.text ||
+                        '',
                 }}
               />
             ) : (
-              <p className="text-muted-foreground">
-                لا يوجد محتوى للعقد
-              </p>
+              <p className="text-muted-foreground">لا يوجد محتوى للعقد</p>
             )}
           </div>
         </CardContent>
@@ -166,7 +146,7 @@ export default async function PortalContractDetailPage({
               </Link>
             )}
             <Button variant="outline">
-              <Download className="h-4 w-4 ml-2" />
+              <Download className="ml-2 h-4 w-4" />
               تحميل PDF
             </Button>
             <Link href={`/portal/bookings/${contract.bookingId}`}>

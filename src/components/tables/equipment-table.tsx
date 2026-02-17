@@ -60,15 +60,11 @@ export function EquipmentTable({ equipment }: EquipmentTableProps) {
               <TableCell>{item.category}</TableCell>
               <TableCell>{item.brand}</TableCell>
               <TableCell>
-                <Badge className={getStatusColor(item.status)}>
-                  {item.status}
-                </Badge>
+                <Badge className={getStatusColor(item.status)}>{item.status}</Badge>
               </TableCell>
               <TableCell>{item.quantity ?? item.stock}</TableCell>
               <TableCell>
-                {item.boxMissing && (
-                  <Badge variant="destructive">Missing box contents</Badge>
-                )}
+                {item.boxMissing && <Badge variant="destructive">Missing box contents</Badge>}
               </TableCell>
               <TableCell>{formatDate(item.updatedAt)}</TableCell>
               <TableCell className="text-right">

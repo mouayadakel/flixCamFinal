@@ -12,22 +12,16 @@ import { rateLimitAPI } from '@/lib/utils/rate-limit'
 
 export async function POST(request: Request) {
   const rateLimit = rateLimitAPI(request)
-  
+
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: 'Too many requests' },
-      { status: 429 }
-    )
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }
 
   try {
     const session = await auth()
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     if (!(await hasPermission(session.user.id, PERMISSIONS.SYSTEM_CLEAR_CACHE))) {
@@ -41,10 +35,7 @@ export async function POST(request: Request) {
     const { lockId } = body
 
     if (!lockId) {
-      return NextResponse.json(
-        { error: 'Lock ID is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Lock ID is required' }, { status: 400 })
     }
 
     // Release soft lock - lockId is a booking ID
@@ -57,10 +48,7 @@ export async function POST(request: Request) {
     })
 
     if (!booking) {
-      return NextResponse.json(
-        { error: 'Booking not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
     }
 
     if (!booking.softLockExpiresAt) {
@@ -97,9 +85,6 @@ export async function POST(request: Request) {
       bookingId: lockId,
     })
   } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Failed to release lock' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Failed to release lock' }, { status: 500 })
   }
 }

@@ -53,21 +53,15 @@ export function TablePagination({
       : `Showing ${start}-${end} of ${total}${itemLabel ? ` ${itemLabel}` : ''}`
 
   return (
-    <div
-      className="flex flex-wrap items-center justify-between gap-4 py-4"
-      dir={dir}
-    >
+    <div className="flex flex-wrap items-center justify-between gap-4 py-4" dir={dir}>
       <div className="text-sm text-muted-foreground">{showingText}</div>
       <div className="flex items-center gap-4">
         {onPageSizeChange && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground whitespace-nowrap">
+            <span className="whitespace-nowrap text-sm text-muted-foreground">
               {dir === 'rtl' ? 'لكل صفحة:' : 'Per page:'}
             </span>
-            <Select
-              value={String(pageSize)}
-              onValueChange={(v) => onPageSizeChange(Number(v))}
-            >
+            <Select value={String(pageSize)} onValueChange={(v) => onPageSizeChange(Number(v))}>
               <SelectTrigger className="w-[72px]">
                 <SelectValue />
               </SelectTrigger>

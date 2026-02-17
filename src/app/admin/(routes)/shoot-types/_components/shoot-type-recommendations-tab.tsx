@@ -55,12 +55,30 @@ export function ShootTypeRecommendationsTab({
 }: {
   shootTypeId: string
   categorySteps: CategoryStep[]
-  recommendations: { id: string; equipmentId: string; budgetTier: string; reason: string | null; reasonAr: string | null; defaultQuantity: number; isAutoSelect: boolean; sortOrder: number; equipment: { id: string; sku: string; model: string | null; categoryId: string; category: { name: string; slug: string } } }[]
+  recommendations: {
+    id: string
+    equipmentId: string
+    budgetTier: string
+    reason: string | null
+    reasonAr: string | null
+    defaultQuantity: number
+    isAutoSelect: boolean
+    sortOrder: number
+    equipment: {
+      id: string
+      sku: string
+      model: string | null
+      categoryId: string
+      category: { name: string; slug: string }
+    }
+  }[]
   onSaved: () => void
 }) {
   const { toast } = useToast()
   const [saving, setSaving] = useState(false)
-  const [equipmentByCategory, setEquipmentByCategory] = useState<Record<string, EquipmentOption[]>>({})
+  const [equipmentByCategory, setEquipmentByCategory] = useState<Record<string, EquipmentOption[]>>(
+    {}
+  )
   const [recsByCategory, setRecsByCategory] = useState<Record<string, RecItem[]>>({})
 
   useEffect(() => {
@@ -91,13 +109,21 @@ export function ShootTypeRecommendationsTab({
           const data = Array.isArray(json?.data) ? json.data : []
           setEquipmentByCategory((prev) => ({
             ...prev,
-            [cat.categoryId]: data.map((e: { id: string; sku: string; model?: string; dailyPrice: number; category?: { name: string } }) => ({
-              id: e.id,
-              sku: e.sku,
-              model: e.model ?? null,
-              dailyPrice: e.dailyPrice ?? 0,
-              category: e.category ?? { name: '' },
-            })),
+            [cat.categoryId]: data.map(
+              (e: {
+                id: string
+                sku: string
+                model?: string
+                dailyPrice: number
+                category?: { name: string }
+              }) => ({
+                id: e.id,
+                sku: e.sku,
+                model: e.model ?? null,
+                dailyPrice: e.dailyPrice ?? 0,
+                category: e.category ?? { name: '' },
+              })
+            ),
           }))
         })
         .catch(() => {})
@@ -135,10 +161,17 @@ export function ShootTypeRecommendationsTab({
     }))
   }
 
-  const updateRec = (categoryId: string, equipmentId: string, field: keyof RecItem, value: unknown) => {
+  const updateRec = (
+    categoryId: string,
+    equipmentId: string,
+    field: keyof RecItem,
+    value: unknown
+  ) => {
     setRecsByCategory((prev) => ({
       ...prev,
-      [categoryId]: (prev[categoryId] ?? []).map((r) => (r.equipmentId === equipmentId ? { ...r, [field]: value } : r)),
+      [categoryId]: (prev[categoryId] ?? []).map((r) =>
+        r.equipmentId === equipmentId ? { ...r, [field]: value } : r
+      ),
     }))
   }
 
@@ -186,7 +219,9 @@ export function ShootTypeRecommendationsTab({
     <Card>
       <CardHeader>
         <CardTitle>Recommendations</CardTitle>
-        <CardDescription>Per category, add recommended equipment with budget tier and reason.</CardDescription>
+        <CardDescription>
+          Per category, add recommended equipment with budget tier and reason.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue={categorySteps[0]?.categoryId}>
@@ -200,7 +235,12 @@ export function ShootTypeRecommendationsTab({
           {categorySteps.map((cat) => (
             <TabsContent key={cat.id} value={cat.categoryId} className="space-y-4 pt-4">
               <div className="flex items-center justify-between">
-                <Button type="button" variant="outline" size="sm" onClick={() => addRec(cat.categoryId)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => addRec(cat.categoryId)}
+                >
                   <Plus className="h-4 w-4" />
                   Add equipment
                 </Button>
@@ -210,9 +250,17 @@ export function ShootTypeRecommendationsTab({
               </div>
               <div className="space-y-2">
                 {(recsByCategory[cat.categoryId] ?? []).map((r) => (
-                  <div key={r.equipmentId} className="flex flex-wrap items-center gap-2 rounded-lg border p-3">
+                  <div
+                    key={r.equipmentId}
+                    className="flex flex-wrap items-center gap-2 rounded-lg border p-3"
+                  >
                     <span className="font-medium">{r.equipmentName ?? r.equipmentId}</span>
-                    <Select value={r.budgetTier} onValueChange={(v) => updateRec(cat.categoryId, r.equipmentId, 'budgetTier', v)}>
+                    <Select
+                      value={r.budgetTier}
+                      onValueChange={(v) =>
+                        updateRec(cat.categoryId, r.equipmentId, 'budgetTier', v)
+                      }
+                    >
                       <SelectTrigger className="w-[130px]">
                         <SelectValue />
                       </SelectTrigger>
@@ -226,14 +274,40 @@ export function ShootTypeRecommendationsTab({
                       placeholder="Reason (EN)"
                       className="max-w-xs"
                       value={r.reason}
-                      onChange={(e) => updateRec(cat.categoryId, r.equipmentId, 'reason', e.target.value)}
+                      onChange={(e) =>
+                        updateRec(cat.categoryId, r.equipmentId, 'reason', e.target.value)
+                      }
                     />
                     <label className="flex items-center gap-1 text-sm">
-                      <input type="checkbox" checked={r.isAutoSelect} onChange={(e) => updateRec(cat.categoryId, r.equipmentId, 'isAutoSelect', e.target.checked)} />
+                      <input
+                        type="checkbox"
+                        checked={r.isAutoSelect}
+                        onChange={(e) =>
+                          updateRec(cat.categoryId, r.equipmentId, 'isAutoSelect', e.target.checked)
+                        }
+                      />
                       Auto-select
                     </label>
-                    <Input type="number" min={1} className="w-16" value={r.defaultQuantity} onChange={(e) => updateRec(cat.categoryId, r.equipmentId, 'defaultQuantity', parseInt(e.target.value, 10) || 1)} />
-                    <Button type="button" variant="ghost" size="icon" onClick={() => removeRec(cat.categoryId, r.equipmentId)}>
+                    <Input
+                      type="number"
+                      min={1}
+                      className="w-16"
+                      value={r.defaultQuantity}
+                      onChange={(e) =>
+                        updateRec(
+                          cat.categoryId,
+                          r.equipmentId,
+                          'defaultQuantity',
+                          parseInt(e.target.value, 10) || 1
+                        )
+                      }
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeRec(cat.categoryId, r.equipmentId)}
+                    >
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>

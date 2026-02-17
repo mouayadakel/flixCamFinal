@@ -6,8 +6,7 @@
 
 const FETCH_TIMEOUT_MS = 15_000
 const MAX_TEXT_LENGTH = 22_000
-const USER_AGENT =
-  'Mozilla/5.0 (compatible; FlixCamBot/1.0; +https://flixcam.rent)'
+const USER_AGENT = 'Mozilla/5.0 (compatible; FlixCamBot/1.0; +https://flixcam.rent)'
 
 /**
  * Strip HTML to plain text: remove script/style, replace block tags with newline, collapse spaces.
@@ -32,11 +31,7 @@ function htmlToText(html: string): string {
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
   // Collapse whitespace and trim lines
-  s = s
-    .replace(/\s+/g, ' ')
-    .replace(/\n\s+/g, '\n')
-    .replace(/\s+\n/g, '\n')
-    .trim()
+  s = s.replace(/\s+/g, ' ').replace(/\n\s+/g, '\n').replace(/\s+\n/g, '\n').trim()
   return s
 }
 

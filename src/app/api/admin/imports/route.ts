@@ -24,9 +24,9 @@ const getRowNameValue = (row: Record<string, any>) => {
 }
 
 const getExcelRowNumber = (row: Record<string, any>, fallback: number) => {
-  return (row?.rowNumber as number | undefined) ??
-    (row?.__rowNum__ as number | undefined) ??
-    fallback
+  return (
+    (row?.rowNumber as number | undefined) ?? (row?.__rowNum__ as number | undefined) ?? fallback
+  )
 }
 
 // POST /api/admin/imports/excel
@@ -60,11 +60,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unsupported file type' }, { status: 400 })
     }
 
-    const mapping: Array<{ sheetName: string; categoryId: string; subCategoryId?: string | null }> = mappingRaw
-      ? JSON.parse(mappingRaw)
-      : []
-    const selectedSheets: string[] | undefined = selectedSheetsRaw ? JSON.parse(selectedSheetsRaw) : undefined
-    const selectedRows: Record<string, number[]> | undefined = selectedRowsRaw ? JSON.parse(selectedRowsRaw) : undefined
+    const mapping: Array<{ sheetName: string; categoryId: string; subCategoryId?: string | null }> =
+      mappingRaw ? JSON.parse(mappingRaw) : []
+    const selectedSheets: string[] | undefined = selectedSheetsRaw
+      ? JSON.parse(selectedSheetsRaw)
+      : undefined
+    const selectedRows: Record<string, number[]> | undefined = selectedRowsRaw
+      ? JSON.parse(selectedRowsRaw)
+      : undefined
 
     const buffer = Buffer.from(await file.arrayBuffer())
     const wb = XLSX.read(buffer, { type: 'buffer' })
@@ -111,18 +114,19 @@ export async function POST(request: NextRequest) {
       wb.SheetNames.forEach((sheetName) => {
         if (totalRows >= MAX_ROWS) return
         // Filter by selectedSheets if provided
-        if (selectedSheets && selectedSheets.length > 0 && !selectedSheets.includes(sheetName)) return
+        if (selectedSheets && selectedSheets.length > 0 && !selectedSheets.includes(sheetName))
+          return
         if (mappedSheets.size > 0 && !mappedSheets.has(sheetName)) return
-        
+
         const sheet = wb.Sheets[sheetName]
         if (!sheet) return
-        
+
         const data = XLSX.utils.sheet_to_json<Record<string, any>>(sheet, {
           defval: null,
           raw: false,
         })
         const mapEntry = mapping.find((m) => m.sheetName === sheetName)
-        
+
         const sheetSelectedRows = selectedRows?.[sheetName] || []
         const hasRowSelection = sheetSelectedRows.length > 0
 
@@ -176,7 +180,10 @@ export async function POST(request: NextRequest) {
       selectedRows,
     })
 
-    const skippedRowsCount = Object.values(skippedRowsBySheet).reduce((sum, rows) => sum + rows.length, 0)
+    const skippedRowsCount = Object.values(skippedRowsBySheet).reduce(
+      (sum, rows) => sum + rows.length,
+      0
+    )
     return NextResponse.json(
       { jobId: job.id, totalRows, skippedRowsCount, skippedRowsBySheet },
       { status: 201 }

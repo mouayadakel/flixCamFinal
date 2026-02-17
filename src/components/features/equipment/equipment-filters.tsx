@@ -56,7 +56,10 @@ export function EquipmentFilters({ categories, brands }: EquipmentFiltersProps) 
 
   return (
     <div className="flex flex-wrap items-center gap-4">
-      <Select value={categoryId || 'all'} onValueChange={(v) => updateParam('categoryId', v === 'all' ? '' : v)}>
+      <Select
+        value={categoryId || 'all'}
+        onValueChange={(v) => updateParam('categoryId', v === 'all' ? '' : v)}
+      >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder={t('nav.equipment')} />
         </SelectTrigger>
@@ -69,7 +72,10 @@ export function EquipmentFilters({ categories, brands }: EquipmentFiltersProps) 
           ))}
         </SelectContent>
       </Select>
-      <Select value={brandId || 'all'} onValueChange={(v) => updateParam('brandId', v === 'all' ? '' : v)}>
+      <Select
+        value={brandId || 'all'}
+        onValueChange={(v) => updateParam('brandId', v === 'all' ? '' : v)}
+      >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Brand" />
         </SelectTrigger>

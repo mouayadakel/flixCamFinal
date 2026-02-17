@@ -13,10 +13,7 @@ import { DeliveryPolicy } from '@/lib/policies/delivery.policy'
 import { updateDeliveryStatusSchema } from '@/lib/validators/delivery.validator'
 import { ValidationError, ForbiddenError } from '@/lib/errors'
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { bookingId: string } }
-) {
+export async function PATCH(req: NextRequest, { params }: { params: { bookingId: string } }) {
   try {
     const session = await auth()
 
@@ -29,10 +26,7 @@ export async function PATCH(
     // Check policy
     const policy = await DeliveryPolicy.canUpdate(userId)
     if (!policy.allowed) {
-      return NextResponse.json(
-        { error: policy.reason || 'Forbidden' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: policy.reason || 'Forbidden' }, { status: 403 })
     }
 
     const body = await req.json()
@@ -60,17 +54,11 @@ export async function PATCH(
     })
   } catch (error: any) {
     if (error instanceof ValidationError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     if (error instanceof ForbiddenError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 403 })
     }
 
     if (error.name === 'ZodError') {
@@ -81,9 +69,6 @@ export async function PATCH(
     }
 
     console.error('Update delivery status error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

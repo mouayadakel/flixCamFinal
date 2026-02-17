@@ -51,14 +51,20 @@ export default function NewRolePage() {
     fetch('/api/admin/permissions')
       .then((r) => r.json())
       .then((data) => setCategories(data.data || []))
-      .catch(() => toast({ title: 'خطأ', description: 'فشل تحميل الصلاحيات', variant: 'destructive' }))
+      .catch(() =>
+        toast({ title: 'خطأ', description: 'فشل تحميل الصلاحيات', variant: 'destructive' })
+      )
       .finally(() => setLoading(false))
   }, [toast])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.name.trim() || !form.displayName.trim()) {
-      toast({ title: 'بيانات ناقصة', description: 'الاسم واسم العرض مطلوبان', variant: 'destructive' })
+      toast({
+        title: 'بيانات ناقصة',
+        description: 'الاسم واسم العرض مطلوبان',
+        variant: 'destructive',
+      })
       return
     }
     setSubmitting(true)
@@ -93,7 +99,9 @@ export default function NewRolePage() {
   return (
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/admin/settings/roles" className="hover:text-foreground">الأدوار والصلاحيات</Link>
+        <Link href="/admin/settings/roles" className="hover:text-foreground">
+          الأدوار والصلاحيات
+        </Link>
         <ArrowRight className="h-4 w-4 rtl:rotate-180" />
         <span>دور جديد</span>
       </div>
@@ -180,7 +188,7 @@ export default function NewRolePage() {
 
         <div className="flex gap-2">
           <Button type="submit" disabled={submitting}>
-            {submitting ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : null}
+            {submitting ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
             حفظ
           </Button>
           <Button type="button" variant="outline" asChild>

@@ -48,10 +48,7 @@ function shapeRule(r: {
   }
 }
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()
@@ -67,10 +64,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()
@@ -88,10 +82,13 @@ export async function PATCH(
     if (parsed.priority !== undefined) updateData.priority = parsed.priority
     if (parsed.conditions !== undefined) updateData.conditions = parsed.conditions
     if (parsed.adjustmentType !== undefined) updateData.adjustmentType = parsed.adjustmentType
-    if (parsed.adjustmentValue !== undefined) updateData.adjustmentValue = new Decimal(parsed.adjustmentValue)
+    if (parsed.adjustmentValue !== undefined)
+      updateData.adjustmentValue = new Decimal(parsed.adjustmentValue)
     if (parsed.isActive !== undefined) updateData.isActive = parsed.isActive
-    if (parsed.validFrom !== undefined) updateData.validFrom = parsed.validFrom ? new Date(parsed.validFrom) : null
-    if (parsed.validUntil !== undefined) updateData.validUntil = parsed.validUntil ? new Date(parsed.validUntil) : null
+    if (parsed.validFrom !== undefined)
+      updateData.validFrom = parsed.validFrom ? new Date(parsed.validFrom) : null
+    if (parsed.validUntil !== undefined)
+      updateData.validUntil = parsed.validUntil ? new Date(parsed.validUntil) : null
 
     const rule = await prisma.pricingRule.update({
       where: { id },

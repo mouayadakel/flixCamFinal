@@ -18,10 +18,7 @@ export async function GET(request: NextRequest) {
     where: { userId: session.user.id, deletedAt: null, status: 'APPROVED' },
   })
   if (!vendor) {
-    return NextResponse.json(
-      { error: 'Vendor account not found or not approved' },
-      { status: 403 }
-    )
+    return NextResponse.json({ error: 'Vendor account not found or not approved' }, { status: 403 })
   }
 
   const { searchParams } = new URL(request.url)

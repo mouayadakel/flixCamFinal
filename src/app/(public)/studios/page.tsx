@@ -33,7 +33,7 @@ export default async function StudiosListPage() {
   if (!enabled) redirect('/')
   const studios = await getStudios()
   return (
-    <main className="container py-8 px-4">
+    <main className="container px-4 py-8">
       <StudiosListClient studios={studios} />
     </main>
   )

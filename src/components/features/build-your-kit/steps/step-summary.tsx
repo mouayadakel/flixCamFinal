@@ -29,7 +29,10 @@ import {
 import { Minus, Plus, ShoppingCart, Sparkles, Loader2 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
-import { KitPrebuiltComparison, type PrebuiltKitMatch } from '@/components/features/build-your-kit/kit-prebuilt-comparison'
+import {
+  KitPrebuiltComparison,
+  type PrebuiltKitMatch,
+} from '@/components/features/build-your-kit/kit-prebuilt-comparison'
 
 const VAT_RATE = 0.15
 const EQUIPMENT_PLACEHOLDER = '/images/placeholder.jpg'
@@ -80,7 +83,10 @@ export function StepSummary() {
   )
   const byCategory = new Map<
     string,
-    { name: string; entries: [string, { qty: number; dailyPrice: number; model?: string; imageUrl?: string }][] }
+    {
+      name: string
+      entries: [string, { qty: number; dailyPrice: number; model?: string; imageUrl?: string }][]
+    }
   >()
   for (const [id, item] of Object.entries(selectedEquipment)) {
     const catId = item.categoryId ?? 'other'
@@ -183,16 +189,11 @@ export function StepSummary() {
   }, [aiOpen, entries.length, fetchAiSuggestions])
 
   const handleAddSuggestion = (s: EquipmentRecommendationItem) => {
-    addEquipment(
-      s.equipmentId,
-      s.quantity,
-      s.dailyPrice,
-      {
-        model: s.equipmentName,
-        categoryId: undefined,
-        isRecommended: true,
-      }
-    )
+    addEquipment(s.equipmentId, s.quantity, s.dailyPrice, {
+      model: s.equipmentName,
+      categoryId: undefined,
+      isRecommended: true,
+    })
     setAiSuggestions(aiSuggestions?.filter((x) => x.equipmentId !== s.equipmentId) ?? null)
     toast({
       title: t('kit.addSuggestion'),
@@ -236,11 +237,11 @@ export function StepSummary() {
   if (isEmpty) {
     return (
       <div className="animate-fade-in">
-        <h2 className="text-section-title text-text-heading mb-1">{t('kit.summaryTitle')}</h2>
-        <p className="text-body-main text-text-muted mb-6">{t('kit.summaryDesc')}</p>
+        <h2 className="mb-1 text-section-title text-text-heading">{t('kit.summaryTitle')}</h2>
+        <p className="mb-6 text-body-main text-text-muted">{t('kit.summaryDesc')}</p>
         <div className="rounded-xl border border-border-light bg-surface-light p-12 text-center">
-          <ShoppingCart className="mx-auto h-12 w-12 text-text-muted mb-4" />
-          <p className="text-text-body text-text-muted mb-4">{t('kit.emptyKit')}</p>
+          <ShoppingCart className="mx-auto mb-4 h-12 w-12 text-text-muted" />
+          <p className="mb-4 text-text-body text-text-muted">{t('kit.emptyKit')}</p>
           <Button variant="outline" onClick={() => router.push('/build-your-kit')}>
             {t('common.back')}
           </Button>
@@ -251,8 +252,8 @@ export function StepSummary() {
 
   return (
     <div className="animate-fade-in">
-      <h2 className="text-section-title text-text-heading mb-1">{t('kit.summaryTitle')}</h2>
-      <p className="text-body-main text-text-muted mb-6">{t('kit.summaryDesc')}</p>
+      <h2 className="mb-1 text-section-title text-text-heading">{t('kit.summaryTitle')}</h2>
+      <p className="mb-6 text-body-main text-text-muted">{t('kit.summaryDesc')}</p>
 
       {/* Date range */}
       <div className="mb-6 rounded-xl border border-border-light bg-surface-light p-4">
@@ -268,7 +269,7 @@ export function StepSummary() {
       </div>
 
       {/* Per-category breakdown */}
-      <ul className="space-y-6 mb-6">
+      <ul className="mb-6 space-y-6">
         {Array.from(byCategory.entries()).map(([catId, { name, entries: catEntries }]) => {
           const catSubtotal = catEntries.reduce(
             (sum, [, item]) => sum + item.qty * item.dailyPrice,
@@ -276,7 +277,7 @@ export function StepSummary() {
           )
           return (
             <li key={catId}>
-              <h3 className="text-lg font-semibold text-text-heading mb-3">{name}</h3>
+              <h3 className="mb-3 text-lg font-semibold text-text-heading">{name}</h3>
               <ul className="space-y-4">
                 {catEntries.map(([id, item]) => {
                   const lineTotal = item.qty * item.dailyPrice
@@ -296,12 +297,12 @@ export function StepSummary() {
                         />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium text-text-heading truncate">{item.model ?? id}</p>
+                        <p className="truncate font-medium text-text-heading">{item.model ?? id}</p>
                         <p className="text-sm text-text-muted">
                           {formatSar(item.dailyPrice)} / {t('kit.perDay')} × {item.qty}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex shrink-0 items-center gap-2">
                         <div className="flex items-center rounded-lg border border-border-light bg-surface-light">
                           <Button
                             type="button"
@@ -336,13 +337,13 @@ export function StepSummary() {
                             <Plus className="h-4 w-4" />
                           </Button>
                         </div>
-                        <span className="font-semibold w-20 text-end">{formatSar(lineTotal)}</span>
+                        <span className="w-20 text-end font-semibold">{formatSar(lineTotal)}</span>
                       </div>
                     </li>
                   )
                 })}
               </ul>
-              <p className="mt-2 text-sm text-text-muted text-right">
+              <p className="mt-2 text-right text-sm text-text-muted">
                 {name} subtotal: {formatSar(catSubtotal)}/day
               </p>
             </li>
@@ -351,7 +352,7 @@ export function StepSummary() {
       </ul>
 
       {/* Pricing */}
-      <div className="rounded-xl border border-border-light bg-surface-light p-4 space-y-2 mb-6">
+      <div className="mb-6 space-y-2 rounded-xl border border-border-light bg-surface-light p-4">
         <div className="flex justify-between text-sm">
           <span className="text-text-muted">{t('kit.subtotal')}</span>
           <span>{formatSar(subtotal)}</span>
@@ -377,7 +378,7 @@ export function StepSummary() {
       </div>
 
       {/* Add to cart + AI assistant */}
-      <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+      <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
         <Button
           size="lg"
           className="flex-1 bg-brand-primary hover:bg-brand-primary-hover"
@@ -401,7 +402,7 @@ export function StepSummary() {
               {t('kit.aiAssistant')}
             </Button>
           </DialogTrigger>
-          <DialogContent className="w-full sm:max-w-md max-h-[85vh] flex flex-col">
+          <DialogContent className="flex max-h-[85vh] w-full flex-col sm:max-w-md">
             <DialogHeader>
               <DialogTitle>{t('kit.aiAssistant')}</DialogTitle>
             </DialogHeader>
@@ -421,8 +422,8 @@ export function StepSummary() {
                       )}
                     >
                       <p className="font-medium text-text-heading">{s.equipmentName}</p>
-                      <p className="text-sm text-text-muted mb-2">{s.reason}</p>
-                      <p className="text-sm text-text-muted mb-2">
+                      <p className="mb-2 text-sm text-text-muted">{s.reason}</p>
+                      <p className="mb-2 text-sm text-text-muted">
                         {formatSar(s.dailyPrice)}/day · Qty {s.quantity}
                       </p>
                       <Button

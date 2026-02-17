@@ -81,18 +81,14 @@ export default function WarehousePage() {
     <div className="space-y-6" dir="rtl">
       <div>
         <h1 className="text-3xl font-bold">المستودع</h1>
-        <p className="text-muted-foreground mt-2">
-          إدارة عمليات إخراج وإرجاع المعدات
-        </p>
+        <p className="mt-2 text-muted-foreground">إدارة عمليات إخراج وإرجاع المعدات</p>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              جاهز للإخراج
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">جاهز للإخراج</CardTitle>
             <ArrowRight className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -101,17 +97,13 @@ export default function WarehousePage() {
             ) : (
               <div className="text-2xl font-bold">{checkOutQueue.length}</div>
             )}
-            <p className="text-xs text-muted-foreground">
-              حجز جاهز للإخراج
-            </p>
+            <p className="text-xs text-muted-foreground">حجز جاهز للإخراج</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              جاهز للإرجاع
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">جاهز للإرجاع</CardTitle>
             <ArrowLeft className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -120,26 +112,19 @@ export default function WarehousePage() {
             ) : (
               <div className="text-2xl font-bold">{checkInQueue.length}</div>
             )}
-            <p className="text-xs text-muted-foreground">
-              حجز جاهز للإرجاع
-            </p>
+            <p className="text-xs text-muted-foreground">حجز جاهز للإرجاع</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              المخزون
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">المخزون</CardTitle>
             <Box className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">-</div>
             <p className="text-xs text-muted-foreground">
-              <Link
-                href="/admin/ops/warehouse/inventory"
-                className="text-primary hover:underline"
-              >
+              <Link href="/admin/ops/warehouse/inventory" className="text-primary hover:underline">
                 عرض المخزون
               </Link>
             </p>
@@ -151,19 +136,19 @@ export default function WarehousePage() {
       <div className="flex gap-4">
         <Link href="/admin/ops/warehouse/check-out">
           <Button>
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="ml-2 h-4 w-4" />
             إخراج معدات
           </Button>
         </Link>
         <Link href="/admin/ops/warehouse/check-in">
           <Button variant="outline">
-            <ArrowLeft className="h-4 w-4 ml-2" />
+            <ArrowLeft className="ml-2 h-4 w-4" />
             إرجاع معدات
           </Button>
         </Link>
         <Link href="/admin/ops/warehouse/inventory">
           <Button variant="outline">
-            <Package className="h-4 w-4 ml-2" />
+            <Package className="ml-2 h-4 w-4" />
             عرض المخزون
           </Button>
         </Link>
@@ -188,7 +173,7 @@ export default function WarehousePage() {
               <Skeleton className="h-20 w-full" />
             </div>
           ) : checkOutQueue.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">
+            <p className="py-8 text-center text-sm text-muted-foreground">
               لا توجد حجوزات جاهزة للإخراج
             </p>
           ) : (
@@ -196,7 +181,7 @@ export default function WarehousePage() {
               {checkOutQueue.slice(0, 5).map((booking) => (
                 <div
                   key={booking.id}
-                  className="border rounded-lg p-4 hover:bg-neutral-50 transition-colors"
+                  className="rounded-lg border p-4 transition-colors hover:bg-neutral-50"
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -206,15 +191,14 @@ export default function WarehousePage() {
                           {booking.customer.name || booking.customer.email}
                         </span>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {booking.equipment.length} معدات • من{' '}
-                        {formatDate(booking.startDate)} إلى{' '}
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {booking.equipment.length} معدات • من {formatDate(booking.startDate)} إلى{' '}
                         {formatDate(booking.endDate)}
                       </p>
                     </div>
                     <Link href={`/admin/ops/warehouse/check-out?booking=${booking.id}`}>
                       <Button size="sm">
-                        <ArrowRight className="h-4 w-4 ml-2" />
+                        <ArrowRight className="ml-2 h-4 w-4" />
                         إخراج
                       </Button>
                     </Link>
@@ -245,7 +229,7 @@ export default function WarehousePage() {
               <Skeleton className="h-20 w-full" />
             </div>
           ) : checkInQueue.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">
+            <p className="py-8 text-center text-sm text-muted-foreground">
               لا توجد حجوزات جاهزة للإرجاع
             </p>
           ) : (
@@ -253,7 +237,7 @@ export default function WarehousePage() {
               {checkInQueue.slice(0, 5).map((booking) => (
                 <div
                   key={booking.id}
-                  className="border rounded-lg p-4 hover:bg-neutral-50 transition-colors"
+                  className="rounded-lg border p-4 transition-colors hover:bg-neutral-50"
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -263,15 +247,14 @@ export default function WarehousePage() {
                           {booking.customer.name || booking.customer.email}
                         </span>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {booking.equipment.length} معدات • من{' '}
-                        {formatDate(booking.startDate)} إلى{' '}
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {booking.equipment.length} معدات • من {formatDate(booking.startDate)} إلى{' '}
                         {formatDate(booking.endDate)}
                       </p>
                     </div>
                     <Link href={`/admin/ops/warehouse/check-in?booking=${booking.id}`}>
                       <Button size="sm" variant="outline">
-                        <ArrowLeft className="h-4 w-4 ml-2" />
+                        <ArrowLeft className="ml-2 h-4 w-4" />
                         إرجاع
                       </Button>
                     </Link>

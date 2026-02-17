@@ -47,9 +47,12 @@ export default function PortalSavedPage() {
   const handleRemove = async (equipmentId: string) => {
     setRemovingId(equipmentId)
     try {
-      const res = await fetch(`/api/user/saved-gear?equipmentId=${encodeURIComponent(equipmentId)}`, {
-        method: 'DELETE',
-      })
+      const res = await fetch(
+        `/api/user/saved-gear?equipmentId=${encodeURIComponent(equipmentId)}`,
+        {
+          method: 'DELETE',
+        }
+      )
       if (res.ok) setItems((prev) => prev.filter((i) => i.equipment.id !== equipmentId))
     } finally {
       setRemovingId(null)

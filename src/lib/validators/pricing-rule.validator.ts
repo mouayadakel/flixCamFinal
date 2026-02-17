@@ -6,19 +6,28 @@
 
 import { z } from 'zod'
 
-const ruleTypeEnum = z.enum(['SEASONAL', 'DEMAND_BASED', 'DURATION', 'CUSTOMER', 'EARLY_BIRD', 'BUNDLE'])
+const ruleTypeEnum = z.enum([
+  'SEASONAL',
+  'DEMAND_BASED',
+  'DURATION',
+  'CUSTOMER',
+  'EARLY_BIRD',
+  'BUNDLE',
+])
 const adjustmentTypeEnum = z.enum(['PERCENTAGE', 'FIXED', 'REPLACE'])
 
-const conditionsSchema = z.object({
-  dateRange: z.object({ start: z.string(), end: z.string() }).optional(),
-  daysOfWeek: z.array(z.number().min(0).max(6)).optional(),
-  minDuration: z.number().int().min(0).optional(),
-  maxDuration: z.number().int().min(0).optional(),
-  customerSegmentIds: z.array(z.string().cuid()).optional(),
-  equipmentCategoryIds: z.array(z.string().cuid()).optional(),
-  studioIds: z.array(z.string().cuid()).optional(),
-  bookDaysAhead: z.number().int().min(0).optional(),
-}).strict()
+const conditionsSchema = z
+  .object({
+    dateRange: z.object({ start: z.string(), end: z.string() }).optional(),
+    daysOfWeek: z.array(z.number().min(0).max(6)).optional(),
+    minDuration: z.number().int().min(0).optional(),
+    maxDuration: z.number().int().min(0).optional(),
+    customerSegmentIds: z.array(z.string().cuid()).optional(),
+    equipmentCategoryIds: z.array(z.string().cuid()).optional(),
+    studioIds: z.array(z.string().cuid()).optional(),
+    bookDaysAhead: z.number().int().min(0).optional(),
+  })
+  .strict()
 
 export const createPricingRuleSchema = z.object({
   name: z.string().min(1).max(120),

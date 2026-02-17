@@ -4,12 +4,14 @@ Date: 2026-01-28
 Scope: Pages linked from `src/components/layouts/admin-sidebar.tsx`.
 
 ## High-level summary
+
 - Missing routes: `/admin/action-center`, `/admin/approvals`, `/admin/live-ops`, `/admin/kit-builder`, `/admin/dynamic-pricing`, `/admin/ai-recommendations`, `/admin/inventory/brands`.
 - Placeholder/mock data pages: `/admin/calendar`, `/admin/inventory/categories`, `/admin/studios`, `/admin/technicians`, `/admin/settings/roles`.
 - KPI-heavy pages: `/admin/dashboard` (real DB KPIs), `/admin/ops/warehouse` (counts only), `/admin/finance/reports` (revenue KPIs only), `/admin/settings/ai-control` (AI analytics KPIs).
 - Most list pages lack: summary KPIs, advanced filters, bulk actions, export, and deeper insights.
 
 Legend:
+
 - STATUS: IMPLEMENTED | PLACEHOLDER | MISSING
 - DATA: LIVE (API/DB) | MOCK | NONE
 
@@ -18,6 +20,7 @@ Legend:
 ## 1) Command Center
 
 ### /admin/dashboard (Dashboard)
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (Prisma queries for KPIs, revenue series, booking state, recent bookings)
 - Current content/features:
@@ -39,6 +42,7 @@ Legend:
   - Add quick links to Action Center and Live Ops panels
 
 ### /admin/action-center
+
 - STATUS: MISSING
 - DATA: NONE
 - Missing:
@@ -49,6 +53,7 @@ Legend:
   - One-click actions (approve/reject, notify customer, create task)
 
 ### /admin/approvals
+
 - STATUS: MISSING
 - DATA: NONE (APIs exist under `/api/approvals/...`)
 - Missing:
@@ -59,6 +64,7 @@ Legend:
   - Filters by type (discount override, feature flag, refund, etc.)
 
 ### /admin/live-ops
+
 - STATUS: MISSING
 - DATA: NONE
 - Missing:
@@ -73,6 +79,7 @@ Legend:
 ## 2) Booking Engine
 
 ### /admin/quotes
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (`/api/quotes`)
 - Current content/features:
@@ -89,6 +96,7 @@ Legend:
   - Add quick templates and follow-up reminders
 
 ### /admin/bookings
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (`/api/bookings`)
 - Current content/features:
@@ -104,6 +112,7 @@ Legend:
   - Add quick actions (check-out, collect payment, extend)
 
 ### /admin/calendar
+
 - STATUS: PLACEHOLDER
 - DATA: MOCK (`mockBookings`)
 - Current content/features:
@@ -122,6 +131,7 @@ Legend:
 ## 3) Smart Sales Tools
 
 ### /admin/ai
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (AI API endpoints)
 - Current content/features:
@@ -138,6 +148,7 @@ Legend:
   - Provide drop-down selectors and templates to reduce manual IDs
 
 ### /admin/kit-builder
+
 - STATUS: MISSING
 - DATA: NONE (functionality exists inside /admin/ai tab)
 - Missing:
@@ -147,6 +158,7 @@ Legend:
   - Integrate with quote creation
 
 ### /admin/dynamic-pricing
+
 - STATUS: MISSING
 - DATA: NONE
 - Missing:
@@ -156,6 +168,7 @@ Legend:
   - One-click apply + A/B pricing tests
 
 ### /admin/ai-recommendations
+
 - STATUS: MISSING
 - DATA: NONE
 - Missing:
@@ -169,6 +182,7 @@ Legend:
 ## 4) Inventory & Assets
 
 ### /admin/inventory/equipment
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (`/api/equipment`)
 - Current content/features:
@@ -184,6 +198,7 @@ Legend:
   - Add bulk edit and export
 
 ### /admin/inventory/categories
+
 - STATUS: PLACEHOLDER
 - DATA: MOCK (`mockCategories`)
 - Current content/features:
@@ -196,6 +211,7 @@ Legend:
   - Add drag-and-drop hierarchy management
 
 ### /admin/inventory/brands
+
 - STATUS: MISSING
 - DATA: NONE
 - Missing:
@@ -205,6 +221,7 @@ Legend:
   - Brand catalog with linked equipment
 
 ### /admin/studios
+
 - STATUS: PLACEHOLDER
 - DATA: MOCK (in-file array)
 - Current content/features:
@@ -217,6 +234,7 @@ Legend:
   - Add calendar view and quick booking creation
 
 ### /admin/inventory/import
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (import APIs)
 - Current content/features:
@@ -235,6 +253,7 @@ Legend:
 ## 5) Field Operations
 
 ### /admin/ops/warehouse
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (check-in/out queues)
 - Current content/features:
@@ -248,6 +267,7 @@ Legend:
   - Add scan-based flow and exception capture
 
 ### /admin/ops/delivery
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (`/api/delivery`)
 - Current content/features:
@@ -261,6 +281,7 @@ Legend:
   - Add KPI strip (on-time %, failed, in-transit)
 
 ### /admin/technicians
+
 - STATUS: PLACEHOLDER
 - DATA: MOCK (in-file array)
 - Current content/features:
@@ -273,6 +294,7 @@ Legend:
   - Add technician calendar and job assignment drag/drop
 
 ### /admin/maintenance
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (`/api/maintenance`)
 - Current content/features:
@@ -290,6 +312,7 @@ Legend:
 ## 6) Finance & Legal
 
 ### /admin/invoices
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (`/api/invoices`)
 - Current content/features:
@@ -303,6 +326,7 @@ Legend:
   - Add inline pay/collect actions
 
 ### /admin/payments
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (`/api/payments`)
 - Current content/features:
@@ -316,6 +340,7 @@ Legend:
   - Add payment gateway drill-down and export
 
 ### /admin/contracts
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (`/api/contracts`)
 - Current content/features:
@@ -329,6 +354,7 @@ Legend:
   - Add document preview and send/resend
 
 ### /admin/finance/reports
+
 - STATUS: IMPLEMENTED (PARTIAL)
 - DATA: LIVE (`/api/reports/...`)
 - Current content/features:
@@ -347,6 +373,7 @@ Legend:
 ## 7) CRM & Marketing
 
 ### /admin/clients
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (`/api/clients`)
 - Current content/features:
@@ -360,6 +387,7 @@ Legend:
   - Add quick actions (message, create quote)
 
 ### /admin/coupons
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (`/api/coupons`)
 - Current content/features:
@@ -373,6 +401,7 @@ Legend:
   - Add segments and auto-expiry rules
 
 ### /admin/marketing
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (`/api/marketing/campaigns`)
 - Current content/features:
@@ -390,6 +419,7 @@ Legend:
 ## 8) Settings
 
 ### /admin/settings
+
 - STATUS: IMPLEMENTED (NAV ONLY)
 - DATA: NONE
 - Current content/features:
@@ -402,6 +432,7 @@ Legend:
   - Add system health overview
 
 ### /admin/settings/integrations
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (`/api/integrations`)
 - Current content/features:
@@ -416,6 +447,7 @@ Legend:
   - Add event replay and error diagnostics
 
 ### /admin/settings/features
+
 - STATUS: IMPLEMENTED
 - DATA: LIVE (`/api/feature-flags`)
 - Current content/features:
@@ -429,6 +461,7 @@ Legend:
   - Add usage metrics per feature flag
 
 ### /admin/settings/roles
+
 - STATUS: PLACEHOLDER
 - DATA: MOCK (in-file array)
 - Current content/features:
@@ -441,6 +474,7 @@ Legend:
   - Add role-based access report and change history
 
 ### /admin/settings/ai-control
+
 - STATUS: IMPLEMENTED (PARTIAL)
 - DATA: LIVE (`/api/admin/settings/ai`, `/api/admin/ai/analytics`)
 - Current content/features:
@@ -456,6 +490,7 @@ Legend:
 ---
 
 ## Cross-cutting gaps (applies to many pages)
+
 - No consistent KPI strip across list pages
 - Limited pagination, sorting, and export
 - Few bulk actions and workflow shortcuts
@@ -463,8 +498,8 @@ Legend:
 - No global filters (date range, location, business unit)
 
 ## Quick wins (high impact, low effort)
+
 - Add a shared KPI strip component for list pages
 - Add export (CSV) and saved filters
 - Add "last updated" timestamps and refresh buttons
 - Add consistent empty states with recommended next actions
-

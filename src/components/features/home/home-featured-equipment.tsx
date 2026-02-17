@@ -39,20 +39,16 @@ export function HomeFeaturedEquipment({ items }: HomeFeaturedEquipmentProps) {
   }, [])
 
   return (
-    <section className="bg-surface-light py-16 md:py-20 lg:py-24">
+    <section className="bg-surface-light py-10 md:py-14">
       <PublicContainer>
         <div className="mb-8 flex items-end justify-between">
           <div>
-            <h2 className="text-section-title text-text-heading">
-              {t('home.featuredEquipment')}
-            </h2>
-            <p className="mt-2 text-body-main text-text-body">
-              {t('home.heroSubtitle')}
-            </p>
+            <h2 className="text-section-title text-text-heading">{t('home.featuredEquipment')}</h2>
+            <p className="mt-2 text-body-main text-text-body">{t('home.featuredSubtitle')}</p>
           </div>
           <Button
             variant="ghost"
-            className="hidden sm:inline-flex items-center gap-1 text-brand-primary hover:text-brand-primary-hover hover:bg-brand-primary/5 font-semibold transition-colors"
+            className="hidden items-center gap-1 font-semibold text-brand-primary transition-colors hover:bg-brand-primary/5 hover:text-brand-primary-hover sm:inline-flex"
             asChild
           >
             <Link href="/equipment">
@@ -61,14 +57,14 @@ export function HomeFeaturedEquipment({ items }: HomeFeaturedEquipmentProps) {
             </Link>
           </Button>
         </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
-          {items.slice(0, 4).map((item, index) => {
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:gap-6 lg:grid-cols-4">
+          {items.slice(0, 8).map((item, index) => {
             const soldOut = (item.quantityAvailable ?? 0) <= 0
             return (
               <Link
                 key={item.id}
                 href={`/equipment/${item.id}`}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-border-light/60 bg-white shadow-card transition-all duration-350 hover:-translate-y-1.5 hover:shadow-card-hover opacity-0 animate-fade-in-up"
+                className="group flex animate-fade-in-up flex-col overflow-hidden rounded-2xl border border-border-light/60 bg-white opacity-0 shadow-card transition-all duration-350 hover:-translate-y-1.5 hover:shadow-card-hover"
                 style={{ animationDelay: `${0.1 * index}s` }}
               >
                 <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-surface-light">
@@ -87,19 +83,19 @@ export function HomeFeaturedEquipment({ items }: HomeFeaturedEquipmentProps) {
                   )}
                   {/* Hover overlay */}
                   <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/30">
-                    <span className="flex items-center gap-2 rounded-full bg-white/90 px-5 py-2.5 text-sm font-semibold text-text-heading opacity-0 translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 shadow-lg backdrop-blur-sm">
+                    <span className="flex translate-y-2 items-center gap-2 rounded-full bg-white/90 px-5 py-2.5 text-sm font-semibold text-text-heading opacity-0 shadow-lg backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                       <Eye className="h-4 w-4" />
-                      {t('common.viewDetails') ?? 'View Details'}
+                      {t('common.viewDetails')}
                     </span>
                   </div>
                   {/* Status badges */}
                   {soldOut && (
-                    <span className="absolute top-3 end-3 rounded-lg bg-sold-out/90 px-3 py-1 text-label-small uppercase text-white backdrop-blur-sm">
+                    <span className="absolute end-3 top-3 rounded-lg bg-sold-out/90 px-3 py-1 text-label-small uppercase text-white backdrop-blur-sm">
                       {t('common.unavailable')}
                     </span>
                   )}
                   {!soldOut && index === 0 && (
-                    <span className="absolute top-3 start-3 rounded-lg bg-brand-primary px-3 py-1 text-label-small uppercase text-white shadow-sm">
+                    <span className="absolute start-3 top-3 rounded-lg bg-brand-primary px-3 py-1 text-label-small uppercase text-white shadow-sm">
                       Featured
                     </span>
                   )}
@@ -108,10 +104,10 @@ export function HomeFeaturedEquipment({ items }: HomeFeaturedEquipmentProps) {
                   <p className="text-label-small uppercase tracking-wider text-text-muted">
                     {item.brand?.name ?? item.category?.name ?? '—'}
                   </p>
-                  <p className="mt-1.5 truncate text-card-title text-text-heading group-hover:text-brand-primary transition-colors">
+                  <p className="mt-1.5 truncate text-card-title text-text-heading transition-colors group-hover:text-brand-primary">
                     {item.model ?? item.sku ?? item.id}
                   </p>
-                  <div className="mt-3 flex items-baseline gap-1.5 pt-3 border-t border-border-light/60">
+                  <div className="mt-3 flex items-baseline gap-1.5 border-t border-border-light/60 pt-3">
                     <span className="text-price-tag text-brand-primary">
                       {item.dailyPrice > 0
                         ? `${Number(item.dailyPrice).toLocaleString()} SAR`
@@ -130,7 +126,7 @@ export function HomeFeaturedEquipment({ items }: HomeFeaturedEquipmentProps) {
         <div className="mt-8 text-center sm:hidden">
           <Button
             variant="outline"
-            className="border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white rounded-xl px-8 transition-all"
+            className="rounded-xl border-brand-primary px-8 text-brand-primary transition-all hover:bg-brand-primary hover:text-white"
             asChild
           >
             <Link href="/equipment">

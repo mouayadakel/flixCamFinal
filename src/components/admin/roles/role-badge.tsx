@@ -17,13 +17,7 @@ interface RoleBadgeProps {
   className?: string
 }
 
-export function RoleBadge({
-  name,
-  displayName,
-  displayNameAr,
-  color,
-  className,
-}: RoleBadgeProps) {
+export function RoleBadge({ name, displayName, displayNameAr, color, className }: RoleBadgeProps) {
   const label = displayNameAr || displayName || name
   const style = color
     ? { backgroundColor: `${color}20`, color: color, borderColor: `${color}40` }

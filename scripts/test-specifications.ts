@@ -143,9 +143,7 @@ async function runComprehensiveTests(): Promise<TestResults> {
     if (isStructuredSpecifications(item.specifications)) {
       results.summary.structured++
       const validationStart = Date.now()
-      const validation = validateSpecifications(
-        item.specifications as StructuredSpecifications
-      )
+      const validation = validateSpecifications(item.specifications as StructuredSpecifications)
       validationTimes.push(Date.now() - validationStart)
       results.validationTests.tested++
       if (validation.valid) {
@@ -265,10 +263,7 @@ function generateRecommendations(results: TestResults) {
     )
   }
 
-  const completePct = (
-    (summary.structured / summary.total) *
-    100
-  ).toFixed(1)
+  const completePct = ((summary.structured / summary.total) * 100).toFixed(1)
   if (summary.structured === summary.total) {
     results.recommendations.push(
       `All equipment (${summary.total}) have structured specifications - excellent!`
@@ -278,13 +273,9 @@ function generateRecommendations(results: TestResults) {
       `${completePct}% of equipment have structured specifications - good coverage`
     )
   } else if (parseFloat(completePct) > 50) {
-    results.recommendations.push(
-      `${completePct}% structured - consider bulk conversion to improve`
-    )
+    results.recommendations.push(`${completePct}% structured - consider bulk conversion to improve`)
   } else {
-    results.recommendations.push(
-      `Only ${completePct}% structured - bulk conversion recommended`
-    )
+    results.recommendations.push(`Only ${completePct}% structured - bulk conversion recommended`)
   }
 }
 
@@ -303,12 +294,10 @@ function printResults(results: TestResults, totalTime: number) {
     console.log(`  Attempted:  ${results.conversionTests.attempted}`)
     console.log(`  Success:    ${results.conversionTests.successful}`)
     console.log(`  Failed:     ${results.conversionTests.failed.length}`)
-    const rate =
-      (
-        (results.conversionTests.successful /
-          results.conversionTests.attempted) *
-        100
-      ).toFixed(1)
+    const rate = (
+      (results.conversionTests.successful / results.conversionTests.attempted) *
+      100
+    ).toFixed(1)
     console.log(`  Success Rate: ${rate}%`)
     if (results.conversionTests.failed.length > 0) {
       console.log('\n  Failed Conversions:')
@@ -317,9 +306,7 @@ function printResults(results: TestResults, totalTime: number) {
         console.log(`       Error: ${f.error}`)
       })
       if (results.conversionTests.failed.length > 5) {
-        console.log(
-          `    ... and ${results.conversionTests.failed.length - 5} more`
-        )
+        console.log(`    ... and ${results.conversionTests.failed.length - 5} more`)
       }
     }
   }
@@ -341,9 +328,7 @@ function printResults(results: TestResults, totalTime: number) {
         f.errors.forEach((err) => console.log(`       - ${err}`))
       })
       if (results.validationTests.failed.length > 5) {
-        console.log(
-          `    ... and ${results.validationTests.failed.length - 5} more`
-        )
+        console.log(`    ... and ${results.validationTests.failed.length - 5} more`)
       }
     }
   }
@@ -373,11 +358,9 @@ runComprehensiveTests()
   .then((results) => {
     const hasCriticalFailures =
       results.summary.invalid > 0 ||
-      results.conversionTests.failed.length >
-        results.conversionTests.attempted * 0.2 ||
+      results.conversionTests.failed.length > results.conversionTests.attempted * 0.2 ||
       (results.validationTests.tested > 0 &&
-        results.validationTests.failed.length >
-          results.validationTests.tested * 0.2)
+        results.validationTests.failed.length > results.validationTests.tested * 0.2)
     process.exit(hasCriticalFailures ? 1 : 0)
   })
   .catch((error) => {

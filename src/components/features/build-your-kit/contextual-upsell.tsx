@@ -53,7 +53,8 @@ export function ContextualUpsell() {
   const hasCamera = categorySteps.some(
     (s) =>
       selectedCategoryIds.has(s.categoryId) &&
-      (s.categoryName.toLowerCase().includes('camera') || s.stepTitle?.toLowerCase().includes('camera'))
+      (s.categoryName.toLowerCase().includes('camera') ||
+        s.stepTitle?.toLowerCase().includes('camera'))
   )
   const missingLens = missingCategories.find(
     (s) =>
@@ -129,8 +130,10 @@ export function ContextualUpsell() {
             key={rule.id}
             className={cn(
               'flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4',
-              rule.variant === 'warning' && 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30',
-              rule.variant === 'success' && 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30',
+              rule.variant === 'warning' &&
+                'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30',
+              rule.variant === 'success' &&
+                'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30',
               rule.variant === 'default' && 'border-border-light bg-surface-light'
             )}
           >

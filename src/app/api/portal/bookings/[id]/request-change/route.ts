@@ -16,10 +16,7 @@ export const dynamic = 'force-dynamic'
  * POST /api/portal/bookings/[id]/request-change
  * Customer submits a change request for their booking.
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.id) {
@@ -68,10 +65,7 @@ export async function POST(
     })
   } catch (error) {
     if (error && typeof error === 'object' && 'name' in error && error.name === 'ZodError') {
-      return NextResponse.json(
-        { error: 'بيانات غير صالحة', details: error },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'بيانات غير صالحة', details: error }, { status: 400 })
     }
     console.error('Portal request-change error:', error)
     return NextResponse.json(

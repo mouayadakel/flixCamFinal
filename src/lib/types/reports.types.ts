@@ -6,7 +6,13 @@
  * @created 2026-01-28
  */
 
-export type ReportType = 'revenue' | 'bookings' | 'equipment' | 'customers' | 'financial' | 'inventory'
+export type ReportType =
+  | 'revenue'
+  | 'bookings'
+  | 'equipment'
+  | 'customers'
+  | 'financial'
+  | 'inventory'
 export type ReportPeriod = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly' | 'custom'
 
 export interface ReportFilter {

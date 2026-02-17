@@ -11,16 +11,21 @@ import { prisma } from '@/lib/db/prisma'
 import { AuditService } from './audit.service'
 import { BookingService } from './booking.service'
 import { EventBus } from '@/lib/events/event-bus'
-import {
-  NotFoundError,
-  ValidationError,
-  ForbiddenError,
-} from '@/lib/errors'
+import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission } from '@/lib/auth/permissions'
-import { DeliveryType as PrismaDeliveryType, DeliveryStatus as PrismaDeliveryStatus } from '@prisma/client'
+import {
+  DeliveryType as PrismaDeliveryType,
+  DeliveryStatus as PrismaDeliveryStatus,
+} from '@prisma/client'
 
 export type DeliveryType = 'pickup' | 'return'
-export type DeliveryStatus = 'pending' | 'scheduled' | 'in_transit' | 'delivered' | 'failed' | 'cancelled'
+export type DeliveryStatus =
+  | 'pending'
+  | 'scheduled'
+  | 'in_transit'
+  | 'delivered'
+  | 'failed'
+  | 'cancelled'
 
 export interface DeliveryCreateInput {
   bookingId: string
@@ -141,10 +146,14 @@ export class DeliveryService {
     }
 
     if (input.type === 'pickup' && booking.status !== 'CONFIRMED' && booking.status !== 'ACTIVE') {
-      throw new ValidationError(`Cannot schedule pickup delivery for booking in ${booking.status} status`)
+      throw new ValidationError(
+        `Cannot schedule pickup delivery for booking in ${booking.status} status`
+      )
     }
     if (input.type === 'return' && booking.status !== 'ACTIVE' && booking.status !== 'RETURNED') {
-      throw new ValidationError(`Cannot schedule return delivery for booking in ${booking.status} status`)
+      throw new ValidationError(
+        `Cannot schedule return delivery for booking in ${booking.status} status`
+      )
     }
 
     if (input.driverId) {

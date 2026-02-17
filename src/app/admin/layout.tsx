@@ -10,22 +10,18 @@ import { AdminBreadcrumbs } from '@/components/layouts/admin-breadcrumbs'
 import { ProtectedRoute } from '@/components/auth/protected-route'
 import { Suspense } from 'react'
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen w-full overflow-hidden bg-neutral-50" dir="rtl">
       {/* Sidebar */}
-      <Suspense fallback={<div className="w-64 bg-white border-l" />}>
+      <Suspense fallback={<div className="w-64 border-l bg-white" />}>
         <AdminSidebar />
       </Suspense>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col overflow-hidden min-w-0 lg:mr-0">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden lg:mr-0">
         {/* Header */}
-        <Suspense fallback={<div className="h-16 bg-white border-b" />}>
+        <Suspense fallback={<div className="h-16 border-b bg-white" />}>
           <AdminHeader />
         </Suspense>
 

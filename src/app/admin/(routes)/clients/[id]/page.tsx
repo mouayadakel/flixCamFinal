@@ -9,11 +9,11 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { 
-  ArrowRight, 
-  User, 
-  Mail, 
-  Phone, 
+import {
+  ArrowRight,
+  User,
+  Mail,
+  Phone,
   Calendar,
   DollarSign,
   Package,
@@ -27,7 +27,7 @@ import {
   CreditCard,
   ShieldCheck,
   ShieldX,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -162,24 +162,25 @@ export default function ClientDetailPage() {
       }
       const data = await response.json()
       setClient(data.data || data)
-      
+
       // Calculate stats
       const bookings = data.data?.bookings || data.bookings || []
       const payments = data.data?.payments || data.payments || []
-      
+
       const totalSpent = payments
         .filter((p: any) => p.status === 'SUCCESS')
         .reduce((sum: number, p: any) => sum + Number(p.amount), 0)
-      
-      const activeBookings = bookings.filter((b: any) => 
+
+      const activeBookings = bookings.filter((b: any) =>
         ['CONFIRMED', 'ACTIVE'].includes(b.status)
       ).length
-      
-      const lastBooking = bookings.length > 0 
-        ? bookings.sort((a: any, b: any) => 
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          )[0]
-        : null
+
+      const lastBooking =
+        bookings.length > 0
+          ? bookings.sort(
+              (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            )[0]
+          : null
 
       setStats({
         totalBookings: bookings.length,
@@ -214,7 +215,9 @@ export default function ClientDetailPage() {
     }
   }
 
-  const handleVerificationStatusChange = async (status: 'VERIFIED' | 'REJECTED' | 'PENDING' | 'UNVERIFIED') => {
+  const handleVerificationStatusChange = async (
+    status: 'VERIFIED' | 'REJECTED' | 'PENDING' | 'UNVERIFIED'
+  ) => {
     if (!params?.id) return
     try {
       const res = await fetch(`/api/clients/${params.id}/verification`, {
@@ -226,11 +229,19 @@ export default function ClientDetailPage() {
       toast({ title: 'Success', description: 'Verification status updated' })
       loadVerification()
     } catch {
-      toast({ title: 'Error', description: 'Failed to update verification status', variant: 'destructive' })
+      toast({
+        title: 'Error',
+        description: 'Failed to update verification status',
+        variant: 'destructive',
+      })
     }
   }
 
-  const handleDocumentReview = async (docId: string, status: 'approved' | 'rejected', rejectionReason?: string) => {
+  const handleDocumentReview = async (
+    docId: string,
+    status: 'approved' | 'rejected',
+    rejectionReason?: string
+  ) => {
     try {
       const res = await fetch(`/api/verification-documents/${docId}`, {
         method: 'PATCH',
@@ -304,8 +315,10 @@ export default function ClientDetailPage() {
     return (
       <div className="space-y-6" dir="rtl">
         <Skeleton className="h-8 w-64" />
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-24" />)}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-24" />
+          ))}
         </div>
         <Skeleton className="h-96" />
       </div>
@@ -314,8 +327,8 @@ export default function ClientDetailPage() {
 
   if (!client) {
     return (
-      <div className="text-center py-12" dir="rtl">
-        <AlertCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+      <div className="py-12 text-center" dir="rtl">
+        <AlertCircle className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
         <p className="text-lg font-medium">العميل غير موجود</p>
         <Button asChild className="mt-4">
           <Link href="/admin/clients">العودة إلى العملاء</Link>
@@ -331,11 +344,11 @@ export default function ClientDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <User className="h-8 w-8" />
             {client.name || client.email}
           </h1>
-          <div className="flex items-center gap-2 mt-2">
+          <div className="mt-2 flex items-center gap-2">
             <Badge className={statusConfig.color}>{statusConfig.label}</Badge>
             <span className="text-muted-foreground">•</span>
             <span className="text-muted-foreground">عميل منذ {formatDate(client.createdAt)}</span>
@@ -344,20 +357,20 @@ export default function ClientDetailPage() {
         <div className="flex gap-2">
           <Button variant="outline" asChild>
             <Link href="/admin/clients">
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <ArrowRight className="ml-2 h-4 w-4" />
               العودة
             </Link>
           </Button>
           <Button variant="outline" asChild>
             <Link href={`/admin/clients/${client.id}/edit`}>
-              <Edit className="h-4 w-4 ml-2" />
+              <Edit className="ml-2 h-4 w-4" />
               تعديل
             </Link>
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" disabled={deleting}>
-                <Trash2 className="h-4 w-4 ml-2" />
+                <Trash2 className="ml-2 h-4 w-4" />
                 حذف
               </Button>
             </AlertDialogTrigger>
@@ -370,7 +383,10 @@ export default function ClientDetailPage() {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  className="bg-destructive text-destructive-foreground"
+                >
                   حذف
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -380,7 +396,7 @@ export default function ClientDetailPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
@@ -419,7 +435,9 @@ export default function ClientDetailPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">متوسط قيمة الحجز</p>
-                <p className="text-2xl font-bold">{formatCurrency(stats?.averageBookingValue || 0)}</p>
+                <p className="text-2xl font-bold">
+                  {formatCurrency(stats?.averageBookingValue || 0)}
+                </p>
               </div>
               <CreditCard className="h-8 w-8 text-orange-500 opacity-50" />
             </div>
@@ -433,13 +451,15 @@ export default function ClientDetailPage() {
           <TabsTrigger value="info">المعلومات</TabsTrigger>
           <TabsTrigger value="bookings">الحجوزات ({client.bookings?.length || 0})</TabsTrigger>
           <TabsTrigger value="payments">المدفوعات</TabsTrigger>
-          <TabsTrigger value="verification" onClick={() => !verification && loadVerification()}>التحقق</TabsTrigger>
+          <TabsTrigger value="verification" onClick={() => !verification && loadVerification()}>
+            التحقق
+          </TabsTrigger>
           <TabsTrigger value="actions">الإجراءات</TabsTrigger>
         </TabsList>
 
         {/* Info Tab */}
         <TabsContent value="info" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>معلومات الاتصال</CardTitle>
@@ -457,7 +477,9 @@ export default function ClientDetailPage() {
                     <Phone className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <p className="text-sm text-muted-foreground">الهاتف</p>
-                      <p className="font-medium" dir="ltr">{client.phone}</p>
+                      <p className="font-medium" dir="ltr">
+                        {client.phone}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -466,7 +488,9 @@ export default function ClientDetailPage() {
                     <MapPin className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <p className="text-sm text-muted-foreground">العنوان</p>
-                      <p className="font-medium">{[client.address, client.city].filter(Boolean).join(', ')}</p>
+                      <p className="font-medium">
+                        {[client.address, client.city].filter(Boolean).join(', ')}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -510,14 +534,16 @@ export default function ClientDetailPage() {
                     <User className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <p className="text-sm text-muted-foreground">شريحة العملاء</p>
-                      <p className="font-medium">{client.segmentName ?? (client as any).segment?.name}</p>
+                      <p className="font-medium">
+                        {client.segmentName ?? (client as any).segment?.name}
+                      </p>
                     </div>
                   </div>
                 )}
                 {client.notes && (
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">ملاحظات</p>
-                    <p className="text-sm bg-muted p-3 rounded-lg">{client.notes}</p>
+                    <p className="mb-1 text-sm text-muted-foreground">ملاحظات</p>
+                    <p className="rounded-lg bg-muted p-3 text-sm">{client.notes}</p>
                   </div>
                 )}
               </CardContent>
@@ -532,16 +558,14 @@ export default function ClientDetailPage() {
               <div className="flex items-center justify-between">
                 <CardTitle>سجل الحجوزات</CardTitle>
                 <Button asChild>
-                  <Link href={`/admin/bookings/new?customerId=${client.id}`}>
-                    حجز جديد
-                  </Link>
+                  <Link href={`/admin/bookings/new?customerId=${client.id}`}>حجز جديد</Link>
                 </Button>
               </div>
             </CardHeader>
             <CardContent>
               {!client.bookings || client.bookings.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <div className="py-8 text-center text-muted-foreground">
+                  <Calendar className="mx-auto mb-4 h-12 w-12 opacity-50" />
                   <p>لا توجد حجوزات</p>
                 </div>
               ) : (
@@ -558,7 +582,10 @@ export default function ClientDetailPage() {
                   </TableHeader>
                   <TableBody>
                     {client.bookings.map((booking) => {
-                      const statusConf = BOOKING_STATUS_CONFIG[booking.status] || { label: booking.status, color: 'bg-gray-100' }
+                      const statusConf = BOOKING_STATUS_CONFIG[booking.status] || {
+                        label: booking.status,
+                        color: 'bg-gray-100',
+                      }
                       return (
                         <TableRow key={booking.id}>
                           <TableCell className="font-mono">{booking.bookingNumber}</TableCell>
@@ -570,7 +597,9 @@ export default function ClientDetailPage() {
                           <TableCell>{formatCurrency(booking.totalAmount)}</TableCell>
                           <TableCell>
                             <Link href={`/admin/bookings/${booking.id}`}>
-                              <Button size="sm" variant="ghost">عرض</Button>
+                              <Button size="sm" variant="ghost">
+                                عرض
+                              </Button>
                             </Link>
                           </TableCell>
                         </TableRow>
@@ -591,36 +620,55 @@ export default function ClientDetailPage() {
                 <ShieldCheck className="h-5 w-5" />
                 التحقق من الهوية
               </CardTitle>
-              <CardDescription>حالة التحقق ومستندات العميل. وافق أو ارفض المستندات أو الحالة الإجمالية.</CardDescription>
+              <CardDescription>
+                حالة التحقق ومستندات العميل. وافق أو ارفض المستندات أو الحالة الإجمالية.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {verificationLoading ? (
                 <Skeleton className="h-32 w-full" />
               ) : verification ? (
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Badge className={
-                      verification.verificationStatus === 'VERIFIED' ? 'bg-green-100 text-green-800' :
-                      verification.verificationStatus === 'REJECTED' ? 'bg-red-100 text-red-800' :
-                      verification.verificationStatus === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-800'
-                    }>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge
+                      className={
+                        verification.verificationStatus === 'VERIFIED'
+                          ? 'bg-green-100 text-green-800'
+                          : verification.verificationStatus === 'REJECTED'
+                            ? 'bg-red-100 text-red-800'
+                            : verification.verificationStatus === 'PENDING'
+                              ? 'bg-amber-100 text-amber-800'
+                              : 'bg-gray-100 text-gray-800'
+                      }
+                    >
                       {verification.verificationStatus}
                     </Badge>
                     {verification.verificationStatus !== 'VERIFIED' && (
-                      <Button size="sm" variant="outline" onClick={() => handleVerificationStatusChange('VERIFIED')}>
-                        <CheckCircle className="h-4 w-4 mr-1" /> اعتماد
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleVerificationStatusChange('VERIFIED')}
+                      >
+                        <CheckCircle className="mr-1 h-4 w-4" /> اعتماد
                       </Button>
                     )}
                     {verification.verificationStatus !== 'REJECTED' && (
-                      <Button size="sm" variant="outline" onClick={() => handleVerificationStatusChange('REJECTED')}>
-                        <ShieldX className="h-4 w-4 mr-1" /> رفض
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleVerificationStatusChange('REJECTED')}
+                      >
+                        <ShieldX className="mr-1 h-4 w-4" /> رفض
                       </Button>
                     )}
                   </div>
                   <div>
-                    <h4 className="font-medium mb-2">المستندات</h4>
+                    <h4 className="mb-2 font-medium">المستندات</h4>
                     {verification.documents.length === 0 ? (
-                      <p className="text-muted-foreground text-sm">لا توجد مستندات مرفوعة. استخدم واجهة رفع الملفات ثم أضف الرابط هنا أو أضف مستنداً عبر API.</p>
+                      <p className="text-sm text-muted-foreground">
+                        لا توجد مستندات مرفوعة. استخدم واجهة رفع الملفات ثم أضف الرابط هنا أو أضف
+                        مستنداً عبر API.
+                      </p>
                     ) : (
                       <Table>
                         <TableHeader>
@@ -636,7 +684,15 @@ export default function ClientDetailPage() {
                             <TableRow key={doc.id}>
                               <TableCell>{doc.documentType}</TableCell>
                               <TableCell>
-                                <Badge variant={doc.status === 'approved' ? 'default' : doc.status === 'rejected' ? 'destructive' : 'secondary'}>
+                                <Badge
+                                  variant={
+                                    doc.status === 'approved'
+                                      ? 'default'
+                                      : doc.status === 'rejected'
+                                        ? 'destructive'
+                                        : 'secondary'
+                                  }
+                                >
                                   {doc.status}
                                 </Badge>
                               </TableCell>
@@ -650,8 +706,20 @@ export default function ClientDetailPage() {
                                   </Button>
                                   {doc.status === 'pending' && (
                                     <>
-                                      <Button size="sm" variant="outline" onClick={() => handleDocumentReview(doc.id, 'approved')}>اعتماد</Button>
-                                      <Button size="sm" variant="outline" onClick={() => handleDocumentReview(doc.id, 'rejected')}>رفض</Button>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => handleDocumentReview(doc.id, 'approved')}
+                                      >
+                                        اعتماد
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => handleDocumentReview(doc.id, 'rejected')}
+                                      >
+                                        رفض
+                                      </Button>
                                     </>
                                   )}
                                 </div>
@@ -664,7 +732,7 @@ export default function ClientDetailPage() {
                   </div>
                 </div>
               ) : (
-                <p className="text-muted-foreground text-sm">اختر تبويب التحقق لتحميل البيانات.</p>
+                <p className="text-sm text-muted-foreground">اختر تبويب التحقق لتحميل البيانات.</p>
               )}
             </CardContent>
           </Card>
@@ -678,8 +746,8 @@ export default function ClientDetailPage() {
             </CardHeader>
             <CardContent>
               {!client.payments || client.payments.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <CreditCard className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <div className="py-8 text-center text-muted-foreground">
+                  <CreditCard className="mx-auto mb-4 h-12 w-12 opacity-50" />
                   <p>لا توجد مدفوعات</p>
                 </div>
               ) : (
@@ -694,7 +762,9 @@ export default function ClientDetailPage() {
                   <TableBody>
                     {client.payments.map((payment) => (
                       <TableRow key={payment.id}>
-                        <TableCell className="font-medium">{formatCurrency(payment.amount)}</TableCell>
+                        <TableCell className="font-medium">
+                          {formatCurrency(payment.amount)}
+                        </TableCell>
                         <TableCell>
                           <Badge variant={payment.status === 'SUCCESS' ? 'default' : 'secondary'}>
                             {payment.status === 'SUCCESS' ? 'ناجح' : payment.status}
@@ -721,36 +791,36 @@ export default function ClientDetailPage() {
               <div className="flex flex-wrap gap-2">
                 {client.status !== 'active' && (
                   <Button onClick={() => handleStatusChange('active')}>
-                    <CheckCircle className="h-4 w-4 ml-2" />
+                    <CheckCircle className="ml-2 h-4 w-4" />
                     تفعيل العميل
                   </Button>
                 )}
                 {client.status !== 'suspended' && (
                   <Button variant="outline" onClick={() => handleStatusChange('suspended')}>
-                    <AlertCircle className="h-4 w-4 ml-2" />
+                    <AlertCircle className="ml-2 h-4 w-4" />
                     تعليق العميل
                   </Button>
                 )}
                 {client.status !== 'inactive' && (
                   <Button variant="outline" onClick={() => handleStatusChange('inactive')}>
-                    <Clock className="h-4 w-4 ml-2" />
+                    <Clock className="ml-2 h-4 w-4" />
                     إلغاء التفعيل
                   </Button>
                 )}
               </div>
-              
-              <div className="border-t pt-4 mt-4">
-                <h4 className="font-medium mb-2">إجراءات أخرى</h4>
+
+              <div className="mt-4 border-t pt-4">
+                <h4 className="mb-2 font-medium">إجراءات أخرى</h4>
                 <div className="flex flex-wrap gap-2">
                   <Button variant="outline" asChild>
                     <Link href={`/admin/bookings/new?customerId=${client.id}`}>
-                      <Calendar className="h-4 w-4 ml-2" />
+                      <Calendar className="ml-2 h-4 w-4" />
                       إنشاء حجز
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
                     <Link href={`/admin/quotes/new?customerId=${client.id}`}>
-                      <FileText className="h-4 w-4 ml-2" />
+                      <FileText className="ml-2 h-4 w-4" />
                       إنشاء عرض سعر
                     </Link>
                   </Button>

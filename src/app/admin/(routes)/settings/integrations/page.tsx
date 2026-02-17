@@ -28,7 +28,9 @@ export default function IntegrationsPage() {
   const [loading, setLoading] = useState(true)
   const [testing, setTesting] = useState<Record<string, boolean>>({})
   const [saving, setSaving] = useState<Record<string, boolean>>({})
-  const [testResults, setTestResults] = useState<Record<string, { success: boolean; message: string }>>({})
+  const [testResults, setTestResults] = useState<
+    Record<string, { success: boolean; message: string }>
+  >({})
   const [configValues, setConfigValues] = useState<Record<string, Record<string, string>>>({})
   const { toast } = useToast()
 
@@ -45,7 +47,7 @@ export default function IntegrationsPage() {
       }
       const data = await response.json()
       setIntegrations(data.integrations || [])
-      
+
       // Initialize config values from fetched integrations
       const initialConfig: Record<string, Record<string, string>> = {}
       data.integrations?.forEach((integration: IntegrationConfig) => {
@@ -68,7 +70,7 @@ export default function IntegrationsPage() {
       setSaving((prev) => ({ ...prev, [type]: true }))
       const config = configValues[type] || {}
       const integration = getIntegration(type)
-      
+
       const response = await fetch(`/api/integrations/${type}`, {
         method: 'PATCH',
         headers: {
@@ -149,7 +151,7 @@ export default function IntegrationsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex min-h-[400px] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
@@ -193,9 +195,10 @@ export default function IntegrationsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {!getIntegration('payments')?.configured && (
-                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3">
                   <p className="text-sm text-yellow-800">
-                    <strong>Warning:</strong> Tap Payments is not configured. Configure via environment variables or save configuration below.
+                    <strong>Warning:</strong> Tap Payments is not configured. Configure via
+                    environment variables or save configuration below.
                   </p>
                 </div>
               )}
@@ -205,7 +208,11 @@ export default function IntegrationsPage() {
                   id="tap-secret"
                   type="password"
                   placeholder="sk_test_..."
-                  value={configValues.payments?.secretKey || getIntegration('payments')?.config.secretKey || ''}
+                  value={
+                    configValues.payments?.secretKey ||
+                    getIntegration('payments')?.config.secretKey ||
+                    ''
+                  }
                   onChange={(e) => updateConfigValue('payments', 'secretKey', e.target.value)}
                 />
                 <p className="text-sm text-muted-foreground">
@@ -217,12 +224,14 @@ export default function IntegrationsPage() {
                 <Input
                   id="tap-public"
                   placeholder="pk_test_..."
-                  value={configValues.payments?.publicKey || getIntegration('payments')?.config.publicKey || ''}
+                  value={
+                    configValues.payments?.publicKey ||
+                    getIntegration('payments')?.config.publicKey ||
+                    ''
+                  }
                   onChange={(e) => updateConfigValue('payments', 'publicKey', e.target.value)}
                 />
-                <p className="text-sm text-muted-foreground">
-                  Enter your Tap Payments public key
-                </p>
+                <p className="text-sm text-muted-foreground">Enter your Tap Payments public key</p>
               </div>
               <div className="flex gap-2">
                 <Button
@@ -232,16 +241,15 @@ export default function IntegrationsPage() {
                   {testing.payments && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Test Connection
                 </Button>
-                <Button
-                  onClick={() => handleSaveConfig('payments')}
-                  disabled={saving.payments}
-                >
+                <Button onClick={() => handleSaveConfig('payments')} disabled={saving.payments}>
                   {saving.payments && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Save Configuration
                 </Button>
               </div>
               {testResults.payments && (
-                <div className={`p-3 rounded-md ${testResults.payments.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+                <div
+                  className={`rounded-md p-3 ${testResults.payments.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}
+                >
                   {testResults.payments.message}
                 </div>
               )}
@@ -272,9 +280,10 @@ export default function IntegrationsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {!getIntegration('email')?.configured && (
-                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3">
                   <p className="text-sm text-yellow-800">
-                    <strong>Warning:</strong> Email is not configured. Configure SMTP settings below.
+                    <strong>Warning:</strong> Email is not configured. Configure SMTP settings
+                    below.
                   </p>
                 </div>
               )}
@@ -286,9 +295,7 @@ export default function IntegrationsPage() {
                   value={configValues.email?.host || getIntegration('email')?.config.host || ''}
                   onChange={(e) => updateConfigValue('email', 'host', e.target.value)}
                 />
-                <p className="text-sm text-muted-foreground">
-                  SMTP server hostname
-                </p>
+                <p className="text-sm text-muted-foreground">SMTP server hostname</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="smtp-user">SMTP User</Label>
@@ -298,9 +305,7 @@ export default function IntegrationsPage() {
                   value={configValues.email?.user || getIntegration('email')?.config.user || ''}
                   onChange={(e) => updateConfigValue('email', 'user', e.target.value)}
                 />
-                <p className="text-sm text-muted-foreground">
-                  SMTP username/email
-                </p>
+                <p className="text-sm text-muted-foreground">SMTP username/email</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="smtp-password">SMTP Password</Label>
@@ -311,9 +316,7 @@ export default function IntegrationsPage() {
                   value={configValues.email?.password || ''}
                   onChange={(e) => updateConfigValue('email', 'password', e.target.value)}
                 />
-                <p className="text-sm text-muted-foreground">
-                  SMTP password (will be encrypted)
-                </p>
+                <p className="text-sm text-muted-foreground">SMTP password (will be encrypted)</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="smtp-port">SMTP Port</Label>
@@ -333,16 +336,15 @@ export default function IntegrationsPage() {
                   {testing.email && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Test Connection
                 </Button>
-                <Button
-                  onClick={() => handleSaveConfig('email')}
-                  disabled={saving.email}
-                >
+                <Button onClick={() => handleSaveConfig('email')} disabled={saving.email}>
                   {saving.email && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Save Configuration
                 </Button>
               </div>
               {testResults.email && (
-                <div className={`p-3 rounded-md ${testResults.email.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+                <div
+                  className={`rounded-md p-3 ${testResults.email.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}
+                >
                   {testResults.email.message}
                 </div>
               )}
@@ -373,7 +375,7 @@ export default function IntegrationsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {!getIntegration('whatsapp')?.configured && (
-                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3">
                   <p className="text-sm text-yellow-800">
                     <strong>Warning:</strong> WhatsApp is not configured. Enter your API key below.
                   </p>
@@ -385,7 +387,9 @@ export default function IntegrationsPage() {
                   id="whatsapp-api-key"
                   type="password"
                   placeholder="Your WhatsApp API key"
-                  value={configValues.whatsapp?.apiKey || getIntegration('whatsapp')?.config.apiKey || ''}
+                  value={
+                    configValues.whatsapp?.apiKey || getIntegration('whatsapp')?.config.apiKey || ''
+                  }
                   onChange={(e) => updateConfigValue('whatsapp', 'apiKey', e.target.value)}
                 />
                 <p className="text-sm text-muted-foreground">
@@ -400,16 +404,15 @@ export default function IntegrationsPage() {
                   {testing.whatsapp && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Test Connection
                 </Button>
-                <Button
-                  onClick={() => handleSaveConfig('whatsapp')}
-                  disabled={saving.whatsapp}
-                >
+                <Button onClick={() => handleSaveConfig('whatsapp')} disabled={saving.whatsapp}>
                   {saving.whatsapp && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Save Configuration
                 </Button>
               </div>
               {testResults.whatsapp && (
-                <div className={`p-3 rounded-md ${testResults.whatsapp.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+                <div
+                  className={`rounded-md p-3 ${testResults.whatsapp.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}
+                >
                   {testResults.whatsapp.message}
                 </div>
               )}
@@ -440,9 +443,10 @@ export default function IntegrationsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {!getIntegration('analytics')?.configured && (
-                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                <div className="rounded-md border border-yellow-200 bg-yellow-50 p-3">
                   <p className="text-sm text-yellow-800">
-                    <strong>Warning:</strong> Analytics is not configured. Configure at least one tracking service below.
+                    <strong>Warning:</strong> Analytics is not configured. Configure at least one
+                    tracking service below.
                   </p>
                 </div>
               )}
@@ -450,34 +454,42 @@ export default function IntegrationsPage() {
                 <Label>Google Tag Manager Container ID</Label>
                 <Input
                   placeholder="GTM-XXXXXXX"
-                  value={configValues.analytics?.gtmContainerId || getIntegration('analytics')?.config.gtmContainerId || ''}
+                  value={
+                    configValues.analytics?.gtmContainerId ||
+                    getIntegration('analytics')?.config.gtmContainerId ||
+                    ''
+                  }
                   onChange={(e) => updateConfigValue('analytics', 'gtmContainerId', e.target.value)}
                 />
-                <p className="text-sm text-muted-foreground">
-                  Enter your GTM container ID
-                </p>
+                <p className="text-sm text-muted-foreground">Enter your GTM container ID</p>
               </div>
               <div className="space-y-2">
                 <Label>Google Analytics 4 Measurement ID</Label>
                 <Input
                   placeholder="G-XXXXXXXXXX"
-                  value={configValues.analytics?.ga4MeasurementId || getIntegration('analytics')?.config.ga4MeasurementId || ''}
-                  onChange={(e) => updateConfigValue('analytics', 'ga4MeasurementId', e.target.value)}
+                  value={
+                    configValues.analytics?.ga4MeasurementId ||
+                    getIntegration('analytics')?.config.ga4MeasurementId ||
+                    ''
+                  }
+                  onChange={(e) =>
+                    updateConfigValue('analytics', 'ga4MeasurementId', e.target.value)
+                  }
                 />
-                <p className="text-sm text-muted-foreground">
-                  Enter your GA4 measurement ID
-                </p>
+                <p className="text-sm text-muted-foreground">Enter your GA4 measurement ID</p>
               </div>
               <div className="space-y-2">
                 <Label>Meta Pixel ID</Label>
                 <Input
                   placeholder="123456789012345"
-                  value={configValues.analytics?.metaPixelId || getIntegration('analytics')?.config.metaPixelId || ''}
+                  value={
+                    configValues.analytics?.metaPixelId ||
+                    getIntegration('analytics')?.config.metaPixelId ||
+                    ''
+                  }
                   onChange={(e) => updateConfigValue('analytics', 'metaPixelId', e.target.value)}
                 />
-                <p className="text-sm text-muted-foreground">
-                  Enter your Meta Pixel ID
-                </p>
+                <p className="text-sm text-muted-foreground">Enter your Meta Pixel ID</p>
               </div>
               <div className="flex gap-2">
                 <Button
@@ -487,16 +499,15 @@ export default function IntegrationsPage() {
                   {testing.analytics && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Test Configuration
                 </Button>
-                <Button
-                  onClick={() => handleSaveConfig('analytics')}
-                  disabled={saving.analytics}
-                >
+                <Button onClick={() => handleSaveConfig('analytics')} disabled={saving.analytics}>
                   {saving.analytics && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Save Configuration
                 </Button>
               </div>
               {testResults.analytics && (
-                <div className={`p-3 rounded-md ${testResults.analytics.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+                <div
+                  className={`rounded-md p-3 ${testResults.analytics.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}
+                >
                   {testResults.analytics.message}
                 </div>
               )}
@@ -521,10 +532,8 @@ export default function IntegrationsPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label>Webhook Endpoints</Label>
-                <div className="p-3 bg-muted rounded-md">
-                  <code className="text-sm">
-                    POST /api/webhooks/tap
-                  </code>
+                <div className="rounded-md bg-muted p-3">
+                  <code className="text-sm">POST /api/webhooks/tap</code>
                 </div>
               </div>
               <div className="flex gap-2">
@@ -537,7 +546,9 @@ export default function IntegrationsPage() {
                 </Button>
               </div>
               {testResults.webhooks && (
-                <div className={`p-3 rounded-md ${testResults.webhooks.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+                <div
+                  className={`rounded-md p-3 ${testResults.webhooks.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}
+                >
                   {testResults.webhooks.message}
                 </div>
               )}

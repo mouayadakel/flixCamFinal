@@ -20,7 +20,11 @@ export default function CloneRolePage() {
   const params = useParams()
   const router = useRouter()
   const { toast } = useToast()
-  const [role, setRole] = useState<{ id: string; displayName: string; displayNameAr: string | null } | null>(null)
+  const [role, setRole] = useState<{
+    id: string
+    displayName: string
+    displayNameAr: string | null
+  } | null>(null)
   const [loading, setLoading] = useState(true)
   const [newName, setNewName] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -36,7 +40,9 @@ export default function CloneRolePage() {
           setRole(r)
           if (r?.name) setNewName(`${r.name}_copy`)
         })
-        .catch(() => toast({ title: 'خطأ', description: 'فشل تحميل الدور', variant: 'destructive' }))
+        .catch(() =>
+          toast({ title: 'خطأ', description: 'فشل تحميل الدور', variant: 'destructive' })
+        )
         .finally(() => setLoading(false))
     }
   }, [id, toast])
@@ -72,7 +78,7 @@ export default function CloneRolePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[280px]">
+      <div className="flex min-h-[280px] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
@@ -92,7 +98,9 @@ export default function CloneRolePage() {
   return (
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/admin/settings/roles" className="hover:text-foreground">الأدوار والصلاحيات</Link>
+        <Link href="/admin/settings/roles" className="hover:text-foreground">
+          الأدوار والصلاحيات
+        </Link>
         <ArrowRight className="h-4 w-4 rtl:rotate-180" />
         <Link href={`/admin/settings/roles/${id}`} className="hover:text-foreground">
           {role.displayNameAr || role.displayName}
@@ -109,7 +117,8 @@ export default function CloneRolePage() {
               نسخ الدور
             </CardTitle>
             <CardDescription>
-              إنشاء نسخة من &quot;{role.displayNameAr || role.displayName}&quot; باسم جديد. سيتم نسخ جميع الصلاحيات.
+              إنشاء نسخة من &quot;{role.displayNameAr || role.displayName}&quot; باسم جديد. سيتم نسخ
+              جميع الصلاحيات.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -126,7 +135,7 @@ export default function CloneRolePage() {
         </Card>
         <div className="flex gap-2">
           <Button type="submit" disabled={submitting}>
-            {submitting ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : null}
+            {submitting ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
             نسخ وإنشاء
           </Button>
           <Button type="button" variant="outline" asChild>

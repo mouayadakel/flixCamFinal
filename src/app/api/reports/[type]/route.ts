@@ -13,10 +13,7 @@ import { ReportsPolicy } from '@/lib/policies/reports.policy'
 import { reportFilterSchema, reportTypeSchema } from '@/lib/validators/reports.validator'
 import { ValidationError, ForbiddenError } from '@/lib/errors'
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { type: string } }
-) {
+export async function POST(req: NextRequest, { params }: { params: { type: string } }) {
   try {
     const session = await auth()
 
@@ -32,10 +29,7 @@ export async function POST(
     // Check policy
     const policy = await ReportsPolicy.canView(userId, reportType)
     if (!policy.allowed) {
-      return NextResponse.json(
-        { error: policy.reason || 'Forbidden' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: policy.reason || 'Forbidden' }, { status: 403 })
     }
 
     const body = await req.json()
@@ -64,10 +58,7 @@ export async function POST(
         report = await ReportsService.generateInventoryReport(filter, userId)
         break
       default:
-        return NextResponse.json(
-          { error: 'نوع التقرير غير مدعوم' },
-          { status: 400 }
-        )
+        return NextResponse.json({ error: 'نوع التقرير غير مدعوم' }, { status: 400 })
     }
 
     return NextResponse.json({
@@ -76,17 +67,11 @@ export async function POST(
     })
   } catch (error: any) {
     if (error instanceof ValidationError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     if (error instanceof ForbiddenError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 403 })
     }
 
     if (error.name === 'ZodError') {
@@ -97,9 +82,6 @@ export async function POST(
     }
 
     console.error('Generate report error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

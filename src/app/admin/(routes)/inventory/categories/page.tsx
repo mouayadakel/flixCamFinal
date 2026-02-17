@@ -7,14 +7,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import {
-  Plus,
-  Edit,
-  Trash2,
-  Search,
-  FolderTree,
-  RefreshCw,
-} from 'lucide-react'
+import { Plus, Edit, Trash2, Search, FolderTree, RefreshCw } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -247,28 +240,35 @@ export default function CategoriesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <FolderTree className="h-8 w-8" />
             Categories
           </h1>
-          <p className="text-muted-foreground mt-1">Manage equipment categories and hierarchy</p>
+          <p className="mt-1 text-muted-foreground">Manage equipment categories and hierarchy</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={loadCategories}>
-            <RefreshCw className="h-4 w-4 mr-2" />
+            <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
           </Button>
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => { resetForm(); setIsCreateOpen(true); }}>
-                <Plus className="h-4 w-4 mr-2" />
+              <Button
+                onClick={() => {
+                  resetForm()
+                  setIsCreateOpen(true)
+                }}
+              >
+                <Plus className="mr-2 h-4 w-4" />
                 Add Category
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Add Category</DialogTitle>
-                <DialogDescription>Create a new equipment category. Optionally set a parent for hierarchy.</DialogDescription>
+                <DialogDescription>
+                  Create a new equipment category. Optionally set a parent for hierarchy.
+                </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
@@ -291,7 +291,9 @@ export default function CategoriesPage() {
                   <Label>Parent category</Label>
                   <Select
                     value={formData.parentId || 'none'}
-                    onValueChange={(v) => setFormData({ ...formData, parentId: v === 'none' ? '' : v })}
+                    onValueChange={(v) =>
+                      setFormData({ ...formData, parentId: v === 'none' ? '' : v })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="None (top level)" />
@@ -299,7 +301,9 @@ export default function CategoriesPage() {
                     <SelectContent>
                       <SelectItem value="none">None (top level)</SelectItem>
                       {parentOptions.map((c) => (
-                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.name}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -314,7 +318,9 @@ export default function CategoriesPage() {
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsCreateOpen(false)}>Cancel</Button>
+                <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
+                  Cancel
+                </Button>
                 <Button onClick={handleCreate} disabled={submitting}>
                   {submitting ? 'Creating...' : 'Create'}
                 </Button>
@@ -327,7 +333,7 @@ export default function CategoriesPage() {
       <Card>
         <CardContent className="py-4">
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search by name or slug..."
               value={searchQuery}
@@ -341,7 +347,9 @@ export default function CategoriesPage() {
       <Card>
         <CardHeader>
           <CardTitle>Categories ({filteredCategories.length})</CardTitle>
-          <p className="text-sm text-muted-foreground">Equipment count includes items in this category only.</p>
+          <p className="text-sm text-muted-foreground">
+            Equipment count includes items in this category only.
+          </p>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">
@@ -368,7 +376,7 @@ export default function CategoriesPage() {
                   </TableRow>
                 ) : filteredCategories.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
                       No categories. Add one to get started.
                     </TableCell>
                   </TableRow>
@@ -381,10 +389,18 @@ export default function CategoriesPage() {
                       <TableCell>{category.equipmentCount}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button size="sm" variant="ghost" onClick={() => openEditDialog(category)}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => openEditDialog(category)}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button size="sm" variant="ghost" onClick={() => openDeleteDialog(category)}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => openDeleteDialog(category)}
+                          >
                             <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
                         </div>
@@ -431,7 +447,9 @@ export default function CategoriesPage() {
                 <SelectContent>
                   <SelectItem value="none">None (top level)</SelectItem>
                   {parentOptions.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -445,7 +463,9 @@ export default function CategoriesPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setIsEditOpen(false)}>
+              Cancel
+            </Button>
             <Button onClick={handleEdit} disabled={submitting}>
               {submitting ? 'Saving...' : 'Save'}
             </Button>
@@ -460,12 +480,13 @@ export default function CategoriesPage() {
             <AlertDialogDescription>
               Are you sure you want to delete &quot;{selectedCategory?.name}&quot;?
               {(selectedCategory?.equipmentCount ?? 0) > 0 && (
-                <span className="block mt-2 text-destructive">
-                  Warning: this category has {selectedCategory?.equipmentCount} equipment item(s). Consider reassigning them first.
+                <span className="mt-2 block text-destructive">
+                  Warning: this category has {selectedCategory?.equipmentCount} equipment item(s).
+                  Consider reassigning them first.
                 </span>
               )}
               {(selectedCategory?.childrenCount ?? 0) > 0 && (
-                <span className="block mt-2 text-destructive">
+                <span className="mt-2 block text-destructive">
                   This category has subcategories. Delete or move them first.
                 </span>
               )}

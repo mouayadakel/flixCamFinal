@@ -157,7 +157,7 @@ export default function KitDetailPage() {
 
   if (loading || !kit) {
     return (
-      <div className="flex items-center justify-center min-h-[200px]">
+      <div className="flex min-h-[200px] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
@@ -166,7 +166,9 @@ export default function KitDetailPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/admin/inventory/kits" className="hover:text-foreground">الحزم</Link>
+        <Link href="/admin/inventory/kits" className="hover:text-foreground">
+          الحزم
+        </Link>
         <ArrowRight className="h-4 w-4 rtl:rotate-180" />
         <span>{kit.name}</span>
       </div>
@@ -179,20 +181,33 @@ export default function KitDetailPage() {
               <Button size="sm" onClick={handleSave} disabled={saving}>
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'حفظ'}
               </Button>
-              <Button size="sm" variant="outline" onClick={() => { setEditing(false); setForm({ name: kit.name, slug: kit.slug, description: kit.description ?? '', discountPercent: parseFloat(kit.discountPercent ?? '0') || 0, isActive: kit.isActive }); }}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setEditing(false)
+                  setForm({
+                    name: kit.name,
+                    slug: kit.slug,
+                    description: kit.description ?? '',
+                    discountPercent: parseFloat(kit.discountPercent ?? '0') || 0,
+                    isActive: kit.isActive,
+                  })
+                }}
+              >
                 إلغاء
               </Button>
             </>
           ) : (
             <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
-              <Pencil className="h-4 w-4 ml-1" />
+              <Pencil className="ml-1 h-4 w-4" />
               تعديل
             </Button>
           )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm">
-                <Trash2 className="h-4 w-4 ml-1" />
+                <Trash2 className="ml-1 h-4 w-4" />
                 حذف
               </Button>
             </AlertDialogTrigger>
@@ -205,7 +220,10 @@ export default function KitDetailPage() {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  className="bg-destructive text-destructive-foreground"
+                >
                   حذف
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -222,19 +240,29 @@ export default function KitDetailPage() {
         <CardContent className="space-y-4">
           {editing ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label>الاسم</Label>
-                  <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+                  <Input
+                    value={form.name}
+                    onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>الرابط (slug)</Label>
-                  <Input value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} />
+                  <Input
+                    value={form.slug}
+                    onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label>الوصف</Label>
-                <Textarea value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} rows={2} />
+                <Textarea
+                  value={form.description}
+                  onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                  rows={2}
+                />
               </div>
               <div className="flex items-center gap-4">
                 <div className="space-y-2">
@@ -244,18 +272,23 @@ export default function KitDetailPage() {
                     min={0}
                     max={100}
                     value={form.discountPercent}
-                    onChange={(e) => setForm((f) => ({ ...f, discountPercent: parseFloat(e.target.value) || 0 }))}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, discountPercent: parseFloat(e.target.value) || 0 }))
+                    }
                     className="w-24"
                   />
                 </div>
                 <div className="flex items-center gap-2">
                   <Label>نشط</Label>
-                  <Switch checked={form.isActive} onCheckedChange={(v) => setForm((f) => ({ ...f, isActive: v }))} />
+                  <Switch
+                    checked={form.isActive}
+                    onCheckedChange={(v) => setForm((f) => ({ ...f, isActive: v }))}
+                  />
                 </div>
               </div>
             </>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <Label className="text-muted-foreground">الاسم</Label>
                 <p className="font-medium">{kit.name}</p>
@@ -270,7 +303,9 @@ export default function KitDetailPage() {
               </div>
               <div>
                 <Label className="text-muted-foreground">الحالة</Label>
-                <Badge variant={kit.isActive ? 'default' : 'secondary'}>{kit.isActive ? 'نشط' : 'غير نشط'}</Badge>
+                <Badge variant={kit.isActive ? 'default' : 'secondary'}>
+                  {kit.isActive ? 'نشط' : 'غير نشط'}
+                </Badge>
               </div>
               {kit.description && (
                 <div className="md:col-span-2">
@@ -289,7 +324,7 @@ export default function KitDetailPage() {
           <CardDescription>السعر اليومي الإجمالي قبل وبعد الخصم</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <ul className="border rounded-md divide-y">
+          <ul className="divide-y rounded-md border">
             {kit.items.map((item) => (
               <li key={item.equipmentId} className="flex items-center justify-between px-3 py-2">
                 <span>
@@ -303,11 +338,13 @@ export default function KitDetailPage() {
           </ul>
           <div className="flex flex-wrap gap-4 text-sm">
             <span>
-              <span className="text-muted-foreground">المجموع اليومي (قبل خصم):</span> {formatCurrency(kit.totalDailyRate)}
+              <span className="text-muted-foreground">المجموع اليومي (قبل خصم):</span>{' '}
+              {formatCurrency(kit.totalDailyRate)}
             </span>
             {kit.discountPercent && parseFloat(kit.discountPercent) > 0 && (
               <span>
-                <span className="text-muted-foreground">بعد خصم {kit.discountPercent}%:</span> {formatCurrency(kit.finalDailyRate)}
+                <span className="text-muted-foreground">بعد خصم {kit.discountPercent}%:</span>{' '}
+                {formatCurrency(kit.finalDailyRate)}
               </span>
             )}
           </div>

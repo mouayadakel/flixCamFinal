@@ -9,11 +9,13 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLocale } from '@/hooks/use-locale'
 import { cn } from '@/lib/utils'
+import { EquipmentNavDropdown } from './equipment-nav-dropdown'
 
 interface PublicNavProps {
   className?: string
   onLinkClick?: () => void
   hiddenRoutes?: Set<string>
+  enableEquipmentDropdown?: boolean
 }
 
 const NAV_LINKS = [
@@ -26,18 +28,37 @@ const NAV_LINKS = [
   { href: '/support', key: 'nav.support' },
 ] as const
 
-export function PublicNav({ className, onLinkClick, hiddenRoutes }: PublicNavProps) {
+const EQUIPMENT_HREF = '/equipment'
+
+export function PublicNav({
+  className,
+  onLinkClick,
+  hiddenRoutes,
+  enableEquipmentDropdown = false,
+}: PublicNavProps) {
   const { t } = useLocale()
   const pathname = usePathname()
-  const visibleLinks =
-    hiddenRoutes?.size ? NAV_LINKS.filter(({ href }) => !hiddenRoutes.has(href)) : NAV_LINKS
+  const visibleLinks = hiddenRoutes?.size
+    ? NAV_LINKS.filter(({ href }) => !hiddenRoutes.has(href))
+    : NAV_LINKS
 
   return (
     <nav className={cn('flex items-center gap-6', className)} aria-label="Main navigation">
       {visibleLinks.map(({ href, key }) => {
         const isActive =
-          pathname !== null &&
-          (pathname === href || (href !== '/' && pathname.startsWith(href)))
+          pathname !== null && (pathname === href || (href !== '/' && pathname.startsWith(href)))
+
+        if (href === EQUIPMENT_HREF && enableEquipmentDropdown) {
+          return (
+            <EquipmentNavDropdown
+              key={href}
+              isActive={isActive}
+              onLinkClick={onLinkClick}
+              hidden={hiddenRoutes?.has(EQUIPMENT_HREF)}
+            />
+          )
+        }
+
         return (
           <Link
             key={href}
@@ -46,7 +67,7 @@ export function PublicNav({ className, onLinkClick, hiddenRoutes }: PublicNavPro
             className={cn(
               'text-sm font-medium transition-colors',
               isActive
-                ? 'text-brand-primary font-semibold'
+                ? 'font-semibold text-brand-primary'
                 : 'text-foreground/90 hover:text-foreground'
             )}
           >

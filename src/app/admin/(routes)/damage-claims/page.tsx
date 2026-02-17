@@ -107,14 +107,16 @@ export default function DamageClaimsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <AlertTriangle className="h-8 w-8" />
             Damage Claims
           </h1>
-          <p className="text-muted-foreground mt-1">Report and resolve equipment or studio damage</p>
+          <p className="mt-1 text-muted-foreground">
+            Report and resolve equipment or studio damage
+          </p>
         </div>
         <Button variant="outline" onClick={loadClaims}>
-          <RefreshCw className="h-4 w-4 mr-2" />
+          <RefreshCw className="mr-2 h-4 w-4" />
           Refresh
         </Button>
       </div>
@@ -128,7 +130,9 @@ export default function DamageClaimsPage() {
             </SelectTrigger>
             <SelectContent>
               {STATUS_OPTIONS.map((o) => (
-                <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                <SelectItem key={o.value} value={o.value}>
+                  {o.label}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -162,7 +166,7 @@ export default function DamageClaimsPage() {
                   </TableRow>
                 ) : claims.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={9} className="py-8 text-center text-muted-foreground">
                       No damage claims. Report one from a booking detail page.
                     </TableCell>
                   </TableRow>
@@ -179,7 +183,9 @@ export default function DamageClaimsPage() {
                       </TableCell>
                       <TableCell>
                         {c.equipment ? (
-                          <span>{c.equipment.sku} {c.equipment.model ?? ''}</span>
+                          <span>
+                            {c.equipment.sku} {c.equipment.model ?? ''}
+                          </span>
                         ) : c.studio ? (
                           <span>{c.studio.name}</span>
                         ) : (
@@ -189,7 +195,10 @@ export default function DamageClaimsPage() {
                       <TableCell>
                         <div className="flex flex-col gap-1">
                           <span className="text-sm">{c.damageType.replace(/_/g, ' ')}</span>
-                          <Badge className={SEVERITY_COLOR[c.severity] ?? 'bg-muted'} variant="secondary">
+                          <Badge
+                            className={SEVERITY_COLOR[c.severity] ?? 'bg-muted'}
+                            variant="secondary"
+                          >
                             {c.severity}
                           </Badge>
                         </div>
@@ -204,15 +213,19 @@ export default function DamageClaimsPage() {
                         {Array.isArray(c.photos) ? c.photos.length : 0}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={c.status === 'PENDING' || c.status === 'INVESTIGATING' ? 'secondary' : 'default'}>
+                        <Badge
+                          variant={
+                            c.status === 'PENDING' || c.status === 'INVESTIGATING'
+                              ? 'secondary'
+                              : 'default'
+                          }
+                        >
                           {c.status}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {formatDate(c.createdAt)}
-                        {c.reporter?.name && (
-                          <span className="block">{c.reporter.name}</span>
-                        )}
+                        {c.reporter?.name && <span className="block">{c.reporter.name}</span>}
                       </TableCell>
                       <TableCell>
                         <Button asChild size="sm" variant="ghost">

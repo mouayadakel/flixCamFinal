@@ -34,7 +34,7 @@ export function PublicLayoutClient({ children, flags }: PublicLayoutClientProps)
       {/* Top padding compensates for removed category bar so content vertical position feels like before */}
       <main
         id="main-content"
-        className="min-h-[calc(100vh-theme(spacing.14)-1px)] flex flex-col pt-4 md:pt-10"
+        className="flex min-h-[calc(100vh-theme(spacing.14)-1px)] flex-col pt-4 md:pt-10"
       >
         {children}
       </main>

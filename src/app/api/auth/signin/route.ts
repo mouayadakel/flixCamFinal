@@ -8,8 +8,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { handlers, signIn, auth } from '@/lib/auth'
 
 const ENABLE_JSON_SIGNIN =
-  process.env.NODE_ENV !== 'production' ||
-  process.env.ENABLE_TEST_AUTH === 'true'
+  process.env.NODE_ENV !== 'production' || process.env.ENABLE_TEST_AUTH === 'true'
 
 function getCredentialsFromBasic(request: NextRequest): {
   email: string
@@ -45,29 +44,18 @@ export async function POST(request: NextRequest) {
     try {
       const body = await request.json()
       const cred = body.credential ?? body
-      email = (cred.email ?? cred.username ?? body.email ?? body.username) as
-        | string
-        | undefined
+      email = (cred.email ?? cred.username ?? body.email ?? body.username) as string | undefined
       password = (cred.password ?? body.password) as string | undefined
     } catch {
-      return NextResponse.json(
-        { error: 'Invalid JSON body' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
     }
-  } else if (
-    ENABLE_JSON_SIGNIN &&
-    contentType.includes('application/x-www-form-urlencoded')
-  ) {
+  } else if (ENABLE_JSON_SIGNIN && contentType.includes('application/x-www-form-urlencoded')) {
     try {
       const form = await request.formData()
       email = (form.get('email') ?? form.get('username')) as string | undefined
       password = form.get('password') as string | undefined
     } catch {
-      return NextResponse.json(
-        { error: 'Invalid form body' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Invalid form body' }, { status: 400 })
     }
   } else if (ENABLE_JSON_SIGNIN) {
     const basic = getCredentialsFromBasic(request)
@@ -86,10 +74,7 @@ export async function POST(request: NextRequest) {
       })
 
       if (typeof redirectUrl === 'string' && redirectUrl.includes('error=')) {
-        return NextResponse.json(
-          { error: 'Invalid credentials' },
-          { status: 401 }
-        )
+        return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
       }
 
       const session = await auth()
@@ -107,10 +92,7 @@ export async function POST(request: NextRequest) {
           : null,
       })
     } catch {
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
   }
 

@@ -3,12 +3,14 @@
 ## ✅ All Components Implemented
 
 ### Core Infrastructure
+
 - ✅ Redis client (`src/lib/queue/redis.client.ts`)
 - ✅ BullMQ queues (import, AI processing, image processing)
 - ✅ Workers (import, AI, image)
 - ✅ Database schema (AIProcessingJob, AISettings)
 
 ### Services
+
 - ✅ Translation service (OpenAI & Gemini)
 - ✅ SEO generation service
 - ✅ AI autofill orchestration
@@ -16,6 +18,7 @@
 - ✅ Import validation
 
 ### API Endpoints
+
 - ✅ `/api/admin/imports/sheets` - Sheet metadata
 - ✅ `/api/admin/imports/validate` - Validation
 - ✅ `/api/admin/imports` - Start import
@@ -29,6 +32,7 @@
 - ✅ `/api/admin/ai/analytics` - AI analytics
 
 ### UI Components
+
 - ✅ Import page with accordion UI
 - ✅ Row-level selection
 - ✅ AI preview dialog
@@ -37,12 +41,14 @@
 - ✅ Product review page
 
 ### Navigation
+
 - ✅ Admin sidebar updated (Import, AI Control)
 - ✅ Context sidebar updated
 
 ## 🔧 Setup Required
 
 ### 1. Install Redis
+
 ```bash
 # macOS
 brew install redis
@@ -53,7 +59,9 @@ docker run -d -p 6379:6379 --name redis redis:alpine
 ```
 
 ### 2. Environment Variables
+
 Add to `.env`:
+
 ```env
 REDIS_URL=redis://localhost:6379
 CLOUDINARY_CLOUD_NAME=your_cloud_name
@@ -66,6 +74,7 @@ GEMINI_API_KEY=your_key
 ```
 
 ### 3. Start Workers
+
 ```bash
 npm run worker:all
 ```

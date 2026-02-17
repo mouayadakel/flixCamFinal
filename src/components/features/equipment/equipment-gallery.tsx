@@ -30,7 +30,7 @@ export function EquipmentGallery({ media, alt }: EquipmentGalleryProps) {
 
   if (items.length === 0) {
     return (
-      <div className="aspect-[4/3] rounded-2xl bg-surface-light border border-border-light/60 flex flex-col items-center justify-center gap-3 text-text-muted">
+      <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 rounded-2xl border border-border-light/60 bg-surface-light text-text-muted">
         <ImageOff className="h-10 w-10 text-text-muted/40" />
         <span className="text-sm">No images available</span>
       </div>
@@ -40,14 +40,14 @@ export function EquipmentGallery({ media, alt }: EquipmentGalleryProps) {
   return (
     <div className="space-y-3">
       {/* Main image with navigation arrows */}
-      <div className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-surface-light border border-border-light/60 shadow-card">
+      <div className="group relative aspect-[4/3] overflow-hidden rounded-2xl border border-border-light/60 bg-surface-light shadow-card">
         {/* Images stacked for crossfade */}
         {items.map((m, i) => (
           <div
             key={m.id}
             className={cn(
               'absolute inset-0 transition-opacity duration-500 ease-in-out',
-              i === selected ? 'opacity-100 z-10' : 'opacity-0 z-0'
+              i === selected ? 'z-10 opacity-100' : 'z-0 opacity-0'
             )}
           >
             <Image
@@ -67,7 +67,7 @@ export function EquipmentGallery({ media, alt }: EquipmentGalleryProps) {
             <button
               type="button"
               onClick={() => goTo(selected - 1)}
-              className="absolute start-3 top-1/2 z-20 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-text-heading shadow-md backdrop-blur-sm opacity-0 transition-all duration-300 group-hover:opacity-100 hover:bg-white hover:shadow-lg active:scale-95"
+              className="absolute start-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-text-heading opacity-0 shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-white hover:shadow-lg active:scale-95 group-hover:opacity-100"
               aria-label="Previous image"
             >
               <ChevronLeft className="h-5 w-5" />
@@ -75,7 +75,7 @@ export function EquipmentGallery({ media, alt }: EquipmentGalleryProps) {
             <button
               type="button"
               onClick={() => goTo(selected + 1)}
-              className="absolute end-3 top-1/2 z-20 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-text-heading shadow-md backdrop-blur-sm opacity-0 transition-all duration-300 group-hover:opacity-100 hover:bg-white hover:shadow-lg active:scale-95"
+              className="absolute end-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-text-heading opacity-0 shadow-md backdrop-blur-sm transition-all duration-300 hover:bg-white hover:shadow-lg active:scale-95 group-hover:opacity-100"
               aria-label="Next image"
             >
               <ChevronRight className="h-5 w-5" />
@@ -93,7 +93,7 @@ export function EquipmentGallery({ media, alt }: EquipmentGalleryProps) {
 
       {/* Thumbnail strip */}
       {items.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <div className="scrollbar-none flex gap-2 overflow-x-auto pb-1">
           {items.map((m, i) => (
             <button
               key={m.id}
@@ -102,17 +102,11 @@ export function EquipmentGallery({ media, alt }: EquipmentGalleryProps) {
               className={cn(
                 'relative h-[68px] w-[92px] shrink-0 overflow-hidden rounded-xl border-2 transition-all duration-200',
                 selected === i
-                  ? 'border-brand-primary ring-2 ring-brand-primary/20 shadow-md'
-                  : 'border-transparent opacity-70 hover:opacity-100 hover:border-border-light'
+                  ? 'border-brand-primary shadow-md ring-2 ring-brand-primary/20'
+                  : 'border-transparent opacity-70 hover:border-border-light hover:opacity-100'
               )}
             >
-              <Image
-                src={m.url}
-                alt=""
-                fill
-                className="object-cover"
-                sizes="92px"
-              />
+              <Image src={m.url} alt="" fill className="object-cover" sizes="92px" />
             </button>
           ))}
         </div>

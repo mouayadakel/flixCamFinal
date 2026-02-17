@@ -12,8 +12,20 @@ import { hasPermission } from '@/lib/auth/permissions'
 export interface ConflictPair {
   equipmentId: string
   equipmentSku: string
-  bookingA: { id: string; bookingNumber: string; status: string; startDate: string; endDate: string }
-  bookingB: { id: string; bookingNumber: string; status: string; startDate: string; endDate: string }
+  bookingA: {
+    id: string
+    bookingNumber: string
+    status: string
+    startDate: string
+    endDate: string
+  }
+  bookingB: {
+    id: string
+    bookingNumber: string
+    status: string
+    startDate: string
+    endDate: string
+  }
   overlapStart: string
   overlapEnd: string
   severity: 'hard' | 'soft'
@@ -54,7 +66,10 @@ export async function GET() {
       orderBy: { startDate: 'asc' },
     })
 
-    const byEquipment = new Map<string, Array<{ id: string; bookingNumber: string; status: string; start: Date; end: Date }>>()
+    const byEquipment = new Map<
+      string,
+      Array<{ id: string; bookingNumber: string; status: string; start: Date; end: Date }>
+    >()
 
     for (const b of bookings) {
       for (const be of b.equipment) {
@@ -94,8 +109,20 @@ export async function GET() {
           conflicts.push({
             equipmentId,
             equipmentSku: sku,
-            bookingA: { id: a.id, bookingNumber: a.bookingNumber, status: a.status, startDate: a.start.toISOString(), endDate: a.end.toISOString() },
-            bookingB: { id: b.id, bookingNumber: b.bookingNumber, status: b.status, startDate: b.start.toISOString(), endDate: b.end.toISOString() },
+            bookingA: {
+              id: a.id,
+              bookingNumber: a.bookingNumber,
+              status: a.status,
+              startDate: a.start.toISOString(),
+              endDate: a.end.toISOString(),
+            },
+            bookingB: {
+              id: b.id,
+              bookingNumber: b.bookingNumber,
+              status: b.status,
+              startDate: b.start.toISOString(),
+              endDate: b.end.toISOString(),
+            },
             overlapStart: overlapStart.toISOString(),
             overlapEnd: overlapEnd.toISOString(),
             severity,

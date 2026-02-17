@@ -40,14 +40,20 @@ export async function GET() {
         customer: { select: { id: true, name: true, email: true } },
         equipment: {
           where: { deletedAt: null },
-          select: { equipmentId: true, quantity: true, equipment: { select: { id: true, sku: true, model: true } } },
+          select: {
+            equipmentId: true,
+            quantity: true,
+            equipment: { select: { id: true, sku: true, model: true } },
+          },
         },
       },
       orderBy: { softLockExpiresAt: 'asc' },
     })
 
     const fiveMinFromNow = new Date(now.getTime() + 5 * 60 * 1000)
-    const expiringSoon = holds.filter((h) => h.softLockExpiresAt && h.softLockExpiresAt <= fiveMinFromNow)
+    const expiringSoon = holds.filter(
+      (h) => h.softLockExpiresAt && h.softLockExpiresAt <= fiveMinFromNow
+    )
     const equipmentIds = new Set<string>()
     holds.forEach((h) => h.equipment.forEach((e) => equipmentIds.add(e.equipmentId)))
 
@@ -59,7 +65,12 @@ export async function GET() {
       endDate: h.endDate.toISOString(),
       softLockExpiresAt: h.softLockExpiresAt?.toISOString() ?? null,
       customer: h.customer,
-      equipment: h.equipment.map((e) => ({ equipmentId: e.equipmentId, quantity: e.quantity, sku: (e.equipment as { sku: string }).sku, model: (e.equipment as { model: string | null }).model })),
+      equipment: h.equipment.map((e) => ({
+        equipmentId: e.equipmentId,
+        quantity: e.quantity,
+        sku: (e.equipment as { sku: string }).sku,
+        model: (e.equipment as { model: string | null }).model,
+      })),
     }))
 
     return NextResponse.json({

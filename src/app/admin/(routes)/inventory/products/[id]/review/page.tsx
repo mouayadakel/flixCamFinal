@@ -81,7 +81,10 @@ export default function ProductReviewPage() {
       })
 
       if (!res.ok) throw new Error('Failed to retry AI processing')
-      toast({ title: 'AI processing retried', description: 'The product will be reprocessed in the background' })
+      toast({
+        title: 'AI processing retried',
+        description: 'The product will be reprocessed in the background',
+      })
       setTimeout(() => loadProduct(), 2000)
     } catch (error: any) {
       toast({ title: 'Failed to retry AI', description: error.message, variant: 'destructive' })
@@ -126,7 +129,7 @@ export default function ProductReviewPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     )
@@ -135,10 +138,10 @@ export default function ProductReviewPage() {
   if (!product) {
     return (
       <div className="space-y-6">
-        <div className="text-center py-12">
+        <div className="py-12 text-center">
           <p className="text-muted-foreground">Product not found</p>
           <Button variant="outline" onClick={() => router.back()} className="mt-4">
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Go Back
           </Button>
         </div>
@@ -162,20 +165,20 @@ export default function ProductReviewPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Review Product</h1>
-          </div>
+        </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => router.back()}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
           <Button variant="outline" onClick={handleRetryAI} disabled={retrying}>
-            {retrying && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            <RefreshCw className="h-4 w-4 mr-2" />
+            {retrying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <RefreshCw className="mr-2 h-4 w-4" />
             Retry AI
           </Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-            <Save className="h-4 w-4 mr-2" />
+            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Save className="mr-2 h-4 w-4" />
             Save Changes
           </Button>
         </div>
@@ -212,7 +215,7 @@ export default function ProductReviewPage() {
             <p className="text-sm text-yellow-700">
               The following fields are missing and need to be filled:
             </p>
-            <ul className="list-disc list-inside mt-2 text-sm text-yellow-700">
+            <ul className="mt-2 list-inside list-disc text-sm text-yellow-700">
               {missingTranslations.map((field) => (
                 <li key={field}>{field}</li>
               ))}
@@ -229,7 +232,8 @@ export default function ProductReviewPage() {
         </TabsList>
 
         {(['en', 'ar', 'zh'] as const).map((locale) => {
-          const translation = edits[locale] || product.translations?.find((t) => t.locale === locale)
+          const translation =
+            edits[locale] || product.translations?.find((t) => t.locale === locale)
           const isMissing = !translation
 
           return (
@@ -237,16 +241,19 @@ export default function ProductReviewPage() {
               {isMissing ? (
                 <Card className="border-dashed">
                   <CardContent className="pt-6 text-center text-muted-foreground">
-                    {locale === 'en' ? 'English' : locale === 'ar' ? 'Arabic' : 'Chinese'} translation is missing.
+                    {locale === 'en' ? 'English' : locale === 'ar' ? 'Arabic' : 'Chinese'}{' '}
+                    translation is missing.
                     <br />
-                    Click &quot;Retry AI&quot; to generate it automatically, or fill it manually below.
+                    Click &quot;Retry AI&quot; to generate it automatically, or fill it manually
+                    below.
                   </CardContent>
                 </Card>
               ) : (
                 <Card>
                   <CardHeader>
                     <CardTitle>
-                      {locale === 'en' ? 'English' : locale === 'ar' ? 'Arabic' : 'Chinese'} Translation
+                      {locale === 'en' ? 'English' : locale === 'ar' ? 'Arabic' : 'Chinese'}{' '}
+                      Translation
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -260,8 +267,12 @@ export default function ProductReviewPage() {
                     <div>
                       <Label>Short Description</Label>
                       <Textarea
-                        value={edits[locale]?.shortDescription || translation?.shortDescription || ''}
-                        onChange={(e) => updateTranslation(locale, 'shortDescription', e.target.value)}
+                        value={
+                          edits[locale]?.shortDescription || translation?.shortDescription || ''
+                        }
+                        onChange={(e) =>
+                          updateTranslation(locale, 'shortDescription', e.target.value)
+                        }
                         rows={3}
                       />
                     </div>
@@ -269,7 +280,9 @@ export default function ProductReviewPage() {
                       <Label>Long Description</Label>
                       <Textarea
                         value={edits[locale]?.longDescription || translation?.longDescription || ''}
-                        onChange={(e) => updateTranslation(locale, 'longDescription', e.target.value)}
+                        onChange={(e) =>
+                          updateTranslation(locale, 'longDescription', e.target.value)
+                        }
                         rows={6}
                       />
                     </div>
@@ -285,8 +298,12 @@ export default function ProductReviewPage() {
                         <div>
                           <Label>SEO Description</Label>
                           <Textarea
-                            value={edits[locale]?.seoDescription || translation?.seoDescription || ''}
-                            onChange={(e) => updateTranslation(locale, 'seoDescription', e.target.value)}
+                            value={
+                              edits[locale]?.seoDescription || translation?.seoDescription || ''
+                            }
+                            onChange={(e) =>
+                              updateTranslation(locale, 'seoDescription', e.target.value)
+                            }
                             rows={3}
                           />
                         </div>
@@ -294,7 +311,9 @@ export default function ProductReviewPage() {
                           <Label>SEO Keywords</Label>
                           <Input
                             value={edits[locale]?.seoKeywords || translation?.seoKeywords || ''}
-                            onChange={(e) => updateTranslation(locale, 'seoKeywords', e.target.value)}
+                            onChange={(e) =>
+                              updateTranslation(locale, 'seoKeywords', e.target.value)
+                            }
                           />
                         </div>
                       </>

@@ -54,7 +54,9 @@ export function ShootTypeBulkEditor({ shootTypes, onUpdated }: ShootTypeBulkEdit
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
-  const [recs, setRecs] = useState<Record<string, Record<string, { recommended: boolean; budgetTier: string }>>>({})
+  const [recs, setRecs] = useState<
+    Record<string, Record<string, { recommended: boolean; budgetTier: string }>>
+  >({})
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -68,14 +70,22 @@ export function ShootTypeBulkEditor({ shootTypes, onUpdated }: ShootTypeBulkEdit
         if (cancelled) return
         const data = Array.isArray(json?.data) ? json.data : []
         setEquipment(
-          data.map((e: { id: string; sku: string; model?: string; dailyPrice: number; category?: { name: string; id: string } }) => ({
-            id: e.id,
-            sku: e.sku,
-            model: e.model ?? null,
-            dailyPrice: e.dailyPrice ?? 0,
-            categoryName: e.category?.name ?? '—',
-            categoryId: e.category?.id ?? '',
-          }))
+          data.map(
+            (e: {
+              id: string
+              sku: string
+              model?: string
+              dailyPrice: number
+              category?: { name: string; id: string }
+            }) => ({
+              id: e.id,
+              sku: e.sku,
+              model: e.model ?? null,
+              dailyPrice: e.dailyPrice ?? 0,
+              categoryName: e.category?.name ?? '—',
+              categoryId: e.category?.id ?? '',
+            })
+          )
         )
       })
       .catch(() => setEquipment([]))
@@ -88,16 +98,16 @@ export function ShootTypeBulkEditor({ shootTypes, onUpdated }: ShootTypeBulkEdit
   }, [search])
 
   const filteredEquipment =
-    categoryFilter === 'all'
-      ? equipment
-      : equipment.filter((e) => e.categoryId === categoryFilter)
-  const categories = Array.from(new Set(equipment.map((e) => ({ id: e.categoryId, name: e.categoryName }))))
+    categoryFilter === 'all' ? equipment : equipment.filter((e) => e.categoryId === categoryFilter)
+  const categories = Array.from(
+    new Set(equipment.map((e) => ({ id: e.categoryId, name: e.categoryName })))
+  )
   const uniqueCategories = categories.filter((c, i, a) => a.findIndex((x) => x.id === c.id) === i)
 
   return (
     <Card className="overflow-hidden">
       <div className="flex flex-wrap items-center gap-4 border-b bg-muted/30 p-4">
-        <div className="relative flex-1 min-w-[200px]">
+        <div className="relative min-w-[200px] flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search equipment..."
@@ -145,9 +155,7 @@ export function ShootTypeBulkEditor({ shootTypes, onUpdated }: ShootTypeBulkEdit
             <TableBody>
               {filteredEquipment.map((eq) => (
                 <TableRow key={eq.id}>
-                  <TableCell className="font-medium">
-                    {eq.model ?? eq.sku}
-                  </TableCell>
+                  <TableCell className="font-medium">{eq.model ?? eq.sku}</TableCell>
                   <TableCell>{eq.categoryName}</TableCell>
                   <TableCell className="text-right">{eq.dailyPrice} SAR</TableCell>
                   {shootTypes.map((st) => (
@@ -207,8 +215,9 @@ export function ShootTypeBulkEditor({ shootTypes, onUpdated }: ShootTypeBulkEdit
         )}
       </div>
       <div className="border-t p-4">
-        <p className="text-sm text-muted-foreground mb-2">
-          Bulk editor: check the box and set budget tier per shoot type. Save will update recommendations via API.
+        <p className="mb-2 text-sm text-muted-foreground">
+          Bulk editor: check the box and set budget tier per shoot type. Save will update
+          recommendations via API.
         </p>
         <Button
           disabled={saving}

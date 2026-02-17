@@ -16,12 +16,14 @@ export async function signIn(email: string, password: string) {
       email,
       password,
     })
-    
+
     if (error) {
       console.error('Sign in error:', error)
-      throw new Error(error.message || 'فشل تسجيل الدخول. يرجى التحقق من البريد الإلكتروني وكلمة المرور.')
+      throw new Error(
+        error.message || 'فشل تسجيل الدخول. يرجى التحقق من البريد الإلكتروني وكلمة المرور.'
+      )
     }
-    
+
     return data
   } catch (error) {
     if (error instanceof Error) {
@@ -37,7 +39,7 @@ export async function signIn(email: string, password: string) {
 export async function signOut() {
   try {
     const { error } = await supabase.auth.signOut()
-    
+
     if (error) {
       console.error('Sign out error:', error)
       throw new Error(error.message || 'فشل تسجيل الخروج')
@@ -55,13 +57,16 @@ export async function signOut() {
  */
 export async function getCurrentUser() {
   try {
-    const { data: { user }, error } = await supabase.auth.getUser()
-    
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser()
+
     if (error) {
       console.error('Get user error:', error)
       return null
     }
-    
+
     return user
   } catch (error) {
     console.error('Unexpected error getting user:', error)
@@ -79,14 +84,17 @@ export async function getUserRole(userId: string) {
       .select('role:roles(*)')
       .eq('user_id', userId)
       .single()
-    
+
     if (error) {
       console.error('Get user role error:', error)
       // Return default role if not found
       return { name: 'client' }
     }
 
-    const role = data && typeof data === 'object' && 'role' in data ? (data as { role?: { name: string } }).role : undefined
+    const role =
+      data && typeof data === 'object' && 'role' in data
+        ? (data as { role?: { name: string } }).role
+        : undefined
     return role ?? { name: 'client' }
   } catch (error) {
     console.error('Unexpected error getting user role:', error)

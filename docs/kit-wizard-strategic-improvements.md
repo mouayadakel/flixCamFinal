@@ -1,4 +1,5 @@
 # Build Your Kit — Strategic UX/UI Improvement Plan
+
 ## Beyond the Audit: Making It World-Class
 
 **Date:** 2026-02-14  
@@ -14,6 +15,7 @@ The audit correctly identifies 2.8/10 quality issues. However, the **opportunity
 ### The Core Problem (Unstated in Audit)
 
 **The kit builder assumes users know exactly what they need.** But rental customers often:
+
 - Don't know equipment compatibility (will this lens fit this camera?)
 - Don't understand what's required for their project type
 - Don't know if they're over/under-renting
@@ -45,12 +47,14 @@ Transform from **"shopping cart with categories"** → **"intelligent rental con
 ```
 
 **Smart backend logic:**
+
 1. User selects "Wedding Photography"
 2. System suggests: Camera body (1) + 2-3 lenses + 2 memory cards + backup battery + light reflector
 3. Shows **why** each item: "85mm lens for portraits, 24-70mm for wide ceremony shots"
 4. User can accept bundle or customize
 
 **Implementation:**
+
 - New endpoint: `POST /api/kits/suggest` with `{ projectType, experience, budget, duration }`
 - Returns: `{ recommended: [], optional: [], alternatives: [] }`
 - Store project templates in DB (`kit_templates` table)
@@ -71,6 +75,7 @@ Transform from **"shopping cart with categories"** → **"intelligent rental con
 ```
 
 **Technical approach:**
+
 - Add `compatibility_matrix` table: `equipment_id_1`, `equipment_id_2`, `compatibility_type` (direct, adapter_required, incompatible)
 - Frontend checks selections in real-time
 - Show compatibility badges on equipment cards
@@ -81,6 +86,7 @@ Transform from **"shopping cart with categories"** → **"intelligent rental con
 **Scenario:** User adds entry-level lens
 
 **Smart suggestion:**
+
 ```
 ┌──────────────────────────────────────────┐
 │ 💡 Pro tip                                │
@@ -120,6 +126,7 @@ Transform from **"shopping cart with categories"** → **"intelligent rental con
 ```
 
 **Technical implementation:**
+
 - CSS Grid with drag-and-drop reordering (dnd-kit library)
 - Equipment thumbnails with hover zoom
 - Visual grouping by category (cameras, lenses, audio, lighting)
@@ -272,8 +279,8 @@ Step 2.3: Refined List (5-10 items)
     </TooltipTrigger>
     <TooltipContent>
       <p className="max-w-xs">
-        Full-frame cameras offer better low-light performance
-        and shallower depth-of-field than crop sensors.
+        Full-frame cameras offer better low-light performance and shallower depth-of-field than crop
+        sensors.
       </p>
     </TooltipContent>
   </Tooltip>
@@ -317,7 +324,7 @@ Step 2.3: Refined List (5-10 items)
 Your kit completeness: 85% ━━━━━━━━━━━━━━━━━━━░░
 ✅ Camera body         ⚠️  Missing: Backup battery
 ✅ Primary lens        ⚠️  Consider: Memory cards
-✅ Audio equipment     
+✅ Audio equipment
 ❓ No lighting (needed for indoor shoots)
 ```
 
@@ -335,24 +342,24 @@ interface KitWizardState {
   // Wizard state
   currentStep: number
   projectType: ProjectType | null
-  
+
   // Selections
   selectedCategory: Category | null
   selectedEquipment: Map<string, { qty: number; item: Equipment }>
   duration: { days: number; startDate: Date | null; endDate: Date | null }
-  
+
   // Computed
   total: number
   compatibility: CompatibilityIssue[]
   suggestions: Equipment[]
-  
+
   // Actions
   setStep: (step: number) => void
   addEquipment: (id: string, qty: number) => void
   removeEquipment: (id: string) => void
   updateQuantity: (id: string, qty: number) => void
   checkCompatibility: () => void
-  
+
   // Persistence
   saveProgress: () => void
   loadProgress: () => void
@@ -415,16 +422,16 @@ const addEquipmentMutation = useMutation({
   onMutate: async (newItem) => {
     // Cancel outgoing refetches
     await queryClient.cancelQueries(['cart'])
-    
+
     // Snapshot previous value
     const previousCart = queryClient.getQueryData(['cart'])
-    
+
     // Optimistically update to new value
     queryClient.setQueryData(['cart'], (old) => [...old, newItem])
-    
+
     // Show success toast immediately
     toast.success('Added to kit')
-    
+
     return { previousCart }
   },
   onError: (err, newItem, context) => {
@@ -517,12 +524,7 @@ const handlers = useSwipeable({
 
 ```tsx
 // Live region for step changes
-<div
-  role="status"
-  aria-live="polite"
-  aria-atomic="true"
-  className="sr-only"
->
+;<div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
   {announcement}
 </div>
 
@@ -532,7 +534,7 @@ useEffect(() => {
     t('kit.stepAnnouncement', {
       current: step,
       total: TOTAL_STEPS,
-      title: stepTitles[step]
+      title: stepTitles[step],
     })
   )
 }, [step])
@@ -558,7 +560,7 @@ useEffect(() => {
       }
     }
   }
-  
+
   window.addEventListener('keydown', handleKeyDown)
   return () => window.removeEventListener('keydown', handleKeyDown)
 }, [])
@@ -570,16 +572,16 @@ useEffect(() => {
 // Custom hook for step transitions
 function useFocusOnStepChange(step: number) {
   const stepHeadingRef = useRef<HTMLHeadingElement>(null)
-  
+
   useEffect(() => {
     // Move focus to new step heading
     stepHeadingRef.current?.focus()
-    
+
     // Announce to screen readers
     const announcement = `Step ${step} of ${TOTAL_STEPS}: ${stepTitles[step]}`
     announceToScreenReader(announcement)
   }, [step])
-  
+
   return stepHeadingRef
 }
 ```
@@ -713,8 +715,12 @@ const variant = useABTest('kit-wizard-flow', {
 })
 
 // Render different flows
-{variant === 'project-first' && <ProjectBasedFlow />}
-{variant === 'category-first' && <CategoryBasedFlow />}
+{
+  variant === 'project-first' && <ProjectBasedFlow />
+}
+{
+  variant === 'category-first' && <CategoryBasedFlow />
+}
 ```
 
 ### 10.3 Equipment Performance Metrics
@@ -745,8 +751,8 @@ analytics.track('Equipment Added to Kit', {
 ```tsx
 <ChatInterface>
   <Message from="assistant">
-    Based on your wedding shoot, I recommend adding a backup camera body.
-    Would you like me to suggest compatible options?
+    Based on your wedding shoot, I recommend adding a backup camera body. Would you like me to
+    suggest compatible options?
   </Message>
   <Input placeholder="Ask about equipment..." />
 </ChatInterface>
@@ -785,6 +791,7 @@ analytics.track('Equipment Added to Kit', {
 ```
 
 Team members can:
+
 - View kit
 - Add comments ("We don't need the 85mm")
 - Suggest changes
@@ -813,6 +820,7 @@ Team members can:
 ```
 
 User's next visit:
+
 ```
 Quick start from your templates:
 [📦 Wedding Standard] [🎥 Interview Setup] [🎬 Commercial Kit]
@@ -831,7 +839,7 @@ function celebrateKitComplete() {
   confetti({
     particleCount: 100,
     spread: 70,
-    origin: { y: 0.6 }
+    origin: { y: 0.6 },
   })
 }
 ```
@@ -872,12 +880,12 @@ function celebrateKitComplete() {
 function addToKit(equipment: Equipment) {
   // Add item
   dispatch(addEquipment(equipment))
-  
+
   // Haptic feedback
   if ('vibrate' in navigator) {
     navigator.vibrate(50) // 50ms vibration
   }
-  
+
   // Visual feedback
   toast.success('Added to kit')
 }
@@ -895,7 +903,7 @@ function addToKit(equipment: Equipment) {
 ⚠️  Warning: The Sony FE 24-70mm lens you selected requires
     a full-frame camera. Your current selection (Sony A6400)
     is a crop sensor.
-    
+
     [Switch to compatible lens] [Change camera to full-frame]
 ```
 
@@ -917,6 +925,7 @@ function addToKit(equipment: Equipment) {
 ### 13.3 Graceful Degradation
 
 **If AI suggestions fail, fall back to:**
+
 1. Most popular items in category
 2. Recently added items by other users
 3. Static category defaults
@@ -938,16 +947,18 @@ const suggestions = await fetchAISuggestions(projectType).catch(() => {
 
 ```tsx
 // Use logical properties throughout
-className="ms-4" // not "ml-4"
-className="me-auto" // not "mr-auto"
+className = 'ms-4' // not "ml-4"
+className = 'me-auto' // not "mr-auto"
 
 // Mirror directional icons
-{locale === 'ar' ? <ArrowLeft /> : <ArrowRight />}
+{
+  locale === 'ar' ? <ArrowLeft /> : <ArrowRight />
+}
 
 // RTL-aware animations
 const slideVariants = {
   enter: { x: locale === 'ar' ? -50 : 50 },
-  exit: { x: locale === 'ar' ? 50 : -50 }
+  exit: { x: locale === 'ar' ? 50 : -50 },
 }
 ```
 
@@ -958,16 +969,12 @@ const slideVariants = {
 ```tsx
 function PriceDisplay({ amount }: { amount: number }) {
   const { locale } = useLocale()
-  
+
   return (
     <div>
-      <span className="text-2xl font-bold">
-        {formatSar(amount)}
-      </span>
+      <span className="text-2xl font-bold">{formatSar(amount)}</span>
       {locale !== 'ar' && (
-        <span className="text-sm text-muted ms-2">
-          ≈ ${(amount / 3.75).toFixed(0)} USD
-        </span>
+        <span className="ms-2 text-sm text-muted">≈ ${(amount / 3.75).toFixed(0)} USD</span>
       )}
     </div>
   )
@@ -988,7 +995,9 @@ Payment methods accepted:
 ## 15. Implementation Roadmap
 
 ### Sprint 1: Foundation (2 weeks)
+
 **P0 issues from audit + basic improvements**
+
 - ✅ Fix cart integration
 - ✅ Add error handling & empty states
 - ✅ Translate all strings
@@ -997,7 +1006,9 @@ Payment methods accepted:
 - ✅ TanStack Query for data fetching
 
 ### Sprint 2: Enhanced UX (2 weeks)
+
 **Visual & interaction improvements**
+
 - ✅ Equipment cards with images
 - ✅ Compatibility checking
 - ✅ Smart pricing display
@@ -1006,7 +1017,9 @@ Payment methods accepted:
 - ✅ Loading states & skeletons
 
 ### Sprint 3: Intelligence Layer (2 weeks)
+
 **Project-based recommendations**
+
 - ✅ Project type selection
 - ✅ AI-powered kit suggestions
 - ✅ Kit templates
@@ -1014,7 +1027,9 @@ Payment methods accepted:
 - ✅ Popular bundles
 
 ### Sprint 4: Mobile & Polish (1 week)
+
 **Mobile optimization & micro-interactions**
+
 - ✅ Bottom sheet navigation
 - ✅ Swipe gestures
 - ✅ Animations & transitions
@@ -1022,7 +1037,9 @@ Payment methods accepted:
 - ✅ Performance tuning
 
 ### Sprint 5: Advanced Features (2 weeks)
+
 **Power user features**
+
 - ✅ 3D product views
 - ✅ Kit comparison
 - ✅ Collaborative kits
@@ -1034,15 +1051,17 @@ Payment methods accepted:
 ## 16. Success Metrics
 
 ### Primary KPIs
-| Metric | Current (Estimated) | Target | Measurement |
-|--------|---------------------|--------|-------------|
-| Kit completion rate | 15% | 45% | % who reach step 4 and add to cart |
-| Avg items per kit | 2.1 | 4.5 | Mean equipment count |
-| Time to complete | 8 min | 3 min | Median duration |
-| Cart abandonment | 70% | 35% | % who leave after kit added |
-| Mobile completion | 8% | 30% | Mobile-specific completion |
+
+| Metric              | Current (Estimated) | Target | Measurement                        |
+| ------------------- | ------------------- | ------ | ---------------------------------- |
+| Kit completion rate | 15%                 | 45%    | % who reach step 4 and add to cart |
+| Avg items per kit   | 2.1                 | 4.5    | Mean equipment count               |
+| Time to complete    | 8 min               | 3 min  | Median duration                    |
+| Cart abandonment    | 70%                 | 35%    | % who leave after kit added        |
+| Mobile completion   | 8%                  | 30%    | Mobile-specific completion         |
 
 ### Secondary KPIs
+
 - Equipment discovery rate (% who view >5 items)
 - Cross-category additions (% kits with 2+ categories)
 - Upgrade conversion (% who accept upgrade suggestions)
@@ -1054,6 +1073,7 @@ Payment methods accepted:
 ## 17. Quick Wins (Can Ship This Week)
 
 ### 1. Visual Loading States
+
 Replace `"جاري التحميل..."` with skeleton screens
 
 ```tsx
@@ -1064,6 +1084,7 @@ Replace `"جاري التحميل..."` with skeleton screens
 **Effort:** 1 hour
 
 ### 2. Equipment Images
+
 Add thumbnails from existing `equipment.imageUrl`
 
 ```tsx
@@ -1074,12 +1095,15 @@ Add thumbnails from existing `equipment.imageUrl`
 **Effort:** 2 hours
 
 ### 3. Smart Total Display
+
 Add subtotal, tax, deposit breakdown
 
 ```tsx
 <div className="space-y-2">
   <div>Daily: {formatSar(dailyRate)}</div>
-  <div>× {durationDays} days: {formatSar(subtotal)}</div>
+  <div>
+    × {durationDays} days: {formatSar(subtotal)}
+  </div>
   <div>VAT (15%): {formatSar(vat)}</div>
   <div className="font-bold">Total: {formatSar(total)}</div>
 </div>
@@ -1089,18 +1113,20 @@ Add subtotal, tax, deposit breakdown
 **Effort:** 1 hour
 
 ### 4. "Most Popular" Badge
+
 Show popular equipment with badge
 
 ```tsx
-{equipment.rentalCount > 20 && (
-  <Badge variant="secondary">🔥 Popular</Badge>
-)}
+{
+  equipment.rentalCount > 20 && <Badge variant="secondary">🔥 Popular</Badge>
+}
 ```
 
 **Impact:** Social proof, guides decisions  
 **Effort:** 30 minutes
 
 ### 5. Progress Persistence
+
 Save wizard state to localStorage
 
 ```tsx
@@ -1117,19 +1143,21 @@ useEffect(() => {
 ## 18. Risk Mitigation
 
 ### Technical Risks
-| Risk | Mitigation |
-|------|------------|
-| AI suggestions API latency | Implement 3s timeout, fall back to popular items |
-| 3D model loading performance | Progressive enhancement: show only for fast connections |
-| State sync issues (multi-tab) | Use Broadcast Channel API for cross-tab sync |
-| Compatibility rules complexity | Start with simple rules, expand based on data |
+
+| Risk                           | Mitigation                                              |
+| ------------------------------ | ------------------------------------------------------- |
+| AI suggestions API latency     | Implement 3s timeout, fall back to popular items        |
+| 3D model loading performance   | Progressive enhancement: show only for fast connections |
+| State sync issues (multi-tab)  | Use Broadcast Channel API for cross-tab sync            |
+| Compatibility rules complexity | Start with simple rules, expand based on data           |
 
 ### UX Risks
-| Risk | Mitigation |
-|------|------------|
-| Analysis paralysis (too many options) | Limit visible items to 12, add "Load more" |
-| Project type confusion | Add "Not sure? Browse all equipment" escape hatch |
-| Over-engineered for simple needs | Always offer "Quick add" shortcut path |
+
+| Risk                                  | Mitigation                                        |
+| ------------------------------------- | ------------------------------------------------- |
+| Analysis paralysis (too many options) | Limit visible items to 12, add "Load more"        |
+| Project type confusion                | Add "Not sure? Browse all equipment" escape hatch |
+| Over-engineered for simple needs      | Always offer "Quick add" shortcut path            |
 
 ---
 
@@ -1137,6 +1165,7 @@ useEffect(() => {
 
 **From:** Generic category → equipment → duration flow  
 **To:** Intelligent rental consultant that:
+
 - Understands user needs
 - Suggests optimal configurations
 - Prevents compatibility issues
@@ -1144,6 +1173,7 @@ useEffect(() => {
 - Delights with thoughtful interactions
 
 **Core Principle:** Every interaction should either:
+
 1. Reduce cognitive load
 2. Provide value/insight
 3. Build trust
@@ -1154,6 +1184,7 @@ This isn't just about fixing bugs—it's about creating the **industry-leading r
 ---
 
 **Next Steps:**
+
 1. Review with team
 2. Prioritize features based on impact/effort
 3. Create detailed tickets for Sprint 1

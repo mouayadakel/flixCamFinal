@@ -46,10 +46,7 @@ export async function GET(request: NextRequest) {
 
   const vendor = await VendorService.getVendorByUserId(session.user.id)
   if (!vendor) {
-    return NextResponse.json(
-      { error: 'Vendor account not found or not approved' },
-      { status: 403 }
-    )
+    return NextResponse.json({ error: 'Vendor account not found or not approved' }, { status: 403 })
   }
 
   const { searchParams } = new URL(request.url)
@@ -61,11 +58,7 @@ export async function GET(request: NextRequest) {
     filters.isActive = isActive === 'true'
   }
 
-  const result = await VendorService.getVendorEquipment(
-    vendor.id,
-    filters,
-    session.user.id
-  )
+  const result = await VendorService.getVendorEquipment(vendor.id, filters, session.user.id)
   return NextResponse.json(result)
 }
 
@@ -77,10 +70,7 @@ export async function POST(request: NextRequest) {
 
   const vendor = await VendorService.getVendorByUserId(session.user.id)
   if (!vendor) {
-    return NextResponse.json(
-      { error: 'Vendor account not found or not approved' },
-      { status: 403 }
-    )
+    return NextResponse.json({ error: 'Vendor account not found or not approved' }, { status: 403 })
   }
 
   let body: unknown
@@ -92,10 +82,7 @@ export async function POST(request: NextRequest) {
 
   const parsed = postSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.flatten().fieldErrors },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 })
   }
 
   const data = parsed.data

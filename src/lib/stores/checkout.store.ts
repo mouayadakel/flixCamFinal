@@ -105,6 +105,17 @@ export const useCheckoutStore = create<CheckoutState>()(
           holdExpiresAt: null,
         }),
     }),
-    { name: 'flixcam-checkout', partialize: (s) => ({ step: s.step, dates: s.dates, fulfillment: s.fulfillment, addons: s.addons, paymentMethod: s.paymentMethod, holdId: s.holdId, holdExpiresAt: s.holdExpiresAt }) }
+    {
+      name: 'flixcam-checkout',
+      partialize: (s) => ({
+        step: s.step,
+        dates: s.dates,
+        fulfillment: s.fulfillment,
+        addons: s.addons,
+        paymentMethod: s.paymentMethod,
+        holdId: s.holdId,
+        holdExpiresAt: s.holdExpiresAt,
+      }),
+    }
   )
 )

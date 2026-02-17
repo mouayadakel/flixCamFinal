@@ -6,11 +6,7 @@
 
 import { prisma } from '@/lib/db/prisma'
 import { AuditService } from './audit.service'
-import {
-  NotFoundError,
-  ValidationError,
-  ForbiddenError,
-} from '@/lib/errors'
+import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission } from '@/lib/auth/permissions'
 import { Decimal } from '@prisma/client/runtime/library'
 
@@ -484,9 +480,7 @@ export class StudioService {
     })
 
     if (activeBookings) {
-      throw new ValidationError(
-        'Cannot delete studio that has active bookings'
-      )
+      throw new ValidationError('Cannot delete studio that has active bookings')
     }
 
     // Soft delete
@@ -514,9 +508,7 @@ export class StudioService {
   /**
    * Check studio availability with buffer calculation
    */
-  static async checkAvailability(
-    check: StudioAvailabilityCheck
-  ): Promise<{
+  static async checkAvailability(check: StudioAvailabilityCheck): Promise<{
     available: boolean
     conflicts: any[]
     effectiveStartTime: Date
@@ -542,9 +534,7 @@ export class StudioService {
     // Calculate effective times with buffers
     // Setup buffer before start, cleaning buffer after end, reset time between bookings
     const effectiveStartTime = new Date(check.startTime)
-    effectiveStartTime.setMinutes(
-      effectiveStartTime.getMinutes() - studio.setupBuffer
-    )
+    effectiveStartTime.setMinutes(effectiveStartTime.getMinutes() - studio.setupBuffer)
 
     const effectiveEndTime = new Date(check.endTime)
     effectiveEndTime.setMinutes(
@@ -683,9 +673,7 @@ export class StudioService {
     })
 
     if (conflictingBooking) {
-      throw new ValidationError(
-        'Blackout date conflicts with an existing booking'
-      )
+      throw new ValidationError('Blackout date conflicts with an existing booking')
     }
 
     const blackoutDate = await prisma.studioBlackoutDate.create({

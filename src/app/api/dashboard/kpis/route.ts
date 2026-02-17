@@ -19,40 +19,41 @@ export async function GET() {
     const now = new Date()
     const startOfCurrentMonth = startOfMonth(now)
 
-    const [revenueData, bookingCount, totalEquipment, activeBookingEquipment, newClientBookings] = await Promise.all([
-      prisma.payment.findMany({
-        where: {
-          status: 'SUCCESS',
-          createdAt: { gte: startOfCurrentMonth },
-          deletedAt: null,
-        },
-        select: { amount: true },
-      }),
-      prisma.booking.count({
-        where: {
-          createdAt: { gte: startOfCurrentMonth },
-          deletedAt: null,
-        },
-      }),
-      prisma.equipment.count({
-        where: { isActive: true, deletedAt: null },
-      }),
-      prisma.bookingEquipment.findMany({
-        where: {
-          booking: { status: { in: ['CONFIRMED', 'ACTIVE'] }, deletedAt: null },
-          deletedAt: null,
-        },
-        select: { quantity: true },
-      }),
-      prisma.booking.findMany({
-        where: {
-          createdAt: { gte: startOfCurrentMonth },
-          deletedAt: null,
-        },
-        select: { customerId: true },
-        distinct: ['customerId'],
-      }),
-    ])
+    const [revenueData, bookingCount, totalEquipment, activeBookingEquipment, newClientBookings] =
+      await Promise.all([
+        prisma.payment.findMany({
+          where: {
+            status: 'SUCCESS',
+            createdAt: { gte: startOfCurrentMonth },
+            deletedAt: null,
+          },
+          select: { amount: true },
+        }),
+        prisma.booking.count({
+          where: {
+            createdAt: { gte: startOfCurrentMonth },
+            deletedAt: null,
+          },
+        }),
+        prisma.equipment.count({
+          where: { isActive: true, deletedAt: null },
+        }),
+        prisma.bookingEquipment.findMany({
+          where: {
+            booking: { status: { in: ['CONFIRMED', 'ACTIVE'] }, deletedAt: null },
+            deletedAt: null,
+          },
+          select: { quantity: true },
+        }),
+        prisma.booking.findMany({
+          where: {
+            createdAt: { gte: startOfCurrentMonth },
+            deletedAt: null,
+          },
+          select: { customerId: true },
+          distinct: ['customerId'],
+        }),
+      ])
 
     const revenue = revenueData.reduce((s, p) => s + Number(p.amount || 0), 0)
     const rentedEquipmentCount = activeBookingEquipment.reduce((s, be) => s + be.quantity, 0)

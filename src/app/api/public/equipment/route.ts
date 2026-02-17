@@ -21,7 +21,10 @@ export async function GET(request: NextRequest) {
   const brandId = searchParams.get('brandId') ?? undefined
   const brandIdsRaw = searchParams.get('brandIds')
   const brandIds = brandIdsRaw
-    ? brandIdsRaw.split(',').map((s) => s.trim()).filter(Boolean)
+    ? brandIdsRaw
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
     : undefined
   const q = searchParams.get('q')?.trim() ?? undefined
   const sort = searchParams.get('sort') ?? 'recommended'
@@ -36,10 +39,7 @@ export async function GET(request: NextRequest) {
   const take = Math.min(parseInt(searchParams.get('take') ?? '24', 10), 100)
   const cacheKey = `cat=${categoryId ?? ''}&brand=${brandId ?? ''}&bids=${brandIds?.join(',') ?? ''}&q=${q ?? ''}&sort=${sort}&pmin=${priceMinNum ?? ''}&pmax=${priceMaxNum ?? ''}&feat=${featured}&bt=${budgetTier ?? ''}&st=${shootTypeSlug ?? ''}&s=${skip}&t=${take}`
 
-  const cached = await cacheGet<{ data: unknown[]; total: number }>(
-    'equipmentList',
-    cacheKey
-  )
+  const cached = await cacheGet<{ data: unknown[]; total: number }>('equipmentList', cacheKey)
   if (cached) {
     return NextResponse.json(cached)
   }
@@ -53,7 +53,8 @@ export async function GET(request: NextRequest) {
     isActive: true,
     ...(featured && { featured: true }),
     ...(categoryId && { categoryId }),
-    ...(budgetTier && BUDGET_TIERS.includes(budgetTier as BudgetTier) && { budgetTier: budgetTier as BudgetTier }),
+    ...(budgetTier &&
+      BUDGET_TIERS.includes(budgetTier as BudgetTier) && { budgetTier: budgetTier as BudgetTier }),
     ...(brandIds?.length ? { brandId: { in: brandIds } } : brandId ? { brandId } : {}),
     ...(Object.keys(dailyPriceRange).length > 0 && { dailyPrice: dailyPriceRange }),
     ...(q && {

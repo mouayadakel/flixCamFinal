@@ -59,7 +59,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { name, nameAr, address, city, phone, email, isActive, latitude, longitude, workingHours } = body
+    const {
+      name,
+      nameAr,
+      address,
+      city,
+      phone,
+      email,
+      isActive,
+      latitude,
+      longitude,
+      workingHours,
+    } = body
 
     if (!name || typeof name !== 'string' || !name.trim()) {
       return NextResponse.json({ error: 'name is required' }, { status: 400 })
@@ -80,21 +91,24 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({
-      id: branch.id,
-      name: branch.name,
-      nameAr: branch.nameAr,
-      address: branch.address,
-      city: branch.city,
-      phone: branch.phone,
-      email: branch.email,
-      isActive: branch.isActive,
-      latitude: branch.latitude,
-      longitude: branch.longitude,
-      workingHours: branch.workingHours,
-      createdAt: branch.createdAt.toISOString(),
-      updatedAt: branch.updatedAt.toISOString(),
-    }, { status: 201 })
+    return NextResponse.json(
+      {
+        id: branch.id,
+        name: branch.name,
+        nameAr: branch.nameAr,
+        address: branch.address,
+        city: branch.city,
+        phone: branch.phone,
+        email: branch.email,
+        isActive: branch.isActive,
+        latitude: branch.latitude,
+        longitude: branch.longitude,
+        workingHours: branch.workingHours,
+        createdAt: branch.createdAt.toISOString(),
+        updatedAt: branch.updatedAt.toISOString(),
+      },
+      { status: 201 }
+    )
   } catch (e) {
     console.error('Branch create error:', e)
     return NextResponse.json({ error: 'Failed to create branch' }, { status: 500 })

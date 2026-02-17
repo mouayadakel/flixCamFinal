@@ -21,6 +21,7 @@
 **Purpose**: Enter and maintain equipment metadata, SEO, categories, and brands—no booking creation or financial access.
 
 **Key Permissions**:
+
 - Equipment: create, read, update (metadata only: name, description, SKU, serial number, specifications, images)
 - Category: create, view, update, delete
 - Brand: create, view, update, delete
@@ -28,6 +29,7 @@
 - Studio: view, update (basic info only)
 
 **Field-Level Restrictions**:
+
 - Cannot edit pricing, rental rates, or availability
 - Cannot access booking creation/editing
 - Cannot access client data
@@ -38,6 +40,7 @@
 ### 1.3 Pure Role-Based Permissions (No User Overrides)
 
 **Remove**:
+
 - `UserPermission` table
 - User permission override APIs (POST/DELETE user permissions)
 - "Add Permission Override" UI in user management
@@ -51,31 +54,39 @@
 ### 2.1 Tables to Create
 
 #### PermissionCategory
+
 - id, name (unique), nameAr, description, sortOrder, createdAt, updatedAt
 
 #### Permission (extend existing)
+
 - Add: categoryId, nameAr, descriptionAr, isSystem, sortOrder
 - Keep: id, name, description, createdAt, updatedAt, deletedAt
 
 #### Role
+
 - id, name (unique), displayName, displayNameAr, description, descriptionAr, isSystem, isDefault, priority, color, createdAt, createdBy, updatedAt, updatedBy, deletedAt, deletedBy
 
 #### RolePermission
+
 - id, roleId, permissionId, createdAt, createdBy
 - Unique: [roleId, permissionId]
 
 #### UserRole (multi-role)
+
 - id, userId, roleId, isPrimary, assignedAt, assignedBy, expiresAt
 - Unique: [userId, roleId]
 
 #### RoleConflict
+
 - id, roleAId, roleBId, reason, createdAt
 - Unique: [roleAId, roleBId]
 
 #### MenuItem
+
 - id, parentId, name, label, labelAr, icon, href, categoryId, sortOrder, isActive, requiresAllPermissions, createdAt, updatedAt
 
 #### MenuItemPermission
+
 - id, menuItemId, permissionId
 - Unique: [menuItemId, permissionId]
 
@@ -91,15 +102,15 @@ Add or support: beforeState, afterState, entityType, entityId for RBAC audit eve
 
 ## Part 3: Required Roles (7 System Roles)
 
-| Role | Purpose | Key Focus |
-|------|---------|-----------|
-| Super Admin | Full system control | Everything |
-| Admin | Day-to-day operations | Bookings, clients, equipment |
-| Finance | Financial operations | Invoices, payments, reports |
-| Data Entry | Metadata and SEO | Equipment details, categories, brands, SEO |
+| Role              | Purpose                   | Key Focus                                  |
+| ----------------- | ------------------------- | ------------------------------------------ |
+| Super Admin       | Full system control       | Everything                                 |
+| Admin             | Day-to-day operations     | Bookings, clients, equipment               |
+| Finance           | Financial operations      | Invoices, payments, reports                |
+| Data Entry        | Metadata and SEO          | Equipment details, categories, brands, SEO |
 | Warehouse Manager | Inventory and maintenance | Equipment tracking, warehouse, maintenance |
-| Delivery | Pickup and delivery | Delivery tasks, equipment check-out |
-| Technicians | Equipment maintenance | Maintenance tickets, equipment condition |
+| Delivery          | Pickup and delivery       | Delivery tasks, equipment check-out        |
+| Technicians       | Equipment maintenance     | Maintenance tickets, equipment condition   |
 
 ### 3.1 Role Conflicts (Segregation of Duties)
 
@@ -115,9 +126,9 @@ Use pattern: `category.action` (e.g., `booking.create`, `equipment.edit_metadata
 
 **Categories**: Booking, Equipment, Payment, Client, Invoice, Contract, Quote, Maintenance, Reports, Marketing, Coupon, Settings, User, Studio, Category, Brand, Delivery, Warehouse, Approval, Audit, Dashboard, SEO, System.
 
-**Data Entry permissions**: equipment.create, equipment.read, equipment.edit_metadata; category.*; brand.*; seo.edit_meta_titles, seo.edit_meta_descriptions, seo.edit_slugs, seo.edit_alt_text; studio.view, studio.update.
+**Data Entry permissions**: equipment.create, equipment.read, equipment.edit*metadata; category.*; brand.\_; seo.edit_meta_titles, seo.edit_meta_descriptions, seo.edit_slugs, seo.edit_alt_text; studio.view, studio.update.
 
-**Explicitly NOT for Data Entry**: booking.*, payment.*, invoice.*, equipment.edit_pricing.
+**Explicitly NOT for Data Entry**: booking._, payment._, invoice.\*, equipment.edit_pricing.
 
 ---
 
@@ -135,26 +146,31 @@ Map Product catalog fields similarly where relevant.
 ## Part 6: Backend APIs
 
 ### Role Management
+
 - GET/POST /api/admin/roles
 - GET/PATCH/DELETE /api/admin/roles/[id]
 - POST /api/admin/roles/[id]/permissions
 - POST /api/admin/roles/[id]/clone
 
 ### Permission Management
+
 - GET /api/admin/permissions
 - GET /api/admin/permissions/categories
 
 ### User Role Assignment
+
 - GET/POST /api/admin/users/[id]/roles
 - DELETE /api/admin/users/[id]/roles/[roleId]
 - GET /api/admin/users/[id]/effective-permissions
 
 ### Menu
+
 - GET /api/admin/menu
 - PATCH /api/admin/menu/[id]
 - GET /api/user/menu (filtered by user permissions)
 
 ### Removed
+
 - POST/DELETE /api/admin/users/[id]/permissions
 
 ---
@@ -183,24 +199,29 @@ Map Product catalog fields similarly where relevant.
 ## Part 9: Current FlixCam Gaps & Adjustments
 
 ### Role Set Mapping
+
 - Add: Super Admin, Delivery
 - Map: Admin→ADMIN, Finance→ACCOUNTANT, Data Entry→DATA_ENTRY, Warehouse Mgr→WAREHOUSE_MANAGER, Technicians→TECHNICIAN
 - Retire or map: SALES_MANAGER, CUSTOMER_SERVICE, MARKETING_MANAGER, RISK_MANAGER, APPROVAL_AGENT, AUDITOR, AI_OPERATOR
 
 ### Product vs Equipment
+
 - FlixCam has Product (catalog) and Equipment (physical units)
 - Map Data Entry permissions to both Product and Equipment metadata/SEO
 - Apply field-level restrictions to Product pricing fields
 
 ### Super Admin vs "No Admin Bypass"
+
 - ROLES_AND_SECURITY.md forbids admin bypass
 - Option A: Super Admin bypass only for RBAC management
 - Option B: Document Super Admin as explicit exception
 
 ### Redis
+
 - Use existing ioredis (getRedisClient) for role/menu caching
 
 ### Permission Naming
+
 - Use consistent pattern: client.view, seo.view_reports (not client.read, seo.view_seo_reports)
 
 ---

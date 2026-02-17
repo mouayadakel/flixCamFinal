@@ -11,11 +11,7 @@ import { AuditService } from './audit.service'
 import { InspectionService, InspectionInput } from './inspection.service'
 import { BookingService } from './booking.service'
 import { EventBus } from '@/lib/events/event-bus'
-import {
-  NotFoundError,
-  ValidationError,
-  ForbiddenError,
-} from '@/lib/errors'
+import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission } from '@/lib/auth/permissions'
 import { BookingStatus, EquipmentCondition } from '@prisma/client'
 
@@ -94,9 +90,7 @@ export class WarehouseService {
 
     // Validate all equipment IDs belong to this booking
     const bookingEquipmentIds = booking.equipment.map((be) => be.equipmentId)
-    const invalidEquipment = input.equipmentIds.filter(
-      (id) => !bookingEquipmentIds.includes(id)
-    )
+    const invalidEquipment = input.equipmentIds.filter((id) => !bookingEquipmentIds.includes(id))
 
     if (invalidEquipment.length > 0) {
       throw new ValidationError(
@@ -152,11 +146,7 @@ export class WarehouseService {
 
       // Transition booking to ACTIVE if it's CONFIRMED
       if (booking.status === 'CONFIRMED') {
-        await BookingService.transitionState(
-          input.bookingId,
-          'ACTIVE',
-          userId
-        )
+        await BookingService.transitionState(input.bookingId, 'ACTIVE', userId)
       }
 
       return inspections
@@ -219,9 +209,7 @@ export class WarehouseService {
 
     // Validate all equipment IDs belong to this booking
     const bookingEquipmentIds = booking.equipment.map((be) => be.equipmentId)
-    const invalidEquipment = input.equipmentIds.filter(
-      (id) => !bookingEquipmentIds.includes(id)
-    )
+    const invalidEquipment = input.equipmentIds.filter((id) => !bookingEquipmentIds.includes(id))
 
     if (invalidEquipment.length > 0) {
       throw new ValidationError(
@@ -240,9 +228,7 @@ export class WarehouseService {
     })
 
     if (checkOuts.length !== input.equipmentIds.length) {
-      throw new ValidationError(
-        'Some equipment has not been checked out yet'
-      )
+      throw new ValidationError('Some equipment has not been checked out yet')
     }
 
     // Use transaction
@@ -296,11 +282,7 @@ export class WarehouseService {
 
       // If all equipment is checked in, transition booking to RETURNED
       if (allCheckIns.length >= allBookingEquipment.length) {
-        await BookingService.transitionState(
-          input.bookingId,
-          'RETURNED',
-          userId
-        )
+        await BookingService.transitionState(input.bookingId, 'RETURNED', userId)
       }
 
       return inspections

@@ -27,10 +27,10 @@ export function StudioDetail({ studio }: StudioDetailProps) {
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold">{studio.name}</h1>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-4">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="space-y-4 lg:col-span-2">
           {studio.media.length > 0 ? (
-            <div className="aspect-video relative rounded-lg overflow-hidden bg-muted">
+            <div className="relative aspect-video overflow-hidden rounded-lg bg-muted">
               <Image
                 src={studio.media[0].url}
                 alt={studio.name}
@@ -41,22 +41,20 @@ export function StudioDetail({ studio }: StudioDetailProps) {
               />
             </div>
           ) : (
-            <div className="aspect-video rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
+            <div className="flex aspect-video items-center justify-center rounded-lg bg-muted text-muted-foreground">
               No image
             </div>
           )}
-          {studio.description && (
-            <p className="text-muted-foreground">{studio.description}</p>
-          )}
-          {studio.capacity != null && (
-            <p className="text-sm">Capacity: {studio.capacity}</p>
-          )}
+          {studio.description && <p className="text-muted-foreground">{studio.description}</p>}
+          {studio.capacity != null && <p className="text-sm">Capacity: {studio.capacity}</p>}
           {studio.addOns.length > 0 && (
             <div>
-              <h3 className="font-medium mb-2">Add-ons</h3>
-              <ul className="text-sm text-muted-foreground space-y-1">
+              <h3 className="mb-2 font-medium">Add-ons</h3>
+              <ul className="space-y-1 text-sm text-muted-foreground">
                 {studio.addOns.map((a) => (
-                  <li key={a.id}>{a.name} — {a.price.toLocaleString()} SAR</li>
+                  <li key={a.id}>
+                    {a.name} — {a.price.toLocaleString()} SAR
+                  </li>
                 ))}
               </ul>
             </div>

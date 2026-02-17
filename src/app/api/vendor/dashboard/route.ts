@@ -16,10 +16,7 @@ export async function GET() {
 
   const vendor = await VendorService.getVendorByUserId(session.user.id)
   if (!vendor) {
-    return NextResponse.json(
-      { error: 'Vendor account not found or not approved' },
-      { status: 403 }
-    )
+    return NextResponse.json({ error: 'Vendor account not found or not approved' }, { status: 403 })
   }
 
   const stats = await VendorService.getVendorDashboardStats(vendor.id, session.user.id)

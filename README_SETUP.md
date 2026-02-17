@@ -13,6 +13,7 @@
 ## 🚀 Quick Start
 
 ### 1. Install Dependencies (if not done)
+
 ```bash
 npm install
 ```
@@ -20,6 +21,7 @@ npm install
 ### 2. Set Up Database
 
 **Option A: Using Docker (Recommended)**
+
 ```bash
 # Start PostgreSQL
 docker compose up -d
@@ -32,17 +34,20 @@ sleep 5
 ```
 
 **Option B: Using Local PostgreSQL**
+
 1. Create database: `createdb flixcam_rent`
 2. Update `.env` with your connection string
 3. Run: `./scripts/setup-database.sh`
 
 **Option C: Using Cloud Database (Supabase/Neon)**
+
 1. Create PostgreSQL database
 2. Get connection string
 3. Update `.env` DATABASE_URL
 4. Run: `./scripts/setup-database.sh`
 
 ### 3. Start Development Server
+
 ```bash
 npm run dev
 ```
@@ -56,6 +61,7 @@ npm run dev
 ### 5. Default Credentials
 
 After database seeding:
+
 - **Email**: `admin@flixcam.rent`
 - **Password**: `admin123`
 
@@ -83,6 +89,7 @@ npm run type-check   # TypeScript check
 ## 🗄️ Database Status
 
 Check database connection:
+
 ```bash
 curl http://localhost:3000/api/test
 ```
@@ -92,14 +99,17 @@ If you see `database_not_configured`, you need to set up the database.
 ## 🔧 Troubleshooting
 
 ### "MissingSecret" Error
+
 ✅ **Fixed** - `.env` file created with `AUTH_SECRET`
 
 ### "Can't reach database server"
+
 - Make sure PostgreSQL is running
 - Check `DATABASE_URL` in `.env`
 - Verify connection string is correct
 
 ### "Environment variable not found: DATABASE_URL"
+
 - Ensure `.env` file exists in project root
 - Check that `DATABASE_URL` is set in `.env`
 

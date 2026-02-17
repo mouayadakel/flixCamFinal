@@ -84,7 +84,11 @@ Generate SEO metadata:`
       throw new Error('Empty response from OpenAI')
     }
 
-    const parsed = JSON.parse(content) as { metaTitle: string; metaDescription: string; metaKeywords: string }
+    const parsed = JSON.parse(content) as {
+      metaTitle: string
+      metaDescription: string
+      metaKeywords: string
+    }
 
     // Estimate cost
     const inputTokens = response.usage?.prompt_tokens || 0
@@ -145,12 +149,17 @@ Return a JSON object with: metaTitle, metaDescription, metaKeywords`
     const jsonMatch = content.match(/\{[\s\S]*\}/)
     const jsonContent = jsonMatch ? jsonMatch[0] : content
 
-    const parsed = JSON.parse(jsonContent) as { metaTitle: string; metaDescription: string; metaKeywords: string }
+    const parsed = JSON.parse(jsonContent) as {
+      metaTitle: string
+      metaDescription: string
+      metaKeywords: string
+    }
 
     // Estimate cost
     const estimatedInputTokens = Math.ceil(prompt.length / 4)
     const estimatedOutputTokens = Math.ceil(content.length / 4)
-    const cost = (estimatedInputTokens / 1_000_000) * 0.075 + (estimatedOutputTokens / 1_000_000) * 0.3
+    const cost =
+      (estimatedInputTokens / 1_000_000) * 0.075 + (estimatedOutputTokens / 1_000_000) * 0.3
 
     return {
       metaTitle: parsed.metaTitle || context.name,
@@ -175,7 +184,7 @@ Return a JSON object with: metaTitle, metaDescription, metaKeywords`
  * Generate SEO metadata using configured provider
  */
 export async function generateSEO(context: SEOContext, provider?: SEOProvider): Promise<SEOResult> {
-  const effectiveProvider = provider || (process.env.AI_PROVIDER || 'openai') as SEOProvider
+  const effectiveProvider = provider || ((process.env.AI_PROVIDER || 'openai') as SEOProvider)
   const settings = await getAISettings(effectiveProvider)
 
   if (!settings || !settings.enabled) {
@@ -215,7 +224,7 @@ export async function generateSEOBatch(
   contexts: SEOContext[],
   provider?: SEOProvider
 ): Promise<SEOResult[]> {
-  const effectiveProvider = provider || (process.env.AI_PROVIDER || 'openai') as SEOProvider
+  const effectiveProvider = provider || ((process.env.AI_PROVIDER || 'openai') as SEOProvider)
   const settings = await getAISettings(effectiveProvider)
 
   if (!settings || !settings.enabled) {

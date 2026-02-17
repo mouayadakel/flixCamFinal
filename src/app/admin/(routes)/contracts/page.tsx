@@ -50,7 +50,10 @@ interface Contract {
   updatedAt: string
 }
 
-const STATUS_LABELS: Record<ContractStatus, { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_LABELS: Record<
+  ContractStatus,
+  { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   draft: { ar: 'مسودة', en: 'Draft', variant: 'outline' },
   pending_signature: { ar: 'في انتظار التوقيع', en: 'Pending Signature', variant: 'secondary' },
   signed: { ar: 'موقّع', en: 'Signed', variant: 'default' },
@@ -152,18 +155,21 @@ export default function ContractsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">العقود</h1>
-          <p className="text-muted-foreground mt-2">
-            إدارة العقود والتوقيعات
-          </p>
+          <p className="mt-2 text-muted-foreground">إدارة العقود والتوقيعات</p>
         </div>
-        <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={filteredContracts.length === 0}>
-          <Download className="h-4 w-4 ml-2" />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleExportCSV}
+          disabled={filteredContracts.length === 0}
+        >
+          <Download className="ml-2 h-4 w-4" />
           تصدير CSV
         </Button>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 items-center flex-wrap">
+      <div className="flex flex-wrap items-center gap-4">
         <input
           type="date"
           value={dateFrom}
@@ -181,18 +187,20 @@ export default function ContractsPage() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="rounded-lg border px-4 py-2"
         >
           {statuses.map((status) => (
             <option key={status} value={status}>
-              {status === 'all' ? 'جميع الحالات' : STATUS_LABELS[status as ContractStatus]?.ar || status}
+              {status === 'all'
+                ? 'جميع الحالات'
+                : STATUS_LABELS[status as ContractStatus]?.ar || status}
             </option>
           ))}
         </select>
         <select
           value={signedFilter}
           onChange={(e) => setSignedFilter(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="rounded-lg border px-4 py-2"
         >
           <option value="all">جميع العقود</option>
           <option value="true">موقّعة</option>
@@ -201,11 +209,19 @@ export default function ContractsPage() {
       </div>
 
       {/* Contracts Table */}
-      <div className="border rounded-lg">
+      <div className="rounded-lg border">
         {loading ? (
           <TableSkeleton
             rowCount={5}
-            headers={['رقم الحجز', 'العميل', 'إصدار الشروط', 'الحالة', 'تاريخ التوقيع', 'تاريخ الإنشاء', 'الإجراءات']}
+            headers={[
+              'رقم الحجز',
+              'العميل',
+              'إصدار الشروط',
+              'الحالة',
+              'تاريخ التوقيع',
+              'تاريخ الإنشاء',
+              'الإجراءات',
+            ]}
           />
         ) : filteredContracts.length === 0 ? (
           <EmptyState
@@ -259,7 +275,7 @@ export default function ContractsPage() {
                     <div className="flex gap-2">
                       <Link href={`/admin/contracts/${contract.id}`}>
                         <Button size="sm" variant="ghost">
-                          <Eye className="h-4 w-4 ml-1" />
+                          <Eye className="ml-1 h-4 w-4" />
                           عرض
                         </Button>
                       </Link>

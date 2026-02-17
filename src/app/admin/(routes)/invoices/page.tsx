@@ -56,7 +56,10 @@ interface Invoice {
   } | null
 }
 
-const STATUS_LABELS: Record<InvoiceStatus, { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_LABELS: Record<
+  InvoiceStatus,
+  { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   draft: { ar: 'مسودة', en: 'Draft', variant: 'outline' },
   sent: { ar: 'مرسل', en: 'Sent', variant: 'secondary' },
   paid: { ar: 'مدفوع', en: 'Paid', variant: 'default' },
@@ -95,13 +98,7 @@ export default function InvoicesPage() {
     'partially_paid',
   ]
 
-  const types: Array<InvoiceType | 'all'> = [
-    'all',
-    'booking',
-    'deposit',
-    'refund',
-    'adjustment',
-  ]
+  const types: Array<InvoiceType | 'all'> = ['all', 'booking', 'deposit', 'refund', 'adjustment']
 
   useEffect(() => {
     loadInvoices()
@@ -150,7 +147,11 @@ export default function InvoicesPage() {
   }
 
   const isOverdue = (invoice: Invoice) => {
-    return invoice.status !== 'paid' && invoice.status !== 'cancelled' && new Date(invoice.dueDate) < new Date()
+    return (
+      invoice.status !== 'paid' &&
+      invoice.status !== 'cancelled' &&
+      new Date(invoice.dueDate) < new Date()
+    )
   }
 
   const daysOverdue = (invoice: Invoice): number | null => {
@@ -204,11 +205,15 @@ export default function InvoicesPage() {
 
   const exportSelected = () => {
     const toExport = filteredInvoices.filter((inv) => selectedIds.has(inv.id))
-    exportToCSV(toCSVRows(toExport), `invoices-selected-${new Date().toISOString().slice(0, 10)}`, [...CSV_COLUMNS])
+    exportToCSV(toCSVRows(toExport), `invoices-selected-${new Date().toISOString().slice(0, 10)}`, [
+      ...CSV_COLUMNS,
+    ])
   }
 
   const handleExportCSV = () => {
-    exportToCSV(toCSVRows(filteredInvoices), `invoices-${new Date().toISOString().slice(0, 10)}`, [...CSV_COLUMNS])
+    exportToCSV(toCSVRows(filteredInvoices), `invoices-${new Date().toISOString().slice(0, 10)}`, [
+      ...CSV_COLUMNS,
+    ])
   }
 
   return (
@@ -216,16 +221,16 @@ export default function InvoicesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">الفواتير</h1>
-          <p className="text-muted-foreground mt-2">
-            إدارة الفواتير والمدفوعات
-          </p>
+          <p className="mt-2 text-muted-foreground">إدارة الفواتير والمدفوعات</p>
         </div>
         <div className="flex gap-2">
           {selectedIds.size > 0 && (
             <>
-              <span className="text-sm text-muted-foreground self-center">{selectedIds.size} محدد</span>
+              <span className="self-center text-sm text-muted-foreground">
+                {selectedIds.size} محدد
+              </span>
               <Button variant="outline" size="sm" onClick={() => exportSelected()}>
-                <Download className="h-4 w-4 ml-2" />
+                <Download className="ml-2 h-4 w-4" />
                 تصدير المحدد
               </Button>
               <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>
@@ -233,13 +238,18 @@ export default function InvoicesPage() {
               </Button>
             </>
           )}
-          <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={filteredInvoices.length === 0}>
-            <Download className="h-4 w-4 ml-2" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportCSV}
+            disabled={filteredInvoices.length === 0}
+          >
+            <Download className="ml-2 h-4 w-4" />
             تصدير CSV
           </Button>
           <Button asChild>
             <Link href="/admin/invoices/new">
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="ml-2 h-4 w-4" />
               فاتورة جديدة
             </Link>
           </Button>
@@ -247,7 +257,7 @@ export default function InvoicesPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 items-center flex-wrap">
+      <div className="flex flex-wrap items-center gap-4">
         <input
           type="date"
           value={dateFrom}
@@ -265,18 +275,20 @@ export default function InvoicesPage() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="rounded-lg border px-4 py-2"
         >
           {statuses.map((status) => (
             <option key={status} value={status}>
-              {status === 'all' ? 'جميع الحالات' : STATUS_LABELS[status as InvoiceStatus]?.ar || status}
+              {status === 'all'
+                ? 'جميع الحالات'
+                : STATUS_LABELS[status as InvoiceStatus]?.ar || status}
             </option>
           ))}
         </select>
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="rounded-lg border px-4 py-2"
         >
           {types.map((type) => (
             <option key={type} value={type}>
@@ -287,13 +299,15 @@ export default function InvoicesPage() {
       </div>
 
       {/* Invoices Table */}
-      <div className="border rounded-lg">
+      <div className="rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-10">
                 <Checkbox
-                  checked={filteredInvoices.length > 0 && selectedIds.size === filteredInvoices.length}
+                  checked={
+                    filteredInvoices.length > 0 && selectedIds.size === filteredInvoices.length
+                  }
                   onCheckedChange={toggleSelectAll}
                   aria-label="تحديد الكل"
                 />
@@ -323,7 +337,7 @@ export default function InvoicesPage() {
               </TableRow>
             ) : filteredInvoices.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={11} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={11} className="py-8 text-center text-muted-foreground">
                   لا توجد فواتير
                 </TableCell>
               </TableRow>
@@ -357,13 +371,17 @@ export default function InvoicesPage() {
                         {getStatusLabel(invoice.status)}
                       </Badge>
                       {isOverdue(invoice) && (
-                        <Badge variant="destructive" className="bg-red-600">متأخر</Badge>
+                        <Badge variant="destructive" className="bg-red-600">
+                          متأخر
+                        </Badge>
                       )}
                     </div>
                   </TableCell>
                   <TableCell>
                     {daysOverdue(invoice) !== null ? (
-                      <span className="text-destructive font-medium">{daysOverdue(invoice)} يوم</span>
+                      <span className="font-medium text-destructive">
+                        {daysOverdue(invoice)} يوم
+                      </span>
                     ) : (
                       '—'
                     )}
@@ -375,7 +393,13 @@ export default function InvoicesPage() {
                     </span>
                   </TableCell>
                   <TableCell>
-                    <span className={invoice.remainingAmount > 0 ? 'text-orange-600 font-medium' : 'text-green-600'}>
+                    <span
+                      className={
+                        invoice.remainingAmount > 0
+                          ? 'font-medium text-orange-600'
+                          : 'text-green-600'
+                      }
+                    >
                       {formatCurrency(invoice.remainingAmount)}
                     </span>
                   </TableCell>
@@ -384,7 +408,7 @@ export default function InvoicesPage() {
                     <div className="flex gap-2">
                       <Link href={`/admin/invoices/${invoice.id}`}>
                         <Button size="sm" variant="ghost">
-                          <Eye className="h-4 w-4 ml-1" />
+                          <Eye className="ml-1 h-4 w-4" />
                           عرض
                         </Button>
                       </Link>

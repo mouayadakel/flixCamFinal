@@ -71,10 +71,9 @@ function generateInvoiceXML(data: ZATCAInvoiceData): string {
     suppressEmptyNode: true,
   })
 
-  const issueDate = typeof data.issueDate === 'string' 
-    ? data.issueDate 
-    : data.issueDate.toISOString().split('T')[0]
-  
+  const issueDate =
+    typeof data.issueDate === 'string' ? data.issueDate : data.issueDate.toISOString().split('T')[0]
+
   const issueTime = data.issueTime || new Date().toTimeString().split(' ')[0]
 
   const invoice = {
@@ -222,9 +221,8 @@ function generateInvoiceXML(data: ZATCAInvoiceData): string {
 function generateQRCodeData(data: ZATCAInvoiceData): string {
   const sellerName = process.env.ZATCA_COMPANY_NAME || data.seller.name
   const sellerVAT = process.env.ZATCA_COMPANY_VAT || data.seller.vatNumber
-  const issueDate = typeof data.issueDate === 'string' 
-    ? data.issueDate 
-    : data.issueDate.toISOString().split('T')[0]
+  const issueDate =
+    typeof data.issueDate === 'string' ? data.issueDate : data.issueDate.toISOString().split('T')[0]
   const issueTime = data.issueTime || new Date().toTimeString().split(' ')[0]
   const dateTime = `${issueDate}T${issueTime}Z`
 
@@ -242,9 +240,7 @@ function generateQRCodeData(data: ZATCAInvoiceData): string {
  * @param data - Invoice data
  * @returns Invoice result with XML, QR code, and submission status
  */
-export async function generateZATCAInvoice(
-  data: ZATCAInvoiceData
-): Promise<ZATCAInvoiceResult> {
+export async function generateZATCAInvoice(data: ZATCAInvoiceData): Promise<ZATCAInvoiceResult> {
   try {
     // 1. Generate XML invoice
     const xmlInvoice = generateInvoiceXML(data)
@@ -255,10 +251,7 @@ export async function generateZATCAInvoice(
 
     // 3. Calculate hash (simplified - in production, use proper hashing algorithm)
     const crypto = require('crypto')
-    const hash = crypto
-      .createHash('sha256')
-      .update(xmlInvoice)
-      .digest('hex')
+    const hash = crypto.createHash('sha256').update(xmlInvoice).digest('hex')
 
     // 4. Submit to ZATCA API (if configured)
     let uuid: string | null = null
@@ -270,9 +263,9 @@ export async function generateZATCAInvoice(
         const response = await fetch(process.env.ZATCA_API_URL, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${process.env.ZATCA_API_KEY}`,
+            Authorization: `Bearer ${process.env.ZATCA_API_KEY}`,
             'Content-Type': 'application/xml',
-            'Accept': 'application/json',
+            Accept: 'application/json',
           },
           body: xmlInvoice,
         })

@@ -11,8 +11,8 @@ export default function CartPage() {
   const { t } = useLocale()
 
   return (
-    <main className="container py-8 px-4">
-      <h1 className="text-2xl font-bold mb-6">{t('cart.title')}</h1>
+    <main className="container px-4 py-8">
+      <h1 className="mb-6 text-2xl font-bold">{t('cart.title')}</h1>
       <CartList />
     </main>
   )

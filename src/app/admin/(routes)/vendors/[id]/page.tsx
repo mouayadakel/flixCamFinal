@@ -134,7 +134,7 @@ export default function VendorDetailPage() {
       <div>
         <Link
           href="/admin/vendors"
-          className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1 mb-2"
+          className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowRight className="h-4 w-4" />
           العودة للموردين
@@ -147,9 +147,7 @@ export default function VendorDetailPage() {
             </Badge>
           </div>
           <div className="flex gap-2">
-            {vendor.status === 'PENDING' && (
-              <Button onClick={handleApprove}>اعتماد</Button>
-            )}
+            {vendor.status === 'PENDING' && <Button onClick={handleApprove}>اعتماد</Button>}
             {vendor.status === 'APPROVED' && (
               <Button variant="destructive" onClick={handleSuspend}>
                 تعليق
@@ -162,7 +160,7 @@ export default function VendorDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>معلومات المورد</CardTitle>
@@ -195,10 +193,7 @@ export default function VendorDetailPage() {
                 ) : (
                   <EyeOff className="h-4 w-4 text-muted-foreground" />
                 )}
-                <Switch
-                  checked={vendor.isNameVisible}
-                  onCheckedChange={handleToggleVisibility}
-                />
+                <Switch checked={vendor.isNameVisible} onCheckedChange={handleToggleVisibility} />
               </div>
             </div>
           </CardContent>

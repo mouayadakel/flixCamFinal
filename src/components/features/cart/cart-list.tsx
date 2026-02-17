@@ -47,8 +47,8 @@ export function CartList() {
 
   if (items.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground mb-4">{t('cart.empty')}</p>
+      <div className="py-12 text-center">
+        <p className="mb-4 text-muted-foreground">{t('cart.empty')}</p>
         <Button asChild>
           <Link href="/equipment">{t('cart.continueShopping')}</Link>
         </Button>
@@ -57,11 +57,9 @@ export function CartList() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <div className="lg:col-span-2 space-y-4">
-        {error && (
-          <p className="text-sm text-destructive">{error}</p>
-        )}
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+      <div className="space-y-4 lg:col-span-2">
+        {error && <p className="text-sm text-destructive">{error}</p>}
         {items.map((item) => (
           <CartItemRow
             key={item.id}

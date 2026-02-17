@@ -68,18 +68,21 @@
 ## What Can Be Tested Without API Keys
 
 ### ✅ Already Verified:
+
 - TypeScript compilation (0 errors)
 - File structure and organization
 - Import/export correctness
 - Code syntax and structure
 
 ### ⚠️ Requires Dev Server:
+
 - Page rendering (needs Next.js dev server)
 - Component mounting
 - Route navigation
 - API route responses (with mock data)
 
 ### ❌ Requires Full Setup:
+
 - Database queries (needs database connection)
 - Authentication flow (needs auth setup)
 - Real data display (needs seeded database)
@@ -90,12 +93,14 @@
 ## Testing Checklist Status
 
 ### Dashboard
+
 - [ ] Dashboard loads with correct KPIs
 - [ ] Active bookings display correctly
 - [ ] Upcoming bookings display correctly
 - [ ] Quick actions navigate correctly
 
 ### Bookings
+
 - [ ] Bookings list loads correctly
 - [ ] Filters work (status, search)
 - [ ] Booking detail page shows all information
@@ -103,6 +108,7 @@
 - [ ] Payment history displays correctly
 
 ### Contracts
+
 - [ ] Contracts list loads correctly
 - [ ] Contract viewing page displays content
 - [ ] Contract signing page loads
@@ -112,6 +118,7 @@
 - [ ] Terms acceptance required
 
 ### Invoices
+
 - [ ] Invoices list loads correctly
 - [ ] Payment status displays correctly
 - [ ] Invoice detail page shows all information
@@ -123,6 +130,7 @@
 ## Next Steps for Testing
 
 ### Option 1: Manual Testing (Recommended)
+
 1. Start dev server: `npm run dev`
 2. Log in as a client user
 3. Navigate to `/portal/dashboard`
@@ -132,6 +140,7 @@
 7. Verify signature saves correctly
 
 ### Option 2: Automated Testing (Future)
+
 1. Create E2E tests with Playwright/Cypress
 2. Create integration tests for API routes
 3. Create unit tests for components
@@ -139,6 +148,7 @@
 5. Create test fixtures
 
 ### Option 3: Quick Verification
+
 1. Check TypeScript compilation: ✅ Done
 2. Check file structure: ✅ Done
 3. Start dev server and check for runtime errors
@@ -158,9 +168,10 @@
 
 ## Recommendation
 
-**Phase 6 code is complete and ready for testing.** 
+**Phase 6 code is complete and ready for testing.**
 
 To fully test Phase 6, you should:
+
 1. Start the dev server (`npm run dev`)
 2. Log in as a client user
 3. Navigate through all portal pages

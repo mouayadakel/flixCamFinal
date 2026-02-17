@@ -39,10 +39,7 @@ export class PayoutService {
    * Called when booking transitions to CONFIRMED.
    * Calculates gross amount per vendor from equipment line totals (dailyPrice * quantity * days).
    */
-  static async createVendorPayoutsForBooking(
-    bookingId: string,
-    createdBy?: string
-  ): Promise<void> {
+  static async createVendorPayoutsForBooking(bookingId: string, createdBy?: string): Promise<void> {
     const booking = await prisma.booking.findFirst({
       where: { id: bookingId, deletedAt: null },
       include: {
@@ -65,8 +62,7 @@ export class PayoutService {
 
     const days =
       Math.ceil(
-        (new Date(booking.endDate).getTime() -
-          new Date(booking.startDate).getTime()) /
+        (new Date(booking.endDate).getTime() - new Date(booking.startDate).getTime()) /
           (1000 * 60 * 60 * 24)
       ) || 1
 

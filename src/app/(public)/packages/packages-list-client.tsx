@@ -17,15 +17,13 @@ export function PackagesListClient({ packages }: { packages: PackageItem[] }) {
 
   return (
     <>
-      <h1 className="text-2xl font-bold mb-6">{t('nav.packages')}</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <h1 className="mb-6 text-2xl font-bold">{t('nav.packages')}</h1>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {packages.map((pkg) => (
           <PackageCard key={pkg.id} pkg={pkg} />
         ))}
       </div>
-      {packages.length === 0 && (
-        <p className="text-muted-foreground">{t('common.noResults')}</p>
-      )}
+      {packages.length === 0 && <p className="text-muted-foreground">{t('common.noResults')}</p>}
     </>
   )
 }

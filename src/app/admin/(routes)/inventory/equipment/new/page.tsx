@@ -69,16 +69,12 @@ export default function NewEquipmentPage() {
       quantityTotal: 1,
       quantityAvailable: 1,
       isActive: true,
-      featured: false,
-      translations: [
-        { locale: 'ar', name: '' },
-      ],
+      translations: [{ locale: 'ar', name: '' }],
       galleryImageUrls: [],
       relatedEquipmentIds: [],
       bufferTimeUnit: 'hours',
     },
   })
-
 
   useEffect(() => {
     loadLookups()
@@ -136,24 +132,27 @@ export default function NewEquipmentPage() {
       }
 
       // Separate data URLs (temporary file uploads) from regular URLs
-      const featuredImageDataUrl = data.featuredImageUrl?.startsWith('blob:') || data.featuredImageUrl?.startsWith('data:') 
-        ? data.featuredImageUrl 
-        : null
-      const galleryImageDataUrls = data.galleryImageUrls?.filter((url) => 
-        url.startsWith('blob:') || url.startsWith('data:')
-      ) || []
-      
+      const featuredImageDataUrl =
+        data.featuredImageUrl?.startsWith('blob:') || data.featuredImageUrl?.startsWith('data:')
+          ? data.featuredImageUrl
+          : null
+      const galleryImageDataUrls =
+        data.galleryImageUrls?.filter(
+          (url) => url.startsWith('blob:') || url.startsWith('data:')
+        ) || []
+
       // Prepare payload - exclude data URLs for now
       const payload = {
         ...data,
         translations: validTranslations,
         featuredImageUrl: featuredImageDataUrl ? undefined : data.featuredImageUrl,
-        galleryImageUrls: data.galleryImageUrls?.filter((url) => 
-          !url.startsWith('blob:') && !url.startsWith('data:')
+        galleryImageUrls: data.galleryImageUrls?.filter(
+          (url) => !url.startsWith('blob:') && !url.startsWith('data:')
         ),
-        videoUrl: data.videoUrl?.startsWith('blob:') || data.videoUrl?.startsWith('data:') 
-          ? undefined 
-          : data.videoUrl,
+        videoUrl:
+          data.videoUrl?.startsWith('blob:') || data.videoUrl?.startsWith('data:')
+            ? undefined
+            : data.videoUrl,
       }
 
       const response = await fetch('/api/equipment', {
@@ -177,7 +176,8 @@ export default function NewEquipmentPage() {
       if (featuredImageDataUrl || galleryImageDataUrls.length > 0) {
         toast({
           title: 'تنبيه',
-          description: 'تم إنشاء المعدة. يُفضل استخدام روابط URLs للصور. يمكنك رفع الملفات من صفحة التعديل.',
+          description:
+            'تم إنشاء المعدة. يُفضل استخدام روابط URLs للصور. يمكنك رفع الملفات من صفحة التعديل.',
           variant: 'default',
         })
       } else {
@@ -250,24 +250,13 @@ export default function NewEquipmentPage() {
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="sku">SKU *</Label>
-                    <Input
-                      id="sku"
-                      {...register('sku')}
-                      placeholder="EQ-001"
-                      dir="ltr"
-                    />
-                    {errors.sku && (
-                      <p className="text-sm text-error-600">{errors.sku.message}</p>
-                    )}
+                    <Input id="sku" {...register('sku')} placeholder="EQ-001" dir="ltr" />
+                    {errors.sku && <p className="text-sm text-error-600">{errors.sku.message}</p>}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="model">الموديل</Label>
-                    <Input
-                      id="model"
-                      {...register('model')}
-                      placeholder="Sony FX3"
-                    />
+                    <Input id="model" {...register('model')} placeholder="Sony FX3" />
                     {errors.model && (
                       <p className="text-sm text-error-600">{errors.model.message}</p>
                     )}
@@ -275,9 +264,7 @@ export default function NewEquipmentPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="categoryId">الفئة *</Label>
-                    <Select
-                      onValueChange={(value) => setValue('categoryId', value)}
-                    >
+                    <Select onValueChange={(value) => setValue('categoryId', value)}>
                       <SelectTrigger id="categoryId">
                         <SelectValue placeholder="اختر الفئة" />
                       </SelectTrigger>
@@ -296,9 +283,7 @@ export default function NewEquipmentPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="brandId">العلامة التجارية</Label>
-                    <Select
-                      onValueChange={(value) => setValue('brandId', value)}
-                    >
+                    <Select onValueChange={(value) => setValue('brandId', value)}>
                       <SelectTrigger id="brandId">
                         <SelectValue placeholder="اختر العلامة التجارية" />
                       </SelectTrigger>
@@ -465,17 +450,6 @@ export default function NewEquipmentPage() {
                       نشط
                     </Label>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="featured"
-                      {...register('featured')}
-                      className="h-4 w-4 rounded border-neutral-300"
-                    />
-                    <Label htmlFor="featured" className="cursor-pointer">
-                      مميز
-                    </Label>
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -486,7 +460,7 @@ export default function NewEquipmentPage() {
             <Card>
               <CardHeader>
                 <CardTitle>الترجمات</CardTitle>
-                <p className="text-sm text-neutral-600 mt-2">
+                <p className="mt-2 text-sm text-neutral-600">
                   أدخل معلومات المعدة بلغات متعددة. العربية مطلوبة كحد أدنى.
                 </p>
               </CardHeader>
@@ -512,7 +486,10 @@ export default function NewEquipmentPage() {
                           updated[index] = { ...updated[index], ...newValue }
                           setValue('translations', updated)
                         } else {
-                          setValue('translations', [...current, { locale, name: newValue.name ?? '', ...newValue }])
+                          setValue('translations', [
+                            ...current,
+                            { locale, name: newValue.name ?? '', ...newValue },
+                          ])
                         }
                       }}
                       defaultExpanded={locale === 'ar'}
@@ -531,7 +508,7 @@ export default function NewEquipmentPage() {
             <Card>
               <CardHeader>
                 <CardTitle>SEO (تحسين محركات البحث)</CardTitle>
-                <p className="text-sm text-neutral-600 mt-2">
+                <p className="mt-2 text-sm text-neutral-600">
                   أدخل معلومات SEO لكل لغة لتحسين ظهور المعدة في نتائج البحث.
                 </p>
               </CardHeader>
@@ -561,11 +538,20 @@ export default function NewEquipmentPage() {
                           updated[index] = { ...updated[index], ...newValue }
                           setValue('translations', updated)
                         } else {
-                          setValue('translations', [...current, { name: ('name' in translation ? translation.name : '') ?? '', ...translation, ...newValue }])
+                          setValue('translations', [
+                            ...current,
+                            {
+                              name: ('name' in translation ? translation.name : '') ?? '',
+                              ...translation,
+                              ...newValue,
+                            },
+                          ])
                         }
                       }}
                       name={'name' in translation ? translation.name : ''}
-                      shortDescription={'shortDescription' in translation ? translation.shortDescription : ''}
+                      shortDescription={
+                        'shortDescription' in translation ? translation.shortDescription : ''
+                      }
                       defaultExpanded={locale === 'ar'}
                     />
                   )
@@ -607,14 +593,14 @@ export default function NewEquipmentPage() {
             <Card>
               <CardHeader>
                 <CardTitle>المواصفات</CardTitle>
-                <p className="text-sm text-neutral-600 mt-2">
+                <p className="mt-2 text-sm text-neutral-600">
                   أدخل مواصفات المعدة باستخدام أي من الطرق المتاحة.
                 </p>
               </CardHeader>
               <CardContent>
                 <SpecificationsEditor
-                  value={watchedSpecifications as Record<string, unknown>}
-                  onChange={(specs) => setValue('specifications', specs as unknown as Record<string, unknown>)}
+                  value={watchedSpecifications ?? undefined}
+                  onChange={(specs) => setValue('specifications', specs)}
                   categoryHint={categoryHint}
                 />
               </CardContent>
@@ -626,7 +612,7 @@ export default function NewEquipmentPage() {
             <Card>
               <CardHeader>
                 <CardTitle>المعدات ذات الصلة</CardTitle>
-                <p className="text-sm text-neutral-600 mt-2">
+                <p className="mt-2 text-sm text-neutral-600">
                   اختر المعدات المرتبطة بهذه المعدة (معدات موصى بها).
                 </p>
               </CardHeader>
@@ -679,7 +665,9 @@ export default function NewEquipmentPage() {
                     <Label htmlFor="bufferTimeUnit">وحدة الوقت</Label>
                     <Select
                       defaultValue="hours"
-                      onValueChange={(value) => setValue('bufferTimeUnit', value as 'hours' | 'days')}
+                      onValueChange={(value) =>
+                        setValue('bufferTimeUnit', value as 'hours' | 'days')
+                      }
                     >
                       <SelectTrigger id="bufferTimeUnit">
                         <SelectValue />
@@ -697,7 +685,7 @@ export default function NewEquipmentPage() {
         </Tabs>
 
         {/* Form Actions */}
-        <div className="flex justify-end gap-3 pt-6 border-t">
+        <div className="flex justify-end gap-3 border-t pt-6">
           <Button type="button" variant="outline" onClick={() => router.back()}>
             إلغاء
           </Button>

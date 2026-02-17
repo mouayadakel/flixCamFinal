@@ -5,6 +5,7 @@ This is the central index for all FlixCam.rent project documentation.
 ## Core Documentation
 
 ### Project Overview
+
 - **[PRD.md](./PRD.md)** - Product Requirements Document
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System Architecture
 - **[ROLES_AND_SECURITY.md](./ROLES_AND_SECURITY.md)** - Security Doctrine & Permissions
@@ -18,6 +19,7 @@ This is the central index for all FlixCam.rent project documentation.
 ## Planning Documents
 
 ### Root Planning (`docs/planning/`)
+
 - **[ROADMAP.md](./planning/ROADMAP.md)** - Overall project roadmap
 - **[SPRINTS.md](./planning/SPRINTS.md)** - Sprint planning and tracking
 - **[MILESTONES.md](./planning/MILESTONES.md)** - Project milestones
@@ -28,13 +30,16 @@ This is the central index for all FlixCam.rent project documentation.
 ## Feature Documentation
 
 ### Feature-Based Docs (`docs/features/[feature]/`)
+
 Each feature has its own folder with:
+
 - `README.md` - Feature overview
 - `PLAN.md` - Implementation plan
 - `API.md` - API documentation
 - Feature-specific documentation
 
 **Available Features:**
+
 - **[Bookings](./features/bookings/)** - Booking management
 - **[Equipment](./features/equipment/)** - Equipment catalog
 - **[Payments](./features/payments/)** - Payment processing
@@ -47,6 +52,7 @@ Each feature has its own folder with:
 ## Shared Documentation
 
 ### Cross-Feature Docs (`docs/shared/`)
+
 - **[DATABASE.md](./shared/DATABASE.md)** - Database schema and patterns
 - **[API_STANDARDS.md](./shared/API_STANDARDS.md)** - API design standards
 - **[ERROR_HANDLING.md](./shared/ERROR_HANDLING.md)** - Error handling patterns

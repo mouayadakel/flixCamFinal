@@ -19,7 +19,12 @@ export interface PricingResult {
   basePrice: number
   finalPrice: number
   breakdown: Array<{ label: string; amount: number }>
-  appliedRules: Array<{ ruleName: string; adjustmentType: string; adjustmentValue: number; newTotal: number }>
+  appliedRules: Array<{
+    ruleName: string
+    adjustmentType: string
+    adjustmentValue: number
+    newTotal: number
+  }>
 }
 
 function diffDays(start: Date, end: Date): number {
@@ -43,7 +48,14 @@ export async function calculatePrice(params: PricingParams): Promise<PricingResu
   if (equipmentIds.length > 0) {
     const equipment = await prisma.equipment.findMany({
       where: { id: { in: equipmentIds }, deletedAt: null },
-      select: { id: true, sku: true, model: true, dailyPrice: true, weeklyPrice: true, monthlyPrice: true },
+      select: {
+        id: true,
+        sku: true,
+        model: true,
+        dailyPrice: true,
+        weeklyPrice: true,
+        monthlyPrice: true,
+      },
     })
     for (const eq of equipment) {
       const daily = Number(eq.dailyPrice)
@@ -86,12 +98,24 @@ export async function calculatePrice(params: PricingParams): Promise<PricingResu
   })
 
   const userSegmentId = customerId
-    ? (await prisma.user.findUnique({ where: { id: customerId }, select: { segmentId: true } }))?.segmentId ?? null
+    ? ((await prisma.user.findUnique({ where: { id: customerId }, select: { segmentId: true } }))
+        ?.segmentId ?? null)
     : null
 
   for (const rule of rules) {
     const conditions = (rule.conditions as Record<string, unknown>) ?? {}
-    if (!ruleApplies(conditions, { start, end, days, customerId, userSegmentId, equipmentIds, studioId })) continue
+    if (
+      !ruleApplies(conditions, {
+        start,
+        end,
+        days,
+        customerId,
+        userSegmentId,
+        equipmentIds,
+        studioId,
+      })
+    )
+      continue
 
     const adjType = rule.adjustmentType
     const adjVal = Number(rule.adjustmentValue)
@@ -147,7 +171,11 @@ function ruleApplies(
   if (typeof conditions.minDuration === 'number' && ctx.days < conditions.minDuration) return false
   if (typeof conditions.maxDuration === 'number' && ctx.days > conditions.maxDuration) return false
   if (Array.isArray(conditions.customerSegmentIds) && conditions.customerSegmentIds.length > 0) {
-    if (!ctx.userSegmentId || !(conditions.customerSegmentIds as string[]).includes(ctx.userSegmentId)) return false
+    if (
+      !ctx.userSegmentId ||
+      !(conditions.customerSegmentIds as string[]).includes(ctx.userSegmentId)
+    )
+      return false
   }
   if (conditions.studioIds && Array.isArray(conditions.studioIds) && ctx.studioId) {
     if (!(conditions.studioIds as string[]).includes(ctx.studioId)) return false

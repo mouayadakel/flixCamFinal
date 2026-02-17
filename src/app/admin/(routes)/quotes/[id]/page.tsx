@@ -20,7 +20,10 @@ import { useToast } from '@/hooks/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { Quote, QuoteStatus } from '@/lib/types/quote.types'
 
-const STATUS_LABELS: Record<QuoteStatus, { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_LABELS: Record<
+  QuoteStatus,
+  { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   draft: { ar: 'مسودة', en: 'Draft', variant: 'outline' },
   sent: { ar: 'مرسل', en: 'Sent', variant: 'secondary' },
   accepted: { ar: 'مقبول', en: 'Accepted', variant: 'default' },
@@ -134,7 +137,8 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
   }
 
   const isExpired = new Date(quote.validUntil) < new Date()
-  const canConvert = quote.status === 'draft' || quote.status === 'sent' || quote.status === 'accepted'
+  const canConvert =
+    quote.status === 'draft' || quote.status === 'sent' || quote.status === 'accepted'
   const canEdit = quote.status === 'draft'
 
   return (
@@ -142,20 +146,18 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">عرض السعر #{quote.quoteNumber}</h1>
-          <p className="text-muted-foreground mt-2">
-            تفاصيل عرض السعر
-          </p>
+          <p className="mt-2 text-muted-foreground">تفاصيل عرض السعر</p>
         </div>
         <div className="flex gap-2">
           <Link href="/admin/quotes">
             <Button variant="outline">
-              <ArrowLeft className="h-4 w-4 ml-2" />
+              <ArrowLeft className="ml-2 h-4 w-4" />
               العودة
             </Button>
           </Link>
           {canConvert && (
             <Button onClick={handleConvert}>
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <ArrowRight className="ml-2 h-4 w-4" />
               تحويل إلى حجز
             </Button>
           )}
@@ -163,7 +165,7 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
       </div>
 
       {/* Quote Information */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium">معلومات العرض</CardTitle>
@@ -183,7 +185,7 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
             </div>
             <div>
               <span className="text-sm text-muted-foreground">صالح حتى:</span>
-              <div className={isExpired ? 'text-destructive font-medium' : ''}>
+              <div className={isExpired ? 'font-medium text-destructive' : ''}>
                 {formatDate(quote.validUntil)}
                 {isExpired && ' (منتهي)'}
               </div>
@@ -246,7 +248,7 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
           <CardTitle>التواريخ</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <span className="text-sm text-muted-foreground">تاريخ البداية:</span>
               <div className="font-medium">{formatDate(quote.startDate)}</div>
@@ -282,12 +284,13 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
           ) : (
             <div className="space-y-2">
               {quote.equipment.map((item, index) => (
-                <div key={index} className="border rounded-lg p-4">
+                <div key={index} className="rounded-lg border p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="font-medium">SKU: {item.equipmentId}</div>
                       <div className="text-sm text-muted-foreground">
-                        الكمية: {item.quantity} × {formatCurrency(item.dailyRate)}/يوم × {item.totalDays} يوم
+                        الكمية: {item.quantity} × {formatCurrency(item.dailyRate)}/يوم ×{' '}
+                        {item.totalDays} يوم
                       </div>
                     </div>
                     <div className="font-medium">{formatCurrency(item.subtotal)}</div>
@@ -305,46 +308,37 @@ export default function QuoteDetailPage({ params }: { params: { id: string } }) 
           <CardTitle>الإجراءات</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex flex-wrap gap-2">
             {quote.status === 'draft' && (
               <>
-                <Button
-                  variant="outline"
-                  onClick={() => handleStatusUpdate('sent')}
-                >
-                  <Send className="h-4 w-4 ml-2" />
+                <Button variant="outline" onClick={() => handleStatusUpdate('sent')}>
+                  <Send className="ml-2 h-4 w-4" />
                   إرسال للعميل
                 </Button>
               </>
             )}
             {quote.status === 'sent' && (
               <>
-                <Button
-                  variant="outline"
-                  onClick={() => handleStatusUpdate('accepted')}
-                >
-                  <Check className="h-4 w-4 ml-2" />
+                <Button variant="outline" onClick={() => handleStatusUpdate('accepted')}>
+                  <Check className="ml-2 h-4 w-4" />
                   قبول العرض
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => handleStatusUpdate('rejected')}
-                >
-                  <X className="h-4 w-4 ml-2" />
+                <Button variant="outline" onClick={() => handleStatusUpdate('rejected')}>
+                  <X className="ml-2 h-4 w-4" />
                   رفض العرض
                 </Button>
               </>
             )}
             {canConvert && (
               <Button onClick={handleConvert}>
-                <ArrowRight className="h-4 w-4 ml-2" />
+                <ArrowRight className="ml-2 h-4 w-4" />
                 تحويل إلى حجز
               </Button>
             )}
             {quote.convertedToBookingId && (
               <Link href={`/admin/bookings/${quote.convertedToBookingId}`}>
                 <Button variant="outline">
-                  <FileText className="h-4 w-4 ml-2" />
+                  <FileText className="ml-2 h-4 w-4" />
                   عرض الحجز
                 </Button>
               </Link>

@@ -12,7 +12,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
 import { TrendingUp, TrendingDown, Package } from 'lucide-react'
 import type { DemandForecast } from '@/lib/types/ai.types'
@@ -122,7 +128,7 @@ export function DemandForecastTab() {
                     </div>
                     <div>
                       <Label>Trend</Label>
-                      <div className="flex items-center gap-2 mt-1">
+                      <div className="mt-1 flex items-center gap-2">
                         {forecast.factors.historicalTrend === 'increasing' ? (
                           <TrendingUp className="h-4 w-4 text-green-500" />
                         ) : forecast.factors.historicalTrend === 'decreasing' ? (
@@ -136,20 +142,22 @@ export function DemandForecastTab() {
                   <div>
                     <Label>Recommendations</Label>
                     <div className="mt-2 space-y-2">
-                      <div className="flex items-center justify-between p-2 bg-muted rounded">
+                      <div className="flex items-center justify-between rounded bg-muted p-2">
                         <span>Inventory Level</span>
                         <Badge variant="outline">{forecast.recommendations.inventoryLevel}</Badge>
                       </div>
                       {forecast.recommendations.purchaseSuggestion && (
-                        <div className="flex items-center gap-2 p-2 bg-green-50 rounded">
+                        <div className="flex items-center gap-2 rounded bg-green-50 p-2">
                           <Package className="h-4 w-4 text-green-500" />
                           <span className="text-sm">Consider purchasing more inventory</span>
                         </div>
                       )}
                       {forecast.recommendations.pricingSuggestion && (
-                        <div className="flex items-center justify-between p-2 bg-muted rounded">
+                        <div className="flex items-center justify-between rounded bg-muted p-2">
                           <span>Pricing Suggestion</span>
-                          <Badge variant="outline">{forecast.recommendations.pricingSuggestion}</Badge>
+                          <Badge variant="outline">
+                            {forecast.recommendations.pricingSuggestion}
+                          </Badge>
                         </div>
                       )}
                     </div>
@@ -158,7 +166,9 @@ export function DemandForecastTab() {
                   {forecast.revenueForecast && (
                     <div>
                       <Label>Revenue Forecast</Label>
-                      <p className="text-lg font-semibold mt-1">{forecast.revenueForecast.toLocaleString()} SAR</p>
+                      <p className="mt-1 text-lg font-semibold">
+                        {forecast.revenueForecast.toLocaleString()} SAR
+                      </p>
                     </div>
                   )}
                 </CardContent>

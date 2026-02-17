@@ -32,10 +32,14 @@ export function CheckoutStepPayment({ depositAmount, onSuccess }: CheckoutStepPa
         <h3 className="mb-4 font-semibold">{t('checkout.deposit')}</h3>
         {depositAmount != null && depositAmount > 0 && (
           <p className="mb-4 text-sm text-text-muted">
-            A deposit of {depositAmount.toLocaleString('en-SA', { style: 'currency', currency: 'SAR' })} will be held and released after equipment return.
+            A deposit of{' '}
+            {depositAmount.toLocaleString('en-SA', { style: 'currency', currency: 'SAR' })} will be
+            held and released after equipment return.
           </p>
         )}
-        <p className="mb-4 text-sm text-text-muted">Payment method: Card / Apple Pay / Bank transfer</p>
+        <p className="mb-4 text-sm text-text-muted">
+          Payment method: Card / Apple Pay / Bank transfer
+        </p>
         <div className="mb-6 flex items-start gap-2">
           <Checkbox
             id="terms-payment"
@@ -44,7 +48,12 @@ export function CheckoutStepPayment({ depositAmount, onSuccess }: CheckoutStepPa
           />
           <label htmlFor="terms-payment" className="cursor-pointer text-sm leading-none">
             {t('checkout.termsAccept')}{' '}
-            <Link href="/policies" className="text-primary underline" target="_blank" rel="noopener">
+            <Link
+              href="/policies"
+              className="text-primary underline"
+              target="_blank"
+              rel="noopener"
+            >
               {t('checkout.termsLink')}
             </Link>
           </label>

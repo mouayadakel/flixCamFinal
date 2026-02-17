@@ -55,7 +55,15 @@ export default function SettingsBranchesPage() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [form, setForm] = useState({ name: '', nameAr: '', address: '', city: '', phone: '', email: '', isActive: true })
+  const [form, setForm] = useState({
+    name: '',
+    nameAr: '',
+    address: '',
+    city: '',
+    phone: '',
+    email: '',
+    isActive: true,
+  })
   const [saving, setSaving] = useState(false)
 
   const load = async () => {
@@ -72,7 +80,9 @@ export default function SettingsBranchesPage() {
     }
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+  }, [])
 
   const openCreate = () => {
     setEditingId(null)
@@ -137,7 +147,11 @@ export default function SettingsBranchesPage() {
       setDialogOpen(false)
       load()
     } catch (e) {
-      toast({ title: 'خطأ', description: e instanceof Error ? e.message : 'فشل الحفظ', variant: 'destructive' })
+      toast({
+        title: 'خطأ',
+        description: e instanceof Error ? e.message : 'فشل الحفظ',
+        variant: 'destructive',
+      })
     } finally {
       setSaving(false)
     }
@@ -161,25 +175,25 @@ export default function SettingsBranchesPage() {
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/admin/settings">
-              <ArrowLeft className="h-4 w-4 ml-1" />
+              <ArrowLeft className="ml-1 h-4 w-4" />
               الإعدادات
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
+            <h1 className="flex items-center gap-2 text-3xl font-bold">
               <MapPin className="h-8 w-8" />
               الفروع / المواقع
             </h1>
-            <p className="text-muted-foreground mt-1">إدارة فروع الشركة ومواقعها</p>
+            <p className="mt-1 text-muted-foreground">إدارة فروع الشركة ومواقعها</p>
           </div>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={load} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 ml-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
           <Button onClick={openCreate}>
-            <Plus className="h-4 w-4 ml-2" />
+            <Plus className="ml-2 h-4 w-4" />
             فرع جديد
           </Button>
         </div>
@@ -211,7 +225,7 @@ export default function SettingsBranchesPage() {
                   </TableRow>
                 ) : branches.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-12 text-muted-foreground">
+                    <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
                       لا توجد فروع. أضف فرعاً جديداً.
                     </TableCell>
                   </TableRow>
@@ -232,7 +246,12 @@ export default function SettingsBranchesPage() {
                         <Button variant="ghost" size="sm" onClick={() => openEdit(b)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="text-destructive" onClick={() => remove(b.id)}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive"
+                          onClick={() => remove(b.id)}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </TableCell>
@@ -254,27 +273,52 @@ export default function SettingsBranchesPage() {
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label>الاسم</Label>
-              <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="اسم الفرع" />
+              <Input
+                value={form.name}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                placeholder="اسم الفرع"
+              />
             </div>
             <div className="grid gap-2">
               <Label>الاسم (عربي)</Label>
-              <Input value={form.nameAr} onChange={(e) => setForm((f) => ({ ...f, nameAr: e.target.value }))} placeholder="اختياري" />
+              <Input
+                value={form.nameAr}
+                onChange={(e) => setForm((f) => ({ ...f, nameAr: e.target.value }))}
+                placeholder="اختياري"
+              />
             </div>
             <div className="grid gap-2">
               <Label>العنوان</Label>
-              <Input value={form.address} onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))} placeholder="اختياري" />
+              <Input
+                value={form.address}
+                onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
+                placeholder="اختياري"
+              />
             </div>
             <div className="grid gap-2">
               <Label>المدينة</Label>
-              <Input value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} placeholder="اختياري" />
+              <Input
+                value={form.city}
+                onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
+                placeholder="اختياري"
+              />
             </div>
             <div className="grid gap-2">
               <Label>الهاتف</Label>
-              <Input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} placeholder="اختياري" />
+              <Input
+                value={form.phone}
+                onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                placeholder="اختياري"
+              />
             </div>
             <div className="grid gap-2">
               <Label>البريد</Label>
-              <Input type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} placeholder="اختياري" />
+              <Input
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                placeholder="اختياري"
+              />
             </div>
             <div className="flex items-center gap-2">
               <input

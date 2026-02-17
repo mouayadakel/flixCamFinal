@@ -103,12 +103,8 @@ export function StepEquipment() {
   if (!selectedCategoryId) {
     return (
       <div className="animate-fade-in">
-        <h2 className="text-section-title text-text-heading mb-1">
-          {t('kit.chooseEquipment')}
-        </h2>
-        <p className="text-body-main text-text-muted">
-          {t('kit.chooseCategoryDesc')}
-        </p>
+        <h2 className="mb-1 text-section-title text-text-heading">{t('kit.chooseEquipment')}</h2>
+        <p className="text-body-main text-text-muted">{t('kit.chooseCategoryDesc')}</p>
       </div>
     )
   }
@@ -116,10 +112,8 @@ export function StepEquipment() {
   if (loading) {
     return (
       <div className="animate-fade-in">
-        <h2 className="text-section-title text-text-heading mb-1">
-          {t('kit.chooseEquipment')}
-        </h2>
-        <p className="text-body-main text-text-muted mb-6">{t('kit.chooseEquipmentDesc')}</p>
+        <h2 className="mb-1 text-section-title text-text-heading">{t('kit.chooseEquipment')}</h2>
+        <p className="mb-6 text-body-main text-text-muted">{t('kit.chooseEquipmentDesc')}</p>
         <EquipmentSkeleton count={6} />
       </div>
     )
@@ -128,12 +122,10 @@ export function StepEquipment() {
   if (error) {
     return (
       <div className="animate-fade-in">
-        <h2 className="text-section-title text-text-heading mb-1">
-          {t('kit.chooseEquipment')}
-        </h2>
-        <p className="text-body-main text-text-muted mb-6">{t('kit.chooseEquipmentDesc')}</p>
+        <h2 className="mb-1 text-section-title text-text-heading">{t('kit.chooseEquipment')}</h2>
+        <p className="mb-6 text-body-main text-text-muted">{t('kit.chooseEquipmentDesc')}</p>
         <div className="rounded-xl border border-border-light bg-surface-light p-8 text-center">
-          <p className="text-text-body text-destructive mb-4">{error}</p>
+          <p className="mb-4 text-destructive text-text-body">{error}</p>
           <Button variant="outline" onClick={() => window.location.reload()}>
             {t('common.retry')}
           </Button>
@@ -145,12 +137,10 @@ export function StepEquipment() {
   if (equipment.length === 0) {
     return (
       <div className="animate-fade-in">
-        <h2 className="text-section-title text-text-heading mb-1">
-          {t('kit.chooseEquipment')}
-        </h2>
-        <p className="text-body-main text-text-muted mb-6">{t('kit.chooseEquipmentDesc')}</p>
+        <h2 className="mb-1 text-section-title text-text-heading">{t('kit.chooseEquipment')}</h2>
+        <p className="mb-6 text-body-main text-text-muted">{t('kit.chooseEquipmentDesc')}</p>
         <div className="flex flex-col items-center justify-center rounded-xl border border-border-light bg-surface-light p-12">
-          <Package className="h-12 w-12 text-text-muted mb-4" />
+          <Package className="mb-4 h-12 w-12 text-text-muted" />
           <p className="text-text-body text-text-muted">{t('kit.noEquipment')}</p>
         </div>
       </div>
@@ -159,12 +149,10 @@ export function StepEquipment() {
 
   return (
     <div className="animate-fade-in">
-      <h2 className="text-section-title text-text-heading mb-1">
-        {t('kit.chooseEquipment')}
-      </h2>
-      <p className="text-body-main text-text-muted mb-6">{t('kit.chooseEquipmentDesc')}</p>
+      <h2 className="mb-1 text-section-title text-text-heading">{t('kit.chooseEquipment')}</h2>
+      <p className="mb-6 text-body-main text-text-muted">{t('kit.chooseEquipmentDesc')}</p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {equipment.map((item) => (
           <KitEquipmentCard
             key={item.id}
@@ -184,11 +172,11 @@ export function StepEquipment() {
           )}
         >
           <span className="text-sm font-medium text-text-heading">
-            {t('kit.itemsSelected').replace('{count}', String(selectedCount))} — {formatSar(totalDaily)} / {t('kit.perDay')}
+            {t('kit.itemsSelected').replace('{count}', String(selectedCount))} —{' '}
+            {formatSar(totalDaily)} / {t('kit.perDay')}
           </span>
         </div>
       )}
     </div>
   )
 }
-

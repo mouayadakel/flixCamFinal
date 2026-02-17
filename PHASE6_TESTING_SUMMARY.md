@@ -54,11 +54,14 @@
 **Cause**: Stale `.next` build cache
 
 **Fix Applied**:
+
 - ✅ Cleared `.next` directory
 - ✅ Fixed TypeScript error in invoices page
 
 **Next Steps**:
+
 1. **Restart dev server**:
+
    ```bash
    # Stop current server (Ctrl+C)
    npm run dev
@@ -78,6 +81,7 @@
 ## Testing Checklist
 
 ### Portal Dashboard
+
 - [ ] Loads at `/portal/dashboard`
 - [ ] Shows KPI cards with data
 - [ ] Active bookings display
@@ -85,6 +89,7 @@
 - [ ] Quick actions navigate
 
 ### My Bookings
+
 - [ ] List loads at `/portal/bookings`
 - [ ] Filters work (status, search)
 - [ ] Booking detail shows at `/portal/bookings/[id]`
@@ -92,6 +97,7 @@
 - [ ] Payment history shows
 
 ### Contracts
+
 - [ ] List loads at `/portal/contracts`
 - [ ] Contract view at `/portal/contracts/[id]`
 - [ ] Sign page at `/portal/contracts/[id]/sign`
@@ -100,6 +106,7 @@
 - [ ] Terms checkbox required
 
 ### Invoices
+
 - [ ] List loads at `/portal/invoices`
 - [ ] Invoice detail at `/portal/invoices/[id]`
 - [ ] Payment status displays

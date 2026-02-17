@@ -440,10 +440,7 @@ async function isSuperAdmin(userId: string): Promise<boolean> {
  * When USE_NEW_RBAC=true, delegates to permission-service (DB + cache).
  * Super admin (ADMIN or RBAC role super_admin) always has permission.
  */
-export async function hasPermission(
-  userId: string,
-  permission: string
-): Promise<boolean> {
+export async function hasPermission(userId: string, permission: string): Promise<boolean> {
   if (process.env.USE_NEW_RBAC === 'true') {
     const { hasPermission: hasPermissionNew } = await import('./permission-service')
     return hasPermissionNew(userId, permission)
@@ -562,10 +559,7 @@ export async function getUserPermissions(userId: string): Promise<string[]> {
 /**
  * Check if user has any of the specified permissions
  */
-export async function hasAnyPermission(
-  userId: string,
-  permissions: string[]
-): Promise<boolean> {
+export async function hasAnyPermission(userId: string, permissions: string[]): Promise<boolean> {
   for (const permission of permissions) {
     if (await hasPermission(userId, permission)) {
       return true
@@ -577,10 +571,7 @@ export async function hasAnyPermission(
 /**
  * Check if user has all of the specified permissions
  */
-export async function hasAllPermissions(
-  userId: string,
-  permissions: string[]
-): Promise<boolean> {
+export async function hasAllPermissions(userId: string, permissions: string[]): Promise<boolean> {
   for (const permission of permissions) {
     if (!(await hasPermission(userId, permission))) {
       return false

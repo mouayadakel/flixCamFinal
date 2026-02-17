@@ -23,10 +23,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const countOnly = searchParams.get('countOnly') === 'true'
     const unreadOnly = searchParams.get('unreadOnly') === 'true'
-    const limit = Math.min(
-      Math.max(parseInt(searchParams.get('limit') ?? '50', 10), 1),
-      100
-    )
+    const limit = Math.min(Math.max(parseInt(searchParams.get('limit') ?? '50', 10), 1), 100)
     const offset = Math.max(parseInt(searchParams.get('offset') ?? '0', 10), 0)
 
     const unreadCount = await NotificationService.getUnreadCount(session.user.id)
@@ -35,10 +32,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ unreadCount })
     }
 
-    const notifications = await NotificationService.getUserNotifications(
-      session.user.id,
-      { unreadOnly, limit, offset }
-    )
+    const notifications = await NotificationService.getUserNotifications(session.user.id, {
+      unreadOnly,
+      limit,
+      offset,
+    })
 
     const shape = notifications.map((n) => ({
       id: n.id,
@@ -78,9 +76,10 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
     }
 
-    const action = typeof body === 'object' && body !== null && 'action' in body
-      ? (body as { action?: string }).action
-      : undefined
+    const action =
+      typeof body === 'object' && body !== null && 'action' in body
+        ? (body as { action?: string }).action
+        : undefined
 
     if (action === 'markAllRead') {
       await NotificationService.markAllAsRead(session.user.id)

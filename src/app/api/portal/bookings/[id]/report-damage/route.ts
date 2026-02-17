@@ -28,10 +28,7 @@ const reportDamageSchema = z.object({
 
 export const dynamic = 'force-dynamic'
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.id) {
@@ -68,10 +65,7 @@ export async function POST(
     if (parsed.equipmentId) {
       const belongs = booking.equipment.some((be) => be.equipmentId === parsed.equipmentId)
       if (!belongs) {
-        return NextResponse.json(
-          { error: 'المعدة المحددة غير مرتبطة بهذا الحجز' },
-          { status: 400 }
-        )
+        return NextResponse.json({ error: 'المعدة المحددة غير مرتبطة بهذا الحجز' }, { status: 400 })
       }
     }
 
@@ -101,10 +95,7 @@ export async function POST(
     })
   } catch (error) {
     if (error && typeof error === 'object' && 'name' in error && error.name === 'ZodError') {
-      return NextResponse.json(
-        { error: 'بيانات غير صالحة', details: error },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'بيانات غير صالحة', details: error }, { status: 400 })
     }
     console.error('Portal report-damage error:', error)
     return NextResponse.json(

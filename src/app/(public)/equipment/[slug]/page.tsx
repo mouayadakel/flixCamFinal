@@ -94,7 +94,7 @@ export default async function EquipmentDetailPage({
       : []
 
     return (
-      <main className="mx-auto w-full max-w-public-container px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <main className="mx-auto w-full max-w-public-container px-4 py-8 sm:px-6 md:py-12 lg:px-8">
         <EquipmentDetail equipment={equipment} recommendations={recommendations} />
       </main>
     )

@@ -64,7 +64,11 @@ interface SeriesDetail {
   interval: number
   endDate: string | null
   occurrenceCount: number | null
-  template: { equipmentIds?: Array<{ equipmentId: string; quantity: number }>; studioId?: string; notes?: string } | null
+  template: {
+    equipmentIds?: Array<{ equipmentId: string; quantity: number }>
+    studioId?: string
+    notes?: string
+  } | null
   isActive: boolean
   bookings: Array<{
     id: string
@@ -187,7 +191,7 @@ export default function RecurringSeriesDetailPage() {
 
   if (loading || !series) {
     return (
-      <div className="flex items-center justify-center min-h-[200px]">
+      <div className="flex min-h-[200px] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
@@ -196,7 +200,9 @@ export default function RecurringSeriesDetailPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/admin/recurring-bookings" className="hover:text-foreground">الحجوزات المتكررة</Link>
+        <Link href="/admin/recurring-bookings" className="hover:text-foreground">
+          الحجوزات المتكررة
+        </Link>
         <ArrowRight className="h-4 w-4 rtl:rotate-180" />
         <span>{series.name}</span>
       </div>
@@ -214,20 +220,27 @@ export default function RecurringSeriesDetailPage() {
               <Button size="sm" onClick={handleUpdateName} disabled={saving}>
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'حفظ'}
               </Button>
-              <Button size="sm" variant="outline" onClick={() => { setIsEditingName(false); setEditName(series.name); }}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setIsEditingName(false)
+                  setEditName(series.name)
+                }}
+              >
                 إلغاء
               </Button>
             </>
           ) : (
             <Button variant="outline" size="sm" onClick={() => setIsEditingName(true)}>
-              <Pencil className="h-4 w-4 ml-1" />
+              <Pencil className="ml-1 h-4 w-4" />
               تعديل الاسم
             </Button>
           )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm">
-                <Trash2 className="h-4 w-4 ml-1" />
+                <Trash2 className="ml-1 h-4 w-4" />
                 حذف
               </Button>
             </AlertDialogTrigger>
@@ -240,7 +253,10 @@ export default function RecurringSeriesDetailPage() {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  className="bg-destructive text-destructive-foreground"
+                >
                   حذف
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -255,11 +271,14 @@ export default function RecurringSeriesDetailPage() {
           <CardDescription>العميل، التكرار، والحالة</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <Label className="text-muted-foreground">العميل</Label>
               <div className="font-medium">
-                <Link href={`/admin/clients/${series.customerId}`} className="text-primary hover:underline">
+                <Link
+                  href={`/admin/clients/${series.customerId}`}
+                  className="text-primary hover:underline"
+                >
                   {series.customer?.name ?? '—'}
                 </Link>
               </div>
@@ -273,7 +292,13 @@ export default function RecurringSeriesDetailPage() {
             </div>
             <div>
               <Label className="text-muted-foreground">تاريخ النهاية</Label>
-              <p>{series.endDate ? formatDate(series.endDate) : (series.occurrenceCount ? `بعد ${series.occurrenceCount} مرة` : '—')}</p>
+              <p>
+                {series.endDate
+                  ? formatDate(series.endDate)
+                  : series.occurrenceCount
+                    ? `بعد ${series.occurrenceCount} مرة`
+                    : '—'}
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <Label htmlFor="active">نشط</Label>
@@ -295,12 +320,14 @@ export default function RecurringSeriesDetailPage() {
             <CardDescription>المعدات المطبقة على كل حجز</CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="list-disc list-inside">
-              {series.template.equipmentIds?.map((item: { equipmentId: string; quantity: number }, idx: number) => (
-                <li key={idx}>
-                  {item.equipmentId} — كمية: {item.quantity}
-                </li>
-              ))}
+            <ul className="list-inside list-disc">
+              {series.template.equipmentIds?.map(
+                (item: { equipmentId: string; quantity: number }, idx: number) => (
+                  <li key={idx}>
+                    {item.equipmentId} — كمية: {item.quantity}
+                  </li>
+                )
+              )}
             </ul>
             {series.template.notes && (
               <p className="mt-2 text-sm text-muted-foreground">ملاحظات: {series.template.notes}</p>
@@ -329,7 +356,7 @@ export default function RecurringSeriesDetailPage() {
               <TableBody>
                 {!series.bookings?.length ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
+                    <TableCell colSpan={5} className="py-6 text-center text-muted-foreground">
                       لا توجد حجوزات
                     </TableCell>
                   </TableRow>

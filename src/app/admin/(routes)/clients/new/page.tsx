@@ -101,14 +101,14 @@ export default function NewClientPage() {
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
+          <h1 className="flex items-center gap-2 text-3xl font-bold">
             <User className="h-8 w-8" />
             عميل جديد
           </h1>
-          </div>
+        </div>
         <Button variant="outline" asChild>
           <Link href="/admin/clients">
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="ml-2 h-4 w-4" />
             إلغاء
           </Link>
         </Button>
@@ -122,7 +122,7 @@ export default function NewClientPage() {
             <CardDescription>معلومات الاتصال الأساسية للعميل</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="name">الاسم الكامل *</Label>
                 <Input
@@ -131,9 +131,7 @@ export default function NewClientPage() {
                   placeholder="أحمد محمد"
                   className={errors.name ? 'border-destructive' : ''}
                 />
-                {errors.name && (
-                  <p className="text-sm text-destructive">{errors.name.message}</p>
-                )}
+                {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
               </div>
 
               <div className="space-y-2">
@@ -146,9 +144,7 @@ export default function NewClientPage() {
                   className={errors.email ? 'border-destructive' : ''}
                   dir="ltr"
                 />
-                {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email.message}</p>
-                )}
+                {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
               </div>
 
               <div className="space-y-2">
@@ -187,21 +183,15 @@ export default function NewClientPage() {
             <CardDescription>عنوان العميل للتوصيل</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="address">العنوان</Label>
-                <Input
-                  id="address"
-                  {...register('address')}
-                  placeholder="الشارع، الحي، المبنى"
-                />
+                <Input id="address" {...register('address')} placeholder="الشارع، الحي، المبنى" />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="city">المدينة</Label>
-                <Select
-                  onValueChange={(value) => setValue('city', value)}
-                >
+                <Select onValueChange={(value) => setValue('city', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="اختر المدينة" />
                   </SelectTrigger>
@@ -227,7 +217,7 @@ export default function NewClientPage() {
             <CardDescription>معلومات إضافية للتحقق والفوترة</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="nationalId">رقم الهوية / الإقامة</Label>
                 <Input
@@ -242,11 +232,7 @@ export default function NewClientPage() {
                 <>
                   <div className="space-y-2">
                     <Label htmlFor="companyName">اسم الشركة</Label>
-                    <Input
-                      id="companyName"
-                      {...register('companyName')}
-                      placeholder="اسم الشركة"
-                    />
+                    <Input id="companyName" {...register('companyName')} placeholder="اسم الشركة" />
                   </div>
 
                   <div className="space-y-2">
@@ -270,11 +256,7 @@ export default function NewClientPage() {
             <CardTitle>ملاحظات</CardTitle>
           </CardHeader>
           <CardContent>
-            <Textarea
-              {...register('notes')}
-              placeholder="ملاحظات إضافية عن العميل..."
-              rows={4}
-            />
+            <Textarea {...register('notes')} placeholder="ملاحظات إضافية عن العميل..." rows={4} />
           </CardContent>
         </Card>
 
@@ -286,12 +268,12 @@ export default function NewClientPage() {
           <Button type="submit" disabled={loading}>
             {loading ? (
               <>
-                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
                 جاري الحفظ...
               </>
             ) : (
               <>
-                <Plus className="h-4 w-4 ml-2" />
+                <Plus className="ml-2 h-4 w-4" />
                 إنشاء العميل
               </>
             )}

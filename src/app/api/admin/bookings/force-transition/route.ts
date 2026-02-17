@@ -14,22 +14,16 @@ import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
 
 export async function POST(request: Request) {
   const rateLimit = rateLimitAPI(request)
-  
+
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: 'Too many requests' },
-      { status: 429 }
-    )
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }
 
   try {
     const session = await auth()
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     if (!(await hasPermission(session.user.id, PERMISSIONS.BOOKING_TRANSITION))) {
@@ -51,10 +45,7 @@ export async function POST(request: Request) {
 
     // Validate status
     if (!Object.values(BookingStatus).includes(newStatus as BookingStatus)) {
-      return NextResponse.json(
-        { error: 'Invalid booking status' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Invalid booking status' }, { status: 400 })
     }
 
     // Force transition (bypass normal state machine)
@@ -62,10 +53,7 @@ export async function POST(request: Request) {
     const booking = await BookingService.getById(bookingId, session.user.id)
 
     if (!booking) {
-      return NextResponse.json(
-        { error: 'Booking not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
     }
 
     // Update booking status directly (bypass service validation)

@@ -9,9 +9,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { 
-  ArrowRight, 
-  Tag, 
+import {
+  ArrowRight,
+  Tag,
   Calendar,
   Users,
   CheckCircle,
@@ -21,7 +21,7 @@ import {
   Trash2,
   Copy,
   ToggleLeft,
-  ToggleRight
+  ToggleRight,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -104,7 +104,7 @@ export default function CouponDetailPage() {
 
   const handleToggleStatus = async () => {
     if (!coupon) return
-    
+
     setToggling(true)
     try {
       const newStatus = coupon.status === 'active' ? 'inactive' : 'active'
@@ -177,8 +177,10 @@ export default function CouponDetailPage() {
     return (
       <div className="space-y-6" dir="rtl">
         <Skeleton className="h-8 w-64" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[1, 2, 3].map(i => <Skeleton key={i} className="h-24" />)}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-24" />
+          ))}
         </div>
         <Skeleton className="h-64" />
       </div>
@@ -187,8 +189,8 @@ export default function CouponDetailPage() {
 
   if (!coupon) {
     return (
-      <div className="text-center py-12" dir="rtl">
-        <AlertCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+      <div className="py-12 text-center" dir="rtl">
+        <AlertCircle className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
         <p className="text-lg font-medium">الكوبون غير موجود</p>
         <Button asChild className="mt-4">
           <Link href="/admin/coupons">العودة إلى الكوبونات</Link>
@@ -207,13 +209,13 @@ export default function CouponDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <Tag className="h-8 w-8" />
             كوبون: {coupon.code}
           </h1>
-          <div className="flex items-center gap-2 mt-2">
+          <div className="mt-2 flex items-center gap-2">
             <Badge className={statusConfig.color}>
-              <StatusIcon className="h-3 w-3 ml-1" />
+              <StatusIcon className="ml-1 h-3 w-3" />
               {statusConfig.label}
             </Badge>
             {isExpired && coupon.status !== 'expired' && (
@@ -224,24 +226,24 @@ export default function CouponDetailPage() {
         <div className="flex gap-2">
           <Button variant="outline" asChild>
             <Link href="/admin/coupons">
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <ArrowRight className="ml-2 h-4 w-4" />
               العودة
             </Link>
           </Button>
           <Button variant="outline" onClick={copyCode}>
-            <Copy className="h-4 w-4 ml-2" />
+            <Copy className="ml-2 h-4 w-4" />
             نسخ الرمز
           </Button>
           <Button variant="outline" asChild>
             <Link href={`/admin/coupons/${coupon.id}/edit`}>
-              <Edit className="h-4 w-4 ml-2" />
+              <Edit className="ml-2 h-4 w-4" />
               تعديل
             </Link>
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" disabled={deleting}>
-                <Trash2 className="h-4 w-4 ml-2" />
+                <Trash2 className="ml-2 h-4 w-4" />
                 حذف
               </Button>
             </AlertDialogTrigger>
@@ -254,7 +256,10 @@ export default function CouponDetailPage() {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  className="bg-destructive text-destructive-foreground"
+                >
                   حذف
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -264,7 +269,7 @@ export default function CouponDetailPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
@@ -285,7 +290,9 @@ export default function CouponDetailPage() {
                 <p className="text-sm text-muted-foreground">مرات الاستخدام</p>
                 <p className="text-2xl font-bold">
                   {coupon.usageCount}
-                  {coupon.usageLimit && <span className="text-muted-foreground text-lg">/{coupon.usageLimit}</span>}
+                  {coupon.usageLimit && (
+                    <span className="text-lg text-muted-foreground">/{coupon.usageLimit}</span>
+                  )}
                 </p>
               </div>
               <Users className="h-8 w-8 text-blue-500 opacity-50" />
@@ -318,9 +325,9 @@ export default function CouponDetailPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Details */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle>تفاصيل الكوبون</CardTitle>
@@ -330,7 +337,7 @@ export default function CouponDetailPage() {
                 <div>
                   <p className="text-sm text-muted-foreground">رمز الكوبون</p>
                   <div className="flex items-center gap-2">
-                    <p className="font-mono text-lg font-bold bg-muted px-3 py-1 rounded">
+                    <p className="rounded bg-muted px-3 py-1 font-mono text-lg font-bold">
                       {coupon.code}
                     </p>
                     <Button size="sm" variant="ghost" onClick={copyCode}>
@@ -357,24 +364,24 @@ export default function CouponDetailPage() {
                   </div>
                 )}
               </div>
-              
+
               {coupon.description && (
                 <div className="border-t pt-4">
-                  <p className="text-sm text-muted-foreground mb-1">الوصف</p>
+                  <p className="mb-1 text-sm text-muted-foreground">الوصف</p>
                   <p>{coupon.description}</p>
                 </div>
               )}
 
               {coupon.usageLimit && (
                 <div className="border-t pt-4">
-                  <p className="text-sm text-muted-foreground mb-2">نسبة الاستخدام</p>
-                  <div className="w-full bg-muted rounded-full h-3">
-                    <div 
+                  <p className="mb-2 text-sm text-muted-foreground">نسبة الاستخدام</p>
+                  <div className="h-3 w-full rounded-full bg-muted">
+                    <div
                       className={`h-3 rounded-full ${usagePercent >= 100 ? 'bg-red-500' : usagePercent >= 75 ? 'bg-yellow-500' : 'bg-green-500'}`}
                       style={{ width: `${Math.min(usagePercent, 100)}%` }}
                     />
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     {coupon.usageCount} من {coupon.usageLimit} ({usagePercent.toFixed(0)}%)
                   </p>
                 </div>
@@ -391,26 +398,26 @@ export default function CouponDetailPage() {
               <CardTitle>الإجراءات</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button 
-                className="w-full" 
+              <Button
+                className="w-full"
                 variant={coupon.status === 'active' ? 'outline' : 'default'}
                 onClick={handleToggleStatus}
                 disabled={toggling || isExpired}
               >
                 {coupon.status === 'active' ? (
                   <>
-                    <ToggleLeft className="h-4 w-4 ml-2" />
+                    <ToggleLeft className="ml-2 h-4 w-4" />
                     إلغاء التفعيل
                   </>
                 ) : (
                   <>
-                    <ToggleRight className="h-4 w-4 ml-2" />
+                    <ToggleRight className="ml-2 h-4 w-4" />
                     تفعيل
                   </>
                 )}
               </Button>
               <Button className="w-full" variant="outline" onClick={copyCode}>
-                <Copy className="h-4 w-4 ml-2" />
+                <Copy className="ml-2 h-4 w-4" />
                 نسخ الرمز
               </Button>
             </CardContent>

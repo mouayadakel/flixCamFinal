@@ -75,9 +75,7 @@ export function KitEquipmentCard({
   const effectiveDailyFromMonthly = showMonthlyRate ? item.monthlyPrice! / 30 : null
   const effectiveDaily = effectiveDailyFromMonthly ?? effectiveDailyFromWeekly ?? item.dailyPrice
   const savePercent =
-    effectiveDaily < item.dailyPrice
-      ? Math.round((1 - effectiveDaily / item.dailyPrice) * 100)
-      : 0
+    effectiveDaily < item.dailyPrice ? Math.round((1 - effectiveDaily / item.dailyPrice) * 100) : 0
 
   return (
     <div
@@ -92,7 +90,7 @@ export function KitEquipmentCard({
     >
       <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-surface-light">
         {multiSelectMode && (
-          <div className="absolute top-3 start-3 z-10">
+          <div className="absolute start-3 top-3 z-10">
             <Checkbox
               checked={isSelected}
               onCheckedChange={() => onToggle()}
@@ -102,12 +100,12 @@ export function KitEquipmentCard({
           </div>
         )}
         {aiRecommended && (
-          <span className="absolute top-3 end-3 z-10 rounded bg-brand-primary/90 px-2 py-0.5 text-xs font-medium text-white">
+          <span className="absolute end-3 top-3 z-10 rounded bg-brand-primary/90 px-2 py-0.5 text-xs font-medium text-white">
             AI Pick
           </span>
         )}
         {available <= 0 && (
-          <span className="absolute bottom-3 start-3 end-3 z-10 rounded bg-red-600 px-2 py-1 text-center text-xs font-medium text-white">
+          <span className="absolute bottom-3 end-3 start-3 z-10 rounded bg-red-600 px-2 py-1 text-center text-xs font-medium text-white">
             {t('kit.unavailable')}
           </span>
         )}
@@ -140,9 +138,7 @@ export function KitEquipmentCard({
         <p className="text-label-small uppercase tracking-wider text-text-muted">
           {item.brand?.name ?? item.category?.name ?? '—'}
         </p>
-        <p className="mt-1 truncate text-card-title text-text-heading">
-          {item.model ?? item.sku}
-        </p>
+        <p className="mt-1 truncate text-card-title text-text-heading">{item.model ?? item.sku}</p>
         <div className="mt-2 flex flex-wrap items-baseline gap-1.5">
           {savePercent > 0 ? (
             <>

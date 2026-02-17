@@ -31,28 +31,34 @@ Before making changes, output:
 ## Impact Analysis for [filename]
 
 ### Files That Will Be Affected:
+
 - [ ] file1.ts (imports this)
 - [ ] file2.tsx (uses this function)
 
 ### Database Changes Required:
+
 - [ ] None
 - [ ] Migration needed: [describe]
 
 ### API Changes:
+
 - [ ] Breaking change: Yes/No
 - [ ] Backwards compatible: Yes/No
 
 ### Security Implications:
+
 - [ ] Authentication affected: Yes/No
 - [ ] Authorization affected: Yes/No
 - [ ] New permissions needed: Yes/No
 
 ### Testing Required:
+
 - [ ] Unit tests to update
 - [ ] Integration tests needed
 - [ ] Manual testing steps
 
 ### Rollback Plan:
+
 [Describe how to undo if this breaks]
 ```
 
@@ -73,21 +79,26 @@ Analyzing impact of changing BookingStatus enum...
 ## Impact Analysis
 
 ### Files Affected (12):
+
 - src/app/api/bookings/route.ts (status checks)
 - src/components/booking-card.tsx (status display)
 - src/lib/services/booking.service.ts (business logic)
-... [9 more]
+  ... [9 more]
 
 ### Database Migration:
+
 ⚠️ WARNING: This is a breaking change
+
 - Need migration to update existing booking records
 - Estimated 500+ records will be affected
 
 ### Breaking Changes:
+
 ❌ API responses will change
 ❌ Frontend components expect old values
 
 ### Recommendation:
+
 1. Create migration script first
 2. Add backwards compatibility layer
 3. Deprecate old values gradually

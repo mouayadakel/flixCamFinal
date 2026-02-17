@@ -11,7 +11,6 @@ import Image from 'next/image'
 import { useLocale } from '@/hooks/use-locale'
 import { isExternalImageUrl } from '@/lib/utils/image.utils'
 import { cn } from '@/lib/utils'
-import { AvailabilityBadge, getAvailabilityStatus } from './availability-badge'
 import { SaveEquipmentButton } from './save-equipment-button'
 import { Eye } from 'lucide-react'
 
@@ -37,14 +36,13 @@ interface EquipmentCardProps {
 export function EquipmentCard({ item, layout = 'grid' }: EquipmentCardProps) {
   const { t } = useLocale()
   const [imageFailed, setImageFailed] = useState(false)
-  const availabilityStatus = getAvailabilityStatus(item.quantityAvailable, true)
   const handleImageError = useCallback(() => setImageFailed(true), [])
 
   if (layout === 'list') {
     return (
       <Link
         href={`/equipment/${item.id}`}
-        className="group flex gap-4 rounded-2xl border border-border-light/60 bg-white p-4 shadow-card transition-all duration-300 hover:shadow-card-hover hover:border-brand-primary/10 hover:-translate-y-0.5"
+        className="group flex gap-4 rounded-2xl border border-border-light/60 bg-white p-4 shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-primary/10 hover:shadow-card-hover"
       >
         <div className="relative h-28 w-36 shrink-0 overflow-hidden rounded-xl bg-surface-light">
           {imageFailed ? (
@@ -61,11 +59,11 @@ export function EquipmentCard({ item, layout = 'grid' }: EquipmentCardProps) {
             />
           )}
         </div>
-        <div className="min-w-0 flex-1 flex flex-col justify-center">
+        <div className="flex min-w-0 flex-1 flex-col justify-center">
           <p className="text-label-small uppercase tracking-wider text-text-muted">
             {item.brand?.name ?? item.category?.name ?? '—'}
           </p>
-          <p className="mt-1 font-semibold truncate text-text-heading group-hover:text-brand-primary transition-colors">
+          <p className="mt-1 truncate font-semibold text-text-heading transition-colors group-hover:text-brand-primary">
             {item.model ?? item.sku}
           </p>
           {item.vendor && (
@@ -73,20 +71,13 @@ export function EquipmentCard({ item, layout = 'grid' }: EquipmentCardProps) {
           )}
           <div className="mt-2 flex items-baseline gap-1.5">
             <span className="text-price-tag text-brand-primary">
-              {item.dailyPrice > 0
-                ? `${Number(item.dailyPrice).toLocaleString()} SAR`
-                : '—'}
+              {item.dailyPrice > 0 ? `${Number(item.dailyPrice).toLocaleString()} SAR` : '—'}
             </span>
             {item.dailyPrice > 0 && (
               <span className="text-sm text-text-muted">/ {t('common.pricePerDay')}</span>
             )}
           </div>
         </div>
-        <AvailabilityBadge
-          status={availabilityStatus}
-          quantityAvailable={item.quantityAvailable ?? 0}
-          className="shrink-0 self-start"
-        />
       </Link>
     )
   }
@@ -94,11 +85,11 @@ export function EquipmentCard({ item, layout = 'grid' }: EquipmentCardProps) {
   return (
     <Link
       href={`/equipment/${item.id}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-border-light/60 bg-white shadow-card transition-all duration-350 hover:-translate-y-1.5 hover:shadow-card-hover hover:border-brand-primary/10"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-border-light/60 bg-white shadow-card transition-all duration-350 hover:-translate-y-1.5 hover:border-brand-primary/10 hover:shadow-card-hover"
     >
       <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-surface-light">
         {/* Save button */}
-        <div className="absolute top-3 right-3 z-10">
+        <div className="absolute right-3 top-3 z-10">
           <SaveEquipmentButton equipmentId={item.id} />
         </div>
         {imageFailed ? (
@@ -116,34 +107,25 @@ export function EquipmentCard({ item, layout = 'grid' }: EquipmentCardProps) {
         )}
         {/* Hover overlay */}
         <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/25">
-          <span className="flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-text-heading opacity-0 translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 shadow-lg backdrop-blur-sm">
+          <span className="flex translate-y-2 items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-text-heading opacity-0 shadow-lg backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
             <Eye className="h-4 w-4" />
-            {t('common.viewDetails') ?? 'View'}
+            {t('common.bookNow')}
           </span>
         </div>
-        {/* Availability badge */}
-        <span className="absolute top-3 end-3">
-          <AvailabilityBadge
-            status={availabilityStatus}
-            quantityAvailable={item.quantityAvailable ?? 0}
-          />
-        </span>
       </div>
       <div className="flex min-w-0 flex-1 flex-col p-4">
         <p className="text-label-small uppercase tracking-wider text-text-muted">
           {item.brand?.name ?? item.category?.name ?? '—'}
         </p>
-        <p className="mt-1.5 truncate text-card-title text-text-heading group-hover:text-brand-primary transition-colors">
+        <p className="mt-1.5 truncate text-card-title text-text-heading transition-colors group-hover:text-brand-primary">
           {item.model ?? item.sku ?? item.id}
         </p>
         {item.vendor && (
           <p className="mt-0.5 text-xs text-muted-foreground">by {item.vendor.companyName}</p>
         )}
-        <div className="mt-3 flex items-baseline gap-1.5 pt-3 border-t border-border-light/60">
+        <div className="mt-3 flex items-baseline gap-1.5 border-t border-border-light/60 pt-3">
           <span className="text-price-tag text-brand-primary">
-            {item.dailyPrice > 0
-              ? `${Number(item.dailyPrice).toLocaleString()} SAR`
-              : '—'}
+            {item.dailyPrice > 0 ? `${Number(item.dailyPrice).toLocaleString()} SAR` : '—'}
           </span>
           {item.dailyPrice > 0 && (
             <span className="text-sm text-text-muted">/ {t('common.pricePerDay')}</span>

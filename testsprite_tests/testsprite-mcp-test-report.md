@@ -3,6 +3,7 @@
 ---
 
 ## 1️⃣ Document Metadata
+
 - **Project Name:** FlixCam.rent
 - **Date:** 2026-01-28
 - **Prepared by:** TestSprite AI Team
@@ -16,9 +17,11 @@
 ## 2️⃣ Requirement Validation Summary
 
 ### Requirement: Authentication & Authorization
+
 - **Description:** Signin, signout, and session endpoints with JSON support for automation.
 
 #### Test TC001 signin api should authenticate user correctly
+
 - **Test Code:** [TC001_signin_api_should_authenticate_user_correctly.py](./TC001_signin_api_should_authenticate_user_correctly.py)
 - **Test Error:** AssertionError: Expected status code 200, got 401
 - **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/f1c34a6e-9757-4b5c-a081-f04591b68b88/f4227293-6c12-4e6a-a631-30a61c4956ac
@@ -29,6 +32,7 @@
 ---
 
 #### Test TC002 signout api should terminate user session
+
 - **Test Code:** [TC002_signout_api_should_terminate_user_session.py](./TC002_signout_api_should_terminate_user_session.py)
 - **Test Error:** AssertionError: Signin failed with status 500
 - **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/f1c34a6e-9757-4b5c-a081-f04591b68b88/84df13cd-bc09-40ac-a1b4-af4a26529144
@@ -39,6 +43,7 @@
 ---
 
 #### Test TC003 session api should return current user session
+
 - **Test Code:** [TC003_session_api_should_return_current_user_session.py](./TC003_session_api_should_return_current_user_session.py)
 - **Test Error:** AssertionError: Signin failed with status code 401
 - **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/f1c34a6e-9757-4b5c-a081-f04591b68b88/32fb8563-8ef2-4a1f-af5d-47a580d9ff85
@@ -49,9 +54,11 @@
 ---
 
 ### Requirement: Booking Management
+
 - **Description:** Bookings CRUD and status transitions.
 
 #### Test TC004 bookings api should support create read update delete operations
+
 - **Test Code:** [TC004_bookings_api_should_support_create_read_update_delete_operations.py](./TC004_bookings_api_should_support_create_read_update_delete_operations.py)
 - **Test Error:** AssertionError: Failed to signin
 - **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/f1c34a6e-9757-4b5c-a081-f04591b68b88/2a0d00e6-96f6-4952-87f2-cee914d27bf7
@@ -62,6 +69,7 @@
 ---
 
 #### Test TC005 bookings transition api should handle valid state transitions
+
 - **Test Code:** [TC005_bookings_transition_api_should_handle_valid_state_transitions.py](./TC005_bookings_transition_api_should_handle_valid_state_transitions.py)
 - **Test Error:** AssertionError: Signin failed: {"error":"Invalid credentials"}
 - **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/f1c34a6e-9757-4b5c-a081-f04591b68b88/4acc3494-19c3-4f67-862a-2ee13e2fc82a
@@ -72,9 +80,11 @@
 ---
 
 ### Requirement: Equipment Management
+
 - **Description:** Equipment CRUD and availability.
 
 #### Test TC006 equipment api should support equipment management and availability check
+
 - **Test Code:** [TC006_equipment_api_should_support_equipment_management_and_availability_check.py](./TC006_equipment_api_should_support_equipment_management_and_availability_check.py)
 - **Test Error:** AssertionError: Signin failed: {"error":"Invalid credentials"}
 - **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/f1c34a6e-9757-4b5c-a081-f04591b68b88/246c79c7-5132-4dc8-95a5-c6c6a088f70d
@@ -85,9 +95,11 @@
 ---
 
 ### Requirement: Payments
+
 - **Description:** List payments and process refunds.
 
 #### Test TC007 payments api should list payments and process refunds
+
 - **Test Code:** [TC007_payments_api_should_list_payments_and_process_refunds.py](./TC007_payments_api_should_list_payments_and_process_refunds.py)
 - **Test Error:** AssertionError: Sign in failed: {"error":"Invalid credentials"}
 - **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/f1c34a6e-9757-4b5c-a081-f04591b68b88/817e96f1-72b2-4ca4-8d5a-15a1ea2512ed
@@ -98,9 +110,11 @@
 ---
 
 ### Requirement: Invoices
+
 - **Description:** Generate and manage invoices.
 
 #### Test TC008 invoices api should generate and manage invoices
+
 - **Test Code:** [TC008_invoices_api_should_generate_and_manage_invoices.py](./TC008_invoices_api_should_generate_and_manage_invoices.py)
 - **Test Error:** AssertionError: Failed to fetch clients
 - **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/f1c34a6e-9757-4b5c-a081-f04591b68b88/c99fb030-c63f-4df2-bf69-3a9b369a583d
@@ -111,9 +125,11 @@
 ---
 
 ### Requirement: Client Management
+
 - **Description:** Client CRUD with role-based access.
 
 #### Test TC009 clients api should support client management
+
 - **Test Code:** [TC009_clients_api_should_support_client_management.py](./TC009_clients_api_should_support_client_management.py)
 - **Test Error:** AssertionError: Client creation failed: {"error":"Unauthorized"}
 - **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/f1c34a6e-9757-4b5c-a081-f04591b68b88/3ee628ef-bf06-4406-9a52-bc3bf5dbed6f
@@ -124,9 +140,11 @@
 ---
 
 ### Requirement: Reports & Dashboard
+
 - **Description:** Dashboard statistics and report export.
 
 #### Test TC010 reports dashboard api should provide statistics and export functionality
+
 - **Test Code:** [TC010_reports_dashboard_api_should_provide_statistics_and_export_functionality.py](./TC010_reports_dashboard_api_should_provide_statistics_and_export_functionality.py)
 - **Test Error:** AssertionError: Signin failed: {"error":"Invalid credentials"}
 - **Test Visualization and Result:** https://www.testsprite.com/dashboard/mcp/tests/f1c34a6e-9757-4b5c-a081-f04591b68b88/9d9a1ed5-c6c2-4b94-9b04-8446c939cf7f
@@ -140,16 +158,16 @@
 
 - **0 of 10 tests passed (0%).**
 
-| Requirement              | Total Tests | ✅ Passed | ❌ Failed |
-|--------------------------|-------------|-----------|-----------|
-| Authentication           | 3           | 0         | 3         |
-| Booking Management       | 2           | 0         | 2         |
-| Equipment Management     | 1           | 0         | 1         |
-| Payments                 | 1           | 0         | 1         |
-| Invoices                 | 1           | 0         | 1         |
-| Client Management        | 1           | 0         | 1         |
-| Reports & Dashboard      | 1           | 0         | 1         |
-| **Total**                | **10**      | **0**     | **10**    |
+| Requirement          | Total Tests | ✅ Passed | ❌ Failed |
+| -------------------- | ----------- | --------- | --------- |
+| Authentication       | 3           | 0         | 3         |
+| Booking Management   | 2           | 0         | 2         |
+| Equipment Management | 1           | 0         | 1         |
+| Payments             | 1           | 0         | 1         |
+| Invoices             | 1           | 0         | 1         |
+| Client Management    | 1           | 0         | 1         |
+| Reports & Dashboard  | 1           | 0         | 1         |
+| **Total**            | **10**      | **0**     | **10**    |
 
 ---
 

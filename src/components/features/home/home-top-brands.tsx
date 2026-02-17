@@ -37,14 +37,12 @@ export function HomeTopBrands() {
   }, [])
 
   return (
-    <section className="py-16 md:py-20 lg:py-24 bg-white border-t border-border-light/50">
+    <section className="border-t border-border-light/50 bg-white py-10 md:py-14">
       <PublicContainer>
         <div className="mb-10 text-center">
-          <h2 className="text-section-title text-text-heading">
-            {t('home.topBrandsTitle')}
-          </h2>
+          <h2 className="text-section-title text-text-heading">{t('home.topBrandsTitle')}</h2>
           <p className="mx-auto mt-3 max-w-md text-body-main text-text-body">
-            {t('home.heroSubtitle')}
+            {t('home.topBrandsSubtitle')}
           </p>
         </div>
         {loading ? (
@@ -66,7 +64,7 @@ export function HomeTopBrands() {
               <Link
                 key={brand.id}
                 href={`/equipment?brandId=${brand.id}`}
-                className="group flex flex-col items-center rounded-2xl border border-border-light/60 bg-white p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover hover:border-brand-primary/10 opacity-0 animate-fade-in-up"
+                className="group flex animate-fade-in-up flex-col items-center rounded-2xl border border-border-light/60 bg-white p-6 opacity-0 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-brand-primary/10 hover:shadow-card-hover"
                 style={{ animationDelay: `${0.05 * index}s` }}
               >
                 <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-surface-light transition-transform duration-300 group-hover:scale-110">
@@ -86,7 +84,7 @@ export function HomeTopBrands() {
                     </div>
                   )}
                 </div>
-                <p className="mt-3 text-center text-sm font-semibold text-text-heading group-hover:text-brand-primary transition-colors">
+                <p className="mt-3 text-center text-sm font-semibold text-text-heading transition-colors group-hover:text-brand-primary">
                   {brand.name}
                 </p>
                 <p className="mt-0.5 text-label-small text-text-muted">

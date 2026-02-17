@@ -155,11 +155,16 @@ export default function ReviewDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild>
-          <Link href="/admin/reviews"><ArrowLeft className="h-4 w-4" /></Link>
+          <Link href="/admin/reviews">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
         </Button>
         <div>
           <h1 className="text-2xl font-bold">Review</h1>
-          <p className="text-muted-foreground text-sm">Booking {review.booking?.bookingNumber ?? review.bookingId} · {formatDate(review.createdAt)}</p>
+          <p className="text-sm text-muted-foreground">
+            Booking {review.booking?.bookingNumber ?? review.bookingId} ·{' '}
+            {formatDate(review.createdAt)}
+          </p>
         </div>
       </div>
 
@@ -173,7 +178,9 @@ export default function ReviewDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-2xl font-semibold">{review.rating} / 5</p>
-            <p className="text-muted-foreground whitespace-pre-wrap">{review.comment || 'No comment'}</p>
+            <p className="whitespace-pre-wrap text-muted-foreground">
+              {review.comment || 'No comment'}
+            </p>
             <div>
               <span className="text-sm text-muted-foreground">Customer: </span>
               <span>{review.user?.name || review.user?.email || review.userId}</span>
@@ -187,26 +194,52 @@ export default function ReviewDetailPage() {
               <MessageSquare className="h-5 w-5" />
               Moderation
             </CardTitle>
-            <CardDescription>Approve or reject the review; optionally add a public reply</CardDescription>
+            <CardDescription>
+              Approve or reject the review; optionally add a public reply
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-2">
-              <Badge className={statusColor[review.status] ?? 'bg-gray-100'}>{review.status.replace(/_/g, ' ')}</Badge>
+              <Badge className={statusColor[review.status] ?? 'bg-gray-100'}>
+                {review.status.replace(/_/g, ' ')}
+              </Badge>
             </div>
             {review.adminResponse && (
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Your response</p>
-                <p className="whitespace-pre-wrap rounded bg-muted p-3 text-sm">{review.adminResponse}</p>
-                {review.respondedAt && <p className="text-xs text-muted-foreground mt-1">Responded {formatDate(review.respondedAt)}</p>}
+                <p className="whitespace-pre-wrap rounded bg-muted p-3 text-sm">
+                  {review.adminResponse}
+                </p>
+                {review.respondedAt && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Responded {formatDate(review.respondedAt)}
+                  </p>
+                )}
               </div>
             )}
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => { setModerateStatus(review.status === 'REJECTED' ? 'APPROVED' : 'REJECTED'); setModerateOpen(true) }}>
-                {review.status === 'PENDING_MODERATION' ? <CheckCircle className="h-4 w-4 mr-2" /> : <XCircle className="h-4 w-4 mr-2" />}
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setModerateStatus(review.status === 'REJECTED' ? 'APPROVED' : 'REJECTED')
+                  setModerateOpen(true)
+                }}
+              >
+                {review.status === 'PENDING_MODERATION' ? (
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                ) : (
+                  <XCircle className="mr-2 h-4 w-4" />
+                )}
                 {review.status === 'PENDING_MODERATION' ? 'Approve / Reject' : 'Change status'}
               </Button>
-              <Button variant="outline" onClick={() => { setAdminResponse(review.adminResponse ?? ''); setRespondOpen(true) }}>
-                <Send className="h-4 w-4 mr-2" />
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setAdminResponse(review.adminResponse ?? '')
+                  setRespondOpen(true)
+                }}
+              >
+                <Send className="mr-2 h-4 w-4" />
                 {review.adminResponse ? 'Edit response' : 'Respond'}
               </Button>
             </div>
@@ -221,10 +254,14 @@ export default function ReviewDetailPage() {
             <CardDescription>Booking linked to this review</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="link" className="p-0 h-auto" asChild>
-              <Link href={`/admin/bookings/${review.booking.id}`}>{review.booking.bookingNumber} · {review.booking.status}</Link>
+            <Button variant="link" className="h-auto p-0" asChild>
+              <Link href={`/admin/bookings/${review.booking.id}`}>
+                {review.booking.bookingNumber} · {review.booking.status}
+              </Link>
             </Button>
-            <p className="text-sm text-muted-foreground mt-1">{formatDate(review.booking.startDate)} – {formatDate(review.booking.endDate)}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {formatDate(review.booking.startDate)} – {formatDate(review.booking.endDate)}
+            </p>
           </CardContent>
         </Card>
       )}
@@ -233,7 +270,9 @@ export default function ReviewDetailPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Change status</DialogTitle>
-            <DialogDescription>Approved reviews are shown publicly; rejected are hidden.</DialogDescription>
+            <DialogDescription>
+              Approved reviews are shown publicly; rejected are hidden.
+            </DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <Select value={moderateStatus} onValueChange={setModerateStatus}>
@@ -248,8 +287,12 @@ export default function ReviewDetailPage() {
             </Select>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setModerateOpen(false)}>Cancel</Button>
-            <Button onClick={handleModerate} disabled={submitting}>{submitting ? 'Saving...' : 'Save'}</Button>
+            <Button variant="outline" onClick={() => setModerateOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleModerate} disabled={submitting}>
+              {submitting ? 'Saving...' : 'Save'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -258,7 +301,9 @@ export default function ReviewDetailPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Respond to review</DialogTitle>
-            <DialogDescription>Your reply will be shown publicly under the review.</DialogDescription>
+            <DialogDescription>
+              Your reply will be shown publicly under the review.
+            </DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <Textarea
@@ -269,8 +314,12 @@ export default function ReviewDetailPage() {
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRespondOpen(false)}>Cancel</Button>
-            <Button onClick={handleRespond} disabled={submitting || !adminResponse.trim()}>{submitting ? 'Sending...' : 'Post response'}</Button>
+            <Button variant="outline" onClick={() => setRespondOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleRespond} disabled={submitting || !adminResponse.trim()}>
+              {submitting ? 'Sending...' : 'Post response'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

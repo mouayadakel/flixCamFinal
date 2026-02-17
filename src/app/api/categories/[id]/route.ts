@@ -10,6 +10,7 @@ import { prisma } from '@/lib/db/prisma'
 import { updateCategorySchema } from '@/lib/validators/category.validator'
 import { handleApiError } from '@/lib/utils/api-helpers'
 import { UnauthorizedError, NotFoundError } from '@/lib/errors'
+import { cacheDelete } from '@/lib/cache'
 
 function shapeCategory(c: {
   id: string
@@ -35,10 +36,7 @@ function shapeCategory(c: {
 /**
  * GET /api/categories/:id – Get one category
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()
@@ -67,10 +65,7 @@ export async function GET(
 /**
  * PATCH /api/categories/:id – Update category
  */
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()
@@ -86,10 +81,7 @@ export async function PATCH(
 
     if (parsed.parentId !== undefined) {
       if (parsed.parentId === id) {
-        return NextResponse.json(
-          { error: 'Category cannot be its own parent' },
-          { status: 400 }
-        )
+        return NextResponse.json({ error: 'Category cannot be its own parent' }, { status: 400 })
       }
       if (parsed.parentId) {
         const parent = await prisma.category.findFirst({
@@ -110,7 +102,10 @@ export async function PATCH(
     } = { updatedBy: session.user.id }
     if (parsed.name !== undefined) updateData.name = parsed.name.trim()
     if (parsed.slug !== undefined) {
-      const newSlug = (parsed.slug.trim() || existing.slug).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+      const newSlug = (parsed.slug.trim() || existing.slug)
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
       if (newSlug !== existing.slug) {
         const conflict = await prisma.category.findFirst({
           where: { slug: newSlug, deletedAt: null, id: { not: id } },
@@ -121,7 +116,8 @@ export async function PATCH(
         updateData.slug = newSlug
       }
     }
-    if (parsed.description !== undefined) updateData.description = parsed.description?.trim() ?? null
+    if (parsed.description !== undefined)
+      updateData.description = parsed.description?.trim() ?? null
     if (parsed.parentId !== undefined) updateData.parentId = parsed.parentId ?? null
 
     const category = await prisma.category.update({
@@ -138,6 +134,7 @@ export async function PATCH(
       },
     })
 
+    await cacheDelete('websiteContent', 'categories')
     return NextResponse.json(shapeCategory(category))
   } catch (error) {
     return handleApiError(error)
@@ -177,6 +174,7 @@ export async function DELETE(
       },
     })
 
+    await cacheDelete('websiteContent', 'categories')
     return NextResponse.json({ success: true })
   } catch (error) {
     return handleApiError(error)

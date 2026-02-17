@@ -13,7 +13,15 @@ import { siteConfig } from '@/config/site.config'
 import { getWhatsAppUrl } from '@/lib/utils/whatsapp-context'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Mail, Phone, MapPin, ArrowRight, Instagram, MessageCircle, CreditCard, Shield } from 'lucide-react'
+import {
+  Mail,
+  Phone,
+  MapPin,
+  ArrowRight,
+  Instagram,
+  MessageCircle,
+  CreditCard,
+} from 'lucide-react'
 
 const CATEGORY_LINKS = [
   { href: '/equipment', key: 'nav.equipment' },
@@ -29,16 +37,19 @@ interface PublicFooterProps {
 const ABOUT_LINKS = [
   { href: '/how-it-works', key: 'nav.howItWorks' },
   { href: '/support', key: 'nav.support' },
+  { href: '/faq', key: 'nav.faq' },
   { href: '/policies', key: 'nav.policies' },
 ] as const
 
 export function PublicFooter({ hiddenRoutes }: PublicFooterProps = {}) {
   const { t } = useLocale()
   const [email, setEmail] = useState('')
-  const visibleCategoryLinks =
-    hiddenRoutes?.size ? CATEGORY_LINKS.filter(({ href }) => !hiddenRoutes.has(href)) : CATEGORY_LINKS
-  const visibleAboutLinks =
-    hiddenRoutes?.size ? ABOUT_LINKS.filter(({ href }) => !hiddenRoutes.has(href)) : ABOUT_LINKS
+  const visibleCategoryLinks = hiddenRoutes?.size
+    ? CATEGORY_LINKS.filter(({ href }) => !hiddenRoutes.has(href))
+    : CATEGORY_LINKS
+  const visibleAboutLinks = hiddenRoutes?.size
+    ? ABOUT_LINKS.filter(({ href }) => !hiddenRoutes.has(href))
+    : ABOUT_LINKS
 
   const handleNewsletter = (e: React.FormEvent) => {
     e.preventDefault()
@@ -52,17 +63,10 @@ export function PublicFooter({ hiddenRoutes }: PublicFooterProps = {}) {
         <PublicContainer>
           <div className="flex flex-col items-center gap-6 py-12 md:flex-row md:justify-between md:gap-12">
             <div className="text-center md:text-start">
-              <h3 className="text-xl font-bold text-inverse-heading">
-                {t('footer.contactUs')}
-              </h3>
-              <p className="mt-1 text-sm text-inverse-body/80">
-                {t('footer.gotQuestion')}
-              </p>
+              <h3 className="text-xl font-bold text-inverse-heading">{t('footer.contactUs')}</h3>
+              <p className="mt-1 text-sm text-inverse-body/80">{t('footer.gotQuestion')}</p>
             </div>
-            <form
-              onSubmit={handleNewsletter}
-              className="flex w-full max-w-md gap-2"
-            >
+            <form onSubmit={handleNewsletter} className="flex w-full max-w-md gap-2">
               <Input
                 type="email"
                 value={email}
@@ -72,7 +76,7 @@ export function PublicFooter({ hiddenRoutes }: PublicFooterProps = {}) {
               />
               <Button
                 type="submit"
-                className="h-12 rounded-xl bg-brand-primary px-6 font-semibold hover:bg-brand-primary-hover shadow-md transition-all hover:shadow-lg"
+                className="h-12 rounded-xl bg-brand-primary px-6 font-semibold shadow-md transition-all hover:bg-brand-primary-hover hover:shadow-lg"
               >
                 <ArrowRight className="h-4 w-4" />
               </Button>
@@ -88,7 +92,7 @@ export function PublicFooter({ hiddenRoutes }: PublicFooterProps = {}) {
           <div className="lg:col-span-1">
             <Link
               href="/"
-              className="inline-block text-xl font-bold text-inverse-heading hover:text-brand-primary transition-colors"
+              className="inline-block text-xl font-bold text-inverse-heading transition-colors hover:text-brand-primary"
             >
               {siteConfig.brandName}
             </Link>
@@ -127,7 +131,7 @@ export function PublicFooter({ hiddenRoutes }: PublicFooterProps = {}) {
                 <li key={href}>
                   <Link
                     href={href}
-                    className="text-sm text-inverse-body/80 transition-all hover:text-inverse-heading hover:translate-x-0.5 inline-block"
+                    className="inline-block text-sm text-inverse-body/80 transition-all hover:translate-x-0.5 hover:text-inverse-heading"
                   >
                     {t(key)}
                   </Link>
@@ -149,7 +153,7 @@ export function PublicFooter({ hiddenRoutes }: PublicFooterProps = {}) {
                 <li key={href}>
                   <Link
                     href={href}
-                    className="text-sm text-inverse-body/80 transition-all hover:text-inverse-heading hover:translate-x-0.5 inline-block"
+                    className="inline-block text-sm text-inverse-body/80 transition-all hover:translate-x-0.5 hover:text-inverse-heading"
                   >
                     {t(key)}
                   </Link>
@@ -168,7 +172,7 @@ export function PublicFooter({ hiddenRoutes }: PublicFooterProps = {}) {
                 href={siteConfig.contact.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-inverse-body transition-all hover:bg-brand-primary hover:text-white hover:shadow-lg hover:shadow-brand-primary/20 hover:-translate-y-0.5"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-inverse-body transition-all hover:-translate-y-0.5 hover:bg-brand-primary hover:text-white hover:shadow-lg hover:shadow-brand-primary/20"
                 aria-label="Instagram"
               >
                 <Instagram className="h-4 w-4" />
@@ -177,7 +181,7 @@ export function PublicFooter({ hiddenRoutes }: PublicFooterProps = {}) {
                 href={getWhatsAppUrl({ number: siteConfig.contact.whatsappNumber })}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-inverse-body transition-all hover:bg-brand-secondary-accent hover:text-white hover:shadow-lg hover:shadow-brand-secondary-accent/20 hover:-translate-y-0.5"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-inverse-body transition-all hover:-translate-y-0.5 hover:bg-brand-secondary-accent hover:text-white hover:shadow-lg hover:shadow-brand-secondary-accent/20"
                 aria-label="WhatsApp"
               >
                 <MessageCircle className="h-4 w-4" />
@@ -186,10 +190,6 @@ export function PublicFooter({ hiddenRoutes }: PublicFooterProps = {}) {
 
             {/* Trust signals */}
             <div className="mt-8 space-y-3">
-              <div className="flex items-center gap-2 text-sm text-inverse-body/60">
-                <Shield className="h-4 w-4" />
-                <span>{t('home.trustInsured')}</span>
-              </div>
               <div className="flex items-center gap-2 text-sm text-inverse-body/60">
                 <CreditCard className="h-4 w-4" />
                 <span>{t('footer.paymentMethods')}</span>
@@ -204,7 +204,8 @@ export function PublicFooter({ hiddenRoutes }: PublicFooterProps = {}) {
         <PublicContainer>
           <div className="flex min-h-14 flex-col items-center justify-between gap-4 py-5 sm:flex-row">
             <p className="text-xs text-inverse-body/50">
-              &copy; {new Date().getFullYear()} {siteConfig.brandName} &mdash; {t('footer.copyright')}
+              &copy; {new Date().getFullYear()} {siteConfig.brandName} &mdash;{' '}
+              {t('footer.copyright')}
             </p>
             <div className="flex items-center gap-4">
               {/* Payment method icons */}

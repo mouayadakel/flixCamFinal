@@ -7,10 +7,7 @@ import { prisma } from '@/lib/db/prisma'
 import { rateLimitByTier } from '@/lib/utils/rate-limit'
 import { cacheGet, cacheSet } from '@/lib/cache'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const rate = rateLimitByTier(request, 'public')
   if (!rate.allowed) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
@@ -52,10 +49,7 @@ export async function GET(
     },
   }))
 
-  const subtotal = items.reduce(
-    (sum, i) => sum + i.equipment.dailyPrice * i.quantity,
-    0
-  )
+  const subtotal = items.reduce((sum, i) => sum + i.equipment.dailyPrice * i.quantity, 0)
   const discountPercent = kit.discountPercent ? Number(kit.discountPercent) : 0
   const total = discountPercent > 0 ? subtotal * (1 - discountPercent / 100) : subtotal
 

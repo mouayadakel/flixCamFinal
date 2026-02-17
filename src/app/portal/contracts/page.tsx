@@ -52,9 +52,7 @@ export default async function PortalContractsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">عقودي</h1>
-        <p className="text-muted-foreground mt-2">
-          عرض وإدارة جميع عقودك
-        </p>
+        <p className="mt-2 text-muted-foreground">عرض وإدارة جميع عقودك</p>
       </div>
 
       <Card>
@@ -63,7 +61,7 @@ export default async function PortalContractsPage() {
         </CardHeader>
         <CardContent>
           {contracts.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="py-12 text-center">
               <p className="text-muted-foreground">لا توجد عقود</p>
             </div>
           ) : (
@@ -71,27 +69,17 @@ export default async function PortalContractsPage() {
               {contracts.map((contract) => (
                 <div
                   key={contract.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-neutral-50 transition-colors"
+                  className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-neutral-50"
                 >
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="mb-2 flex items-center gap-3">
                       <FileText className="h-5 w-5 text-muted-foreground" />
-                      <span className="font-medium text-lg">
-                        عقد #{contract.id.slice(0, 8)}
-                      </span>
-                      <Badge
-                        variant={
-                          contract.signedAt
-                            ? 'default'
-                            : 'secondary'
-                        }
-                      >
-                        {contract.signedAt
-                          ? 'موقع'
-                          : 'في انتظار التوقيع'}
+                      <span className="text-lg font-medium">عقد #{contract.id.slice(0, 8)}</span>
+                      <Badge variant={contract.signedAt ? 'default' : 'secondary'}>
+                        {contract.signedAt ? 'موقع' : 'في انتظار التوقيع'}
                       </Badge>
                     </div>
-                    <div className="text-sm text-muted-foreground space-y-1">
+                    <div className="space-y-1 text-sm text-muted-foreground">
                       <div>
                         <span className="font-medium">الحجز:</span> #
                         {contract.booking.bookingNumber}
@@ -111,9 +99,7 @@ export default async function PortalContractsPage() {
                   <div className="flex items-center gap-2">
                     <Link href={`/portal/contracts/${contract.id}`}>
                       <Button variant="outline" size="sm">
-                        {!contract.signedAt
-                          ? 'توقيع العقد'
-                          : 'عرض العقد'}
+                        {!contract.signedAt ? 'توقيع العقد' : 'عرض العقد'}
                       </Button>
                     </Link>
                   </div>

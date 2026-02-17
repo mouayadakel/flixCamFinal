@@ -59,7 +59,8 @@ export class AIService {
     customerHistory?: 'excellent' | 'good' | 'fair' | 'poor' | 'new'
   }): Promise<RiskAssessment> {
     // Fetch customer history if customerId provided
-    let customerHistory: 'excellent' | 'good' | 'fair' | 'poor' | 'new' = input.customerHistory || 'new'
+    let customerHistory: 'excellent' | 'good' | 'fair' | 'poor' | 'new' =
+      input.customerHistory || 'new'
     let totalBookings = 0
     let completedBookings = 0
     let cancelledBookings = 0
@@ -168,7 +169,8 @@ export class AIService {
       {
         name: 'Customer History',
         weight: 30,
-        impact: customerHistory === 'excellent' || customerHistory === 'good' ? 'positive' : 'negative',
+        impact:
+          customerHistory === 'excellent' || customerHistory === 'good' ? 'positive' : 'negative',
         description: `Customer has ${customerHistory} booking history (${totalBookings} total bookings, ${completedBookings} completed, ${cancelledBookings} cancelled)`,
       },
       {
@@ -373,7 +375,19 @@ export class AIService {
   static async getCompatibleEquipment(input: {
     selectedEquipmentIds: string[]
     targetCategoryId: string
-  }): Promise<{ id: string; sku: string; model: string | null; dailyPrice: number; categoryId: string; category: { name: string; slug: string }; brand: { name: string; slug: string } | null; media: { url: string; type: string }[]; matchingCameraModels?: string[] }[]> {
+  }): Promise<
+    {
+      id: string
+      sku: string
+      model: string | null
+      dailyPrice: number
+      categoryId: string
+      category: { name: string; slug: string }
+      brand: { name: string; slug: string } | null
+      media: { url: string; type: string }[]
+      matchingCameraModels?: string[]
+    }[]
+  > {
     if (input.selectedEquipmentIds.length === 0) {
       const allInCategory = await prisma.equipment.findMany({
         where: {
@@ -414,7 +428,13 @@ export class AIService {
 
     const selected = await prisma.equipment.findMany({
       where: { id: { in: input.selectedEquipmentIds }, deletedAt: null },
-      select: { id: true, model: true, categoryId: true, category: { select: { slug: true } }, specifications: true },
+      select: {
+        id: true,
+        model: true,
+        categoryId: true,
+        category: { select: { slug: true } },
+        specifications: true,
+      },
     })
 
     const mounts = new Set<string>()
@@ -493,7 +513,8 @@ export class AIService {
 
     const matchingModelsForLens = (e: (typeof candidates)[0]): string[] => {
       const spec = e.specifications
-      const lensMount = (getSpecValue(spec, 'lensMount') ?? getSpecValue(spec, 'mount'))?.trim() ?? null
+      const lensMount =
+        (getSpecValue(spec, 'lensMount') ?? getSpecValue(spec, 'mount'))?.trim() ?? null
       const compatibleMounts = getSpecArray(spec, 'compatibleMounts').map((m) => m.trim())
       const models: string[] = []
       if (lensMount && mountToModels.has(lensMount)) models.push(...mountToModels.get(lensMount)!)
@@ -509,7 +530,8 @@ export class AIService {
 
     const compatible = candidates.filter((e) => {
       const spec = e.specifications
-      const lensMount = (getSpecValue(spec, 'lensMount') ?? getSpecValue(spec, 'mount'))?.trim() ?? null
+      const lensMount =
+        (getSpecValue(spec, 'lensMount') ?? getSpecValue(spec, 'mount'))?.trim() ?? null
       const compatibleMounts = getSpecArray(spec, 'compatibleMounts').map((m) => m.trim())
       if (lensMount && mounts.has(lensMount)) return true
       return compatibleMounts.some((m) => mounts.has(m))
@@ -570,19 +592,21 @@ export class AIService {
 
     if (shootTypeConfig?.recommendations && Array.isArray(shootTypeConfig.recommendations)) {
       const tier = input.budgetTier ?? 'PROFESSIONAL'
-      const recs = (shootTypeConfig.recommendations as Array<{
-        equipmentId: string
-        budgetTier: string
-        reason: string | null
-        defaultQuantity: number
-        sortOrder: number
-        equipment: {
-          id: string
-          sku: string
-          model: string | null
-          dailyPrice: number | { toNumber?: () => number }
-        }
-      }>)
+      const recs = (
+        shootTypeConfig.recommendations as Array<{
+          equipmentId: string
+          budgetTier: string
+          reason: string | null
+          defaultQuantity: number
+          sortOrder: number
+          equipment: {
+            id: string
+            sku: string
+            model: string | null
+            dailyPrice: number | { toNumber?: () => number }
+          }
+        }>
+      )
         .filter((r) => !excludeSet.has(r.equipmentId))
         .filter((r) => !input.budgetTier || r.budgetTier === tier)
         .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -722,7 +746,11 @@ export class AIService {
         sku: eq.sku,
         quantity: 1,
         dailyPrice,
-        role: (index === 0 ? 'primary' : index < 3 ? 'support' : 'optional') as KitEquipment['role'],
+        role: (index === 0
+          ? 'primary'
+          : index < 3
+            ? 'support'
+            : 'optional') as KitEquipment['role'],
         reason: `Essential for ${input.projectType} projects`,
       }
     })
@@ -752,7 +780,11 @@ export class AIService {
           sku: eq.sku,
           quantity: 1,
           dailyPrice,
-          role: (index < 3 ? 'primary' : index < 6 ? 'support' : 'optional') as KitEquipment['role'],
+          role: (index < 3
+            ? 'primary'
+            : index < 6
+              ? 'support'
+              : 'optional') as KitEquipment['role'],
           reason: `Professional-grade equipment for ${input.projectType}`,
         }
       })
@@ -837,7 +869,10 @@ export class AIService {
     }
 
     // Clamp to reasonable bounds
-    suggestedPrice = Math.max(input.currentPrice * 0.7, Math.min(input.currentPrice * 1.3, suggestedPrice))
+    suggestedPrice = Math.max(
+      input.currentPrice * 0.7,
+      Math.min(input.currentPrice * 1.3, suggestedPrice)
+    )
     change = ((suggestedPrice - input.currentPrice) / input.currentPrice) * 100
 
     return {
@@ -889,7 +924,15 @@ export class AIService {
 
       // Calculate historical demand
       const totalBookings = historicalBookings.length
-      const avgBookingsPerMonth = (totalBookings / 3) * (input.period === 'week' ? 0.25 : input.period === 'month' ? 1 : input.period === 'quarter' ? 3 : 12)
+      const avgBookingsPerMonth =
+        (totalBookings / 3) *
+        (input.period === 'week'
+          ? 0.25
+          : input.period === 'month'
+            ? 1
+            : input.period === 'quarter'
+              ? 3
+              : 12)
 
       // Simple prediction (can be enhanced with ML)
       const predictedDemand = Math.round(avgBookingsPerMonth * 1.1) // 10% growth assumption
@@ -917,13 +960,20 @@ export class AIService {
         factors: {
           historicalTrend,
           seasonalFactor: 1.0, // Placeholder
-          marketTrend: historicalTrend === 'increasing' ? 'up' : historicalTrend === 'decreasing' ? 'down' : 'stable',
+          marketTrend:
+            historicalTrend === 'increasing'
+              ? 'up'
+              : historicalTrend === 'decreasing'
+                ? 'down'
+                : 'stable',
           competitorActivity: 'medium', // Placeholder
         },
         recommendations: {
-          inventoryLevel: predictedDemand > 10 ? 'increase' : predictedDemand > 5 ? 'maintain' : 'decrease',
+          inventoryLevel:
+            predictedDemand > 10 ? 'increase' : predictedDemand > 5 ? 'maintain' : 'decrease',
           purchaseSuggestion: predictedDemand > 15,
-          pricingSuggestion: predictedDemand > 10 ? 'increase' : predictedDemand < 3 ? 'decrease' : 'maintain',
+          pricingSuggestion:
+            predictedDemand > 10 ? 'increase' : predictedDemand < 3 ? 'decrease' : 'maintain',
         },
         revenueForecast: predictedDemand * Number(equipment.dailyPrice || 0) * 7, // Estimate
       }
@@ -953,7 +1003,8 @@ export class AIService {
     let confidence = 70
 
     if (message.includes('price') || message.includes('cost') || message.includes('how much')) {
-      response = 'I can help you find equipment pricing. Would you like to search for specific equipment?'
+      response =
+        'I can help you find equipment pricing. Would you like to search for specific equipment?'
       suggestions = ['Search equipment', 'View pricing', 'Get a quote']
       actions = [
         {
@@ -962,8 +1013,13 @@ export class AIService {
         },
       ]
       confidence = 85
-    } else if (message.includes('available') || message.includes('book') || message.includes('rent')) {
-      response = 'I can help you check equipment availability and create a booking. What equipment are you looking for?'
+    } else if (
+      message.includes('available') ||
+      message.includes('book') ||
+      message.includes('rent')
+    ) {
+      response =
+        'I can help you check equipment availability and create a booking. What equipment are you looking for?'
       suggestions = ['Check availability', 'Create booking', 'View equipment']
       actions = [
         {
@@ -976,7 +1032,11 @@ export class AIService {
         },
       ]
       confidence = 80
-    } else if (message.includes('equipment') || message.includes('camera') || message.includes('lens')) {
+    } else if (
+      message.includes('equipment') ||
+      message.includes('camera') ||
+      message.includes('lens')
+    ) {
       response = 'I can help you find equipment. What type of equipment are you looking for?'
       suggestions = ['Search equipment', 'Browse categories', 'View featured equipment']
       actions = [
@@ -987,7 +1047,8 @@ export class AIService {
       ]
       confidence = 75
     } else if (message.includes('help') || message.includes('support')) {
-      response = 'I can help you with equipment search, pricing, availability, and bookings. What do you need help with?'
+      response =
+        'I can help you with equipment search, pricing, availability, and bookings. What do you need help with?'
       suggestions = ['Equipment search', 'Pricing information', 'Booking help', 'Contact support']
       actions = [
         {
@@ -1017,16 +1078,20 @@ export class AIService {
             temperature: 0.7,
           })
 
-          response = completion.choices[0]?.message?.content || 'I apologize, I could not generate a response.'
+          response =
+            completion.choices[0]?.message?.content ||
+            'I apologize, I could not generate a response.'
           confidence = 80
         } catch (error) {
           console.error('OpenAI API error:', error)
-          response = 'I apologize, I am having trouble processing your request. Please try rephrasing or contact support.'
+          response =
+            'I apologize, I am having trouble processing your request. Please try rephrasing or contact support.'
           requiresHuman = true
           confidence = 30
         }
       } else {
-        response = 'I can help you with equipment search, pricing, availability, and bookings. How can I assist you today?'
+        response =
+          'I can help you with equipment search, pricing, availability, and bookings. How can I assist you today?'
         suggestions = ['Search equipment', 'View pricing', 'Check availability', 'Create booking']
         confidence = 50
       }
@@ -1048,7 +1113,11 @@ export class AIService {
   static async extractSpecificationsFromProductPage(
     pageText: string,
     categoryHint?: string
-  ): Promise<{ groups: import('@/lib/types/specifications.types').SpecGroup[]; highlights?: import('@/lib/types/specifications.types').SpecHighlight[]; quickSpecs?: import('@/lib/types/specifications.types').QuickSpec[] }> {
+  ): Promise<{
+    groups: import('@/lib/types/specifications.types').SpecGroup[]
+    highlights?: import('@/lib/types/specifications.types').SpecHighlight[]
+    quickSpecs?: import('@/lib/types/specifications.types').QuickSpec[]
+  }> {
     const categoryNote = categoryHint
       ? `Product category hint: ${categoryHint}. Use relevant group names (e.g. for lighting: Key Specs, Photometrics, Connectivity, Power & I/O, Mounting, Physical & General).`
       : 'Infer product type from the text and use appropriate group names (e.g. Key Specs, Body & Display, Connectivity, etc.).'
@@ -1102,12 +1171,20 @@ ${pageText.slice(0, 18_000)}
         const result = await model.generateContent(prompt)
         const text = result.response.text()?.trim()
         if (text) {
-          const obj = parseJson(text) as { groups?: unknown[]; highlights?: unknown[]; quickSpecs?: unknown[] }
+          const obj = parseJson(text) as {
+            groups?: unknown[]
+            highlights?: unknown[]
+            quickSpecs?: unknown[]
+          }
           if (Array.isArray(obj.groups) && obj.groups.length > 0) {
             return {
               groups: obj.groups as import('@/lib/types/specifications.types').SpecGroup[],
-              highlights: Array.isArray(obj.highlights) ? (obj.highlights as import('@/lib/types/specifications.types').SpecHighlight[]) : undefined,
-              quickSpecs: Array.isArray(obj.quickSpecs) ? (obj.quickSpecs as import('@/lib/types/specifications.types').QuickSpec[]) : undefined,
+              highlights: Array.isArray(obj.highlights)
+                ? (obj.highlights as import('@/lib/types/specifications.types').SpecHighlight[])
+                : undefined,
+              quickSpecs: Array.isArray(obj.quickSpecs)
+                ? (obj.quickSpecs as import('@/lib/types/specifications.types').QuickSpec[])
+                : undefined,
             }
           }
         }
@@ -1125,18 +1202,28 @@ ${pageText.slice(0, 18_000)}
       })
       const text = res.choices[0]?.message?.content?.trim()
       if (text) {
-        const obj = parseJson(text) as { groups?: unknown[]; highlights?: unknown[]; quickSpecs?: unknown[] }
+        const obj = parseJson(text) as {
+          groups?: unknown[]
+          highlights?: unknown[]
+          quickSpecs?: unknown[]
+        }
         if (Array.isArray(obj.groups) && obj.groups.length > 0) {
           return {
             groups: obj.groups as import('@/lib/types/specifications.types').SpecGroup[],
-            highlights: Array.isArray(obj.highlights) ? (obj.highlights as import('@/lib/types/specifications.types').SpecHighlight[]) : undefined,
-            quickSpecs: Array.isArray(obj.quickSpecs) ? (obj.quickSpecs as import('@/lib/types/specifications.types').QuickSpec[]) : undefined,
+            highlights: Array.isArray(obj.highlights)
+              ? (obj.highlights as import('@/lib/types/specifications.types').SpecHighlight[])
+              : undefined,
+            quickSpecs: Array.isArray(obj.quickSpecs)
+              ? (obj.quickSpecs as import('@/lib/types/specifications.types').QuickSpec[])
+              : undefined,
           }
         }
       }
     }
 
-    throw new ValidationError('AI could not extract specifications. Enable GEMINI_API_KEY or OPENAI_API_KEY and try again.')
+    throw new ValidationError(
+      'AI could not extract specifications. Enable GEMINI_API_KEY or OPENAI_API_KEY and try again.'
+    )
   }
 
   /**

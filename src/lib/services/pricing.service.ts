@@ -151,11 +151,7 @@ export class PricingService {
     hourlyRate: number
     amount: number
   }> {
-    const hours = await StudioService.calculateBookingDuration(
-      studioId,
-      startTime,
-      endTime
-    )
+    const hours = await StudioService.calculateBookingDuration(studioId, startTime, endTime)
 
     const studio = await prisma.studio.findFirst({
       where: {
@@ -253,10 +249,7 @@ export class PricingService {
       })
     )
 
-    const equipmentSubtotal = equipmentBreakdown.reduce(
-      (sum, item) => sum + item.amount,
-      0
-    )
+    const equipmentSubtotal = equipmentBreakdown.reduce((sum, item) => sum + item.amount, 0)
 
     // Calculate studio pricing if provided
     let studioSubtotal = 0
@@ -310,10 +303,7 @@ export class PricingService {
    * Apply bundle discount (Phase 2 - studio + equipment)
    * For now, returns 0 (no discount)
    */
-  static calculateBundleDiscount(
-    equipmentSubtotal: number,
-    studioSubtotal: number
-  ): number {
+  static calculateBundleDiscount(equipmentSubtotal: number, studioSubtotal: number): number {
     // Phase 2: Implement bundle discount logic
     // For now, return 0
     return 0

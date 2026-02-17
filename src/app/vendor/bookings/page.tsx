@@ -49,9 +49,7 @@ export default async function VendorBookingsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">الحجوزات على معداتي</h1>
-        <p className="text-muted-foreground mt-1">
-          الحجوزات التي تشمل معداتك المدرجة
-        </p>
+        <p className="mt-1 text-muted-foreground">الحجوزات التي تشمل معداتك المدرجة</p>
       </div>
 
       <Card>
@@ -60,31 +58,24 @@ export default async function VendorBookingsPage() {
         </CardHeader>
         <CardContent>
           {bookings.length === 0 ? (
-            <p className="text-center py-12 text-muted-foreground">
-              لا توجد حجوزات بعد
-            </p>
+            <p className="py-12 text-center text-muted-foreground">لا توجد حجوزات بعد</p>
           ) : (
             <div className="space-y-4">
               {bookings.map((b) => (
-                <div
-                  key={b.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
-                >
+                <div key={b.id} className="flex items-center justify-between rounded-lg border p-4">
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-medium">#{b.bookingNumber}</span>
                       <Badge variant="outline">{STATUS_LABELS[b.status] || b.status}</Badge>
                     </div>
-                    <div className="text-sm text-muted-foreground mt-1">
+                    <div className="mt-1 text-sm text-muted-foreground">
                       {formatDate(b.startDate)} – {formatDate(b.endDate)}
                     </div>
-                    <div className="text-sm mt-1">
-                      {b.equipment
-                        .map((be) => be.equipment.model || be.equipment.sku)
-                        .join(', ')}
+                    <div className="mt-1 text-sm">
+                      {b.equipment.map((be) => be.equipment.model || be.equipment.sku).join(', ')}
                     </div>
                     {b.customer && (
-                      <div className="text-xs text-muted-foreground mt-1">
+                      <div className="mt-1 text-xs text-muted-foreground">
                         {b.customer.name || b.customer.email}
                       </div>
                     )}

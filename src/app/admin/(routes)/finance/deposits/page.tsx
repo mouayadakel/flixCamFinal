@@ -38,7 +38,10 @@ interface DepositItem {
   customer: { id: string; name: string | null; email: string }
 }
 
-const DEPOSIT_STATUS_LABELS: Record<string, { ar: string; variant: 'default' | 'secondary' | 'destructive' }> = {
+const DEPOSIT_STATUS_LABELS: Record<
+  string,
+  { ar: string; variant: 'default' | 'secondary' | 'destructive' }
+> = {
   paid: { ar: 'مدفوع', variant: 'default' },
   pending: { ar: 'قيد الانتظار', variant: 'secondary' },
   refunded: { ar: 'مسترد', variant: 'destructive' },
@@ -47,7 +50,11 @@ const DEPOSIT_STATUS_LABELS: Record<string, { ar: string; variant: 'default' | '
 export default function FinanceDepositsPage() {
   const { toast } = useToast()
   const [data, setData] = useState<DepositItem[]>([])
-  const [summary, setSummary] = useState<{ totalDepositsHeld: number; pendingDeposits: number; refundedDeposits: number } | null>(null)
+  const [summary, setSummary] = useState<{
+    totalDepositsHeld: number
+    pendingDeposits: number
+    refundedDeposits: number
+  } | null>(null)
   const [loading, setLoading] = useState(true)
 
   const load = async () => {
@@ -76,20 +83,20 @@ export default function FinanceDepositsPage() {
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/admin/finance">
-              <ArrowLeft className="h-4 w-4 ml-1" />
+              <ArrowLeft className="ml-1 h-4 w-4" />
               المالية
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
+            <h1 className="flex items-center gap-2 text-3xl font-bold">
               <Wallet className="h-8 w-8" />
               العربون
             </h1>
-            <p className="text-muted-foreground mt-1">تتبع عربون الحجوزات وحالتها</p>
+            <p className="mt-1 text-muted-foreground">تتبع عربون الحجوزات وحالتها</p>
           </div>
         </div>
         <Button variant="outline" onClick={load} disabled={loading}>
-          <RefreshCw className={`h-4 w-4 ml-2 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           تحديث
         </Button>
       </div>
@@ -101,7 +108,9 @@ export default function FinanceDepositsPage() {
               <CardTitle className="text-sm font-medium">إجمالي العربون المحفوظة</CardTitle>
             </CardHeader>
             <CardContent>
-              <span className="text-2xl font-bold text-green-600">{formatCurrency(summary.totalDepositsHeld)}</span>
+              <span className="text-2xl font-bold text-green-600">
+                {formatCurrency(summary.totalDepositsHeld)}
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -109,7 +118,9 @@ export default function FinanceDepositsPage() {
               <CardTitle className="text-sm font-medium">عربون قيد الانتظار</CardTitle>
             </CardHeader>
             <CardContent>
-              <span className="text-2xl font-bold text-amber-600">{formatCurrency(summary.pendingDeposits)}</span>
+              <span className="text-2xl font-bold text-amber-600">
+                {formatCurrency(summary.pendingDeposits)}
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -117,7 +128,9 @@ export default function FinanceDepositsPage() {
               <CardTitle className="text-sm font-medium">عربون مستردة</CardTitle>
             </CardHeader>
             <CardContent>
-              <span className="text-2xl font-bold text-muted-foreground">{formatCurrency(summary.refundedDeposits)}</span>
+              <span className="text-2xl font-bold text-muted-foreground">
+                {formatCurrency(summary.refundedDeposits)}
+              </span>
             </CardContent>
           </Card>
         </div>
@@ -145,7 +158,7 @@ export default function FinanceDepositsPage() {
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                <TableCell colSpan={7} className="py-12 text-center text-muted-foreground">
                   لا توجد عربون
                 </TableCell>
               </TableRow>
@@ -153,27 +166,32 @@ export default function FinanceDepositsPage() {
               data.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell className="font-medium">
-                    <Link href={`/admin/bookings/${row.id}`} className="text-primary hover:underline">
+                    <Link
+                      href={`/admin/bookings/${row.id}`}
+                      className="text-primary hover:underline"
+                    >
                       #{row.bookingNumber}
                     </Link>
                   </TableCell>
                   <TableCell>{row.customer.name || row.customer.email}</TableCell>
                   <TableCell>{formatCurrency(row.depositAmount)}</TableCell>
                   <TableCell>
-                    <Badge variant={DEPOSIT_STATUS_LABELS[row.depositStatus]?.variant ?? 'secondary'}>
+                    <Badge
+                      variant={DEPOSIT_STATUS_LABELS[row.depositStatus]?.variant ?? 'secondary'}
+                    >
                       {DEPOSIT_STATUS_LABELS[row.depositStatus]?.ar ?? row.depositStatus}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">{row.status}</Badge>
                   </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
+                  <TableCell className="text-sm text-muted-foreground">
                     {row.paidDate ? formatDate(row.paidDate) : '—'}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="sm" asChild>
                       <Link href={`/admin/bookings/${row.id}`}>
-                        <Eye className="h-4 w-4 ml-1" />
+                        <Eye className="ml-1 h-4 w-4" />
                         عرض الحجز
                       </Link>
                     </Button>

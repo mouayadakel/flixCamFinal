@@ -62,7 +62,7 @@ export async function processImportJob(jobId: string) {
   await ImportService.markProcessing(jobId)
 
   // Process in batches of 100
-  const batches: typeof job.rows[] = []
+  const batches: (typeof job.rows)[] = []
   for (let i = 0; i < job.rows.length; i += BATCH_SIZE) {
     batches.push(job.rows.slice(i, i + BATCH_SIZE))
   }
@@ -114,8 +114,14 @@ export async function processImportJob(jobId: string) {
             payload.row['Stock'] ??
             payload.row['stock']
         )
-        const weekly = num(payload.row['Weekly Price'] ?? payload.row['weekly_price'] ?? payload.row['price_weekly'])
-        const monthly = num(payload.row['Monthly Price'] ?? payload.row['monthly_price'] ?? payload.row['price_monthly'])
+        const weekly = num(
+          payload.row['Weekly Price'] ?? payload.row['weekly_price'] ?? payload.row['price_weekly']
+        )
+        const monthly = num(
+          payload.row['Monthly Price'] ??
+            payload.row['monthly_price'] ??
+            payload.row['price_monthly']
+        )
         const deposit = num(payload.row['Deposit'] ?? payload.row['deposit_amount'])
 
         const priceDaily = daily ?? 0
@@ -161,11 +167,21 @@ export async function processImportJob(jobId: string) {
 
         // English translation (default)
         const shortDescriptionEn =
-          payload.row['Short Description'] || payload.row['short_description'] || payload.row['وصف مختصر'] || ''
+          payload.row['Short Description'] ||
+          payload.row['short_description'] ||
+          payload.row['وصف مختصر'] ||
+          ''
         const longDescriptionEn =
-          payload.row['Long Description'] || payload.row['long_description'] || payload.row['وصف طويل'] || ''
+          payload.row['Long Description'] ||
+          payload.row['long_description'] ||
+          payload.row['وصف طويل'] ||
+          ''
         const seoTitleEn = payload.row['SEO Title'] || payload.row['seo_title'] || name
-        const seoDescriptionEn = payload.row['SEO Description'] || payload.row['seo_description'] || shortDescriptionEn || name
+        const seoDescriptionEn =
+          payload.row['SEO Description'] ||
+          payload.row['seo_description'] ||
+          shortDescriptionEn ||
+          name
         const seoKeywordsEn = payload.row['SEO Keywords'] || payload.row['seo_keywords'] || ''
 
         translations.push({
@@ -179,9 +195,18 @@ export async function processImportJob(jobId: string) {
         })
 
         // Arabic translation (if provided)
-        const nameAr = payload.row['الاسم'] || payload.row['Name (AR)'] || payload.row['name_ar'] || ''
-        const shortDescriptionAr = payload.row['وصف مختصر'] || payload.row['Short Description (AR)'] || payload.row['short_description_ar'] || ''
-        const longDescriptionAr = payload.row['وصف طويل'] || payload.row['Long Description (AR)'] || payload.row['long_description_ar'] || ''
+        const nameAr =
+          payload.row['الاسم'] || payload.row['Name (AR)'] || payload.row['name_ar'] || ''
+        const shortDescriptionAr =
+          payload.row['وصف مختصر'] ||
+          payload.row['Short Description (AR)'] ||
+          payload.row['short_description_ar'] ||
+          ''
+        const longDescriptionAr =
+          payload.row['وصف طويل'] ||
+          payload.row['Long Description (AR)'] ||
+          payload.row['long_description_ar'] ||
+          ''
         if (nameAr) {
           translations.push({
             locale: TranslationLocale.ar,
@@ -189,15 +214,22 @@ export async function processImportJob(jobId: string) {
             shortDescription: shortDescriptionAr || undefined,
             longDescription: longDescriptionAr || undefined,
             seoTitle: payload.row['SEO Title (AR)'] || payload.row['seo_title_ar'] || nameAr,
-            seoDescription: payload.row['SEO Description (AR)'] || payload.row['seo_description_ar'] || shortDescriptionAr || nameAr,
+            seoDescription:
+              payload.row['SEO Description (AR)'] ||
+              payload.row['seo_description_ar'] ||
+              shortDescriptionAr ||
+              nameAr,
             seoKeywords: payload.row['SEO Keywords (AR)'] || payload.row['seo_keywords_ar'] || '',
           })
         }
 
         // Chinese translation (if provided)
-        const nameZh = payload.row['名称'] || payload.row['Name (ZH)'] || payload.row['name_zh'] || ''
-        const shortDescriptionZh = payload.row['Short Description (ZH)'] || payload.row['short_description_zh'] || ''
-        const longDescriptionZh = payload.row['Long Description (ZH)'] || payload.row['long_description_zh'] || ''
+        const nameZh =
+          payload.row['名称'] || payload.row['Name (ZH)'] || payload.row['name_zh'] || ''
+        const shortDescriptionZh =
+          payload.row['Short Description (ZH)'] || payload.row['short_description_zh'] || ''
+        const longDescriptionZh =
+          payload.row['Long Description (ZH)'] || payload.row['long_description_zh'] || ''
         if (nameZh) {
           translations.push({
             locale: TranslationLocale.zh,
@@ -205,18 +237,33 @@ export async function processImportJob(jobId: string) {
             shortDescription: shortDescriptionZh || undefined,
             longDescription: longDescriptionZh || undefined,
             seoTitle: payload.row['SEO Title (ZH)'] || payload.row['seo_title_zh'] || nameZh,
-            seoDescription: payload.row['SEO Description (ZH)'] || payload.row['seo_description_zh'] || shortDescriptionZh || nameZh,
+            seoDescription:
+              payload.row['SEO Description (ZH)'] ||
+              payload.row['seo_description_zh'] ||
+              shortDescriptionZh ||
+              nameZh,
             seoKeywords: payload.row['SEO Keywords (ZH)'] || payload.row['seo_keywords_zh'] || '',
           })
         }
 
         // Buffer time and unit
-        const bufferTime = num(payload.row['Buffer Time'] || payload.row['buffer_time'] || payload.row['وقت الفاصل']) || 0
-        const bufferTimeUnit = payload.row['Buffer Time Unit'] || payload.row['buffer_time_unit'] || payload.row['وحدة الوقت'] || 'hours'
+        const bufferTime =
+          num(
+            payload.row['Buffer Time'] || payload.row['buffer_time'] || payload.row['وقت الفاصل']
+          ) || 0
+        const bufferTimeUnit =
+          payload.row['Buffer Time Unit'] ||
+          payload.row['buffer_time_unit'] ||
+          payload.row['وحدة الوقت'] ||
+          'hours'
         const bufferTimeInHours = bufferTimeUnit === 'days' ? bufferTime * 24 : bufferTime
 
         // Box contents
-        const boxContentsValue = payload.row['Box Contents'] || payload.row['box_contents'] || payload.row['محتوى الصندوق'] || null
+        const boxContentsValue =
+          payload.row['Box Contents'] ||
+          payload.row['box_contents'] ||
+          payload.row['محتوى الصندوق'] ||
+          null
 
         const product = await ProductCatalogService.create({
           status,
@@ -251,10 +298,14 @@ export async function processImportJob(jobId: string) {
           createdBy: job.createdBy || 'system',
         })
 
-        await ImportService.markRow(jobId, row.rowNumber, ImportRowStatus.SUCCESS, { productId: product.id })
+        await ImportService.markRow(jobId, row.rowNumber, ImportRowStatus.SUCCESS, {
+          productId: product.id,
+        })
         batchSuccess++
       } catch (err: any) {
-        await ImportService.markRow(jobId, row.rowNumber, ImportRowStatus.ERROR, { error: err.message })
+        await ImportService.markRow(jobId, row.rowNumber, ImportRowStatus.ERROR, {
+          error: err.message,
+        })
         batchErrors++
       }
     }

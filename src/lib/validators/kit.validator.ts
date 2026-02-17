@@ -13,7 +13,11 @@ const kitItemSchema = z.object({
 
 export const createKitSchema = z.object({
   name: z.string().min(1).max(120),
-  slug: z.string().min(1).max(80).regex(/^[a-z0-9_-]+$/),
+  slug: z
+    .string()
+    .min(1)
+    .max(80)
+    .regex(/^[a-z0-9_-]+$/),
   description: z.string().max(1000).optional().nullable(),
   discountPercent: z.number().min(0).max(100).optional().nullable(),
   isActive: z.boolean().optional().default(true),
@@ -22,7 +26,12 @@ export const createKitSchema = z.object({
 
 export const updateKitSchema = z.object({
   name: z.string().min(1).max(120).optional(),
-  slug: z.string().min(1).max(80).regex(/^[a-z0-9_-]+$/).optional(),
+  slug: z
+    .string()
+    .min(1)
+    .max(80)
+    .regex(/^[a-z0-9_-]+$/)
+    .optional(),
   description: z.string().max(1000).optional().nullable(),
   discountPercent: z.number().min(0).max(100).optional().nullable(),
   isActive: z.boolean().optional(),

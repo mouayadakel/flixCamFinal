@@ -93,7 +93,10 @@ export async function POST(request: NextRequest) {
   })
   if (updated?.status !== 'PAYMENT_PENDING') {
     return NextResponse.json(
-      { error: 'الحجز قيد المراجعة. سنتواصل معك قريباً.', redirectUrl: `${process.env.NEXTAUTH_URL || process.env.APP_URL || 'http://localhost:3000'}/portal/bookings` },
+      {
+        error: 'الحجز قيد المراجعة. سنتواصل معك قريباً.',
+        redirectUrl: `${process.env.NEXTAUTH_URL || process.env.APP_URL || 'http://localhost:3000'}/portal/bookings`,
+      },
       { status: 200 }
     )
   }

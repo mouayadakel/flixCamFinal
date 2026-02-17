@@ -181,7 +181,7 @@ export default function HeroBannerDetailPage() {
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/admin/settings/hero-banners">
-            <ArrowLeft className="h-4 w-4 ml-1" />
+            <ArrowLeft className="ml-1 h-4 w-4" />
             البانرات
           </Link>
         </Button>
@@ -276,7 +276,7 @@ export default function HeroBannerDetailPage() {
         </CardHeader>
         <CardContent>
           {banner.slides.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
+            <div className="py-12 text-center text-muted-foreground">
               لا توجد شرائح. انقر &quot;إضافة شريحة&quot; لبدء الإضافة.
             </div>
           ) : (
@@ -284,7 +284,7 @@ export default function HeroBannerDetailPage() {
               {banner.slides.map((slide, index) => (
                 <div
                   key={slide.id}
-                  className="flex items-center gap-4 p-4 border rounded-lg hover:bg-muted/30"
+                  className="flex items-center gap-4 rounded-lg border p-4 hover:bg-muted/30"
                 >
                   <div className="flex flex-col gap-1">
                     <Button
@@ -306,15 +306,11 @@ export default function HeroBannerDetailPage() {
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </div>
-                  <div className="relative h-14 w-24 flex-shrink-0 rounded overflow-hidden bg-muted">
-                    <img
-                      src={slide.imageUrl}
-                      alt=""
-                      className="object-cover w-full h-full"
-                    />
+                  <div className="relative h-14 w-24 flex-shrink-0 overflow-hidden rounded bg-muted">
+                    <img src={slide.imageUrl} alt="" className="h-full w-full object-cover" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium truncate">{slide.titleAr || slide.titleEn}</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-medium">{slide.titleAr || slide.titleEn}</div>
                     <div className="text-sm text-muted-foreground">
                       ترتيب {slide.order + 1}
                       {!slide.isActive && (
@@ -325,11 +321,7 @@ export default function HeroBannerDetailPage() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openEditSlide(slide)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => openEditSlide(slide)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button

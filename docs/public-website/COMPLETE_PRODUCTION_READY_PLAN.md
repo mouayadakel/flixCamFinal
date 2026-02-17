@@ -1,162 +1,162 @@
 ---
 name: FlixCam Public Website Complete - Production Ready
-overview: "خطة شاملة Production-Ready لـ FlixCam.rent تشمل: الأمان والامتثال، المراقبة، Business Logic، رسوم بيانية، قصص مستخدم، حالات اختبار، UX/UI، Performance. الجدول: 25 أسبوع. التنفيذ بالتوازي: الأمان + الميزات."
+overview: 'خطة شاملة Production-Ready لـ FlixCam.rent تشمل: الأمان والامتثال، المراقبة، Business Logic، رسوم بيانية، قصص مستخدم، حالات اختبار، UX/UI، Performance. الجدول: 25 أسبوع. التنفيذ بالتوازي: الأمان + الميزات.'
 todos:
   - id: phase0-security-headers
-    content: "المرحلة 0.1: Security Headers (CSP, CORS, XSS, HTTPS, X-Frame-Options)"
+    content: 'المرحلة 0.1: Security Headers (CSP, CORS, XSS, HTTPS, X-Frame-Options)'
     status: pending
   - id: phase0-rate-limiting
-    content: "المرحلة 0.2: Rate Limiting (Upstash Redis - 100/min public, 10/min checkout)"
+    content: 'المرحلة 0.2: Rate Limiting (Upstash Redis - 100/min public, 10/min checkout)'
     status: pending
   - id: phase0-session
-    content: "المرحلة 0.3: Session Management (Secure cookies, 30min timeout, httpOnly)"
+    content: 'المرحلة 0.3: Session Management (Secure cookies, 30min timeout, httpOnly)'
     status: pending
   - id: phase0-monitoring
-    content: "المرحلة 0.4: Error Tracking (Sentry) + Structured Logging (Winston)"
+    content: 'المرحلة 0.4: Error Tracking (Sentry) + Structured Logging (Winston)'
     status: pending
   - id: phase0-analytics
-    content: "المرحلة 0.5: Analytics (GA4 + Web Vitals) + Performance Monitoring"
+    content: 'المرحلة 0.5: Analytics (GA4 + Web Vitals) + Performance Monitoring'
     status: pending
   - id: phase0-privacy
-    content: "المرحلة 0.6: Privacy Policy + Cookie Consent + PDPL Compliance"
+    content: 'المرحلة 0.6: Privacy Policy + Cookie Consent + PDPL Compliance'
     status: pending
   - id: phase0-caching
-    content: "المرحلة 0.7: Redis Caching Layer (Equipment 10min, Availability 1min)"
+    content: 'المرحلة 0.7: Redis Caching Layer (Equipment 10min, Availability 1min)'
     status: pending
   - id: phase1-db
-    content: "المرحلة 1.1: إنشاء Prisma Models + Audit Fields + Soft Delete + Indexes"
+    content: 'المرحلة 1.1: إنشاء Prisma Models + Audit Fields + Soft Delete + Indexes'
     status: pending
   - id: phase1-routes
-    content: "المرحلة 1.2: إنشاء Route Group (public) + هيكل المجلدات الكامل"
+    content: 'المرحلة 1.2: إنشاء Route Group (public) + هيكل المجلدات الكامل'
     status: pending
   - id: phase1-api
-    content: "المرحلة 1.3: إنشاء Public APIs (/api/public/*) - Equipment, Studios, Categories, Brands"
+    content: 'المرحلة 1.3: إنشاء Public APIs (/api/public/*) - Equipment, Studios, Categories, Brands'
     status: pending
   - id: phase1-i18n
-    content: "المرحلة 1.4: إعداد i18n (AR/EN/ZH) مع RTL + Language Switcher"
+    content: 'المرحلة 1.4: إعداد i18n (AR/EN/ZH) مع RTL + Language Switcher'
     status: pending
   - id: phase1-layout
-    content: "المرحلة 1.5: إنشاء Public Layout (Header, Footer, Mobile Nav, Mini Cart)"
+    content: 'المرحلة 1.5: إنشاء Public Layout (Header, Footer, Mobile Nav, Mini Cart)'
     status: pending
   - id: phase2-home
-    content: "المرحلة 2.1: بناء الصفحة الرئيسية (Hero, Featured, How It Works, FAQ, CTA)"
+    content: 'المرحلة 2.1: بناء الصفحة الرئيسية (Hero, Featured, How It Works, FAQ, CTA)'
     status: pending
   - id: phase2-equipment
-    content: "المرحلة 2.2: كتالوج المعدات (Grid, Filters, Cards, Skeleton, Pagination)"
+    content: 'المرحلة 2.2: كتالوج المعدات (Grid, Filters, Cards, Skeleton, Pagination)'
     status: pending
   - id: phase2-equipment-detail
-    content: "المرحلة 2.3: صفحة تفاصيل المعدة (Gallery, Price Block, Availability, Recommendations)"
+    content: 'المرحلة 2.3: صفحة تفاصيل المعدة (Gallery, Price Block, Availability, Recommendations)'
     status: pending
   - id: phase2-studios
-    content: "المرحلة 2.4: صفحات الاستوديوهات (List, Detail, Slot Picker, Booking Form)"
+    content: 'المرحلة 2.4: صفحات الاستوديوهات (List, Detail, Slot Picker, Booking Form)'
     status: pending
   - id: phase2-packages
-    content: "المرحلة 2.5: صفحة الباقات (Grid, Cards, Detail)"
+    content: 'المرحلة 2.5: صفحة الباقات (Grid, Cards, Detail)'
     status: pending
   - id: phase2-kit
-    content: "المرحلة 2.6: Build Your Kit Wizard (7 Steps, Compatibility, Live Pricing)"
+    content: 'المرحلة 2.6: Build Your Kit Wizard (7 Steps, Compatibility, Live Pricing)'
     status: pending
   - id: phase3-cart
-    content: "المرحلة 3.1: نظام السلة (Local + Server Sync, Revalidation, Coupon)"
+    content: 'المرحلة 3.1: نظام السلة (Local + Server Sync, Revalidation, Coupon)'
     status: pending
   - id: phase3-checkout-auth
-    content: "المرحلة 3.2: Checkout Step 1 - التسجيل المؤجل (Email/Phone/Social)"
+    content: 'المرحلة 3.2: Checkout Step 1 - التسجيل المؤجل (Email/Phone/Social)'
     status: pending
   - id: phase3-checkout-data
-    content: "المرحلة 3.3: Checkout Step 2 - البيانات (Profile, Identity, Delivery)"
+    content: 'المرحلة 3.3: Checkout Step 2 - البيانات (Profile, Identity, Delivery)'
     status: pending
   - id: phase3-checkout-review
-    content: "المرحلة 3.4: Checkout Step 3 - المراجعة (Summary, Terms, Price Lock)"
+    content: 'المرحلة 3.4: Checkout Step 3 - المراجعة (Summary, Terms, Price Lock)'
     status: pending
   - id: phase3-payment
-    content: "المرحلة 3.5: تكامل الدفع (TAP, Apple Pay, STC Pay, Tabby, 3D Secure, Webhook Retry)"
+    content: 'المرحلة 3.5: تكامل الدفع (TAP, Apple Pay, STC Pay, Tabby, 3D Secure, Webhook Retry)'
     status: pending
   - id: phase3-payment-security
-    content: "المرحلة 3.6: Payment Security (PCI DSS, Fraud Detection, Duplicate Prevention)"
+    content: 'المرحلة 3.6: Payment Security (PCI DSS, Fraud Detection, Duplicate Prevention)'
     status: pending
   - id: phase3-confirmation
-    content: "المرحلة 3.7: صفحة التأكيد (Summary, PDF, Calendar, WhatsApp)"
+    content: 'المرحلة 3.7: صفحة التأكيد (Summary, PDF, Calendar, WhatsApp)'
     status: pending
   - id: phase3-inventory-lock
-    content: "المرحلة 3.8: Inventory Locking Service (Overbooking Protection)"
+    content: 'المرحلة 3.8: Inventory Locking Service (Overbooking Protection)'
     status: pending
   - id: phase3-price-lock
-    content: "المرحلة 3.9: Price Lock Mechanism (15min TTL, Auto-expire)"
+    content: 'المرحلة 3.9: Price Lock Mechanism (15min TTL, Auto-expire)'
     status: pending
   - id: phase3-tax-calc
-    content: "المرحلة 3.10: Tax Calculation (15% VAT Saudi Arabia)"
+    content: 'المرحلة 3.10: Tax Calculation (15% VAT Saudi Arabia)'
     status: pending
   - id: phase4-portal-dashboard
-    content: "المرحلة 4.1: بوابة العميل - Dashboard + Bookings List"
+    content: 'المرحلة 4.1: بوابة العميل - Dashboard + Bookings List'
     status: pending
   - id: phase4-portal-detail
-    content: "المرحلة 4.2: بوابة العميل - تفاصيل الحجز + الإجراءات"
+    content: 'المرحلة 4.2: بوابة العميل - تفاصيل الحجز + الإجراءات'
     status: pending
   - id: phase4-portal-requests
-    content: "المرحلة 4.3: بوابة العميل - طلب تعديل/تمديد/إلغاء + Waitlist"
+    content: 'المرحلة 4.3: بوابة العميل - طلب تعديل/تمديد/إلغاء + Waitlist'
     status: pending
   - id: phase4-portal-profile
-    content: "المرحلة 4.4: بوابة العميل - المستندات + الملف الشخصي + 2FA"
+    content: 'المرحلة 4.4: بوابة العميل - المستندات + الملف الشخصي + 2FA'
     status: pending
   - id: phase4-late-return
-    content: "المرحلة 4.5: Late Return Handling (Auto-calculation + Fees 150%)"
+    content: 'المرحلة 4.5: Late Return Handling (Auto-calculation + Fees 150%)'
     status: pending
   - id: phase4-damage
-    content: "المرحلة 4.6: Damage Handling Workflow (Report + Deposit Deduction)"
+    content: 'المرحلة 4.6: Damage Handling Workflow (Report + Deposit Deduction)'
     status: pending
   - id: phase5-admin-pages
-    content: "المرحلة 5.1: Admin - إدارة صفحات الموقع العام"
+    content: 'المرحلة 5.1: Admin - إدارة صفحات الموقع العام'
     status: pending
   - id: phase5-admin-features
-    content: "المرحلة 5.2: Admin - Feature Flags + Checkout Settings"
+    content: 'المرحلة 5.2: Admin - Feature Flags + Checkout Settings'
     status: pending
   - id: phase5-admin-otp
-    content: "المرحلة 5.3: Admin - إعدادات OTP Providers + Payment"
+    content: 'المرحلة 5.3: Admin - إعدادات OTP Providers + Payment'
     status: pending
   - id: phase6-integrations
-    content: "المرحلة 6.1: التكاملات (WhatsApp Context, Email, Push)"
+    content: 'المرحلة 6.1: التكاملات (WhatsApp Context, Email, Push)'
     status: pending
   - id: phase6-seo
-    content: "المرحلة 6.2: SEO (Meta, OG, Schema, Sitemap, Canonical)"
+    content: 'المرحلة 6.2: SEO (Meta, OG, Schema, Sitemap, Canonical)'
     status: pending
   - id: phase7-performance
-    content: "المرحلة 7.1: تحسين الأداء (Lazy Loading, Code Splitting, Image Opt)"
+    content: 'المرحلة 7.1: تحسين الأداء (Lazy Loading, Code Splitting, Image Opt)'
     status: pending
   - id: phase7-mobile
-    content: "المرحلة 7.2: تحسين الموبايل + RTL Testing"
+    content: 'المرحلة 7.2: تحسين الموبايل + RTL Testing'
     status: pending
   - id: phase8-unit-tests
-    content: "المرحلة 8.1: Unit Tests (80% coverage - Services, Utils)"
+    content: 'المرحلة 8.1: Unit Tests (80% coverage - Services, Utils)'
     status: pending
   - id: phase8-integration-tests
-    content: "المرحلة 8.2: Integration Tests (API Routes, Database)"
+    content: 'المرحلة 8.2: Integration Tests (API Routes, Database)'
     status: pending
   - id: phase8-e2e-tests
-    content: "المرحلة 8.3: E2E Tests (Playwright - Critical User Flows)"
+    content: 'المرحلة 8.3: E2E Tests (Playwright - Critical User Flows)'
     status: pending
   - id: phase8-load-tests
-    content: "المرحلة 8.4: Load Testing (K6 - 200 concurrent users)"
+    content: 'المرحلة 8.4: Load Testing (K6 - 200 concurrent users)'
     status: pending
   - id: phase8-security-audit
-    content: "المرحلة 8.5: Security Audit + Penetration Testing"
+    content: 'المرحلة 8.5: Security Audit + Penetration Testing'
     status: pending
   - id: phase8-accessibility
-    content: "المرحلة 8.6: Accessibility Testing (WCAG AA)"
+    content: 'المرحلة 8.6: Accessibility Testing (WCAG AA)'
     status: pending
   - id: phase8-qa
-    content: "المرحلة 8.7: QA Final + UAT + Bug Fixes"
+    content: 'المرحلة 8.7: QA Final + UAT + Bug Fixes'
     status: pending
   - id: phase9-docs
-    content: "المرحلة 9.1: Documentation (API Docs, User Guides, Runbooks)"
+    content: 'المرحلة 9.1: Documentation (API Docs, User Guides, Runbooks)'
     status: pending
   - id: phase9-backup
-    content: "المرحلة 9.2: Backup Strategy + Disaster Recovery Plan"
+    content: 'المرحلة 9.2: Backup Strategy + Disaster Recovery Plan'
     status: pending
   - id: phase9-monitoring
-    content: "المرحلة 9.3: Production Monitoring Setup + Alerting"
+    content: 'المرحلة 9.3: Production Monitoring Setup + Alerting'
     status: pending
   - id: phase9-launch
-    content: "المرحلة 9.4: Launch Checklist + Rollback Plan + Status Page"
+    content: 'المرحلة 9.4: Launch Checklist + Rollback Plan + Status Page'
     status: pending
 isProject: false
 ---
@@ -169,13 +169,11 @@ isProject: false
 
 ### معلومات المشروع
 
-
 | الجانب             | الوصف                                         |
 | ------------------ | --------------------------------------------- |
 | **الجدول الزمني**  | 25 أسبوع (~6 أشهر)                            |
 | **التنفيذ**        | بالتوازي (الأمان + الميزات)                   |
 | **الفريق المقترح** | 2-3 Full-stack + 1 DevOps + 1 QA + 1 Designer |
-
 
 ### المميزات الرئيسية
 
@@ -188,7 +186,6 @@ isProject: false
 
 ### تقييم الجودة (Gap Analysis)
 
-
 | الجانب         | قبل        | بعد        |
 | -------------- | ---------- | ---------- |
 | الأمان         | 0/10       | 9/10       |
@@ -196,7 +193,6 @@ isProject: false
 | الاختبار       | 1/10       | 9/10       |
 | Business Logic | 3/10       | 9/10       |
 | **الإجمالي**   | **45/100** | **90/100** |
-
 
 ---
 
@@ -218,14 +214,12 @@ const securityHeaders = [
 
 ### 0.2 Rate Limiting (Upstash Redis)
 
-
 | Endpoint      | Limit       |
 | ------------- | ----------- |
 | Public APIs   | 100 req/min |
 | Authenticated | 300 req/min |
 | Checkout      | 10 req/min  |
 | Payment       | 5 req/5min  |
-
 
 ### 0.3 Session Management
 
@@ -250,7 +244,6 @@ const securityHeaders = [
 
 ### 0.6 Redis Caching Layer
 
-
 | Data             | TTL        |
 | ---------------- | ---------- |
 | Website Content  | 1 hour     |
@@ -258,7 +251,6 @@ const securityHeaders = [
 | Equipment Detail | 10 minutes |
 | Availability     | 1 minute   |
 | Cart             | 15 minutes |
-
 
 ### 0.7 PDPL/Privacy Compliance
 
@@ -280,7 +272,7 @@ flowchart TB
         Components[UI Components]
         LocalCart[Local Cart - Zustand]
     end
-    
+
     subgraph API[API Layer]
         PublicAPI[/api/public/*]
         CartAPI[/api/cart/*]
@@ -288,7 +280,7 @@ flowchart TB
         PaymentAPI[/api/payment/*]
         MeAPI[/api/me/*]
     end
-    
+
     subgraph Services[Business Logic]
         EquipmentService[Equipment Service]
         StudioService[Studio Service]
@@ -296,7 +288,7 @@ flowchart TB
         PaymentService[Payment Service]
         CartService[Cart Service]
     end
-    
+
     subgraph DB[Database - PostgreSQL]
         Equipment[(Equipment)]
         Studio[(Studio)]
@@ -304,14 +296,14 @@ flowchart TB
         Cart[(Cart)]
         WebsiteContent[(Website Content)]
     end
-    
+
     subgraph External[External Services]
         TAP[TAP Payment]
         OTP[OTP Provider]
         WhatsApp[WhatsApp API]
         Email[Email Service]
     end
-    
+
     PublicPages --> PublicAPI
     PublicPages --> LocalCart
     ClientPortal --> MeAPI
@@ -327,8 +319,6 @@ flowchart TB
     BookingService --> Email
 ```
 
-
-
 ---
 
 ## رحلة المستخدم الكاملة
@@ -336,41 +326,39 @@ flowchart TB
 ```mermaid
 stateDiagram-v2
     [*] --> Browsing: زيارة الموقع
-    
+
     Browsing --> ViewEquipment: تصفح المعدات
     Browsing --> ViewStudios: تصفح الاستوديوهات
     Browsing --> ViewPackages: تصفح الباقات
     Browsing --> BuildKit: ابنِ كيتك
-    
+
     ViewEquipment --> ProductDetail: اختيار معدة
     ViewStudios --> StudioDetail: اختيار استوديو
     ViewPackages --> PackageDetail: اختيار باقة
     BuildKit --> KitComplete: إتمام الكيت
-    
+
     ProductDetail --> AddToCart: إضافة للسلة
     StudioDetail --> AddToCart
     PackageDetail --> AddToCart
     KitComplete --> AddToCart
-    
+
     AddToCart --> Cart: عرض السلة
     Cart --> Checkout: إتمام الحجز
-    
+
     Checkout --> Registration: التسجيل السريع
     Registration --> DataEntry: إدخال البيانات
     DataEntry --> Review: مراجعة الطلب
     Review --> Payment: الدفع
-    
+
     Payment --> Processing: معالجة
     Processing --> Success: نجاح
     Processing --> Failed: فشل
-    
+
     Success --> Confirmation: تأكيد الحجز
     Failed --> Payment: إعادة المحاولة
-    
+
     Confirmation --> [*]
 ```
-
-
 
 ---
 
@@ -379,35 +367,33 @@ stateDiagram-v2
 ```mermaid
 stateDiagram-v2
     [*] --> Draft: إنشاء
-    
+
     Draft --> Validated: التحقق من التوفر
     Validated --> PaymentPending: قفل السعر
-    
+
     PaymentPending --> Processing: بدء الدفع
     PaymentPending --> Expired: انتهاء الوقت
-    
+
     Processing --> Confirmed: نجاح الدفع
     Processing --> Failed: فشل الدفع
-    
+
     Failed --> PaymentPending: إعادة المحاولة
     Expired --> [*]
-    
+
     Confirmed --> Active: بدء الإيجار
     Confirmed --> PendingChange: طلب تعديل
     Confirmed --> Cancelled: إلغاء
-    
+
     PendingChange --> Confirmed: موافقة
     PendingChange --> Cancelled: رفض
-    
+
     Active --> Completed: إرجاع المعدات
     Active --> Extended: تمديد
-    
+
     Extended --> Active
     Completed --> [*]
     Cancelled --> [*]
 ```
-
-
 
 ---
 
@@ -417,7 +403,7 @@ stateDiagram-v2
 
 **كـ** زائر  
 **أريد** تصفح كتالوج المعدات مع الفلاتر  
-**لكي** أجد ما يناسب مشروعي  
+**لكي** أجد ما يناسب مشروعي
 
 **معايير القبول:**
 
@@ -431,7 +417,7 @@ stateDiagram-v2
 
 **كـ** زائر  
 **أريد** إضافة معدات للسلة بدون تسجيل  
-**لكي** أكمل تجميع طلبي قبل الالتزام  
+**لكي** أكمل تجميع طلبي قبل الالتزام
 
 **معايير القبول:**
 
@@ -445,7 +431,7 @@ stateDiagram-v2
 
 **كـ** زائر لديه سلة  
 **أريد** التسجيل بسرعة عند Checkout  
-**لكي** لا أضيع وقتي بتسجيل مبكر  
+**لكي** لا أضيع وقتي بتسجيل مبكر
 
 **معايير القبول:**
 
@@ -459,7 +445,7 @@ stateDiagram-v2
 
 **كـ** مستخدم مسجل  
 **أريد** إتمام الدفع بأمان  
-**لكي** أؤكد حجزي  
+**لكي** أؤكد حجزي
 
 **معايير القبول:**
 
@@ -473,7 +459,7 @@ stateDiagram-v2
 
 **كـ** عميل لديه حجز  
 **أريد** تعديل أو تمديد أو إلغاء حجزي  
-**لكي** أتعامل مع تغييرات مشروعي  
+**لكي** أتعامل مع تغييرات مشروعي
 
 **معايير القبول:**
 
@@ -496,57 +482,55 @@ sequenceDiagram
     participant API as API
     participant DB as Database
     participant Pay as Payment
-    
+
     User->>FE: تصفح المعدات
     FE->>API: GET /api/public/equipment
     API->>DB: Query equipment
     DB-->>API: Equipment list
     API-->>FE: Equipment data
     FE-->>User: عرض الكتالوج
-    
+
     User->>FE: اختيار معدة + تواريخ
     FE->>API: POST /api/public/equipment/availability
     API->>DB: Check availability
     DB-->>API: Available
     API-->>FE: متاح
-    
+
     User->>FE: إضافة للسلة
     FE->>FE: Save to LocalStorage
     FE-->>User: تمت الإضافة
-    
+
     User->>FE: إتمام الحجز
     FE-->>User: نموذج التسجيل
-    
+
     User->>FE: تسجيل (Phone+OTP)
     FE->>API: POST /api/auth/register
     API->>DB: Create user
     API-->>FE: User created
-    
+
     FE->>API: POST /api/cart/sync
     API->>DB: Merge carts
     API-->>FE: Cart synced
-    
+
     FE->>API: POST /api/checkout/lock-price
     API->>DB: Lock prices (1h TTL)
     API-->>FE: Locked
-    
+
     User->>FE: اختيار طريقة الدفع
     FE->>API: POST /api/payment/create-session
     API->>Pay: Create session
     Pay-->>API: Session URL
     API-->>FE: Redirect URL
-    
+
     FE-->>User: توجيه للدفع
     User->>Pay: إتمام الدفع
     Pay->>API: Webhook (success)
     API->>DB: Update booking status
-    
+
     FE->>API: GET /api/payment/status
     API-->>FE: Confirmed
     FE-->>User: صفحة التأكيد
 ```
-
-
 
 ### UC-02: حجز استوديو
 
@@ -556,39 +540,36 @@ sequenceDiagram
     participant FE as Frontend
     participant API as API
     participant DB as Database
-    
+
     User->>FE: تصفح الاستوديوهات
     FE->>API: GET /api/public/studios
     API->>DB: Query studios
     API-->>FE: Studios list
-    
+
     User->>FE: اختيار استوديو
     FE->>API: GET /api/public/studios/[slug]
     API-->>FE: Studio details
-    
+
     User->>FE: اختيار تاريخ + وقت + مدة
     FE->>API: POST /api/public/studios/availability
     API->>DB: Check slots
     API-->>FE: Available slots
-    
+
     User->>FE: اختيار إضافات
     FE->>FE: Calculate total
-    
+
     User->>FE: إضافة للسلة
     FE->>FE: Save to cart
     FE-->>User: تمت الإضافة
-    
+
     Note over User,FE: يكمل نفس تدفق الـ Checkout
 ```
-
-
 
 ---
 
 ## Test Cases - حالات الاختبار
 
 ### TC-BROWSE: تصفح الكتالوج
-
 
 | ID     | السيناريو          | الخطوات            | النتيجة المتوقعة           | الأولوية |
 | ------ | ------------------ | ------------------ | -------------------------- | -------- |
@@ -603,9 +584,7 @@ sequenceDiagram
 | TC-B09 | حالة فارغة         | فلتر بدون نتائج    | رسالة "لا توجد نتائج"      | Medium   |
 | TC-B10 | خطأ في API         | فشل الاتصال        | رسالة خطأ + إعادة          | High     |
 
-
 ### TC-CART: السلة
-
 
 | ID     | السيناريو         | الخطوات            | النتيجة المتوقعة         | الأولوية |
 | ------ | ----------------- | ------------------ | ------------------------ | -------- |
@@ -622,9 +601,7 @@ sequenceDiagram
 | TC-C11 | Revalidation      | عنصر يصبح غير متاح | إشعار + خيارات           | High     |
 | TC-C12 | سلة مختلطة        | معدات + استوديو    | كلاهما في السلة          | High     |
 
-
 ### TC-CHECKOUT: إتمام الطلب
-
 
 | ID      | السيناريو            | الخطوات            | النتيجة المتوقعة      | الأولوية |
 | ------- | -------------------- | ------------------ | --------------------- | -------- |
@@ -641,9 +618,7 @@ sequenceDiagram
 | TC-CH11 | اختيار التوصيل       | توصيل/استلام       | تحديث الإجمالي        | Medium   |
 | TC-CH12 | Return URL           | تسجيل من صفحة معدة | رجوع + تواريخ محفوظة  | High     |
 
-
 ### TC-PAYMENT: الدفع
-
 
 | ID     | السيناريو       | الخطوات         | النتيجة المتوقعة          | الأولوية |
 | ------ | --------------- | --------------- | ------------------------- | -------- |
@@ -660,9 +635,7 @@ sequenceDiagram
 | TC-P11 | تحويل بنكي      | اختيار تحويل    | تعليمات + WhatsApp        | Medium   |
 | TC-P12 | إلغاء الدفع     | إلغاء           | رجوع للـ Checkout         | Medium   |
 
-
 ### TC-PORTAL: بوابة العميل
-
 
 | ID      | السيناريو     | الخطوات              | النتيجة المتوقعة  | الأولوية |
 | ------- | ------------- | -------------------- | ----------------- | -------- |
@@ -678,7 +651,6 @@ sequenceDiagram
 | TC-PO10 | إعادة الحجز   | ضغط الزر             | سلة معبأة         | Medium   |
 | TC-PO11 | تقييم         | بعد الانتهاء         | حفظ التقييم       | Medium   |
 | TC-PO12 | WhatsApp دعم  | ضغط الزر             | رسالة بالسياق     | High     |
-
 
 ---
 
@@ -703,58 +675,58 @@ flowchart TB
         CartIcon[Cart Icon]
         Account[Account]
     end
-    
+
     subgraph Hero[Hero Section]
         HeroTitle[العنوان الرئيسي]
         HeroSub[الوصف]
         SearchBar[بحث سريع]
         QuickPaths[مسارات سريعة]
     end
-    
+
     subgraph Featured[Featured Equipment]
         FeaturedGrid[Grid 4 items]
         ViewAll[عرض الكل]
     end
-    
+
     subgraph Studios[Studios Teaser]
         StudioCards[3 Studio Cards]
         StudioCTA[استكشف الاستوديوهات]
     end
-    
+
     subgraph HowItWorks[How It Works]
         Step1[1. اختر]
         Step2[2. احجز]
         Step3[3. استلم]
     end
-    
+
     subgraph Packages[Packages]
         PackageCards[Package Cards]
         PackageCTA[عرض الباقات]
     end
-    
+
     subgraph Testimonials[Testimonials]
         Reviews[آراء العملاء]
     end
-    
+
     subgraph Brands[Trusted Brands]
         BrandLogos[شعارات الماركات]
     end
-    
+
     subgraph FAQ[FAQ Section]
         Questions[الأسئلة الشائعة]
     end
-    
+
     subgraph CTA[CTA Banner]
         CTAText[جاهز للبدء؟]
         CTAButton[احجز الآن]
     end
-    
+
     subgraph Footer[Footer]
         Links[الروابط]
         Social[التواصل الاجتماعي]
         Copyright[حقوق النشر]
     end
-    
+
     Header --> Hero
     Hero --> Featured
     Featured --> Studios
@@ -766,8 +738,6 @@ flowchart TB
     FAQ --> CTA
     CTA --> Footer
 ```
-
-
 
 ### Component States
 
@@ -792,33 +762,30 @@ flowchart LR
         ImageOpt[Image Optimization]
         Skeleton[Skeleton Loaders]
     end
-    
+
     subgraph APIStrategy[API Strategy]
         Pagination[Pagination]
         Caching[Response Caching]
         Debounce[Search Debounce]
         Prefetch[Link Prefetching]
     end
-    
+
     subgraph Bundle[Bundle Optimization]
         TreeShake[Tree Shaking]
         DynamicImport[Dynamic Imports]
         MinCSS[Minimal CSS]
     end
-    
+
     FrontendOpt --> FastLoad[Fast Initial Load]
     APIStrategy --> FastData[Fast Data]
     Bundle --> SmallBundle[Small Bundle]
-    
+
     FastLoad --> Target[< 3s FCP]
     FastData --> Target
     SmallBundle --> Target
 ```
 
-
-
 ### تقنيات التحسين
-
 
 | التقنية               | التطبيق                 | الأثر               |
 | --------------------- | ----------------------- | ------------------- |
@@ -830,7 +797,6 @@ flowchart LR
 | **Pagination**        | قوائم طويلة             | تحميل أسرع          |
 | **Debounce**          | البحث والفلاتر          | طلبات أقل           |
 | **Prefetch**          | الروابط الظاهرة         | تنقل فوري           |
-
 
 ---
 
@@ -844,7 +810,7 @@ erDiagram
     WebsiteSection ||--o{ WebsiteContent : has
     WebsiteFeature ||--o{ WebsitePage : affects
     WebsiteLayout ||--|| WebsitePage : applies
-    
+
     WebsitePage {
         string id PK
         string slug UK
@@ -854,7 +820,7 @@ erDiagram
         boolean isPublished
         json seo
     }
-    
+
     WebsiteSection {
         string id PK
         string pageId FK
@@ -864,7 +830,7 @@ erDiagram
         json content
         json settings
     }
-    
+
     WebsiteContent {
         string id PK
         string key UK
@@ -876,7 +842,7 @@ erDiagram
         string section
         boolean isActive
     }
-    
+
     WebsiteFeature {
         string id PK
         string key UK
@@ -885,7 +851,7 @@ erDiagram
         boolean isEnabled
         json config
     }
-    
+
     WebsiteLayout {
         string id PK
         enum type
@@ -894,10 +860,7 @@ erDiagram
     }
 ```
 
-
-
 ### Feature Flags
-
 
 | الميزة              | الوصف           | التحكم      |
 | ------------------- | --------------- | ----------- |
@@ -909,7 +872,6 @@ erDiagram
 | `reviews`           | التقييمات       | تفعيل/تعطيل |
 | `installments`      | التقسيط         | تفعيل/تعطيل |
 | `newsletter`        | النشرة البريدية | تفعيل/تعطيل |
-
 
 ---
 
@@ -1212,25 +1174,22 @@ src/components/
 // Pessimistic locking with database transaction
 await prisma.$transaction(async (tx) => {
   // Lock equipment row (FOR UPDATE)
-  const equipment = await tx.equipment.findUnique({ where: { id } });
-  
+  const equipment = await tx.equipment.findUnique({ where: { id } })
+
   // Check conflicts within transaction
   const conflicts = await tx.bookingItem.findMany({
     where: {
       equipmentId: id,
       booking: { status: { in: ['VALIDATED', 'CONFIRMED', 'ACTIVE'] } },
-      AND: [
-        { startDate: { lte: endDate } },
-        { endDate: { gte: startDate } }
-      ]
-    }
-  });
-  
-  const bookedQty = conflicts.reduce((sum, c) => sum + c.quantity, 0);
+      AND: [{ startDate: { lte: endDate } }, { endDate: { gte: startDate } }],
+    },
+  })
+
+  const bookedQty = conflicts.reduce((sum, c) => sum + c.quantity, 0)
   if (equipment.quantity - bookedQty < requestedQty) {
-    throw new Error('Insufficient inventory');
+    throw new Error('Insufficient inventory')
   }
-});
+})
 ```
 
 ### Price Lock (15 min TTL)
@@ -1238,12 +1197,12 @@ await prisma.$transaction(async (tx) => {
 ```typescript
 async lockPrices(bookingId) {
   const expiresAt = addMinutes(new Date(), 15);
-  
+
   await prisma.booking.update({
     where: { id: bookingId },
     data: { priceLocked: true, priceLockedAt: new Date(), priceLockedUntil: expiresAt }
   });
-  
+
   // Schedule auto-unlock for expired sessions
   scheduleUnlock(bookingId, expiresAt);
 }
@@ -1252,23 +1211,22 @@ async lockPrices(bookingId) {
 ### Tax Calculation (15% VAT)
 
 ```typescript
-const TAX_RATE = 0.15; // Saudi Arabia VAT
-const taxableAmount = subtotal + deliveryFee - discount;
-const taxAmount = taxableAmount * TAX_RATE;
-const total = taxableAmount + taxAmount + securityDeposit;
+const TAX_RATE = 0.15 // Saudi Arabia VAT
+const taxableAmount = subtotal + deliveryFee - discount
+const taxAmount = taxableAmount * TAX_RATE
+const total = taxableAmount + taxAmount + securityDeposit
 ```
 
 ### Late Return Fees (150%)
 
 ```typescript
-const lateDays = Math.ceil((today - dueDate) / (24 * 60 * 60 * 1000));
-const lateFee = dailyRate * lateDays * 1.5; // 150%
+const lateDays = Math.ceil((today - dueDate) / (24 * 60 * 60 * 1000))
+const lateFee = dailyRate * lateDays * 1.5 // 150%
 ```
 
 ---
 
 ## Performance Targets
-
 
 | Metric           | Target  |
 | ---------------- | ------- |
@@ -1281,11 +1239,9 @@ const lateFee = dailyRate * lateDays * 1.5; // 150%
 | **p95 Response** | < 500ms |
 | **Error Rate**   | < 0.1%  |
 
-
 ---
 
 ## Success Metrics
-
 
 | Category      | Metric           | Target |
 | ------------- | ---------------- | ------ |
@@ -1295,11 +1251,9 @@ const lateFee = dailyRate * lateDays * 1.5; // 150%
 | **Business**  | Cart Abandonment | < 70%  |
 | **Business**  | Payment Success  | > 95%  |
 
-
 ---
 
 ## Risk Mitigation
-
 
 | Risk                     | Mitigation                                          |
 | ------------------------ | --------------------------------------------------- |
@@ -1308,7 +1262,6 @@ const lateFee = dailyRate * lateDays * 1.5; // 150%
 | **Database Failure**     | Automated backups + Read replicas                   |
 | **High Traffic**         | Auto-scaling + CDN + Caching                        |
 | **Fraud/Chargebacks**    | 3D Secure + Fraud detection + Identity verification |
-
 
 ---
 
@@ -1352,4 +1305,3 @@ const lateFee = dailyRate * lateDays * 1.5; // 150%
 - Track conversion rates
 - Review error logs
 - Check payment reconciliation
-

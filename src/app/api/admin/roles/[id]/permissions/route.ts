@@ -34,7 +34,10 @@ export async function POST(
     }
     const canManage = await hasPermission(session.user.id, PERMISSIONS.SETTINGS_MANAGE_ROLES)
     if (!canManage) {
-      return NextResponse.json({ error: 'Forbidden - Missing settings.manage_roles permission' }, { status: 403 })
+      return NextResponse.json(
+        { error: 'Forbidden - Missing settings.manage_roles permission' },
+        { status: 403 }
+      )
     }
 
     const p = await Promise.resolve(params)
@@ -49,7 +52,10 @@ export async function POST(
     return NextResponse.json({ success: true, data: role })
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validation error', details: error.errors }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Validation error', details: error.errors },
+        { status: 400 }
+      )
     }
     console.error('Error updating role permissions:', error)
     return NextResponse.json(

@@ -230,7 +230,7 @@ export default function SuperAdminPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Super Admin Console</h1>
-        </div>
+      </div>
 
       {/* Health Checks */}
       <Card>
@@ -253,7 +253,10 @@ export default function SuperAdminPage() {
           ) : (
             <div className="space-y-3">
               {healthChecks.map((check) => (
-                <div key={check.service} className="flex items-center justify-between p-3 border rounded-md">
+                <div
+                  key={check.service}
+                  className="flex items-center justify-between rounded-md border p-3"
+                >
                   <div className="flex items-center gap-3">
                     {check.status === 'healthy' ? (
                       <CheckCircle2 className="h-5 w-5 text-green-600" />
@@ -265,9 +268,7 @@ export default function SuperAdminPage() {
                       <div className="text-sm text-muted-foreground">{check.message}</div>
                     </div>
                   </div>
-                  <Badge
-                    variant={check.status === 'healthy' ? 'default' : 'destructive'}
-                  >
+                  <Badge variant={check.status === 'healthy' ? 'default' : 'destructive'}>
                     {check.status}
                   </Badge>
                 </div>
@@ -301,10 +302,11 @@ export default function SuperAdminPage() {
             </Button>
           </div>
           {readOnlyMode && (
-            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md flex items-start gap-2">
-              <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
+            <div className="flex items-start gap-2 rounded-md border border-yellow-200 bg-yellow-50 p-3">
+              <AlertTriangle className="mt-0.5 h-5 w-5 text-yellow-600" />
               <div className="text-sm text-yellow-800">
-                <strong>Warning:</strong> Read-only mode is enabled. All write operations are blocked.
+                <strong>Warning:</strong> Read-only mode is enabled. All write operations are
+                blocked.
               </div>
             </div>
           )}
@@ -335,14 +337,9 @@ export default function SuperAdminPage() {
               value={jobType}
               onChange={(e) => setJobType(e.target.value)}
             />
-            <p className="text-sm text-muted-foreground">
-              Leave empty for generic job rerun
-            </p>
+            <p className="text-sm text-muted-foreground">Leave empty for generic job rerun</p>
           </div>
-          <Button
-            onClick={handleRerunJob}
-            disabled={processing.rerunJob || !jobId}
-          >
+          <Button onClick={handleRerunJob} disabled={processing.rerunJob || !jobId}>
             {processing.rerunJob && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Re-run Job
           </Button>
@@ -365,10 +362,7 @@ export default function SuperAdminPage() {
               onChange={(e) => setLockId(e.target.value)}
             />
           </div>
-          <Button
-            onClick={handleReleaseLock}
-            disabled={processing.releaseLock || !lockId}
-          >
+          <Button onClick={handleReleaseLock} disabled={processing.releaseLock || !lockId}>
             {processing.releaseLock && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Release Lock
           </Button>

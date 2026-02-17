@@ -9,11 +9,7 @@
 import { prisma } from '@/lib/db/prisma'
 import { AuditService } from './audit.service'
 import { EventBus } from '@/lib/events/event-bus'
-import {
-  NotFoundError,
-  ValidationError,
-  ForbiddenError,
-} from '@/lib/errors'
+import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission } from '@/lib/auth/permissions'
 import type {
   Contract,
@@ -27,7 +23,7 @@ import type {
 
 /**
  * Contract Service
- * 
+ *
  * Handles contract generation, signing, and management
  */
 export class ContractService {
@@ -97,15 +93,17 @@ export class ContractService {
         endDate: booking.endDate,
         totalAmount: Number(booking.totalAmount),
       },
-      customer: booking.customer ? {
-        id: booking.customer.id,
-        name: booking.customer.name,
-        email: booking.customer.email,
-      } : {
-        id: booking.customerId,
-        name: null,
-        email: '',
-      },
+      customer: booking.customer
+        ? {
+            id: booking.customer.id,
+            name: booking.customer.name,
+            email: booking.customer.email,
+          }
+        : {
+            id: booking.customerId,
+            name: null,
+            email: '',
+          },
       termsVersion,
       generatedAt: new Date(),
     }
@@ -421,7 +419,10 @@ export class ContractService {
       updateData.termsVersion = input.termsVersion
       // Regenerate contract content if terms version changed
       if (input.termsVersion !== contract.termsVersion) {
-        const contractContent = await this.generateContractContent(contract.bookingId, input.termsVersion)
+        const contractContent = await this.generateContractContent(
+          contract.bookingId,
+          input.termsVersion
+        )
         updateData.contractContent = contractContent as any
       }
     }

@@ -11,10 +11,7 @@ import { MediaService } from '@/lib/services/media.service'
 /**
  * DELETE /api/media/[id] - Delete media
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
 

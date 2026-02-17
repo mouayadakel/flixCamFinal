@@ -14,7 +14,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts'
 import { DollarSign, TrendingUp, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -59,7 +68,11 @@ export default function DashboardRevenuePage() {
           })
         }
       } catch {
-        toast({ title: 'Error', description: 'Failed to load revenue data', variant: 'destructive' })
+        toast({
+          title: 'Error',
+          description: 'Failed to load revenue data',
+          variant: 'destructive',
+        })
       } finally {
         setLoading(false)
       }
@@ -81,7 +94,7 @@ export default function DashboardRevenuePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold flex items-center gap-3">
+        <h1 className="flex items-center gap-3 text-3xl font-bold">
           <DollarSign className="h-8 w-8" />
           Dashboard · Revenue
         </h1>
@@ -100,10 +113,12 @@ export default function DashboardRevenuePage() {
       </div>
 
       {revenueStats && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Revenue (this month)</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Revenue (this month)
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">{formatCurrency(revenueStats.totalRevenue)}</p>
@@ -111,18 +126,23 @@ export default function DashboardRevenuePage() {
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Growth vs last month</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Growth vs last month
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold flex items-center gap-1">
-                {revenueStats.growthPercentage >= 0 ? '+' : ''}{revenueStats.growthPercentage.toFixed(1)}%
+              <p className="flex items-center gap-1 text-2xl font-bold">
+                {revenueStats.growthPercentage >= 0 ? '+' : ''}
+                {revenueStats.growthPercentage.toFixed(1)}%
                 <TrendingUp className="h-5 w-5 text-green-600" />
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Avg order value</CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Avg order value
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">{formatCurrency(revenueStats.averageOrderValue)}</p>
@@ -134,11 +154,15 @@ export default function DashboardRevenuePage() {
       <Card>
         <CardHeader>
           <CardTitle>Revenue over time</CardTitle>
-          <p className="text-sm text-muted-foreground">Daily revenue and booking count for the selected period</p>
+          <p className="text-sm text-muted-foreground">
+            Daily revenue and booking count for the selected period
+          </p>
         </CardHeader>
         <CardContent>
           {chartData.length === 0 ? (
-            <div className="flex h-80 items-center justify-center text-muted-foreground">No data for this period</div>
+            <div className="flex h-80 items-center justify-center text-muted-foreground">
+              No data for this period
+            </div>
           ) : (
             <ResponsiveContainer width="100%" height={320}>
               <LineChart data={chartData}>
@@ -152,8 +176,20 @@ export default function DashboardRevenuePage() {
                   ]}
                 />
                 <Legend />
-                <Line type="monotone" dataKey="revenue" stroke="#1F87E8" name="Revenue" strokeWidth={2} />
-                <Line type="monotone" dataKey="bookings" stroke="#10B981" name="Bookings" strokeWidth={2} />
+                <Line
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="#1F87E8"
+                  name="Revenue"
+                  strokeWidth={2}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="bookings"
+                  stroke="#10B981"
+                  name="Bookings"
+                  strokeWidth={2}
+                />
               </LineChart>
             </ResponsiveContainer>
           )}

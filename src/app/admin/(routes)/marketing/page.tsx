@@ -45,7 +45,10 @@ interface Campaign {
   updatedAt: string
 }
 
-const STATUS_LABELS: Record<CampaignStatus, { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_LABELS: Record<
+  CampaignStatus,
+  { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   draft: { ar: 'مسودة', en: 'Draft', variant: 'outline' },
   scheduled: { ar: 'مجدولة', en: 'Scheduled', variant: 'secondary' },
   active: { ar: 'نشطة', en: 'Active', variant: 'default' },
@@ -82,13 +85,7 @@ export default function MarketingPage() {
     'cancelled',
   ]
 
-  const types: Array<CampaignType | 'all'> = [
-    'all',
-    'email',
-    'sms',
-    'push',
-    'whatsapp',
-  ]
+  const types: Array<CampaignType | 'all'> = ['all', 'email', 'sms', 'push', 'whatsapp']
 
   useEffect(() => {
     loadCampaigns()
@@ -141,7 +138,7 @@ export default function MarketingPage() {
 
   const getTypeIcon = (type: CampaignType) => {
     const Icon = TYPE_LABELS[type]?.icon ?? Mail
-    return (<Icon className="h-4 w-4" />)
+    return <Icon className="h-4 w-4" />
   }
 
   return (
@@ -149,42 +146,42 @@ export default function MarketingPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">التسويق</h1>
-          <p className="text-muted-foreground mt-2">
-            إدارة الحملات التسويقية
-          </p>
+          <p className="mt-2 text-muted-foreground">إدارة الحملات التسويقية</p>
         </div>
         <Button asChild>
           <Link href="/admin/marketing/campaigns/new">
-            <Plus className="h-4 w-4 ml-2" />
+            <Plus className="ml-2 h-4 w-4" />
             حملة جديدة
           </Link>
         </Button>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 items-center flex-wrap">
+      <div className="flex flex-wrap items-center gap-4">
         <input
           type="text"
           placeholder="البحث باسم الحملة..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="px-4 py-2 border rounded-lg flex-1 min-w-[200px]"
+          className="min-w-[200px] flex-1 rounded-lg border px-4 py-2"
         />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="rounded-lg border px-4 py-2"
         >
           {statuses.map((status) => (
             <option key={status} value={status}>
-              {status === 'all' ? 'جميع الحالات' : STATUS_LABELS[status as CampaignStatus]?.ar || status}
+              {status === 'all'
+                ? 'جميع الحالات'
+                : STATUS_LABELS[status as CampaignStatus]?.ar || status}
             </option>
           ))}
         </select>
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="rounded-lg border px-4 py-2"
         >
           {types.map((type) => (
             <option key={type} value={type}>
@@ -195,7 +192,7 @@ export default function MarketingPage() {
       </div>
 
       {/* Campaigns Table */}
-      <div className="border rounded-lg">
+      <div className="rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -224,7 +221,7 @@ export default function MarketingPage() {
               </TableRow>
             ) : filteredCampaigns.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={10} className="py-8 text-center text-muted-foreground">
                   لا توجد حملات
                 </TableCell>
               </TableRow>
@@ -255,9 +252,7 @@ export default function MarketingPage() {
                   </TableCell>
                   <TableCell>
                     {campaign.sentCount > 0 ? (
-                      <div className="text-green-600 font-medium">
-                        {campaign.sentCount}
-                      </div>
+                      <div className="font-medium text-green-600">{campaign.sentCount}</div>
                     ) : (
                       '-'
                     )}
@@ -291,16 +286,17 @@ export default function MarketingPage() {
                     <div className="flex gap-2">
                       <Link href={`/admin/marketing/campaigns/${campaign.id}`}>
                         <Button size="sm" variant="ghost">
-                          <Eye className="h-4 w-4 ml-1" />
+                          <Eye className="ml-1 h-4 w-4" />
                           عرض
                         </Button>
                       </Link>
                     </div>
                   </TableCell>
                 </TableRow>
-              )))}
-            </TableBody>
-          </Table>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
 
       {total > 0 && (

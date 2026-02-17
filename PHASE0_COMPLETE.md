@@ -22,12 +22,14 @@
 ## Files Created/Modified
 
 ### Created:
+
 1. `src/lib/supabase/client.ts` - Client component Supabase client
 2. `src/lib/supabase/server.ts` - Server component Supabase client
 3. `src/lib/types/database.types.ts` - Base TypeScript types
 4. `src/lib/auth/auth-helpers.ts` - Authentication helper functions
 
 ### Modified:
+
 1. `tailwind.config.ts` - Added RTL plugin, color palettes, font families
 2. `src/app/layout.tsx` - Added Cairo & Inter fonts, RTL layout
 3. `.env.example` - Added Supabase, ZATCA environment variables
@@ -56,16 +58,19 @@
 ## Configuration Details
 
 ### Tailwind RTL Support
+
 - Plugin: `tailwindcss-rtl` added
 - Font families: `arabic` (Cairo), `english` (Inter), `mono` (JetBrains Mono)
 - Color palettes: primary (50-900), error, success, warning, neutral
 
 ### Fonts
+
 - **Cairo**: Arabic font (weights: 300, 400, 500, 600, 700)
 - **Inter**: English font (weights: 300, 400, 500, 600, 700)
 - Applied via CSS variables: `--font-cairo`, `--font-inter`
 
 ### Layout
+
 - HTML: `lang="ar" dir="rtl"`
 - Body: `font-arabic` class applied
 
@@ -74,6 +79,7 @@
 **Phase 1: Authentication & RBAC** is ready to begin.
 
 ### Required Before Phase 1:
+
 1. Create Supabase project at https://supabase.com
 2. Run `DATABASE_SCHEMA.sql` in Supabase SQL Editor
 3. Verify all 60+ tables created

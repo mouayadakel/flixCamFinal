@@ -96,7 +96,11 @@ export default function NotificationTemplatesPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [previewResult, setPreviewResult] = useState<{ subject: string | null; bodyText: string; bodyHtml: string | null } | null>(null)
+  const [previewResult, setPreviewResult] = useState<{
+    subject: string | null
+    bodyText: string
+    bodyHtml: string | null
+  } | null>(null)
   const [form, setForm] = useState({
     name: '',
     slug: '',
@@ -140,7 +144,8 @@ export default function NotificationTemplatesPage() {
       trigger: '',
       channel: '',
       subject: '',
-      bodyText: 'Hello {{customerName}},\n\nYour booking {{bookingId}} is confirmed.\n\nTotal: {{totalAmount}}',
+      bodyText:
+        'Hello {{customerName}},\n\nYour booking {{bookingId}} is confirmed.\n\nTotal: {{totalAmount}}',
       bodyHtml: '',
       isActive: true,
       language: 'en',
@@ -167,7 +172,11 @@ export default function NotificationTemplatesPage() {
 
   const handleSave = async () => {
     if (!form.trigger || !form.channel || !form.bodyText.trim()) {
-      toast({ title: 'Validation', description: 'Name, trigger, channel and body are required', variant: 'destructive' })
+      toast({
+        title: 'Validation',
+        description: 'Name, trigger, channel and body are required',
+        variant: 'destructive',
+      })
       return
     }
     setSaving(true)
@@ -233,7 +242,11 @@ export default function NotificationTemplatesPage() {
       setPreviewResult({
         subject: form.subject || null,
         bodyText: form.bodyText.replace(/\{\{(\w+)\}\}/g, (_, k) => {
-          const d: Record<string, string> = { customerName: 'Ahmed', bookingId: 'BK-001', totalAmount: '500 SAR' }
+          const d: Record<string, string> = {
+            customerName: 'Ahmed',
+            bookingId: 'BK-001',
+            totalAmount: '500 SAR',
+          }
           return d[k] ?? `{{${k}}}`
         }),
         bodyHtml: form.bodyHtml || null,
@@ -260,7 +273,11 @@ export default function NotificationTemplatesPage() {
       setPreviewResult({
         subject: form.subject || null,
         bodyText: form.bodyText.replace(/\{\{(\w+)\}\}/g, (_, k) => {
-          const d: Record<string, string> = { customerName: 'Ahmed', bookingId: 'BK-001', totalAmount: '500 SAR' }
+          const d: Record<string, string> = {
+            customerName: 'Ahmed',
+            bookingId: 'BK-001',
+            totalAmount: '500 SAR',
+          }
           return d[k] ?? `{{${k}}}`
         }),
         bodyHtml: form.bodyHtml || null,
@@ -273,19 +290,21 @@ export default function NotificationTemplatesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <Mail className="h-8 w-8" />
             Notification Templates
           </h1>
-          <p className="text-muted-foreground mt-1">Email, SMS, and in-app message templates with variables (e.g. {`{{customerName}}`})</p>
+          <p className="mt-1 text-muted-foreground">
+            Email, SMS, and in-app message templates with variables (e.g. {`{{customerName}}`})
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={loadTemplates}>
-            <RefreshCw className="h-4 w-4 mr-2" />
+            <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
           </Button>
           <Button onClick={openCreate}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="mr-2 h-4 w-4" />
             Add Template
           </Button>
         </div>
@@ -294,10 +313,13 @@ export default function NotificationTemplatesPage() {
       <Card>
         <CardHeader>
           <CardTitle>Templates</CardTitle>
-          <CardDescription>Filter by trigger and channel. Use Handlebars-style variables in body: {`{{customerName}}`}, {`{{bookingId}}`}, {`{{totalAmount}}`}.</CardDescription>
+          <CardDescription>
+            Filter by trigger and channel. Use Handlebars-style variables in body:{' '}
+            {`{{customerName}}`}, {`{{bookingId}}`}, {`{{totalAmount}}`}.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4 mb-4">
+          <div className="mb-4 flex gap-4">
             <Select value={triggerFilter} onValueChange={setTriggerFilter}>
               <SelectTrigger className="w-[220px]">
                 <SelectValue placeholder="Trigger" />
@@ -305,7 +327,9 @@ export default function NotificationTemplatesPage() {
               <SelectContent>
                 <SelectItem value="all">All triggers</SelectItem>
                 {TRIGGERS.map((t) => (
-                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -316,7 +340,9 @@ export default function NotificationTemplatesPage() {
               <SelectContent>
                 <SelectItem value="all">All channels</SelectItem>
                 {CHANNELS.map((c) => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                  <SelectItem key={c} value={c}>
+                    {c}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -336,24 +362,42 @@ export default function NotificationTemplatesPage() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={6}><Skeleton className="h-8 w-full" /></TableCell>
+                    <TableCell colSpan={6}>
+                      <Skeleton className="h-8 w-full" />
+                    </TableCell>
                   </TableRow>
                 ) : templates.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">No templates found</TableCell>
+                    <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
+                      No templates found
+                    </TableCell>
                   </TableRow>
                 ) : (
                   templates.map((t) => (
                     <TableRow key={t.id}>
                       <TableCell className="font-medium">{t.name}</TableCell>
-                      <TableCell><Badge variant="outline">{t.trigger}</Badge></TableCell>
-                      <TableCell><Badge variant="secondary">{t.channel}</Badge></TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{t.trigger}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">{t.channel}</Badge>
+                      </TableCell>
                       <TableCell>{t.language}</TableCell>
-                      <TableCell>{t.isActive ? <Badge className="bg-green-100 text-green-800">On</Badge> : <Badge variant="secondary">Off</Badge>}</TableCell>
+                      <TableCell>
+                        {t.isActive ? (
+                          <Badge className="bg-green-100 text-green-800">On</Badge>
+                        ) : (
+                          <Badge variant="secondary">Off</Badge>
+                        )}
+                      </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button variant="ghost" size="sm" onClick={() => openEdit(t)}><Edit className="h-4 w-4" /></Button>
-                          <Button variant="ghost" size="sm" onClick={() => setDeleteId(t.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                          <Button variant="ghost" size="sm" onClick={() => openEdit(t)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => setDeleteId(t.id)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -366,59 +410,107 @@ export default function NotificationTemplatesPage() {
       </Card>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingId ? 'Edit Template' : 'New Template'}</DialogTitle>
-            <DialogDescription>Subject is used for email. Body supports variables like {`{{customerName}}`}, {`{{bookingId}}`}.</DialogDescription>
+            <DialogDescription>
+              Subject is used for email. Body supports variables like {`{{customerName}}`},{' '}
+              {`{{bookingId}}`}.
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium">Name</label>
-                <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Template name" />
+                <Input
+                  value={form.name}
+                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                  placeholder="Template name"
+                />
               </div>
               <div>
                 <label className="text-sm font-medium">Slug (unique per language)</label>
-                <Input value={form.slug} onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))} placeholder="booking-confirmed" />
+                <Input
+                  value={form.slug}
+                  onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
+                  placeholder="booking-confirmed"
+                />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-medium">Trigger</label>
-                <Select value={form.trigger} onValueChange={(v) => setForm((f) => ({ ...f, trigger: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Select trigger" /></SelectTrigger>
+                <Select
+                  value={form.trigger}
+                  onValueChange={(v) => setForm((f) => ({ ...f, trigger: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select trigger" />
+                  </SelectTrigger>
                   <SelectContent>
-                    {TRIGGERS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                    {TRIGGERS.map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {t}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <div>
                 <label className="text-sm font-medium">Channel</label>
-                <Select value={form.channel} onValueChange={(v) => setForm((f) => ({ ...f, channel: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Select channel" /></SelectTrigger>
+                <Select
+                  value={form.channel}
+                  onValueChange={(v) => setForm((f) => ({ ...f, channel: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select channel" />
+                  </SelectTrigger>
                   <SelectContent>
-                    {CHANNELS.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                    {CHANNELS.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {c}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <div>
               <label className="text-sm font-medium">Subject (email)</label>
-              <Input value={form.subject} onChange={(e) => setForm((f) => ({ ...f, subject: e.target.value }))} placeholder="Booking {{bookingId}} confirmed" />
+              <Input
+                value={form.subject}
+                onChange={(e) => setForm((f) => ({ ...f, subject: e.target.value }))}
+                placeholder="Booking {{bookingId}} confirmed"
+              />
             </div>
             <div>
               <label className="text-sm font-medium">Body (text)</label>
-              <Textarea value={form.bodyText} onChange={(e) => setForm((f) => ({ ...f, bodyText: e.target.value }))} rows={6} placeholder="Hello {{customerName}}..." className="font-mono text-sm" />
+              <Textarea
+                value={form.bodyText}
+                onChange={(e) => setForm((f) => ({ ...f, bodyText: e.target.value }))}
+                rows={6}
+                placeholder="Hello {{customerName}}..."
+                className="font-mono text-sm"
+              />
             </div>
             <div className="flex items-center gap-2">
-              <Switch checked={form.isActive} onCheckedChange={(v) => setForm((f) => ({ ...f, isActive: v }))} />
+              <Switch
+                checked={form.isActive}
+                onCheckedChange={(v) => setForm((f) => ({ ...f, isActive: v }))}
+              />
               <span className="text-sm">Active</span>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={handlePreview}><Eye className="h-4 w-4 mr-2" /> Preview</Button>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
+            <Button variant="outline" onClick={handlePreview}>
+              <Eye className="mr-2 h-4 w-4" /> Preview
+            </Button>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave} disabled={saving}>
+              {saving ? 'Saving...' : 'Save'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -431,8 +523,14 @@ export default function NotificationTemplatesPage() {
           </DialogHeader>
           {previewResult && (
             <div className="space-y-2 text-sm">
-              {previewResult.subject != null && <p><strong>Subject:</strong> {previewResult.subject}</p>}
-              <pre className="whitespace-pre-wrap rounded bg-muted p-3 max-h-64 overflow-auto">{previewResult.bodyText}</pre>
+              {previewResult.subject != null && (
+                <p>
+                  <strong>Subject:</strong> {previewResult.subject}
+                </p>
+              )}
+              <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded bg-muted p-3">
+                {previewResult.bodyText}
+              </pre>
             </div>
           )}
         </DialogContent>
@@ -446,7 +544,13 @@ export default function NotificationTemplatesPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} disabled={deleting} className="bg-destructive text-destructive-foreground">{deleting ? 'Deleting...' : 'Delete'}</AlertDialogAction>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground"
+            >
+              {deleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

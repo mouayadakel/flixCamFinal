@@ -7,7 +7,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { RecentBookingsTable, type RecentBookingRow } from '@/components/dashboard/recent-bookings-table'
+import {
+  RecentBookingsTable,
+  type RecentBookingRow,
+} from '@/components/dashboard/recent-bookings-table'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
@@ -48,10 +51,7 @@ export default function DashboardRecentBookingsPage() {
           <h1 className="text-3xl font-bold">الحجوزات الأخيرة</h1>
           <p className="mt-1 text-muted-foreground">آخر الحجوزات والنشاط</p>
         </div>
-        <Link
-          href="/admin/bookings"
-          className="text-sm font-medium text-primary hover:underline"
-        >
+        <Link href="/admin/bookings" className="text-sm font-medium text-primary hover:underline">
           عرض كل الحجوزات
         </Link>
       </div>

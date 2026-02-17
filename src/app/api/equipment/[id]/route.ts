@@ -11,10 +11,7 @@ import { EquipmentService } from '@/lib/services/equipment.service'
 /**
  * GET /api/equipment/[id] - Get equipment by ID
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
 
@@ -37,10 +34,7 @@ export async function GET(
 /**
  * PATCH /api/equipment/[id] - Update equipment
  */
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
 
@@ -49,9 +43,10 @@ export async function PATCH(
     }
 
     const body = await request.json()
+    const { featured: _featured, ...rest } = body
     const equipment = await EquipmentService.updateEquipment({
       id: params.id,
-      ...body,
+      ...rest,
       updatedBy: session.user.id,
     })
 
@@ -68,10 +63,7 @@ export async function PATCH(
 /**
  * DELETE /api/equipment/[id] - Delete equipment (soft delete)
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
 

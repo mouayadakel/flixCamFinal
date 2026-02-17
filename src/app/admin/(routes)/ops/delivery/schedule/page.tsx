@@ -59,7 +59,10 @@ interface DeliveryItem {
   updatedAt: string
 }
 
-const STATUS_LABELS: Record<string, { ar: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_LABELS: Record<
+  string,
+  { ar: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   pending: { ar: 'قيد الانتظار', variant: 'outline' },
   scheduled: { ar: 'مجدولة', variant: 'secondary' },
   in_transit: { ar: 'قيد التوصيل', variant: 'default' },
@@ -152,17 +155,17 @@ export default function DeliverySchedulePage() {
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
+          <h1 className="flex items-center gap-2 text-3xl font-bold">
             <Calendar className="h-8 w-8 text-primary" />
             جدولة التوصيل
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             عرض التوصيلات المعلقة والمجدولة حسب التاريخ والنوع
           </p>
         </div>
         <Link href="/admin/ops/delivery">
           <Button variant="outline">
-            <ChevronRight className="h-4 w-4 ml-2" />
+            <ChevronRight className="ml-2 h-4 w-4" />
             إدارة التوصيلات
           </Button>
         </Link>
@@ -174,7 +177,7 @@ export default function DeliverySchedulePage() {
           <CardTitle>الفلاتر</CardTitle>
           <CardDescription>نطاق التاريخ، نوع التوصيل</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-wrap gap-4 items-end">
+        <CardContent className="flex flex-wrap items-end gap-4">
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium">من تاريخ</label>
             <Input
@@ -229,16 +232,16 @@ export default function DeliverySchedulePage() {
             </div>
           ) : loadError ? (
             <div className="py-12 text-center">
-              <AlertTriangle className="h-12 w-12 mx-auto mb-4 text-destructive" />
+              <AlertTriangle className="mx-auto mb-4 h-12 w-12 text-destructive" />
               <p className="font-medium text-destructive">{loadError}</p>
               <Button variant="outline" className="mt-4" onClick={loadDeliveries}>
-                <RefreshCw className="h-4 w-4 ml-2" />
+                <RefreshCw className="ml-2 h-4 w-4" />
                 إعادة المحاولة
               </Button>
             </div>
           ) : deliveries.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground">
-              <Truck className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <Truck className="mx-auto mb-4 h-12 w-12 opacity-50" />
               <p className="font-medium">لا توجد توصيلات</p>
               <p className="text-sm">غيّر نطاق التاريخ أو النوع</p>
             </div>
@@ -277,13 +280,13 @@ export default function DeliverySchedulePage() {
                       </Badge>
                     </TableCell>
                     <TableCell>{formatDate(d.scheduledDate)}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
+                    <TableCell className="text-sm text-muted-foreground">
                       {formatDateTime(d.scheduledDate)}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3 text-muted-foreground shrink-0" />
-                        <span className="text-sm truncate max-w-[160px]">
+                        <MapPin className="h-3 w-3 shrink-0 text-muted-foreground" />
+                        <span className="max-w-[160px] truncate text-sm">
                           {d.address}, {d.city}
                         </span>
                       </div>
@@ -291,11 +294,11 @@ export default function DeliverySchedulePage() {
                     <TableCell>
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-1">
-                          <User className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <User className="h-3 w-3 shrink-0 text-muted-foreground" />
                           <span className="text-sm">{d.contactName}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <Phone className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <Phone className="h-3 w-3 shrink-0 text-muted-foreground" />
                           <span className="text-sm">{d.contactPhone}</span>
                         </div>
                       </div>
@@ -308,7 +311,7 @@ export default function DeliverySchedulePage() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-2 flex-wrap">
+                      <div className="flex flex-wrap gap-2">
                         {d.status === 'pending' && (
                           <Button
                             size="sm"
@@ -338,8 +341,12 @@ export default function DeliverySchedulePage() {
                             تم التوصيل
                           </Button>
                         )}
-                        <Link href={d.bookingId ? `/admin/bookings/${d.bookingId}` : '/admin/bookings'}>
-                          <Button size="sm" variant="ghost">عرض</Button>
+                        <Link
+                          href={d.bookingId ? `/admin/bookings/${d.bookingId}` : '/admin/bookings'}
+                        >
+                          <Button size="sm" variant="ghost">
+                            عرض
+                          </Button>
                         </Link>
                       </div>
                     </TableCell>

@@ -49,7 +49,10 @@ export class CartService {
   /**
    * Get or create cart for user or session.
    */
-  static async getOrCreateCart(userId: string | null, sessionId: string | null): Promise<CartWithItems> {
+  static async getOrCreateCart(
+    userId: string | null,
+    sessionId: string | null
+  ): Promise<CartWithItems> {
     const expiresAt = new Date()
     expiresAt.setHours(expiresAt.getHours() + CART_EXPIRY_HOURS)
 
@@ -83,10 +86,7 @@ export class CartService {
   /**
    * Add item to cart. Resolves daily rate from equipment/studio/kit.
    */
-  static async addItem(
-    cartId: string,
-    input: AddCartItemInput
-  ): Promise<CartWithItems> {
+  static async addItem(cartId: string, input: AddCartItemInput): Promise<CartWithItems> {
     const quantity = Math.max(1, input.quantity ?? 1)
     let dailyRate = input.dailyRate ?? 0
 
@@ -100,7 +100,10 @@ export class CartService {
         where: { id: input.studioId, deletedAt: null },
       })
       dailyRate = st?.hourlyRate ? Number(st.hourlyRate) * 24 : 0
-    } else if ((input.itemType === 'KIT' || input.itemType === 'PACKAGE') && (input.kitId || input.packageId)) {
+    } else if (
+      (input.itemType === 'KIT' || input.itemType === 'PACKAGE') &&
+      (input.kitId || input.packageId)
+    ) {
       const kitId = input.kitId ?? input.packageId
       const kit = await prisma.kit.findFirst({
         where: { id: kitId!, deletedAt: null },
@@ -118,9 +121,10 @@ export class CartService {
 
     const startDate = input.startDate ?? null
     const endDate = input.endDate ?? null
-    const days = startDate && endDate
-      ? Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000)))
-      : 1
+    const days =
+      startDate && endDate
+        ? Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000)))
+        : 1
     const subtotalItem = dailyRate * quantity * days
 
     await prisma.cartItem.create({
@@ -158,9 +162,10 @@ export class CartService {
     const quantity = data.quantity ?? item.quantity
     const startDate = data.startDate ?? item.startDate
     const endDate = data.endDate ?? item.endDate
-    const days = startDate && endDate
-      ? Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000)))
-      : 1
+    const days =
+      startDate && endDate
+        ? Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000)))
+        : 1
     const dailyRate = item.dailyRate ? Number(item.dailyRate) : 0
     const subtotalItem = dailyRate * quantity * days
 
@@ -226,22 +231,30 @@ export class CartService {
     if (!coupon) return { valid: false, discountAmount: 0, error: 'Coupon not found' }
 
     const now = new Date()
-    if (new Date(coupon.validUntil) < now) return { valid: false, discountAmount: 0, error: 'Coupon expired' }
-    if (new Date(coupon.validFrom) > now) return { valid: false, discountAmount: 0, error: 'Coupon not yet valid' }
-    if (coupon.status !== 'ACTIVE') return { valid: false, discountAmount: 0, error: 'Coupon inactive' }
-    if (coupon.usageLimit != null && coupon.usedCount >= coupon.usageLimit) return { valid: false, discountAmount: 0, error: 'Coupon usage limit reached' }
+    if (new Date(coupon.validUntil) < now)
+      return { valid: false, discountAmount: 0, error: 'Coupon expired' }
+    if (new Date(coupon.validFrom) > now)
+      return { valid: false, discountAmount: 0, error: 'Coupon not yet valid' }
+    if (coupon.status !== 'ACTIVE')
+      return { valid: false, discountAmount: 0, error: 'Coupon inactive' }
+    if (coupon.usageLimit != null && coupon.usedCount >= coupon.usageLimit)
+      return { valid: false, discountAmount: 0, error: 'Coupon usage limit reached' }
     const minAmount = coupon.minimumAmount ? Number(coupon.minimumAmount) : 0
-    if (amount < minAmount) return { valid: false, discountAmount: 0, error: `Minimum purchase: ${minAmount} SAR` }
+    if (amount < minAmount)
+      return { valid: false, discountAmount: 0, error: `Minimum purchase: ${minAmount} SAR` }
 
     const equipmentIds = items.map((i) => i.equipmentId).filter(Boolean) as string[]
     const applicable = coupon.applicableEquipmentIds as string[] | null
     if (applicable?.length && equipmentIds.length) {
       const match = equipmentIds.some((id) => applicable.includes(id))
-      if (!match) return { valid: false, discountAmount: 0, error: 'Coupon not applicable to cart items' }
+      if (!match)
+        return { valid: false, discountAmount: 0, error: 'Coupon not applicable to cart items' }
     }
 
     const isPercent = coupon.type === 'PERCENT'
-    const value = isPercent ? Number(coupon.discountPercentage ?? 0) : Number(coupon.discountValue ?? 0)
+    const value = isPercent
+      ? Number(coupon.discountPercentage ?? 0)
+      : Number(coupon.discountValue ?? 0)
     let discountAmount = isPercent ? (amount * value) / 100 : value
     const maxDiscount = coupon.maximumDiscount ? Number(coupon.maximumDiscount) : null
     if (maxDiscount != null && discountAmount > maxDiscount) discountAmount = maxDiscount
@@ -364,7 +377,30 @@ export class CartService {
     return this.toCartWithItems(updated!)
   }
 
-  private static toCartWithItems(cart: { id: string; userId: string | null; sessionId: string | null; couponCode: string | null; discountAmount: unknown; subtotal: unknown; total: unknown; expiresAt: Date; items: { id: string; itemType: CartItemType; equipmentId: string | null; studioId: string | null; packageId: string | null; kitId: string | null; startDate: Date | null; endDate: Date | null; quantity: number; dailyRate: unknown; subtotal: unknown; isAvailable: boolean }[] }): CartWithItems {
+  private static toCartWithItems(cart: {
+    id: string
+    userId: string | null
+    sessionId: string | null
+    couponCode: string | null
+    discountAmount: unknown
+    subtotal: unknown
+    total: unknown
+    expiresAt: Date
+    items: {
+      id: string
+      itemType: CartItemType
+      equipmentId: string | null
+      studioId: string | null
+      packageId: string | null
+      kitId: string | null
+      startDate: Date | null
+      endDate: Date | null
+      quantity: number
+      dailyRate: unknown
+      subtotal: unknown
+      isAvailable: boolean
+    }[]
+  }): CartWithItems {
     return {
       id: cart.id,
       userId: cart.userId,

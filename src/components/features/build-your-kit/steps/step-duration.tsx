@@ -38,12 +38,10 @@ export function StepDuration() {
 
   return (
     <div className="animate-fade-in">
-      <h2 className="text-section-title text-text-heading mb-1">
-        {t('kit.duration')}
-      </h2>
-      <p className="text-body-main text-text-muted mb-6">{t('kit.durationDesc')}</p>
+      <h2 className="mb-1 text-section-title text-text-heading">{t('kit.duration')}</h2>
+      <p className="mb-6 text-body-main text-text-muted">{t('kit.durationDesc')}</p>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
         {DURATION_PRESETS.map(({ days, savePercent, popular }) => (
           <button
             key={days}
@@ -51,25 +49,23 @@ export function StepDuration() {
             onClick={() => setDuration(days)}
             className={cn(
               'relative flex flex-col items-start rounded-xl border bg-white p-4 text-start shadow-card transition-all duration-300',
-              'hover:shadow-card-hover hover:border-brand-primary/20',
+              'hover:border-brand-primary/20 hover:shadow-card-hover',
               durationDays === days
-                ? 'border-brand-primary ring-2 ring-brand-primary ring-offset-2 bg-brand-primary/5'
+                ? 'border-brand-primary bg-brand-primary/5 ring-2 ring-brand-primary ring-offset-2'
                 : 'border-border-light/60'
             )}
           >
             {popular && (
-              <span className="absolute top-2 end-2 rounded-full bg-brand-primary/15 px-2 py-0.5 text-xs font-medium text-brand-primary">
+              <span className="absolute end-2 top-2 rounded-full bg-brand-primary/15 px-2 py-0.5 text-xs font-medium text-brand-primary">
                 {t('kit.mostPopular')}
               </span>
             )}
             <span className="font-semibold text-text-heading">
               {days} {days === 1 ? t('kit.day') : t('kit.days')}
             </span>
-            <span className="mt-1 text-sm text-text-muted">
-              {formatSar(totalDaily * days)}
-            </span>
+            <span className="mt-1 text-sm text-text-muted">{formatSar(totalDaily * days)}</span>
             {savePercent != null && (
-              <span className="mt-1 text-xs text-green-600 font-medium">
+              <span className="mt-1 text-xs font-medium text-green-600">
                 {t('kit.savePercent').replace('{percent}', String(savePercent))}
               </span>
             )}

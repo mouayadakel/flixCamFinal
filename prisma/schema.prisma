@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,9 +7,1724 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ============================================
-// ENUMS
-// ============================================
+model Product {
+  id              String               @id @default(cuid())
+  status          ProductStatus        @default(DRAFT)
+  productType     ProductType          @default(RENTAL)
+  sku             String?              @unique
+  brandId         String
+  categoryId      String
+  subCategoryId   String?
+  priceDaily      Decimal              @db.Decimal(10, 2)
+  priceWeekly     Decimal?             @db.Decimal(10, 2)
+  priceMonthly    Decimal?             @db.Decimal(10, 2)
+  depositAmount   Decimal?             @db.Decimal(10, 2)
+  bufferTime      Int                  @default(0)
+  boxContents     String?
+  featuredImage   String
+  galleryImages   Json?
+  videoUrl        String?
+  relatedProducts Json?
+  tags            String?
+  createdAt       DateTime             @default(now())
+  createdBy       String?
+  updatedAt       DateTime             @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+  deletedBy       String?
+  quantity        Int?
+  inventoryItems  InventoryItem[]
+  brand           Brand                @relation(fields: [brandId], references: [id])
+  category        Category             @relation("ProductCategory", fields: [categoryId], references: [id])
+  subCategory     Category?            @relation("ProductSubCategory", fields: [subCategoryId], references: [id])
+  translations    ProductTranslation[]
+
+  @@index([status])
+  @@index([brandId])
+  @@index([categoryId])
+  @@index([subCategoryId])
+  @@index([deletedAt])
+}
+
+model ProductTranslation {
+  id               String            @id @default(cuid())
+  productId        String
+  locale           TranslationLocale
+  name             String
+  shortDescription String
+  longDescription  String
+  specifications   Json?
+  seoTitle         String
+  seoDescription   String
+  seoKeywords      String
+  createdAt        DateTime          @default(now())
+  createdBy        String?
+  updatedAt        DateTime          @updatedAt
+  updatedBy        String?
+  deletedAt        DateTime?
+  deletedBy        String?
+  product          Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, locale])
+  @@index([locale])
+  @@index([deletedAt])
+}
+
+model InventoryItem {
+  id              String              @id @default(cuid())
+  parentProductId String
+  serialNumber    String              @unique
+  barcode         String              @unique
+  itemStatus      InventoryItemStatus @default(AVAILABLE)
+  location        String?
+  purchaseDate    DateTime?
+  purchasePrice   Decimal?            @db.Decimal(10, 2)
+  createdAt       DateTime            @default(now())
+  createdBy       String?
+  updatedAt       DateTime            @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+  deletedBy       String?
+  product         Product             @relation(fields: [parentProductId], references: [id], onDelete: Cascade)
+
+  @@index([parentProductId])
+  @@index([itemStatus])
+  @@index([deletedAt])
+}
+
+model ImportJob {
+  id                    String            @id @default(cuid())
+  filename              String
+  mimeType              String
+  status                ImportJobStatus   @default(PENDING)
+  totalRows             Int               @default(0)
+  processedRows         Int               @default(0)
+  successRows           Int               @default(0)
+  errorRows             Int               @default(0)
+  errorMessage          String?
+  createdAt             DateTime          @default(now())
+  createdBy             String?
+  updatedAt             DateTime          @updatedAt
+  updatedBy             String?
+  aiProcessingStatus    String?
+  imageProcessingStatus String?
+  selectedRows          Json?
+  selectedSheets        Json?
+  aiProcessingJobs      AIProcessingJob[]
+  rows                  ImportJobRow[]
+}
+
+model ImportJobRow {
+  id        String          @id @default(cuid())
+  jobId     String
+  rowNumber Int
+  status    ImportRowStatus @default(PENDING)
+  error     String?
+  productId String?
+  payload   Json?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  job       ImportJob       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@index([status])
+}
+
+model AIProcessingJob {
+  id             String    @id @default(cuid())
+  importJobId    String
+  status         String
+  provider       String
+  totalItems     Int
+  processedItems Int       @default(0)
+  failedItems    Int       @default(0)
+  cost           Decimal?  @db.Decimal(10, 4)
+  startedAt      DateTime?
+  completedAt    DateTime?
+  errorMessage   String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  importJob      ImportJob @relation(fields: [importJobId], references: [id], onDelete: Cascade)
+
+  @@index([importJobId])
+  @@index([status])
+}
+
+model AISettings {
+  id               String   @id @default(cuid())
+  provider         String   @unique
+  apiKey           String
+  batchSize        Int      @default(50)
+  timeout          Int      @default(30000)
+  fallbackStrategy String   @default("mark_for_review")
+  enabled          Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([enabled])
+}
+
+model User {
+  id                    String                 @id @default(cuid())
+  email                 String                 @unique
+  passwordHash          String
+  name                  String?
+  phone                 String?
+  role                  UserRole               @default(DATA_ENTRY)
+  status                String                 @default("active")
+  twoFactorEnabled      Boolean                @default(false)
+  twoFactorSecret       String?
+  createdAt             DateTime               @default(now())
+  createdBy             String?
+  updatedAt             DateTime               @updatedAt
+  updatedBy             String?
+  deletedAt             DateTime?
+  deletedBy             String?
+  segmentId             String?
+  verificationStatus    VerificationStatus     @default(UNVERIFIED)
+  userRoles             AssignedUserRole[]
+  auditLogs             AuditLog[]
+  authTokens            AuthToken[]
+  createdBookings       Booking[]              @relation("CreatedBookings")
+  bookings              Booking[]              @relation("CustomerBookings")
+  bookingRequests       BookingRequest[]       @relation("BookingRequests")
+  campaigns             Campaign[]
+  cart                  Cart?
+  damageClaimsReported  DamageClaim[]
+  damageClaimsResolved  DamageClaim[]          @relation("ResolvedDamageClaims")
+  deliveries            Delivery[]
+  events                Event[]
+  invoices              Invoice[]
+  maintenance           Maintenance[]          @relation("MaintenanceTechnician")
+  createdPricingRules   PricingRule[]
+  quotes                Quote[]
+  recurringSeries       RecurringSeries[]
+  reviews               Review[]
+  savedEquipment        SavedEquipment[]
+  segment               CustomerSegment?       @relation(fields: [segmentId], references: [id])
+  permissions           UserPermission[]
+  vendor                Vendor?
+  verificationDocuments VerificationDocument[]
+
+  @@index([email])
+  @@index([role])
+  @@index([status])
+  @@index([segmentId])
+  @@index([verificationStatus])
+  @@index([deletedAt])
+}
+
+model AuthToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  type      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+model SavedEquipment {
+  id          String    @id @default(cuid())
+  userId      String
+  equipmentId String
+  createdAt   DateTime  @default(now())
+  equipment   Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, equipmentId])
+  @@index([userId])
+  @@index([equipmentId])
+}
+
+model PermissionCategory {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  nameAr      String?
+  description String?
+  sortOrder   Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  permissions Permission[]
+
+  @@index([sortOrder])
+}
+
+model Permission {
+  id                  String               @id @default(cuid())
+  name                String               @unique
+  description         String?
+  createdAt           DateTime             @default(now())
+  createdBy           String?
+  updatedAt           DateTime             @updatedAt
+  updatedBy           String?
+  deletedAt           DateTime?
+  deletedBy           String?
+  categoryId          String?
+  descriptionAr       String?
+  isSystem            Boolean              @default(false)
+  sortOrder           Int                  @default(0)
+  menuItemPermissions MenuItemPermission[]
+  category            PermissionCategory?  @relation(fields: [categoryId], references: [id])
+  rolePermissions     RolePermission[]
+  userPermissions     UserPermission[]
+
+  @@index([name])
+  @@index([categoryId])
+  @@index([deletedAt])
+}
+
+model UserPermission {
+  id           String     @id @default(cuid())
+  userId       String
+  permissionId String
+  createdAt    DateTime   @default(now())
+  createdBy    String?
+  updatedAt    DateTime   @updatedAt
+  updatedBy    String?
+  deletedAt    DateTime?
+  deletedBy    String?
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
+
+  @@unique([userId, permissionId])
+  @@index([userId])
+  @@index([permissionId])
+  @@index([deletedAt])
+}
+
+model Role {
+  id              String             @id @default(cuid())
+  name            String             @unique
+  displayName     String
+  displayNameAr   String?
+  description     String?
+  descriptionAr   String?
+  isSystem        Boolean            @default(false)
+  isDefault       Boolean            @default(false)
+  priority        Int                @default(0)
+  color           String?
+  createdAt       DateTime           @default(now())
+  createdBy       String?
+  updatedAt       DateTime           @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+  deletedBy       String?
+  userRoles       AssignedUserRole[]
+  roleConflictsA  RoleConflict[]     @relation("RoleConflictA")
+  roleConflictsB  RoleConflict[]     @relation("RoleConflictB")
+  rolePermissions RolePermission[]
+
+  @@index([name])
+  @@index([isSystem])
+  @@index([deletedAt])
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  createdAt    DateTime   @default(now())
+  createdBy    String?
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+model AssignedUserRole {
+  id         String    @id @default(cuid())
+  userId     String
+  roleId     String
+  isPrimary  Boolean   @default(false)
+  assignedAt DateTime  @default(now())
+  assignedBy String?
+  expiresAt  DateTime?
+  role       Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+}
+
+model RoleConflict {
+  id        String   @id @default(cuid())
+  roleAId   String
+  roleBId   String
+  reason    String
+  createdAt DateTime @default(now())
+  roleA     Role     @relation("RoleConflictA", fields: [roleAId], references: [id], onDelete: Cascade)
+  roleB     Role     @relation("RoleConflictB", fields: [roleBId], references: [id], onDelete: Cascade)
+
+  @@unique([roleAId, roleBId])
+  @@index([roleAId])
+  @@index([roleBId])
+}
+
+model MenuItem {
+  id                     String               @id @default(cuid())
+  parentId               String?
+  name                   String               @unique
+  label                  String
+  labelAr                String?
+  icon                   String?
+  href                   String?
+  sortOrder              Int                  @default(0)
+  isActive               Boolean              @default(true)
+  requiresAllPermissions Boolean              @default(false)
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  parent                 MenuItem?            @relation("MenuItemHierarchy", fields: [parentId], references: [id])
+  children               MenuItem[]           @relation("MenuItemHierarchy")
+  menuItemPermissions    MenuItemPermission[]
+
+  @@index([parentId])
+  @@index([isActive])
+}
+
+model MenuItemPermission {
+  id           String     @id @default(cuid())
+  menuItemId   String
+  permissionId String
+  menuItem     MenuItem   @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([menuItemId, permissionId])
+  @@index([menuItemId])
+  @@index([permissionId])
+}
+
+model FeatureFlag {
+  id               String           @id @default(cuid())
+  name             String           @unique
+  description      String?
+  enabled          Boolean          @default(false)
+  scope            FeatureFlagScope
+  requiresApproval Boolean          @default(false)
+  createdAt        DateTime         @default(now())
+  createdBy        String?
+  updatedAt        DateTime         @updatedAt
+  updatedBy        String?
+  deletedAt        DateTime?
+  deletedBy        String?
+
+  @@index([name])
+  @@index([enabled])
+  @@index([scope])
+  @@index([deletedAt])
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  action       String
+  userId       String?
+  resourceType String?
+  resourceId   String?
+  ipAddress    String?
+  userAgent    String?
+  metadata     Json?
+  timestamp    DateTime @default(now())
+  user         User?    @relation(fields: [userId], references: [id])
+
+  @@index([action])
+  @@index([userId])
+  @@index([resourceType, resourceId])
+  @@index([timestamp])
+}
+
+model Event {
+  id           String      @id @default(cuid())
+  eventName    String
+  payload      Json
+  userId       String?
+  resourceType String?
+  resourceId   String?
+  status       EventStatus @default(PENDING)
+  processedAt  DateTime?
+  timestamp    DateTime    @default(now())
+  user         User?       @relation(fields: [userId], references: [id])
+
+  @@index([eventName])
+  @@index([userId])
+  @@index([resourceType, resourceId])
+  @@index([status])
+  @@index([timestamp])
+}
+
+model Vendor {
+  id             String         @id @default(cuid())
+  userId         String         @unique
+  companyName    String
+  companyNameAr  String?
+  slug           String         @unique
+  logo           String?
+  description    String?
+  phone          String?
+  email          String?
+  commercialReg  String?
+  vatNumber      String?
+  bankName       String?
+  iban           String?
+  commissionRate Decimal        @db.Decimal(5, 2)
+  status         VendorStatus   @default(PENDING)
+  isNameVisible  Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  createdBy      String?
+  updatedAt      DateTime       @updatedAt
+  updatedBy      String?
+  approvedAt     DateTime?
+  approvedBy     String?
+  deletedAt      DateTime?
+  deletedBy      String?
+  equipment      Equipment[]
+  user           User           @relation(fields: [userId], references: [id])
+  payouts        VendorPayout[]
+
+  @@index([status])
+  @@index([slug])
+  @@index([userId])
+  @@index([deletedAt])
+}
+
+model VendorPayout {
+  id               String       @id @default(cuid())
+  vendorId         String
+  bookingId        String?
+  periodStart      DateTime?
+  periodEnd        DateTime?
+  grossAmount      Decimal      @db.Decimal(10, 2)
+  commissionAmount Decimal      @db.Decimal(10, 2)
+  netAmount        Decimal      @db.Decimal(10, 2)
+  status           PayoutStatus @default(PENDING)
+  paidAt           DateTime?
+  bankRef          String?
+  notes            String?
+  createdAt        DateTime     @default(now())
+  createdBy        String?
+  updatedAt        DateTime     @updatedAt
+  vendor           Vendor       @relation(fields: [vendorId], references: [id])
+
+  @@index([vendorId])
+  @@index([status])
+  @@index([bookingId])
+}
+
+model Category {
+  id                     String                  @id @default(cuid())
+  name                   String
+  slug                   String                  @unique
+  description            String?
+  parentId               String?
+  createdAt              DateTime                @default(now())
+  createdBy              String?
+  updatedAt              DateTime                @updatedAt
+  updatedBy              String?
+  deletedAt              DateTime?
+  deletedBy              String?
+  parent                 Category?               @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children               Category[]              @relation("CategoryHierarchy")
+  equipment              Equipment[]
+  products               Product[]               @relation("ProductCategory")
+  subProducts            Product[]               @relation("ProductSubCategory")
+  shootTypeCategoryFlows ShootTypeCategoryFlow[]
+
+  @@index([slug])
+  @@index([parentId])
+  @@index([deletedAt])
+}
+
+model Brand {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  slug        String      @unique
+  description String?
+  logo        String?
+  createdAt   DateTime    @default(now())
+  createdBy   String?
+  updatedAt   DateTime    @updatedAt
+  updatedBy   String?
+  deletedAt   DateTime?
+  deletedBy   String?
+  equipment   Equipment[]
+  products    Product[]
+
+  @@index([slug])
+  @@index([deletedAt])
+}
+
+model Equipment {
+  id                       String                    @id @default(cuid())
+  sku                      String                    @unique
+  model                    String?
+  categoryId               String
+  brandId                  String?
+  condition                EquipmentCondition        @default(GOOD)
+  quantityTotal            Int                       @default(1)
+  quantityAvailable        Int                       @default(1)
+  dailyPrice               Decimal                   @db.Decimal(10, 2)
+  weeklyPrice              Decimal?                  @db.Decimal(10, 2)
+  monthlyPrice             Decimal?                  @db.Decimal(10, 2)
+  featured                 Boolean                   @default(false)
+  isActive                 Boolean                   @default(true)
+  warehouseLocation        String?
+  barcode                  String?
+  specifications           Json?
+  customFields             Json?
+  createdAt                DateTime                  @default(now())
+  createdBy                String?
+  updatedAt                DateTime                  @updatedAt
+  updatedBy                String?
+  deletedAt                DateTime?
+  deletedBy                String?
+  budgetTier               BudgetTier?
+  vendorId                 String?
+  bookings                 BookingEquipment[]
+  damageClaims             DamageClaim[]
+  brand                    Brand?                    @relation(fields: [brandId], references: [id])
+  category                 Category                  @relation(fields: [categoryId], references: [id])
+  vendor                   Vendor?                   @relation(fields: [vendorId], references: [id])
+  inspections              Inspection[]
+  kitEquipment             KitEquipment[]
+  maintenance              Maintenance[]
+  media                    Media[]
+  quoteEquipment           QuoteEquipment[]
+  savedByUsers             SavedEquipment[]
+  shootTypeRecommendations ShootTypeRecommendation[]
+
+  @@index([sku])
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([vendorId])
+  @@index([condition])
+  @@index([isActive])
+  @@index([featured])
+  @@index([deletedAt])
+  @@index([budgetTier])
+}
+
+model ShootType {
+  id              String                    @id @default(cuid())
+  name            String
+  slug            String                    @unique
+  description     String?
+  nameAr          String?
+  nameZh          String?
+  descriptionAr   String?
+  descriptionZh   String?
+  icon            String?
+  coverImageUrl   String?
+  sortOrder       Int                       @default(0)
+  isActive        Boolean                   @default(true)
+  questionnaire   Json?
+  createdAt       DateTime                  @default(now())
+  createdBy       String?
+  updatedAt       DateTime                  @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+  deletedBy       String?
+  categoryFlows   ShootTypeCategoryFlow[]
+  recommendations ShootTypeRecommendation[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
+model ShootTypeCategoryFlow {
+  id                String    @id @default(cuid())
+  shootTypeId       String
+  categoryId        String
+  sortOrder         Int       @default(0)
+  isRequired        Boolean   @default(true)
+  minRecommended    Int?
+  maxRecommended    Int?
+  stepTitle         String?
+  stepTitleAr       String?
+  stepDescription   String?
+  stepDescriptionAr String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  category          Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  shootType         ShootType @relation(fields: [shootTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([shootTypeId, categoryId])
+  @@index([shootTypeId])
+  @@index([categoryId])
+}
+
+model ShootTypeRecommendation {
+  id              String     @id @default(cuid())
+  shootTypeId     String
+  equipmentId     String
+  budgetTier      BudgetTier
+  reason          String?
+  reasonAr        String?
+  defaultQuantity Int        @default(1)
+  isAutoSelect    Boolean    @default(false)
+  sortOrder       Int        @default(0)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  equipment       Equipment  @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  shootType       ShootType  @relation(fields: [shootTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([shootTypeId, equipmentId, budgetTier])
+  @@index([shootTypeId])
+  @@index([equipmentId])
+  @@index([budgetTier])
+  @@index([shootTypeId, budgetTier])
+}
+
+model Studio {
+  id             String               @id @default(cuid())
+  name           String
+  slug           String               @unique
+  description    String?
+  capacity       Int?
+  hourlyRate     Decimal              @db.Decimal(10, 2)
+  setupBuffer    Int                  @default(30)
+  cleaningBuffer Int                  @default(30)
+  resetTime      Int                  @default(15)
+  isActive       Boolean              @default(true)
+  createdAt      DateTime             @default(now())
+  createdBy      String?
+  updatedAt      DateTime             @updatedAt
+  updatedBy      String?
+  deletedAt      DateTime?
+  deletedBy      String?
+  bookings       Booking[]
+  damageClaims   DamageClaim[]
+  media          Media[]
+  quotes         Quote[]
+  addOns         StudioAddOn[]
+  blackoutDates  StudioBlackoutDate[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
+model StudioBlackoutDate {
+  id        String    @id @default(cuid())
+  studioId  String
+  startDate DateTime
+  endDate   DateTime
+  reason    String?
+  createdAt DateTime  @default(now())
+  createdBy String?
+  updatedAt DateTime  @updatedAt
+  updatedBy String?
+  deletedAt DateTime?
+  deletedBy String?
+  studio    Studio    @relation(fields: [studioId], references: [id])
+
+  @@index([studioId])
+  @@index([startDate, endDate])
+  @@index([deletedAt])
+}
+
+model StudioAddOn {
+  id          String    @id @default(cuid())
+  studioId    String
+  name        String
+  description String?
+  price       Decimal   @db.Decimal(10, 2)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  createdBy   String?
+  updatedAt   DateTime  @updatedAt
+  updatedBy   String?
+  deletedAt   DateTime?
+  deletedBy   String?
+  studio      Studio    @relation(fields: [studioId], references: [id])
+
+  @@index([studioId])
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
+model Booking {
+  id                String             @id @default(cuid())
+  bookingNumber     String             @unique
+  customerId        String
+  status            BookingStatus      @default(DRAFT)
+  startDate         DateTime
+  endDate           DateTime
+  studioId          String?
+  studioStartTime   DateTime?
+  studioEndTime     DateTime?
+  totalAmount       Decimal            @db.Decimal(10, 2)
+  depositAmount     Decimal?           @db.Decimal(10, 2)
+  vatAmount         Decimal            @db.Decimal(10, 2)
+  notes             String?
+  softLockExpiresAt DateTime?
+  createdAt         DateTime           @default(now())
+  createdBy         String
+  updatedAt         DateTime           @updatedAt
+  updatedBy         String?
+  deletedAt         DateTime?
+  deletedBy         String?
+  actualReturnDate  DateTime?
+  lateFeeAmount     Decimal?           @db.Decimal(10, 2)
+  recurringSeriesId String?
+  createdByUser     User               @relation("CreatedBookings", fields: [createdBy], references: [id])
+  customer          User               @relation("CustomerBookings", fields: [customerId], references: [id])
+  recurringSeries   RecurringSeries?   @relation(fields: [recurringSeriesId], references: [id])
+  studio            Studio?            @relation(fields: [studioId], references: [id])
+  equipment         BookingEquipment[]
+  bookingRequests   BookingRequest[]
+  contracts         Contract[]
+  damageClaims      DamageClaim[]
+  deliveries        Delivery[]
+  inspections       Inspection[]
+  invoices          Invoice[]
+  payments          Payment[]
+  quotes            Quote?             @relation("ConvertedFromQuote")
+  reviews           Review?
+
+  @@index([bookingNumber])
+  @@index([customerId])
+  @@index([status])
+  @@index([startDate, endDate])
+  @@index([studioId])
+  @@index([softLockExpiresAt])
+  @@index([recurringSeriesId])
+  @@index([deletedAt])
+}
+
+model BookingEquipment {
+  id          String    @id @default(cuid())
+  bookingId   String
+  equipmentId String
+  quantity    Int       @default(1)
+  createdAt   DateTime  @default(now())
+  createdBy   String?
+  updatedAt   DateTime  @updatedAt
+  updatedBy   String?
+  deletedAt   DateTime?
+  deletedBy   String?
+  booking     Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  equipment   Equipment @relation(fields: [equipmentId], references: [id])
+
+  @@unique([bookingId, equipmentId])
+  @@index([bookingId])
+  @@index([equipmentId])
+  @@index([deletedAt])
+}
+
+model BookingRequest {
+  id               String               @id @default(cuid())
+  bookingId        String
+  requestedBy      String
+  type             BookingRequestType
+  status           BookingRequestStatus @default(PENDING)
+  reason           String?
+  requestedEndDate DateTime?
+  requestedChanges Json?
+  responseNote     String?
+  respondedAt      DateTime?
+  respondedBy      String?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  deletedAt        DateTime?
+  deletedBy        String?
+  booking          Booking              @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  requester        User                 @relation("BookingRequests", fields: [requestedBy], references: [id])
+
+  @@index([bookingId])
+  @@index([requestedBy])
+  @@index([status])
+  @@index([type])
+  @@index([deletedAt])
+}
+
+model RecurringSeries {
+  id              String              @id @default(cuid())
+  name            String
+  customerId      String
+  frequency       RecurrenceFrequency
+  interval        Int                 @default(1)
+  endDate         DateTime?
+  occurrenceCount Int?
+  template        Json
+  isActive        Boolean             @default(true)
+  createdAt       DateTime            @default(now())
+  createdBy       String
+  updatedAt       DateTime            @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+  deletedBy       String?
+  bookings        Booking[]
+  customer        User                @relation(fields: [customerId], references: [id])
+
+  @@index([customerId])
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
+model Kit {
+  id              String         @id @default(cuid())
+  name            String
+  slug            String         @unique
+  description     String?
+  discountPercent Decimal?       @db.Decimal(5, 2)
+  isActive        Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  createdBy       String?
+  updatedAt       DateTime       @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+  deletedBy       String?
+  items           KitEquipment[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
+model KitEquipment {
+  id          String    @id @default(cuid())
+  kitId       String
+  equipmentId String
+  quantity    Int       @default(1)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  equipment   Equipment @relation(fields: [equipmentId], references: [id])
+  kit         Kit       @relation(fields: [kitId], references: [id], onDelete: Cascade)
+
+  @@unique([kitId, equipmentId])
+  @@index([kitId])
+  @@index([equipmentId])
+}
+
+model DamageClaim {
+  id               String         @id @default(cuid())
+  bookingId        String
+  equipmentId      String?
+  studioId         String?
+  reportedBy       String
+  damageType       DamageType
+  severity         DamageSeverity
+  description      String
+  photos           Json?
+  estimatedCost    Decimal        @db.Decimal(10, 2)
+  actualCost       Decimal?       @db.Decimal(10, 2)
+  status           ClaimStatus    @default(PENDING)
+  resolution       String?
+  resolvedBy       String?
+  resolvedAt       DateTime?
+  customerNotified Boolean        @default(false)
+  insuranceClaim   Boolean        @default(false)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  booking          Booking        @relation(fields: [bookingId], references: [id])
+  equipment        Equipment?     @relation(fields: [equipmentId], references: [id])
+  reporter         User           @relation(fields: [reportedBy], references: [id])
+  resolver         User?          @relation("ResolvedDamageClaims", fields: [resolvedBy], references: [id])
+  studio           Studio?        @relation(fields: [studioId], references: [id])
+
+  @@index([bookingId])
+  @@index([equipmentId])
+  @@index([studioId])
+  @@index([status])
+  @@index([reportedBy])
+  @@index([resolvedBy])
+}
+
+model CustomerSegment {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  slug            String   @unique
+  description     String?
+  discountPercent Decimal? @db.Decimal(5, 2)
+  priorityBooking Boolean  @default(false)
+  extendedTerms   Boolean  @default(false)
+  autoAssignRules Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  users           User[]
+
+  @@index([slug])
+}
+
+model PricingRule {
+  id              String              @id @default(cuid())
+  name            String
+  description     String?
+  ruleType        PricingRuleType
+  priority        Int                 @default(0)
+  conditions      Json
+  adjustmentType  PriceAdjustmentType
+  adjustmentValue Decimal             @db.Decimal(10, 2)
+  isActive        Boolean             @default(true)
+  validFrom       DateTime?
+  validUntil      DateTime?
+  createdBy       String
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  creator         User                @relation(fields: [createdBy], references: [id])
+
+  @@index([priority])
+  @@index([isActive])
+  @@index([createdBy])
+}
+
+model Payment {
+  id               String            @id @default(cuid())
+  bookingId        String
+  amount           Decimal           @db.Decimal(10, 2)
+  status           PaymentStatus     @default(PENDING)
+  tapTransactionId String?
+  tapChargeId      String?
+  refundAmount     Decimal?          @db.Decimal(10, 2)
+  refundReason     String?
+  createdAt        DateTime          @default(now())
+  createdBy        String?
+  updatedAt        DateTime          @updatedAt
+  updatedBy        String?
+  deletedAt        DateTime?
+  deletedBy        String?
+  approvalRequests ApprovalRequest[]
+  invoicePayments  InvoicePayment[]
+  booking          Booking           @relation(fields: [bookingId], references: [id])
+
+  @@index([bookingId])
+  @@index([status])
+  @@index([tapTransactionId])
+  @@index([deletedAt])
+}
+
+model Contract {
+  id              String    @id @default(cuid())
+  bookingId       String
+  termsVersion    String
+  contractContent Json
+  signedAt        DateTime?
+  signedBy        String?
+  signatureData   Json?
+  createdAt       DateTime  @default(now())
+  createdBy       String?
+  updatedAt       DateTime  @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+  deletedBy       String?
+  booking         Booking   @relation(fields: [bookingId], references: [id])
+
+  @@index([bookingId])
+  @@index([termsVersion])
+  @@index([signedAt])
+  @@index([deletedAt])
+}
+
+model Inspection {
+  id          String     @id @default(cuid())
+  bookingId   String
+  equipmentId String?
+  type        String
+  checklist   Json
+  notes       String?
+  createdAt   DateTime   @default(now())
+  createdBy   String?
+  updatedAt   DateTime   @updatedAt
+  updatedBy   String?
+  deletedAt   DateTime?
+  deletedBy   String?
+  booking     Booking    @relation(fields: [bookingId], references: [id])
+  equipment   Equipment? @relation(fields: [equipmentId], references: [id])
+
+  @@index([bookingId])
+  @@index([equipmentId])
+  @@index([type])
+  @@index([deletedAt])
+}
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String?
+  channel   NotificationChannel
+  type      String
+  title     String
+  message   String
+  data      Json?
+  read      Boolean             @default(false)
+  readAt    DateTime?
+  createdAt DateTime            @default(now())
+  createdBy String?
+  updatedAt DateTime            @updatedAt
+  updatedBy String?
+  deletedAt DateTime?
+  deletedBy String?
+
+  @@index([userId])
+  @@index([channel])
+  @@index([read])
+  @@index([createdAt])
+  @@index([deletedAt])
+}
+
+model NotificationTemplate {
+  id          String              @id @default(cuid())
+  name        String
+  slug        String
+  description String?
+  trigger     NotificationTrigger
+  channel     NotificationChannel
+  subject     String?
+  bodyText    String
+  bodyHtml    String?
+  variables   Json?
+  isActive    Boolean             @default(true)
+  language    String              @default("en")
+  variant     String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@unique([slug, language])
+  @@index([trigger])
+  @@index([channel])
+  @@index([isActive])
+}
+
+model Review {
+  id            String       @id @default(cuid())
+  bookingId     String       @unique
+  userId        String
+  rating        Int
+  comment       String?
+  status        ReviewStatus @default(PENDING_MODERATION)
+  adminResponse String?
+  respondedBy   String?
+  respondedAt   DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  booking       Booking      @relation(fields: [bookingId], references: [id])
+  user          User         @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([rating])
+}
+
+model VerificationDocument {
+  id              String    @id @default(cuid())
+  userId          String
+  documentType    String
+  fileUrl         String
+  filename        String?
+  mimeType        String?
+  status          String    @default("pending")
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  rejectionReason String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+model ApprovalRequest {
+  id           String    @id @default(cuid())
+  action       String
+  resourceType String
+  resourceId   String
+  requestedBy  String
+  approvedBy   String?
+  status       String    @default("pending")
+  reason       String?
+  metadata     Json?
+  paymentId    String?
+  createdAt    DateTime  @default(now())
+  createdBy    String?
+  updatedAt    DateTime  @updatedAt
+  updatedBy    String?
+  deletedAt    DateTime?
+  deletedBy    String?
+  payment      Payment?  @relation(fields: [paymentId], references: [id])
+
+  @@index([action])
+  @@index([resourceType, resourceId])
+  @@index([status])
+  @@index([requestedBy])
+  @@index([paymentId])
+  @@index([deletedAt])
+}
+
+model Media {
+  id          String     @id @default(cuid())
+  url         String
+  type        String
+  filename    String
+  mimeType    String
+  size        Int?
+  equipmentId String?
+  studioId    String?
+  createdAt   DateTime   @default(now())
+  createdBy   String?
+  updatedAt   DateTime   @updatedAt
+  updatedBy   String?
+  deletedAt   DateTime?
+  deletedBy   String?
+  equipment   Equipment? @relation(fields: [equipmentId], references: [id])
+  studio      Studio?    @relation(fields: [studioId], references: [id])
+
+  @@index([equipmentId])
+  @@index([studioId])
+  @@index([type])
+  @@index([deletedAt])
+}
+
+model Translation {
+  id         String    @id @default(cuid())
+  entityType String
+  entityId   String
+  field      String
+  language   String
+  value      String
+  createdAt  DateTime  @default(now())
+  createdBy  String?
+  updatedAt  DateTime  @updatedAt
+  updatedBy  String?
+  deletedAt  DateTime?
+  deletedBy  String?
+
+  @@unique([entityType, entityId, field, language])
+  @@index([entityType, entityId])
+  @@index([language])
+  @@index([deletedAt])
+}
+
+model IntegrationConfig {
+  id        String    @id @default(cuid())
+  key       String    @unique
+  value     String
+  createdAt DateTime  @default(now())
+  createdBy String?
+  updatedAt DateTime  @updatedAt
+  updatedBy String?
+  deletedAt DateTime?
+  deletedBy String?
+
+  @@index([key])
+  @@index([deletedAt])
+}
+
+model Branch {
+  id           String   @id @default(cuid())
+  name         String
+  nameAr       String?
+  address      String?
+  city         String?
+  phone        String?
+  email        String?
+  isActive     Boolean  @default(true)
+  latitude     Float?
+  longitude    Float?
+  workingHours Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isActive])
+}
+
+model DeliveryZone {
+  id          String   @id @default(cuid())
+  name        String
+  nameAr      String?
+  baseFee     Decimal  @db.Decimal(10, 2)
+  perKmFee    Decimal? @db.Decimal(10, 2)
+  minOrder    Decimal? @db.Decimal(10, 2)
+  leadTimeHrs Int      @default(24)
+  isActive    Boolean  @default(true)
+  cities      String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive])
+}
+
+model Quote {
+  id              String           @id @default(cuid())
+  quoteNumber     String           @unique
+  customerId      String
+  status          QuoteStatus      @default(DRAFT)
+  startDate       DateTime
+  endDate         DateTime
+  validUntil      DateTime
+  studioId        String?
+  studioStartTime DateTime?
+  studioEndTime   DateTime?
+  subtotal        Decimal          @db.Decimal(10, 2)
+  discount        Decimal?         @db.Decimal(10, 2)
+  vatAmount       Decimal          @db.Decimal(10, 2)
+  totalAmount     Decimal          @db.Decimal(10, 2)
+  depositAmount   Decimal?         @db.Decimal(10, 2)
+  equipment       Json
+  notes           String?
+  bookingId       String?          @unique
+  convertedAt     DateTime?
+  createdAt       DateTime         @default(now())
+  createdBy       String
+  updatedAt       DateTime         @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+  deletedBy       String?
+  booking         Booking?         @relation("ConvertedFromQuote", fields: [bookingId], references: [id])
+  customer        User             @relation(fields: [customerId], references: [id])
+  studio          Studio?          @relation(fields: [studioId], references: [id])
+  equipmentItems  QuoteEquipment[]
+
+  @@index([quoteNumber])
+  @@index([customerId])
+  @@index([status])
+  @@index([validUntil])
+  @@index([bookingId])
+  @@index([deletedAt])
+}
+
+model QuoteEquipment {
+  id          String    @id @default(cuid())
+  quoteId     String
+  equipmentId String
+  quantity    Int       @default(1)
+  dailyRate   Decimal   @db.Decimal(10, 2)
+  totalDays   Int
+  subtotal    Decimal   @db.Decimal(10, 2)
+  createdAt   DateTime  @default(now())
+  createdBy   String?
+  updatedAt   DateTime  @updatedAt
+  updatedBy   String?
+  deletedAt   DateTime?
+  deletedBy   String?
+  equipment   Equipment @relation(fields: [equipmentId], references: [id])
+  quote       Quote     @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  @@unique([quoteId, equipmentId])
+  @@index([quoteId])
+  @@index([equipmentId])
+  @@index([deletedAt])
+}
+
+model Maintenance {
+  id                       String              @id @default(cuid())
+  maintenanceNumber        String              @unique
+  equipmentId              String
+  type                     MaintenanceType
+  status                   MaintenanceStatus   @default(SCHEDULED)
+  priority                 String              @default("medium")
+  scheduledDate            DateTime
+  completedDate            DateTime?
+  technicianId             String?
+  description              String
+  notes                    String?
+  cost                     Decimal?            @db.Decimal(10, 2)
+  partsUsed                Json?
+  equipmentConditionBefore EquipmentCondition?
+  equipmentConditionAfter  EquipmentCondition?
+  createdAt                DateTime            @default(now())
+  createdBy                String
+  updatedAt                DateTime            @updatedAt
+  updatedBy                String?
+  deletedAt                DateTime?
+  deletedBy                String?
+  equipment                Equipment           @relation(fields: [equipmentId], references: [id])
+  technician               User?               @relation("MaintenanceTechnician", fields: [technicianId], references: [id])
+
+  @@index([maintenanceNumber])
+  @@index([equipmentId])
+  @@index([status])
+  @@index([scheduledDate])
+  @@index([technicianId])
+  @@index([deletedAt])
+}
+
+model Invoice {
+  id              String           @id @default(cuid())
+  invoiceNumber   String           @unique
+  customerId      String
+  bookingId       String?
+  type            InvoiceType      @default(BOOKING)
+  status          InvoiceStatus    @default(DRAFT)
+  issueDate       DateTime         @default(now())
+  dueDate         DateTime
+  paidDate        DateTime?
+  subtotal        Decimal          @db.Decimal(10, 2)
+  discount        Decimal?         @db.Decimal(10, 2)
+  vatAmount       Decimal          @db.Decimal(10, 2)
+  totalAmount     Decimal          @db.Decimal(10, 2)
+  paidAmount      Decimal          @default(0) @db.Decimal(10, 2)
+  remainingAmount Decimal          @db.Decimal(10, 2)
+  items           Json
+  notes           String?
+  paymentTerms    String?
+  createdAt       DateTime         @default(now())
+  createdBy       String
+  updatedAt       DateTime         @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+  deletedBy       String?
+  booking         Booking?         @relation(fields: [bookingId], references: [id])
+  customer        User             @relation(fields: [customerId], references: [id])
+  payments        InvoicePayment[]
+
+  @@index([invoiceNumber])
+  @@index([customerId])
+  @@index([bookingId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([deletedAt])
+}
+
+model InvoicePayment {
+  id        String    @id @default(cuid())
+  invoiceId String
+  paymentId String
+  amount    Decimal   @db.Decimal(10, 2)
+  paidAt    DateTime  @default(now())
+  createdAt DateTime  @default(now())
+  createdBy String?
+  updatedAt DateTime  @updatedAt
+  updatedBy String?
+  deletedAt DateTime?
+  deletedBy String?
+  invoice   Invoice   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  payment   Payment   @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@unique([invoiceId, paymentId])
+  @@index([invoiceId])
+  @@index([paymentId])
+  @@index([deletedAt])
+}
+
+model Coupon {
+  id                     String       @id @default(cuid())
+  code                   String       @unique
+  name                   String
+  type                   CouponType
+  discountValue          Decimal?     @db.Decimal(10, 2)
+  discountPercentage     Decimal?     @db.Decimal(5, 2)
+  minimumAmount          Decimal?     @db.Decimal(10, 2)
+  maximumDiscount        Decimal?     @db.Decimal(10, 2)
+  validFrom              DateTime
+  validUntil             DateTime
+  usageLimit             Int?
+  usedCount              Int          @default(0)
+  status                 CouponStatus @default(ACTIVE)
+  applicableEquipmentIds Json?
+  description            String?
+  createdAt              DateTime     @default(now())
+  createdBy              String
+  updatedAt              DateTime     @updatedAt
+  updatedBy              String?
+  deletedAt              DateTime?
+  deletedBy              String?
+
+  @@index([code])
+  @@index([status])
+  @@index([validFrom, validUntil])
+  @@index([deletedAt])
+}
+
+model Campaign {
+  id              String         @id @default(cuid())
+  name            String
+  type            CampaignType
+  status          CampaignStatus @default(DRAFT)
+  subject         String?
+  content         String
+  targetAudience  Json?
+  scheduledAt     DateTime?
+  sentAt          DateTime?
+  totalRecipients Int            @default(0)
+  sentCount       Int            @default(0)
+  openedCount     Int            @default(0)
+  clickedCount    Int            @default(0)
+  conversionCount Int            @default(0)
+  createdAt       DateTime       @default(now())
+  createdBy       String
+  updatedAt       DateTime       @updatedAt
+  updatedBy       String?
+  deletedAt       DateTime?
+  deletedBy       String?
+  createdByUser   User           @relation(fields: [createdBy], references: [id])
+
+  @@index([status])
+  @@index([type])
+  @@index([scheduledAt])
+  @@index([createdBy])
+  @@index([deletedAt])
+}
+
+model Delivery {
+  id             String         @id @default(cuid())
+  deliveryNumber String         @unique
+  bookingId      String
+  type           DeliveryType
+  status         DeliveryStatus @default(PENDING)
+  scheduledDate  DateTime
+  deliveredDate  DateTime?
+  address        String
+  city           String
+  contactName    String
+  contactPhone   String
+  driverId       String?
+  trackingNumber String?
+  notes          String?
+  createdAt      DateTime       @default(now())
+  createdBy      String
+  updatedAt      DateTime       @updatedAt
+  updatedBy      String?
+  deletedAt      DateTime?
+  deletedBy      String?
+  booking        Booking        @relation(fields: [bookingId], references: [id])
+  driver         User?          @relation(fields: [driverId], references: [id])
+
+  @@index([deliveryNumber])
+  @@index([bookingId])
+  @@index([status])
+  @@index([scheduledDate])
+  @@index([driverId])
+  @@index([deletedAt])
+}
+
+model WebsiteContent {
+  id          String             @id @default(cuid())
+  key         String             @unique
+  contentAr   String
+  contentEn   String
+  contentZh   String?
+  type        WebsiteContentType @default(TEXT)
+  section     String?
+  isActive    Boolean            @default(true)
+  version     Int                @default(1)
+  publishAt   DateTime?
+  unpublishAt DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  createdBy   String?
+  updatedBy   String?
+
+  @@index([key])
+  @@index([section])
+}
+
+model WebsiteFeature {
+  id             String   @id @default(cuid())
+  key            String   @unique
+  nameAr         String?
+  nameEn         String?
+  isEnabled      Boolean  @default(true)
+  rolloutPercent Int      @default(100)
+  config         Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([key])
+}
+
+model WebsitePage {
+  id          String           @id @default(cuid())
+  slug        String           @unique
+  titleAr     String
+  titleEn     String
+  titleZh     String?
+  isPublished Boolean          @default(true)
+  seo         Json?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  createdBy   String?
+  updatedBy   String?
+  sections    WebsiteSection[]
+
+  @@index([slug])
+}
+
+model WebsiteSection {
+  id        String             @id @default(cuid())
+  pageId    String
+  type      WebsiteSectionType
+  order     Int                @default(0)
+  isVisible Boolean            @default(true)
+  content   Json?
+  settings  Json?
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  page      WebsitePage        @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
+  @@index([type])
+}
+
+model WebsiteLayout {
+  id        String            @id @default(cuid())
+  type      WebsiteLayoutType
+  content   Json?
+  isActive  Boolean           @default(true)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@index([type])
+}
+
+model HeroBanner {
+  id               String      @id @default(cuid())
+  name             String
+  pageSlug         String      @unique
+  isActive         Boolean     @default(true)
+  autoPlay         Boolean     @default(true)
+  autoPlayInterval Int         @default(6000)
+  transitionType   String      @default("fade")
+  createdAt        DateTime    @default(now())
+  createdBy        String?
+  updatedAt        DateTime    @updatedAt
+  updatedBy        String?
+  deletedAt        DateTime?
+  deletedBy        String?
+  slides           HeroSlide[]
+
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
+model HeroSlide {
+  id             String     @id @default(cuid())
+  bannerId       String
+  imageUrl       String
+  mobileImageUrl String?
+  videoUrl       String?
+  titleAr        String
+  titleEn        String
+  titleZh        String?
+  subtitleAr     String?
+  subtitleEn     String?
+  subtitleZh     String?
+  badgeTextAr    String?
+  badgeTextEn    String?
+  badgeTextZh    String?
+  ctaTextAr      String?
+  ctaTextEn      String?
+  ctaTextZh      String?
+  ctaUrl         String?
+  ctaStyle       String     @default("primary")
+  cta2TextAr     String?
+  cta2TextEn     String?
+  cta2TextZh     String?
+  cta2Url        String?
+  cta2Style      String?
+  order          Int        @default(0)
+  isActive       Boolean    @default(true)
+  overlayOpacity Float      @default(0.3)
+  textPosition   String     @default("start")
+  publishAt      DateTime?
+  unpublishAt    DateTime?
+  createdAt      DateTime   @default(now())
+  createdBy      String?
+  updatedAt      DateTime   @updatedAt
+  updatedBy      String?
+  deletedAt      DateTime?
+  deletedBy      String?
+  banner         HeroBanner @relation(fields: [bannerId], references: [id], onDelete: Cascade)
+
+  @@index([bannerId])
+  @@index([order])
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
+model FaqItem {
+  id         String    @id @default(cuid())
+  questionAr String
+  questionEn String
+  questionZh String?
+  answerAr   String
+  answerEn   String
+  answerZh   String?
+  order      Int       @default(0)
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  createdBy  String?
+  updatedAt  DateTime  @updatedAt
+  updatedBy  String?
+  deletedAt  DateTime?
+  deletedBy  String?
+
+  @@index([order])
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
+model PolicyItem {
+  id        String    @id @default(cuid())
+  titleAr   String
+  titleEn   String
+  titleZh   String?
+  bodyAr    String
+  bodyEn    String
+  bodyZh    String?
+  order     Int       @default(0)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  createdBy String?
+  updatedAt DateTime  @updatedAt
+  updatedBy String?
+  deletedAt DateTime?
+  deletedBy String?
+
+  @@index([order])
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
+model Cart {
+  id             String     @id @default(cuid())
+  userId         String?    @unique
+  sessionId      String?    @unique
+  couponCode     String?
+  discountAmount Decimal?   @db.Decimal(10, 2)
+  subtotal       Decimal    @default(0) @db.Decimal(10, 2)
+  total          Decimal    @default(0) @db.Decimal(10, 2)
+  lastSyncedAt   DateTime?
+  expiresAt      DateTime
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  user           User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items          CartItem[]
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([expiresAt])
+}
+
+model CartItem {
+  id            String       @id @default(cuid())
+  cartId        String
+  itemType      CartItemType
+  equipmentId   String?
+  studioId      String?
+  packageId     String?
+  kitId         String?
+  startDate     DateTime?
+  endDate       DateTime?
+  quantity      Int          @default(1)
+  dailyRate     Decimal?     @db.Decimal(10, 2)
+  subtotal      Decimal      @db.Decimal(10, 2)
+  isAvailable   Boolean      @default(true)
+  lastCheckedAt DateTime?    @default(now())
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  cart          Cart         @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  @@index([cartId])
+  @@index([equipmentId])
+  @@index([studioId])
+}
 
 enum UserRole {
   ADMIN
@@ -126,10 +1838,6 @@ enum PayoutStatus {
   PAID
   FAILED
 }
-
-// ============================================
-// PRODUCT CATALOG
-// ============================================
 
 enum ProductStatus {
   DRAFT
@@ -293,970 +2001,9 @@ enum DeliveryStatus {
   CANCELLED
 }
 
-model Product {
-  id            String        @id @default(cuid())
-  status        ProductStatus @default(DRAFT)
-  productType   ProductType   @default(RENTAL)
-  sku           String?       @unique
-  brandId       String
-  categoryId    String
-  subCategoryId String?
-  quantity      Int?
-
-  priceDaily    Decimal  @db.Decimal(10, 2)
-  priceWeekly   Decimal? @db.Decimal(10, 2)
-  priceMonthly  Decimal? @db.Decimal(10, 2)
-  depositAmount Decimal? @db.Decimal(10, 2)
-
-  bufferTime      Int     @default(0)
-  boxContents     String?
-  featuredImage   String
-  galleryImages   Json?
-  videoUrl        String?
-  relatedProducts Json?
-  tags            String?
-
-  // Relations
-  brand          Brand                @relation(fields: [brandId], references: [id])
-  category       Category             @relation("ProductCategory", fields: [categoryId], references: [id])
-  subCategory    Category?            @relation("ProductSubCategory", fields: [subCategoryId], references: [id])
-  translations   ProductTranslation[]
-  inventoryItems InventoryItem[]
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([status])
-  @@index([brandId])
-  @@index([categoryId])
-  @@index([subCategoryId])
-  @@index([deletedAt])
-}
-
-model ProductTranslation {
-  id               String            @id @default(cuid())
-  productId        String
-  locale           TranslationLocale
-  name             String
-  shortDescription String
-  longDescription  String
-  specifications   Json?
-  seoTitle         String
-  seoDescription   String
-  seoKeywords      String
-
-  // Relations
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@unique([productId, locale])
-  @@index([locale])
-  @@index([deletedAt])
-}
-
-model InventoryItem {
-  id              String              @id @default(cuid())
-  parentProductId String
-  serialNumber    String              @unique
-  barcode         String              @unique
-  itemStatus      InventoryItemStatus @default(AVAILABLE)
-  location        String?
-  purchaseDate    DateTime?
-  purchasePrice   Decimal?            @db.Decimal(10, 2)
-
-  // Relations
-  product Product @relation(fields: [parentProductId], references: [id], onDelete: Cascade)
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([parentProductId])
-  @@index([itemStatus])
-  @@index([deletedAt])
-}
-
-model ImportJob {
-  id                    String          @id @default(cuid())
-  filename              String
-  mimeType              String
-  status                ImportJobStatus @default(PENDING)
-  totalRows             Int             @default(0)
-  processedRows         Int             @default(0)
-  successRows           Int             @default(0)
-  errorRows             Int             @default(0)
-  errorMessage          String?
-  aiProcessingStatus    String? // pending, processing, completed, failed
-  imageProcessingStatus String? // pending, processing, completed, failed
-  selectedSheets        Json? // Array of selected sheet names
-  selectedRows          Json? // Array of selected row numbers per sheet
-
-  // Relations
-  rows             ImportJobRow[]
-  aiProcessingJobs AIProcessingJob[]
-
-  // Audit
-  createdAt DateTime @default(now())
-  createdBy String?
-  updatedAt DateTime @updatedAt
-  updatedBy String?
-}
-
-model ImportJobRow {
-  id        String          @id @default(cuid())
-  jobId     String
-  rowNumber Int
-  status    ImportRowStatus @default(PENDING)
-  error     String?
-  productId String?
-  payload   Json?
-
-  // Relations
-  job ImportJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([jobId])
-  @@index([status])
-}
-
-model AIProcessingJob {
-  id             String    @id @default(cuid())
-  importJobId    String
-  status         String // pending, processing, completed, failed
-  provider       String // openai, gemini
-  totalItems     Int
-  processedItems Int       @default(0)
-  failedItems    Int       @default(0)
-  cost           Decimal?  @db.Decimal(10, 4)
-  startedAt      DateTime?
-  completedAt    DateTime?
-  errorMessage   String?
-
-  // Relations
-  importJob ImportJob @relation(fields: [importJobId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([importJobId])
-  @@index([status])
-}
-
-model AISettings {
-  id               String   @id @default(cuid())
-  provider         String // openai, gemini
-  apiKey           String // encrypted
-  batchSize        Int      @default(50)
-  timeout          Int      @default(30000)
-  fallbackStrategy String   @default("mark_for_review")
-  enabled          Boolean  @default(true)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  @@unique([provider])
-  @@index([enabled])
-}
-
-// ============================================
-// USER & AUTHENTICATION
-// ============================================
-
-model User {
-  id               String   @id @default(cuid())
-  email            String   @unique
-  passwordHash     String
-  name             String?
-  phone            String?
-  role             UserRole @default(DATA_ENTRY)
-  status           String   @default("active") // active, suspended, inactive
-  twoFactorEnabled Boolean  @default(false)
-  twoFactorSecret  String?
-
-  // Relations
-  permissions     UserPermission[]
-  userRoles       AssignedUserRole[]
-  bookings        Booking[]        @relation("CustomerBookings")
-  createdBookings Booking[]        @relation("CreatedBookings")
-  auditLogs       AuditLog[]
-  events          Event[]
-  quotes          Quote[]
-  invoices        Invoice[]
-  maintenance     Maintenance[]        @relation("MaintenanceTechnician")
-  damageClaimsReported DamageClaim[]
-  damageClaimsResolved DamageClaim[]   @relation("ResolvedDamageClaims")
-  segmentId       String?
-  segment         CustomerSegment?    @relation(fields: [segmentId], references: [id])
-  createdPricingRules PricingRule[]
-  deliveries      Delivery[]
-  campaigns       Campaign[]
-  verificationStatus VerificationStatus @default(UNVERIFIED)
-  reviews        Review[]
-  verificationDocuments VerificationDocument[]
-  recurringSeries RecurringSeries[]
-  cart           Cart?              // Phase 1: Public website cart (optional for guest)
-  bookingRequests BookingRequest[]  @relation("BookingRequests")
-  savedEquipment SavedEquipment[]   // Phase 5: Saved gear / wishlist
-  authTokens     AuthToken[]        // password reset, email verification
-  vendor         Vendor?
-
-  // Audit fields (MANDATORY)
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([email])
-  @@index([role])
-  @@index([status])
-  @@index([segmentId])
-  @@index([verificationStatus])
-  @@index([deletedAt])
-}
-
-model AuthToken {
-  id        String   @id @default(cuid())
-  userId    String
-  token     String   @unique
-  type      String   // 'password_reset' | 'email_verification'
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@index([userId])
-  @@index([token])
-  @@index([expiresAt])
-}
-
-model SavedEquipment {
-  id          String    @id @default(cuid())
-  userId      String
-  equipmentId String
-  createdAt   DateTime  @default(now())
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  equipment   Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
-  @@unique([userId, equipmentId])
-  @@index([userId])
-  @@index([equipmentId])
-}
-
-// ============================================
-// RBAC - Permission Categories
-// ============================================
-
-model PermissionCategory {
-  id          String  @id @default(cuid())
-  name        String  @unique
-  nameAr      String?
-  description String? @db.Text
-  sortOrder   Int     @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  permissions Permission[]
-
-  @@index([sortOrder])
-}
-
-model Permission {
-  id          String  @id @default(cuid())
-  name        String  @unique
-  description String?
-  descriptionAr String?
-  categoryId  String?
-  isSystem    Boolean @default(false)
-  sortOrder   Int     @default(0)
-
-  // Relations
-  category         PermissionCategory?  @relation(fields: [categoryId], references: [id])
-  userPermissions  UserPermission[]
-  rolePermissions  RolePermission[]
-  menuItemPermissions MenuItemPermission[]
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([name])
-  @@index([categoryId])
-  @@index([deletedAt])
-}
-
-model UserPermission {
-  id           String @id @default(cuid())
-  userId       String
-  permissionId String
-
-  // Relations
-  user       User       @relation(fields: [userId], references: [id])
-  permission Permission @relation(fields: [permissionId], references: [id])
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@unique([userId, permissionId])
-  @@index([userId])
-  @@index([permissionId])
-  @@index([deletedAt])
-}
-
-// ============================================
-// RBAC - Roles (DB-driven)
-// ============================================
-
-model Role {
-  id           String   @id @default(cuid())
-  name         String   @unique
-  displayName  String
-  displayNameAr String?
-  description  String?  @db.Text
-  descriptionAr String? @db.Text
-  isSystem     Boolean  @default(false)
-  isDefault    Boolean  @default(false)
-  priority     Int      @default(0)
-  color        String?
-
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  rolePermissions RolePermission[]
-  userRoles       AssignedUserRole[]
-  roleConflictsA  RoleConflict[] @relation("RoleConflictA")
-  roleConflictsB  RoleConflict[] @relation("RoleConflictB")
-
-  @@index([name])
-  @@index([isSystem])
-  @@index([deletedAt])
-}
-
-model RolePermission {
-  id           String @id @default(cuid())
-  roleId       String
-  permissionId String
-
-  createdAt DateTime  @default(now())
-  createdBy String?
-
-  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-
-  @@unique([roleId, permissionId])
-  @@index([roleId])
-  @@index([permissionId])
-}
-
-model AssignedUserRole {
-  id         String    @id @default(cuid())
-  userId     String
-  roleId     String
-  isPrimary  Boolean   @default(false)
-  assignedAt DateTime  @default(now())
-  assignedBy String?
-  expiresAt  DateTime?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, roleId])
-  @@index([userId])
-  @@index([roleId])
-}
-
-model RoleConflict {
-  id      String @id @default(cuid())
-  roleAId String
-  roleBId String
-  reason  String @db.Text
-
-  createdAt DateTime @default(now())
-
-  roleA Role @relation("RoleConflictA", fields: [roleAId], references: [id], onDelete: Cascade)
-  roleB Role @relation("RoleConflictB", fields: [roleBId], references: [id], onDelete: Cascade)
-
-  @@unique([roleAId, roleBId])
-  @@index([roleAId])
-  @@index([roleBId])
-}
-
-// ============================================
-// RBAC - Menu Items (sidebar)
-// ============================================
-
-model MenuItem {
-  id                     String   @id @default(cuid())
-  parentId               String?
-  name                   String   @unique
-  label                  String
-  labelAr                String?
-  icon                   String?
-  href                   String?
-  sortOrder              Int      @default(0)
-  isActive               Boolean  @default(true)
-  requiresAllPermissions Boolean  @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  parent   MenuItem?         @relation("MenuItemHierarchy", fields: [parentId], references: [id])
-  children MenuItem[]        @relation("MenuItemHierarchy")
-  menuItemPermissions MenuItemPermission[]
-
-  @@index([parentId])
-  @@index([isActive])
-}
-
-model MenuItemPermission {
-  id           String @id @default(cuid())
-  menuItemId   String
-  permissionId String
-
-  menuItem   MenuItem   @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
-  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-
-  @@unique([menuItemId, permissionId])
-  @@index([menuItemId])
-  @@index([permissionId])
-}
-
-// ============================================
-// FEATURE FLAGS
-// ============================================
-
-model FeatureFlag {
-  id               String           @id @default(cuid())
-  name             String           @unique
-  description      String?
-  enabled          Boolean          @default(false)
-  scope            FeatureFlagScope
-  requiresApproval Boolean          @default(false)
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([name])
-  @@index([enabled])
-  @@index([scope])
-  @@index([deletedAt])
-}
-
-// ============================================
-// AUDIT LOGGING
-// ============================================
-
-model AuditLog {
-  id           String   @id @default(cuid())
-  action       String // e.g., "booking.created", "payment.refunded"
-  userId       String?
-  resourceType String? // e.g., "booking", "equipment"
-  resourceId   String?
-  ipAddress    String?
-  userAgent    String?
-  metadata     Json? // Additional data
-  timestamp    DateTime @default(now())
-
-  // Relations
-  user User? @relation(fields: [userId], references: [id])
-
-  @@index([action])
-  @@index([userId])
-  @@index([resourceType, resourceId])
-  @@index([timestamp])
-}
-
-// ============================================
-// EVENT SYSTEM
-// ============================================
-
-model Event {
-  id           String      @id @default(cuid())
-  eventName    String // e.g., "booking.created", "payment.success"
-  payload      Json
-  userId       String?
-  resourceType String?
-  resourceId   String?
-  status       EventStatus @default(PENDING)
-  processedAt  DateTime?
-  timestamp    DateTime    @default(now())
-
-  // Relations
-  user User? @relation(fields: [userId], references: [id])
-
-  @@index([eventName])
-  @@index([userId])
-  @@index([resourceType, resourceId])
-  @@index([status])
-  @@index([timestamp])
-}
-
-// ============================================
-// VENDOR (Multi-vendor marketplace)
-// ============================================
-
-model Vendor {
-  id             String       @id @default(cuid())
-  userId         String       @unique
-  companyName    String
-  companyNameAr  String?
-  slug           String       @unique
-  logo           String?
-  description    String?      @db.Text
-  phone          String?
-  email          String?
-  commercialReg  String?
-  vatNumber      String?
-  bankName       String?
-  iban           String?
-  commissionRate Decimal      @db.Decimal(5, 2)
-  status         VendorStatus @default(PENDING)
-  isNameVisible  Boolean      @default(false)
-
-  user     User           @relation(fields: [userId], references: [id])
-  equipment Equipment[]
-  payouts  VendorPayout[]
-
-  createdAt  DateTime  @default(now())
-  createdBy  String?
-  updatedAt  DateTime  @updatedAt
-  updatedBy  String?
-  approvedAt DateTime?
-  approvedBy String?
-  deletedAt  DateTime?
-  deletedBy  String?
-
-  @@index([status])
-  @@index([slug])
-  @@index([userId])
-  @@index([deletedAt])
-}
-
-model VendorPayout {
-  id               String       @id @default(cuid())
-  vendorId         String
-  bookingId        String?
-  periodStart      DateTime?
-  periodEnd        DateTime?
-  grossAmount      Decimal      @db.Decimal(10, 2)
-  commissionAmount Decimal      @db.Decimal(10, 2)
-  netAmount        Decimal      @db.Decimal(10, 2)
-  status           PayoutStatus @default(PENDING)
-  paidAt           DateTime?
-  bankRef          String?
-  notes            String?
-
-  vendor Vendor @relation(fields: [vendorId], references: [id])
-
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-
-  @@index([vendorId])
-  @@index([status])
-  @@index([bookingId])
-}
-
-// ============================================
-// EQUIPMENT
-// ============================================
-
-model Category {
-  id          String  @id @default(cuid())
-  name        String
-  slug        String  @unique
-  description String?
-  parentId    String?
-
-  // Relations
-  parent      Category?   @relation("CategoryHierarchy", fields: [parentId], references: [id])
-  children    Category[]  @relation("CategoryHierarchy")
-  equipment   Equipment[]
-  products    Product[]   @relation("ProductCategory")
-  subProducts Product[]   @relation("ProductSubCategory")
-  shootTypeCategoryFlows ShootTypeCategoryFlow[]
-
-  // Translations (stored in Translation model)
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([slug])
-  @@index([parentId])
-  @@index([deletedAt])
-}
-
-model Brand {
-  id          String  @id @default(cuid())
-  name        String  @unique
-  slug        String  @unique
-  description String?
-  logo        String?
-
-  // Relations
-  equipment Equipment[]
-  products  Product[]
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([slug])
-  @@index([deletedAt])
-}
-
-model Equipment {
-  id                String             @id @default(cuid())
-  sku               String             @unique
-  model             String?
-  categoryId        String
-  brandId           String?
-  condition         EquipmentCondition @default(GOOD)
-  quantityTotal     Int                @default(1)
-  quantityAvailable Int                @default(1)
-  dailyPrice        Decimal            @db.Decimal(10, 2)
-  weeklyPrice       Decimal?           @db.Decimal(10, 2)
-  monthlyPrice      Decimal?           @db.Decimal(10, 2)
-  featured          Boolean            @default(false)
-  isActive          Boolean            @default(true)
-  warehouseLocation String?
-  barcode           String?
-  specifications    Json? // Structured data
-  customFields      Json? // Flexible custom fields
-  vendorId          String?
-  budgetTier        BudgetTier? // For smart kit builder: Essential / Professional / Premium
-
-  // Relations
-  category       Category           @relation(fields: [categoryId], references: [id])
-  brand          Brand?             @relation(fields: [brandId], references: [id])
-  vendor         Vendor?            @relation(fields: [vendorId], references: [id])
-  media          Media[]
-  bookings       BookingEquipment[]
-  damageClaims   DamageClaim[]
-  inspections    Inspection[]
-  maintenance    Maintenance[]
-  quoteEquipment QuoteEquipment[]
-  kitEquipment   KitEquipment[]
-  savedByUsers   SavedEquipment[]
-  shootTypeRecommendations ShootTypeRecommendation[]
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([sku])
-  @@index([categoryId])
-  @@index([brandId])
-  @@index([vendorId])
-  @@index([condition])
-  @@index([isActive])
-  @@index([featured])
-  @@index([deletedAt])
-  @@index([budgetTier])
-}
-
-// ============================================
-// SHOOT TYPES (Smart Kit Builder)
-// ============================================
-
-model ShootType {
-  id            String   @id @default(cuid())
-  name          String
-  slug          String   @unique
-  description   String?  @db.Text
-  nameAr        String?
-  nameZh        String?
-  descriptionAr String?  @db.Text
-  descriptionZh String?  @db.Text
-  icon          String?  // Lucide icon name
-  coverImageUrl String?
-  sortOrder     Int      @default(0)
-  isActive      Boolean  @default(true)
-  questionnaire Json?    // Array of dynamic questions
-
-  // Relations
-  categoryFlows    ShootTypeCategoryFlow[]
-  recommendations  ShootTypeRecommendation[]
-
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([slug])
-  @@index([isActive])
-  @@index([deletedAt])
-}
-
-model ShootTypeCategoryFlow {
-  id              String  @id @default(cuid())
-  shootTypeId     String
-  categoryId      String
-  sortOrder       Int     @default(0)
-  isRequired      Boolean @default(true)
-  minRecommended  Int?    // e.g. "We recommend at least 2 cameras"
-  maxRecommended  Int?
-  stepTitle       String?
-  stepTitleAr     String?
-  stepDescription String? @db.Text
-  stepDescriptionAr String? @db.Text
-
-  shootType ShootType @relation(fields: [shootTypeId], references: [id], onDelete: Cascade)
-  category  Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([shootTypeId, categoryId])
-  @@index([shootTypeId])
-  @@index([categoryId])
-}
-
-model ShootTypeRecommendation {
-  id             String     @id @default(cuid())
-  shootTypeId    String
-  equipmentId    String
-  budgetTier     BudgetTier
-  reason         String?    @db.Text
-  reasonAr       String?    @db.Text
-  defaultQuantity Int       @default(1)
-  isAutoSelect   Boolean    @default(false)
-  sortOrder      Int        @default(0)
-
-  shootType  ShootType  @relation(fields: [shootTypeId], references: [id], onDelete: Cascade)
-  equipment  Equipment  @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([shootTypeId, equipmentId, budgetTier])
-  @@index([shootTypeId])
-  @@index([equipmentId])
-  @@index([budgetTier])
-  @@index([shootTypeId, budgetTier])
-}
-
-// ============================================
-// STUDIO
-// ============================================
-
-model Studio {
-  id             String  @id @default(cuid())
-  name           String
-  slug           String  @unique
-  description    String?
-  capacity       Int?
-  hourlyRate     Decimal @db.Decimal(10, 2)
-  setupBuffer    Int     @default(30) // minutes
-  cleaningBuffer Int     @default(30) // minutes
-  resetTime      Int     @default(15) // minutes
-  isActive       Boolean @default(true)
-
-  // Relations
-  media         Media[]
-  bookings      Booking[]
-  damageClaims  DamageClaim[]
-  blackoutDates StudioBlackoutDate[]
-  addOns        StudioAddOn[]
-  quotes        Quote[]
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([slug])
-  @@index([isActive])
-  @@index([deletedAt])
-}
-
-model StudioBlackoutDate {
-  id        String   @id @default(cuid())
-  studioId  String
-  startDate DateTime
-  endDate   DateTime
-  reason    String?
-
-  // Relations
-  studio Studio @relation(fields: [studioId], references: [id])
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([studioId])
-  @@index([startDate, endDate])
-  @@index([deletedAt])
-}
-
-model StudioAddOn {
-  id          String  @id @default(cuid())
-  studioId    String
-  name        String
-  description String?
-  price       Decimal @db.Decimal(10, 2)
-  isActive    Boolean @default(true)
-
-  // Relations
-  studio Studio @relation(fields: [studioId], references: [id])
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([studioId])
-  @@index([isActive])
-  @@index([deletedAt])
-}
-
-// ============================================
-// BOOKING
-// ============================================
-
-model Booking {
-  id                String        @id @default(cuid())
-  bookingNumber     String        @unique
-  customerId        String
-  status            BookingStatus @default(DRAFT)
-  startDate         DateTime
-  endDate           DateTime
-  studioId          String?
-  studioStartTime   DateTime?
-  studioEndTime     DateTime?
-  totalAmount       Decimal       @db.Decimal(10, 2)
-  depositAmount     Decimal?      @db.Decimal(10, 2)
-  vatAmount         Decimal       @db.Decimal(10, 2)
-  notes             String?
-  softLockExpiresAt DateTime?
-  actualReturnDate  DateTime?     // Phase 4.5: when equipment was actually returned
-  lateFeeAmount     Decimal?      @db.Decimal(10, 2) // 150% of daily rate * late days
-
-  // Relations
-  customer      User               @relation("CustomerBookings", fields: [customerId], references: [id])
-  createdByUser User               @relation("CreatedBookings", fields: [createdBy], references: [id])
-  studio        Studio?            @relation(fields: [studioId], references: [id])
-  equipment     BookingEquipment[]
-  damageClaims  DamageClaim[]
-  payments      Payment[]
-  contracts     Contract[]
-  inspections   Inspection[]
-  quotes        Quote[]            @relation("ConvertedFromQuote")
-  invoices      Invoice[]
-  deliveries    Delivery[]
-  reviews       Review[]
-  recurringSeriesId String?
-  recurringSeries   RecurringSeries? @relation(fields: [recurringSeriesId], references: [id])
-  bookingRequests BookingRequest[]
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([bookingNumber])
-  @@index([customerId])
-  @@index([status])
-  @@index([startDate, endDate])
-  @@index([studioId])
-  @@index([softLockExpiresAt])
-  @@index([recurringSeriesId])
-  @@index([deletedAt])
-}
-
-model BookingEquipment {
-  id          String @id @default(cuid())
-  bookingId   String
-  equipmentId String
-  quantity    Int    @default(1)
-
-  // Relations
-  booking   Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  equipment Equipment @relation(fields: [equipmentId], references: [id])
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@unique([bookingId, equipmentId])
-  @@index([bookingId])
-  @@index([equipmentId])
-  @@index([deletedAt])
-}
-
-// ============================================
-// BOOKING REQUESTS (Change / Extension - Phase 4.3)
-// ============================================
-
 enum BookingRequestType {
-  CHANGE    // طلب تعديل
-  EXTENSION // طلب تمديد
+  CHANGE
+  EXTENSION
 }
 
 enum BookingRequestStatus {
@@ -1265,869 +2012,11 @@ enum BookingRequestStatus {
   REJECTED
 }
 
-model BookingRequest {
-  id                String                @id @default(cuid())
-  bookingId         String
-  requestedBy       String
-  type              BookingRequestType
-  status            BookingRequestStatus   @default(PENDING)
-  reason            String?
-  requestedEndDate  DateTime?              // for EXTENSION: new end date
-  requestedChanges  Json?                 // for CHANGE: e.g. { equipmentIds?: [], startDate?, endDate? }
-  responseNote      String?
-  respondedAt       DateTime?
-  respondedBy       String?
-
-  // Relations
-  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  requester User    @relation("BookingRequests", fields: [requestedBy], references: [id])
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  updatedAt DateTime   @updatedAt
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([bookingId])
-  @@index([requestedBy])
-  @@index([status])
-  @@index([type])
-  @@index([deletedAt])
-}
-
-// ============================================
-// RECURRING BOOKING SERIES
-// ============================================
-
 enum RecurrenceFrequency {
   DAILY
   WEEKLY
   MONTHLY
 }
-
-model RecurringSeries {
-  id              String             @id @default(cuid())
-  name            String
-  customerId      String
-  frequency       RecurrenceFrequency
-  interval        Int                @default(1) // every N days/weeks/months
-  endDate         DateTime?         // series end (optional if occurrenceCount set)
-  occurrenceCount Int?               // max occurrences (optional if endDate set)
-  template        Json               // { equipmentIds: [{ id, quantity }], studioId?, notes? }
-  isActive        Boolean            @default(true)
-
-  // Relations
-  customer User      @relation(fields: [customerId], references: [id])
-  bookings Booking[]
-
-  createdAt DateTime  @default(now())
-  createdBy String
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([customerId])
-  @@index([isActive])
-  @@index([deletedAt])
-}
-
-// ============================================
-// EQUIPMENT KITS (BUNDLES)
-// ============================================
-
-model Kit {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  description String?  @db.Text
-  discountPercent Decimal? @db.Decimal(5, 2) // e.g. 10 = 10% off sum of items
-  isActive    Boolean  @default(true)
-
-  // Relations
-  items KitEquipment[]
-
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([slug])
-  @@index([isActive])
-  @@index([deletedAt])
-}
-
-model KitEquipment {
-  id          String @id @default(cuid())
-  kitId       String
-  equipmentId String
-  quantity    Int    @default(1)
-
-  kit       Kit       @relation(fields: [kitId], references: [id], onDelete: Cascade)
-  equipment Equipment @relation(fields: [equipmentId], references: [id])
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@unique([kitId, equipmentId])
-  @@index([kitId])
-  @@index([equipmentId])
-}
-
-// ============================================
-// DAMAGE CLAIMS
-// ============================================
-
-model DamageClaim {
-  id               String         @id @default(cuid())
-  bookingId        String
-  equipmentId      String?
-  studioId         String?
-  reportedBy       String
-  damageType      DamageType
-  severity         DamageSeverity
-  description      String         @db.Text
-  photos           Json?         // Array of photo URLs
-  estimatedCost    Decimal        @db.Decimal(10, 2)
-  actualCost       Decimal?      @db.Decimal(10, 2)
-  status           ClaimStatus    @default(PENDING)
-  resolution       String?       @db.Text
-  resolvedBy       String?
-  resolvedAt       DateTime?
-  customerNotified Boolean        @default(false)
-  insuranceClaim   Boolean        @default(false)
-
-  // Relations
-  booking   Booking    @relation(fields: [bookingId], references: [id])
-  equipment Equipment? @relation(fields: [equipmentId], references: [id])
-  studio    Studio?    @relation(fields: [studioId], references: [id])
-  reporter  User       @relation(fields: [reportedBy], references: [id])
-  resolver  User?      @relation("ResolvedDamageClaims", fields: [resolvedBy], references: [id])
-
-  // Audit
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@index([bookingId])
-  @@index([equipmentId])
-  @@index([studioId])
-  @@index([status])
-  @@index([reportedBy])
-  @@index([resolvedBy])
-}
-
-// ============================================
-// CUSTOMER SEGMENTS
-// ============================================
-
-model CustomerSegment {
-  id               String    @id @default(cuid())
-  name             String    @unique
-  slug             String    @unique
-  description      String?   @db.Text
-  discountPercent  Decimal?  @db.Decimal(5, 2)
-  priorityBooking  Boolean   @default(false)
-  extendedTerms    Boolean   @default(false)
-  autoAssignRules  Json?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-
-  users User[]
-
-  @@index([slug])
-}
-
-// ============================================
-// PRICING RULES
-// ============================================
-
-model PricingRule {
-  id              String             @id @default(cuid())
-  name            String
-  description     String?            @db.Text
-  ruleType        PricingRuleType
-  priority        Int                @default(0)
-  conditions      Json
-  adjustmentType  PriceAdjustmentType
-  adjustmentValue Decimal            @db.Decimal(10, 2)
-  isActive        Boolean            @default(true)
-  validFrom       DateTime?
-  validUntil      DateTime?
-  createdBy       String
-
-  creator User @relation(fields: [createdBy], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([priority])
-  @@index([isActive])
-  @@index([createdBy])
-}
-
-// ============================================
-// PAYMENT
-// ============================================
-
-model Payment {
-  id               String        @id @default(cuid())
-  bookingId        String
-  amount           Decimal       @db.Decimal(10, 2)
-  status           PaymentStatus @default(PENDING)
-  tapTransactionId String?
-  tapChargeId      String?
-  refundAmount     Decimal?      @db.Decimal(10, 2)
-  refundReason     String?
-
-  // Relations
-  booking          Booking           @relation(fields: [bookingId], references: [id])
-  approvalRequests ApprovalRequest[]
-  invoicePayments  InvoicePayment[]
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([bookingId])
-  @@index([status])
-  @@index([tapTransactionId])
-  @@index([deletedAt])
-}
-
-// ============================================
-// CONTRACT
-// ============================================
-
-model Contract {
-  id              String    @id @default(cuid())
-  bookingId       String
-  termsVersion    String // Version of terms accepted
-  contractContent Json // Snapshot of contract at time of signing
-  signedAt        DateTime?
-  signedBy        String?
-  signatureData   Json? // E-signature data
-
-  // Relations
-  booking Booking @relation(fields: [bookingId], references: [id])
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([bookingId])
-  @@index([termsVersion])
-  @@index([signedAt])
-  @@index([deletedAt])
-}
-
-// ============================================
-// INSPECTION
-// ============================================
-
-model Inspection {
-  id          String  @id @default(cuid())
-  bookingId   String
-  equipmentId String?
-  type        String // "check_in" or "check_out"
-  checklist   Json // Structured checklist data
-  notes       String?
-
-  // Relations
-  booking   Booking    @relation(fields: [bookingId], references: [id])
-  equipment Equipment? @relation(fields: [equipmentId], references: [id])
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([bookingId])
-  @@index([equipmentId])
-  @@index([type])
-  @@index([deletedAt])
-}
-
-// ============================================
-// NOTIFICATION
-// ============================================
-
-model Notification {
-  id      String              @id @default(cuid())
-  userId  String?
-  channel NotificationChannel
-  type    String // e.g., "booking.confirmed", "payment.success"
-  title   String
-  message String
-  data    Json?
-  read    Boolean             @default(false)
-  readAt  DateTime?
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([userId])
-  @@index([channel])
-  @@index([read])
-  @@index([createdAt])
-  @@index([deletedAt])
-}
-
-// ============================================
-// NOTIFICATION TEMPLATES
-// ============================================
-
-model NotificationTemplate {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String
-  description String?  @db.Text
-  trigger     NotificationTrigger
-  channel     NotificationChannel
-  subject     String?  // For email
-  bodyText    String   @db.Text
-  bodyHtml    String?  @db.Text
-  variables   Json?    // e.g. ["customerName", "bookingId", "totalAmount"]
-  isActive    Boolean  @default(true)
-  language    String   @default("en")
-  variant     String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@unique([slug, language])
-  @@index([trigger])
-  @@index([channel])
-  @@index([isActive])
-}
-
-// ============================================
-// REVIEWS
-// ============================================
-
-model Review {
-  id            String      @id @default(cuid())
-  bookingId     String
-  userId        String
-  rating        Int         // 1-5
-  comment       String?     @db.Text
-  status        ReviewStatus @default(PENDING_MODERATION)
-  adminResponse String?     @db.Text
-  respondedBy   String?
-  respondedAt   DateTime?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  booking Booking @relation(fields: [bookingId], references: [id])
-  user    User    @relation(fields: [userId], references: [id])
-
-  @@unique([bookingId])
-  @@index([userId])
-  @@index([status])
-  @@index([rating])
-}
-
-// ============================================
-// CUSTOMER VERIFICATION
-// ============================================
-
-model VerificationDocument {
-  id           String   @id @default(cuid())
-  userId       String
-  documentType String   // ID, PROOF_OF_ADDRESS, etc.
-  fileUrl      String
-  filename     String?
-  mimeType     String?
-  status       String   @default("pending") // pending, approved, rejected
-  reviewedBy   String?
-  reviewedAt   DateTime?
-  rejectionReason String? @db.Text
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([status])
-}
-
-// ============================================
-// APPROVAL WORKFLOW
-// ============================================
-
-model ApprovalRequest {
-  id           String  @id @default(cuid())
-  action       String // e.g., "payment.refund", "credit.apply"
-  resourceType String // e.g., "payment", "booking"
-  resourceId   String
-  requestedBy  String
-  approvedBy   String?
-  status       String  @default("pending") // pending, approved, rejected
-  reason       String?
-  metadata     Json?
-
-  // Note: Polymorphic relationship - use resourceType + resourceId
-  // to reference Payment, Booking, etc. No direct foreign keys.
-  // For payments, we can add an optional relation if needed:
-  paymentId String?
-  payment   Payment? @relation(fields: [paymentId], references: [id])
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([action])
-  @@index([resourceType, resourceId])
-  @@index([status])
-  @@index([requestedBy])
-  @@index([paymentId])
-  @@index([deletedAt])
-}
-
-// ============================================
-// MEDIA
-// ============================================
-
-model Media {
-  id          String  @id @default(cuid())
-  url         String
-  type        String // "image", "video", "document"
-  filename    String
-  mimeType    String
-  size        Int? // bytes
-  equipmentId String?
-  studioId    String?
-
-  // Relations
-  equipment Equipment? @relation(fields: [equipmentId], references: [id])
-  studio    Studio?    @relation(fields: [studioId], references: [id])
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([equipmentId])
-  @@index([studioId])
-  @@index([type])
-  @@index([deletedAt])
-}
-
-// ============================================
-// TRANSLATION (Multi-language support)
-// ============================================
-
-model Translation {
-  id         String @id @default(cuid())
-  entityType String // "equipment", "category", "studio", etc.
-  entityId   String
-  field      String // "name", "description", "seo_title", etc.
-  language   String // "ar", "en", "zh"
-  value      String
-
-  // Note: Polymorphic relationship - no direct foreign keys
-  // Use entityType + entityId to reference Equipment, Studio, etc.
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@unique([entityType, entityId, field, language])
-  @@index([entityType, entityId])
-  @@index([language])
-  @@index([deletedAt])
-}
-
-// ============================================
-// INTEGRATION CONFIG
-// ============================================
-
-model IntegrationConfig {
-  id    String @id @default(cuid())
-  key   String @unique // e.g., "integration.payments"
-  value String // Encrypted JSON config
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([key])
-  @@index([deletedAt])
-}
-
-// ============================================
-// BRANCH (Locations)
-// ============================================
-
-model Branch {
-  id           String   @id @default(cuid())
-  name         String
-  nameAr       String?
-  address      String?
-  city         String?
-  phone        String?
-  email        String?
-  isActive     Boolean  @default(true)
-  latitude     Float?
-  longitude    Float?
-  workingHours Json?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@index([isActive])
-}
-
-// ============================================
-// DELIVERY ZONE
-// ============================================
-
-model DeliveryZone {
-  id          String   @id @default(cuid())
-  name        String
-  nameAr      String?
-  baseFee     Decimal  @db.Decimal(10, 2)
-  perKmFee    Decimal? @db.Decimal(10, 2)
-  minOrder    Decimal? @db.Decimal(10, 2)
-  leadTimeHrs Int      @default(24)
-  isActive    Boolean  @default(true)
-  cities      String[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([isActive])
-}
-
-// ============================================
-// QUOTE
-// ============================================
-
-model Quote {
-  id              String      @id @default(cuid())
-  quoteNumber     String      @unique
-  customerId      String
-  status          QuoteStatus @default(DRAFT)
-  startDate       DateTime
-  endDate         DateTime
-  validUntil      DateTime
-  studioId        String?
-  studioStartTime DateTime?
-  studioEndTime   DateTime?
-  subtotal        Decimal     @db.Decimal(10, 2)
-  discount        Decimal?    @db.Decimal(10, 2)
-  vatAmount       Decimal     @db.Decimal(10, 2)
-  totalAmount     Decimal     @db.Decimal(10, 2)
-  depositAmount   Decimal?    @db.Decimal(10, 2)
-  equipment       Json // Array of QuoteEquipmentItem
-  notes           String?
-  bookingId       String?     @unique // If converted to booking
-  convertedAt     DateTime?
-
-  // Relations
-  customer       User             @relation(fields: [customerId], references: [id])
-  studio         Studio?          @relation(fields: [studioId], references: [id])
-  booking        Booking?         @relation("ConvertedFromQuote", fields: [bookingId], references: [id])
-  equipmentItems QuoteEquipment[]
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([quoteNumber])
-  @@index([customerId])
-  @@index([status])
-  @@index([validUntil])
-  @@index([bookingId])
-  @@index([deletedAt])
-}
-
-model QuoteEquipment {
-  id          String  @id @default(cuid())
-  quoteId     String
-  equipmentId String
-  quantity    Int     @default(1)
-  dailyRate   Decimal @db.Decimal(10, 2)
-  totalDays   Int
-  subtotal    Decimal @db.Decimal(10, 2)
-
-  // Relations
-  quote     Quote     @relation(fields: [quoteId], references: [id], onDelete: Cascade)
-  equipment Equipment @relation(fields: [equipmentId], references: [id])
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@unique([quoteId, equipmentId])
-  @@index([quoteId])
-  @@index([equipmentId])
-  @@index([deletedAt])
-}
-
-// ============================================
-// MAINTENANCE
-// ============================================
-
-model Maintenance {
-  id                       String              @id @default(cuid())
-  maintenanceNumber        String              @unique
-  equipmentId              String
-  type                     MaintenanceType
-  status                   MaintenanceStatus   @default(SCHEDULED)
-  priority                 String              @default("medium") // low, medium, high, urgent
-  scheduledDate            DateTime
-  completedDate            DateTime?
-  technicianId             String?
-  description              String
-  notes                    String?
-  cost                     Decimal?            @db.Decimal(10, 2)
-  partsUsed                Json? // Array of parts
-  equipmentConditionBefore EquipmentCondition?
-  equipmentConditionAfter  EquipmentCondition?
-
-  // Relations
-  equipment  Equipment @relation(fields: [equipmentId], references: [id])
-  technician User?     @relation("MaintenanceTechnician", fields: [technicianId], references: [id])
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([maintenanceNumber])
-  @@index([equipmentId])
-  @@index([status])
-  @@index([scheduledDate])
-  @@index([technicianId])
-  @@index([deletedAt])
-}
-
-// ============================================
-// INVOICE
-// ============================================
-
-model Invoice {
-  id              String        @id @default(cuid())
-  invoiceNumber   String        @unique
-  customerId      String
-  bookingId       String?
-  type            InvoiceType   @default(BOOKING)
-  status          InvoiceStatus @default(DRAFT)
-  issueDate       DateTime      @default(now())
-  dueDate         DateTime
-  paidDate        DateTime?
-  subtotal        Decimal       @db.Decimal(10, 2)
-  discount        Decimal?      @db.Decimal(10, 2)
-  vatAmount       Decimal       @db.Decimal(10, 2)
-  totalAmount     Decimal       @db.Decimal(10, 2)
-  paidAmount      Decimal       @default(0) @db.Decimal(10, 2)
-  remainingAmount Decimal       @db.Decimal(10, 2)
-  items           Json // Array of InvoiceItem
-  notes           String?
-  paymentTerms    String?
-
-  // Relations
-  customer User             @relation(fields: [customerId], references: [id])
-  booking  Booking?         @relation(fields: [bookingId], references: [id])
-  payments InvoicePayment[]
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([invoiceNumber])
-  @@index([customerId])
-  @@index([bookingId])
-  @@index([status])
-  @@index([dueDate])
-  @@index([deletedAt])
-}
-
-model InvoicePayment {
-  id        String   @id @default(cuid())
-  invoiceId String
-  paymentId String
-  amount    Decimal  @db.Decimal(10, 2)
-  paidAt    DateTime @default(now())
-
-  // Relations
-  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@unique([invoiceId, paymentId])
-  @@index([invoiceId])
-  @@index([paymentId])
-  @@index([deletedAt])
-}
-
-// ============================================
-// COUPON
-// ============================================
-
-model Coupon {
-  id                     String       @id @default(cuid())
-  code                   String       @unique
-  name                   String
-  type                   CouponType
-  discountValue          Decimal?     @db.Decimal(10, 2) // For fixed type
-  discountPercentage     Decimal?     @db.Decimal(5, 2) // For percent type (0-100)
-  minimumAmount          Decimal?     @db.Decimal(10, 2)
-  maximumDiscount        Decimal?     @db.Decimal(10, 2)
-  validFrom              DateTime
-  validUntil             DateTime
-  usageLimit             Int?
-  usedCount              Int          @default(0)
-  status                 CouponStatus @default(ACTIVE)
-  applicableEquipmentIds Json? // Array of equipment IDs
-  description            String?
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([code])
-  @@index([status])
-  @@index([validFrom, validUntil])
-  @@index([deletedAt])
-}
-
-// ============================================
-// CAMPAIGN
-// ============================================
-
-model Campaign {
-  id              String         @id @default(cuid())
-  name            String
-  type            CampaignType
-  status          CampaignStatus @default(DRAFT)
-  subject         String?
-  content         String
-  targetAudience  Json? // Array of user IDs or segments
-  scheduledAt     DateTime?
-  sentAt          DateTime?
-  totalRecipients Int            @default(0)
-  sentCount       Int            @default(0)
-  openedCount     Int            @default(0)
-  clickedCount    Int            @default(0)
-  conversionCount Int            @default(0)
-
-  // Relations
-  createdByUser User @relation(fields: [createdBy], references: [id])
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([status])
-  @@index([type])
-  @@index([scheduledAt])
-  @@index([createdBy])
-  @@index([deletedAt])
-}
-
-// ============================================
-// DELIVERY
-// ============================================
-
-model Delivery {
-  id             String         @id @default(cuid())
-  deliveryNumber String         @unique
-  bookingId      String
-  type           DeliveryType
-  status         DeliveryStatus @default(PENDING)
-  scheduledDate  DateTime
-  deliveredDate  DateTime?
-  address        String
-  city           String
-  contactName    String
-  contactPhone   String
-  driverId       String?
-  trackingNumber String?
-  notes          String?
-
-  // Relations
-  booking Booking @relation(fields: [bookingId], references: [id])
-  driver  User?   @relation(fields: [driverId], references: [id])
-
-  // Audit fields
-  createdAt DateTime  @default(now())
-  createdBy String
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([deliveryNumber])
-  @@index([bookingId])
-  @@index([status])
-  @@index([scheduledDate])
-  @@index([driverId])
-  @@index([deletedAt])
-}
-
-// ============================================
-// PUBLIC WEBSITE - CMS & CART (Phase 1)
-// ============================================
 
 enum WebsiteContentType {
   TEXT
@@ -2162,213 +2051,4 @@ enum CartItemType {
   STUDIO
   PACKAGE
   KIT
-}
-
-model WebsiteContent {
-  id        String            @id @default(cuid())
-  key       String            @unique
-  contentAr String            @db.Text
-  contentEn String            @db.Text
-  contentZh String?           @db.Text
-  type      WebsiteContentType @default(TEXT)
-  section   String?
-  isActive  Boolean           @default(true)
-  version   Int               @default(1)
-  publishAt DateTime?
-  unpublishAt DateTime?
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  createdBy String?
-  updatedBy String?
-
-  @@index([key])
-  @@index([section])
-}
-
-model WebsiteFeature {
-  id          String   @id @default(cuid())
-  key         String   @unique
-  nameAr      String?
-  nameEn      String?
-  isEnabled   Boolean  @default(true)
-  rolloutPercent Int   @default(100)
-  config      Json?
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@index([key])
-}
-
-model WebsitePage {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  titleAr     String
-  titleEn     String
-  titleZh     String?
-  isPublished Boolean  @default(true)
-  seo         Json?
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  createdBy String?
-  updatedBy String?
-
-  sections WebsiteSection[]
-
-  @@index([slug])
-}
-
-model WebsiteSection {
-  id        String             @id @default(cuid())
-  pageId    String
-  type      WebsiteSectionType
-  order     Int                @default(0)
-  isVisible Boolean            @default(true)
-  content   Json?
-  settings  Json?
-
-  page WebsitePage @relation(fields: [pageId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@index([pageId])
-  @@index([type])
-}
-
-model WebsiteLayout {
-  id        String           @id @default(cuid())
-  type      WebsiteLayoutType
-  content   Json?
-  isActive  Boolean          @default(true)
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@index([type])
-}
-
-model HeroBanner {
-  id               String   @id @default(cuid())
-  name             String
-  pageSlug         String   @unique
-  isActive         Boolean  @default(true)
-  autoPlay         Boolean  @default(true)
-  autoPlayInterval Int      @default(6000)
-  transitionType   String   @default("fade")
-
-  slides HeroSlide[]
-
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([isActive])
-  @@index([deletedAt])
-}
-
-model HeroSlide {
-  id             String  @id @default(cuid())
-  bannerId       String
-  imageUrl       String
-  mobileImageUrl String?
-  videoUrl       String?
-
-  titleAr    String   @db.Text
-  titleEn    String   @db.Text
-  titleZh    String?  @db.Text
-  subtitleAr String?  @db.Text
-  subtitleEn String?  @db.Text
-  subtitleZh String?  @db.Text
-
-  badgeTextAr String?  @db.Text
-  badgeTextEn String?  @db.Text
-  badgeTextZh String?  @db.Text
-
-  ctaTextAr  String? @db.Text
-  ctaTextEn  String? @db.Text
-  ctaTextZh  String? @db.Text
-  ctaUrl     String?
-  ctaStyle   String  @default("primary")
-
-  cta2TextAr String? @db.Text
-  cta2TextEn String? @db.Text
-  cta2TextZh String? @db.Text
-  cta2Url    String?
-  cta2Style  String?
-
-  order          Int     @default(0)
-  isActive       Boolean @default(true)
-  overlayOpacity Float   @default(0.3)
-  textPosition   String  @default("start")
-
-  publishAt   DateTime?
-  unpublishAt DateTime?
-
-  banner HeroBanner @relation(fields: [bannerId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime  @default(now())
-  createdBy String?
-  updatedAt DateTime  @updatedAt
-  updatedBy String?
-  deletedAt DateTime?
-  deletedBy String?
-
-  @@index([bannerId])
-  @@index([order])
-  @@index([isActive])
-  @@index([deletedAt])
-}
-
-model Cart {
-  id            String    @id @default(cuid())
-  userId        String?   @unique
-  sessionId     String?   @unique
-  couponCode    String?
-  discountAmount Decimal? @db.Decimal(10, 2)
-  subtotal      Decimal   @db.Decimal(10, 2) @default(0)
-  total         Decimal   @db.Decimal(10, 2) @default(0)
-  lastSyncedAt  DateTime?
-  expiresAt     DateTime
-
-  user  User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items CartItem[]
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@index([userId])
-  @@index([sessionId])
-  @@index([expiresAt])
-}
-
-model CartItem {
-  id           String       @id @default(cuid())
-  cartId       String
-  itemType     CartItemType
-  equipmentId  String?
-  studioId     String?
-  packageId    String?
-  kitId        String?
-  startDate    DateTime?
-  endDate      DateTime?
-  quantity     Int          @default(1)
-  dailyRate    Decimal?     @db.Decimal(10, 2)
-  subtotal     Decimal      @db.Decimal(10, 2)
-  isAvailable  Boolean      @default(true)
-  lastCheckedAt DateTime?   @default(now())
-
-  cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@index([cartId])
-  @@index([equipmentId])
-  @@index([studioId])
 }

@@ -15,22 +15,16 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
   const rateLimit = rateLimitAPI(request)
-  
+
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: 'Too many requests' },
-      { status: 429 }
-    )
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }
 
   try {
     const session = await auth()
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     if (!(await hasPermission(session.user.id, PERMISSIONS.SYSTEM_HEALTH_CHECK))) {
@@ -88,9 +82,10 @@ export async function GET(request: Request) {
       checks.push({
         service: 'Queue',
         status: pendingEvents < 1000 ? 'healthy' : 'unhealthy',
-        message: pendingEvents < 1000 
-          ? `Queue system operational (${pendingEvents} pending events)`
-          : `Queue backlog: ${pendingEvents} pending events`,
+        message:
+          pendingEvents < 1000
+            ? `Queue system operational (${pendingEvents} pending events)`
+            : `Queue backlog: ${pendingEvents} pending events`,
         details: { pendingEvents },
       })
     } catch (error: any) {
@@ -123,9 +118,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ checks })
   } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Failed to check health' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Failed to check health' }, { status: 500 })
   }
 }

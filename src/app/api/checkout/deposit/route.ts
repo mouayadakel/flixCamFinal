@@ -37,9 +37,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const depositAmount = equipment.length
-    ? await PricingService.calculateDeposit(equipment)
-    : 0
+  const depositAmount = equipment.length ? await PricingService.calculateDeposit(equipment) : 0
 
   return NextResponse.json({ depositAmount })
 }

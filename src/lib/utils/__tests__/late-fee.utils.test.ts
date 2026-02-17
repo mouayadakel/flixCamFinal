@@ -8,8 +8,12 @@ describe('late-fee.utils', () => {
   const endDate = new Date('2026-02-10T00:00:00Z')
 
   it('returns 0 when return date is on or before end date', () => {
-    expect(computeLateFee(endDate, new Date('2026-02-10T00:00:00Z'), [{ quantity: 1, dailyRate: 100 }])).toBe(0)
-    expect(computeLateFee(endDate, new Date('2026-02-09T23:59:00Z'), [{ quantity: 1, dailyRate: 100 }])).toBe(0)
+    expect(
+      computeLateFee(endDate, new Date('2026-02-10T00:00:00Z'), [{ quantity: 1, dailyRate: 100 }])
+    ).toBe(0)
+    expect(
+      computeLateFee(endDate, new Date('2026-02-09T23:59:00Z'), [{ quantity: 1, dailyRate: 100 }])
+    ).toBe(0)
   })
 
   it('computes 150% of daily rate for one item one day late', () => {

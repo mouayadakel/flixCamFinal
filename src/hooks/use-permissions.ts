@@ -31,7 +31,11 @@ export function usePermissions() {
         const data = await response.json()
 
         if (!response.ok) {
-          setError(new Error(data.reason === 'SERVER_ERROR' ? 'فشل تحميل الصلاحيات' : 'Failed to load permissions'))
+          setError(
+            new Error(
+              data.reason === 'SERVER_ERROR' ? 'فشل تحميل الصلاحيات' : 'Failed to load permissions'
+            )
+          )
           setPermissions([])
           setIsSuperAdmin(false)
           setLoading(false)

@@ -18,17 +18,17 @@ export function createImportWorker() {
     IMPORT_QUEUE_NAME,
     async (job: Job) => {
       const { jobId } = job.data as { jobId: string }
-      
+
       // Update job progress
       await job.updateProgress(0)
-      
+
       try {
         // Process the import job
         await processImportJob(jobId)
-        
+
         // Mark as complete
         await job.updateProgress(100)
-        
+
         return { success: true, jobId }
       } catch (error: any) {
         console.error(`Import job ${jobId} failed:`, error)

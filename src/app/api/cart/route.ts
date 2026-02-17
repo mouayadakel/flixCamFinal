@@ -18,10 +18,7 @@ export async function GET(request: NextRequest) {
   const sessionId = getCartSessionId(request.headers.get('cookie') ?? null)
 
   try {
-    const cart = await CartService.getOrCreateCart(
-      session?.user?.id ?? null,
-      sessionId
-    )
+    const cart = await CartService.getOrCreateCart(session?.user?.id ?? null, sessionId)
     const res = NextResponse.json(cart)
     if (!session?.user?.id && !sessionId && cart.sessionId) {
       res.headers.set('Set-Cookie', setCartSessionCookie(cart.sessionId))
@@ -67,10 +64,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const cart = await CartService.getOrCreateCart(
-      session?.user?.id ?? null,
-      sessionId
-    )
+    const cart = await CartService.getOrCreateCart(session?.user?.id ?? null, sessionId)
 
     await CartService.addItem(cart.id, {
       itemType: body.itemType,

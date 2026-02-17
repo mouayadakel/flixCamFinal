@@ -23,48 +23,56 @@ Any state → (cancel) → CANCELLED
 ## Booking States
 
 ### DRAFT
+
 - Initial state when booking is created
 - Can be edited freely
 - No payment required
 - No inventory lock
 
 ### RISK_CHECK
+
 - Conditional state based on risk assessment
 - Auto-transition for low-risk bookings
 - Manual review for high-risk bookings
 - Admin can review and transition
 
 ### PAYMENT_PENDING
+
 - Payment intent created
 - Waiting for payment confirmation
 - Soft inventory lock active (10-15 min TTL)
 - Cannot edit booking
 
 ### CONFIRMED
+
 - Payment successful
 - Booking confirmed
 - Inventory reserved
 - Contract generated
 
 ### ACTIVE
+
 - Equipment picked up
 - Rental period started
 - Cannot cancel
 - Can extend (with approval)
 
 ### RETURNED
+
 - Equipment returned
 - Inspection pending
 - Damage assessment
 - Deposit refund calculation
 
 ### CLOSED
+
 - Inspection complete
 - All charges finalized
 - Deposit refunded (if applicable)
 - Booking archived
 
 ### CANCELLED
+
 - Booking cancelled from any state
 - Soft delete applied
 - Refund processed (if payment made)
@@ -73,29 +81,34 @@ Any state → (cancel) → CANCELLED
 ## Mandatory Checks
 
 ### 1. Availability Check
+
 - Equipment availability for date range
 - Studio availability for time slots
 - No conflicts with existing bookings
 - Quantity validation
 
 ### 2. Compatibility Check
+
 - Equipment compatibility (if applicable)
 - Studio capacity
 - Access requirements
 
 ### 3. Soft Inventory Lock
+
 - 10-15 minute TTL
 - Prevents double-booking
 - Auto-releases on timeout
 - Manual release available
 
 ### 4. Contract Acceptance
+
 - Terms version check
 - E-signature required
 - Contract snapshot created
 - Immutable after signing
 
 ### 5. Payment Success
+
 - Payment confirmation required
 - Cannot confirm without payment
 - Refund workflow for cancellations
@@ -103,12 +116,14 @@ Any state → (cancel) → CANCELLED
 ## Risk Check Logic
 
 ### Risk Factors
+
 - **Booking amount**: Higher amount = higher risk
 - **Customer history**: Past bookings, cancellations, damages
 - **Equipment value**: High-value equipment = higher risk
 - **Rental duration**: Longer duration = higher risk
 
 ### Risk Assessment
+
 - **Low risk**: Auto-approve, auto-transition to PAYMENT_PENDING
 - **High risk**: Manual review required, stay in RISK_CHECK
 - **Admin review**: Admin can review and transition
@@ -156,6 +171,7 @@ Any state → (cancel) → CANCELLED
 ## Events
 
 ### Core Events
+
 - `booking.created` - Booking created in DRAFT
 - `booking.risk_check` - Risk check initiated
 - `booking.payment_pending` - Payment intent created

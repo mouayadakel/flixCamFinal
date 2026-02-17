@@ -60,7 +60,9 @@ export function ShootTypeEditorSheet({
           isActive: data.isActive ?? true,
         })
       })
-      .catch(() => toast({ title: 'Error', description: 'Failed to load shoot type', variant: 'destructive' }))
+      .catch(() =>
+        toast({ title: 'Error', description: 'Failed to load shoot type', variant: 'destructive' })
+      )
       .finally(() => setLoading(false))
   }, [open, shootTypeId, toast])
 

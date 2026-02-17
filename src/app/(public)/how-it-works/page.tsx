@@ -11,11 +11,36 @@ import { PublicContainer } from '@/components/public/public-container'
 import { Button } from '@/components/ui/button'
 
 const STEPS = [
-  { icon: Search, title: 'Choose', description: 'Browse our catalog, filter by category and dates, and add equipment or kits to your cart.' },
-  { icon: CalendarCheck, title: 'Book', description: 'Select your pickup and return dates. We’ll confirm availability and lock the price for 15 minutes.' },
-  { icon: CreditCard, title: 'Pay', description: 'Pay the rental total and deposit securely. We accept cards, Apple Pay, and bank transfer.' },
-  { icon: Package, title: 'Receive', description: 'Pick up at our location or get delivery. We’ll do a quick handover and inspection.' },
-  { icon: RotateCcw, title: 'Return', description: 'Return equipment on time and in the same condition. After inspection we release your deposit.' },
+  {
+    icon: Search,
+    title: 'Choose',
+    description:
+      'Browse our catalog, filter by category and dates, and add equipment or kits to your cart.',
+  },
+  {
+    icon: CalendarCheck,
+    title: 'Book',
+    description:
+      'Select your pickup and return dates. We’ll confirm availability and lock the price for 15 minutes.',
+  },
+  {
+    icon: CreditCard,
+    title: 'Pay',
+    description:
+      'Pay the rental total and deposit securely. We accept cards, Apple Pay, and bank transfer.',
+  },
+  {
+    icon: Package,
+    title: 'Receive',
+    description:
+      'Pick up at our location or get delivery. We’ll do a quick handover and inspection.',
+  },
+  {
+    icon: RotateCcw,
+    title: 'Return',
+    description:
+      'Return equipment on time and in the same condition. After inspection we release your deposit.',
+  },
 ]
 
 export default async function HowItWorksPage() {
@@ -24,8 +49,8 @@ export default async function HowItWorksPage() {
   return (
     <main className="py-12">
       <PublicContainer className="max-w-3xl">
-        <h1 className="text-3xl font-bold mb-2">How It Works</h1>
-        <p className="text-muted-foreground mb-10">
+        <h1 className="mb-2 text-3xl font-bold">How It Works</h1>
+        <p className="mb-10 text-muted-foreground">
           Rent professional film equipment in five simple steps.
         </p>
         <div className="space-y-10">
@@ -35,7 +60,9 @@ export default async function HowItWorksPage() {
                 <step.icon className="h-6 w-6" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold">Step {i + 1}: {step.title}</h2>
+                <h2 className="text-xl font-semibold">
+                  Step {i + 1}: {step.title}
+                </h2>
                 <p className="mt-1 text-muted-foreground">{step.description}</p>
               </div>
             </div>

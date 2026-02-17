@@ -7,7 +7,16 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts'
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 
@@ -45,7 +54,10 @@ export function RevenueChart({ data = [], title = 'الإيرادات (آخر 30
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip
-                formatter={(value: number | undefined) => [`${(value ?? 0).toLocaleString('ar-SA')} ر.س`, 'الإيرادات']}
+                formatter={(value: number | undefined) => [
+                  `${(value ?? 0).toLocaleString('ar-SA')} ر.س`,
+                  'الإيرادات',
+                ]}
               />
               <Legend />
               <Line

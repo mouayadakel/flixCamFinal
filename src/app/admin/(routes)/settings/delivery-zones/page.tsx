@@ -79,11 +79,22 @@ export default function SettingsDeliveryZonesPage() {
     }
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+  }, [])
 
   const openCreate = () => {
     setEditingId(null)
-    setForm({ name: '', nameAr: '', baseFee: '', perKmFee: '', minOrder: '', leadTimeHrs: '24', isActive: true, cities: '' })
+    setForm({
+      name: '',
+      nameAr: '',
+      baseFee: '',
+      perKmFee: '',
+      minOrder: '',
+      leadTimeHrs: '24',
+      isActive: true,
+      cities: '',
+    })
     setDialogOpen(true)
   }
 
@@ -109,7 +120,11 @@ export default function SettingsDeliveryZonesPage() {
     }
     const baseFee = parseFloat(form.baseFee)
     if (Number.isNaN(baseFee) || baseFee < 0) {
-      toast({ title: 'خطأ', description: 'رسوم الأساس يجب أن تكون رقماً موجباً', variant: 'destructive' })
+      toast({
+        title: 'خطأ',
+        description: 'رسوم الأساس يجب أن تكون رقماً موجباً',
+        variant: 'destructive',
+      })
       return
     }
     setSaving(true)
@@ -122,7 +137,10 @@ export default function SettingsDeliveryZonesPage() {
         minOrder: form.minOrder ? parseFloat(form.minOrder) : null,
         leadTimeHrs: parseInt(form.leadTimeHrs, 10) || 24,
         isActive: form.isActive,
-        cities: form.cities.split(',').map((s) => s.trim()).filter(Boolean),
+        cities: form.cities
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean),
       }
       if (editingId) {
         const res = await fetch(`/api/delivery-zones/${editingId}`, {
@@ -144,7 +162,11 @@ export default function SettingsDeliveryZonesPage() {
       setDialogOpen(false)
       load()
     } catch (e) {
-      toast({ title: 'خطأ', description: e instanceof Error ? e.message : 'فشل الحفظ', variant: 'destructive' })
+      toast({
+        title: 'خطأ',
+        description: e instanceof Error ? e.message : 'فشل الحفظ',
+        variant: 'destructive',
+      })
     } finally {
       setSaving(false)
     }
@@ -168,25 +190,27 @@ export default function SettingsDeliveryZonesPage() {
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/admin/settings">
-              <ArrowLeft className="h-4 w-4 ml-1" />
+              <ArrowLeft className="ml-1 h-4 w-4" />
               الإعدادات
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
+            <h1 className="flex items-center gap-2 text-3xl font-bold">
               <Truck className="h-8 w-8" />
               مناطق التوصيل والرسوم
             </h1>
-            <p className="text-muted-foreground mt-1">المناطق، رسوم الأساس، رسوم الكيلو، الحد الأدنى للطلب</p>
+            <p className="mt-1 text-muted-foreground">
+              المناطق، رسوم الأساس، رسوم الكيلو، الحد الأدنى للطلب
+            </p>
           </div>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={load} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 ml-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
           <Button onClick={openCreate}>
-            <Plus className="h-4 w-4 ml-2" />
+            <Plus className="ml-2 h-4 w-4" />
             منطقة جديدة
           </Button>
         </div>
@@ -195,7 +219,9 @@ export default function SettingsDeliveryZonesPage() {
       <Card>
         <CardHeader>
           <CardTitle>قائمة المناطق</CardTitle>
-          <CardDescription>الاسم، المدن، رسوم الأساس، رسوم/كم، الحد الأدنى، مهلة التوصيل (ساعة)</CardDescription>
+          <CardDescription>
+            الاسم، المدن، رسوم الأساس، رسوم/كم، الحد الأدنى، مهلة التوصيل (ساعة)
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">
@@ -221,7 +247,7 @@ export default function SettingsDeliveryZonesPage() {
                   </TableRow>
                 ) : zones.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
+                    <TableCell colSpan={8} className="py-12 text-center text-muted-foreground">
                       لا توجد مناطق. أضف منطقة جديدة.
                     </TableCell>
                   </TableRow>
@@ -229,7 +255,7 @@ export default function SettingsDeliveryZonesPage() {
                   zones.map((z) => (
                     <TableRow key={z.id}>
                       <TableCell className="font-medium">{z.nameAr || z.name}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground max-w-[180px] truncate">
+                      <TableCell className="max-w-[180px] truncate text-sm text-muted-foreground">
                         {Array.isArray(z.cities) && z.cities.length ? z.cities.join(', ') : '—'}
                       </TableCell>
                       <TableCell>{z.baseFee} ر.س</TableCell>
@@ -237,11 +263,22 @@ export default function SettingsDeliveryZonesPage() {
                       <TableCell>{z.minOrder != null ? `${z.minOrder} ر.س` : '—'}</TableCell>
                       <TableCell>{z.leadTimeHrs}</TableCell>
                       <TableCell>
-                        <Badge variant={z.isActive ? 'default' : 'secondary'}>{z.isActive ? 'نشط' : 'غير نشط'}</Badge>
+                        <Badge variant={z.isActive ? 'default' : 'secondary'}>
+                          {z.isActive ? 'نشط' : 'غير نشط'}
+                        </Badge>
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm" onClick={() => openEdit(z)}><Pencil className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="sm" className="text-destructive" onClick={() => remove(z.id)}><Trash2 className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="sm" onClick={() => openEdit(z)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive"
+                          onClick={() => remove(z.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))
@@ -261,44 +298,91 @@ export default function SettingsDeliveryZonesPage() {
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label>الاسم</Label>
-              <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="اسم المنطقة" />
+              <Input
+                value={form.name}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                placeholder="اسم المنطقة"
+              />
             </div>
             <div className="grid gap-2">
               <Label>الاسم (عربي)</Label>
-              <Input value={form.nameAr} onChange={(e) => setForm((f) => ({ ...f, nameAr: e.target.value }))} placeholder="اختياري" />
+              <Input
+                value={form.nameAr}
+                onChange={(e) => setForm((f) => ({ ...f, nameAr: e.target.value }))}
+                placeholder="اختياري"
+              />
             </div>
             <div className="grid gap-2">
               <Label>المدن (مفصولة بفاصلة)</Label>
-              <Input value={form.cities} onChange={(e) => setForm((f) => ({ ...f, cities: e.target.value }))} placeholder="الرياض، جدة، ..." />
+              <Input
+                value={form.cities}
+                onChange={(e) => setForm((f) => ({ ...f, cities: e.target.value }))}
+                placeholder="الرياض، جدة، ..."
+              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>رسوم الأساس (ر.س)</Label>
-                <Input type="number" min="0" step="0.01" value={form.baseFee} onChange={(e) => setForm((f) => ({ ...f, baseFee: e.target.value }))} />
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.baseFee}
+                  onChange={(e) => setForm((f) => ({ ...f, baseFee: e.target.value }))}
+                />
               </div>
               <div className="grid gap-2">
                 <Label>رسوم/كم (ر.س)</Label>
-                <Input type="number" min="0" step="0.01" value={form.perKmFee} onChange={(e) => setForm((f) => ({ ...f, perKmFee: e.target.value }))} placeholder="اختياري" />
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.perKmFee}
+                  onChange={(e) => setForm((f) => ({ ...f, perKmFee: e.target.value }))}
+                  placeholder="اختياري"
+                />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label>الحد الأدنى للطلب (ر.س)</Label>
-                <Input type="number" min="0" step="0.01" value={form.minOrder} onChange={(e) => setForm((f) => ({ ...f, minOrder: e.target.value }))} placeholder="اختياري" />
+                <Input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.minOrder}
+                  onChange={(e) => setForm((f) => ({ ...f, minOrder: e.target.value }))}
+                  placeholder="اختياري"
+                />
               </div>
               <div className="grid gap-2">
                 <Label>مهلة التوصيل (ساعة)</Label>
-                <Input type="number" min="1" value={form.leadTimeHrs} onChange={(e) => setForm((f) => ({ ...f, leadTimeHrs: e.target.value }))} />
+                <Input
+                  type="number"
+                  min="1"
+                  value={form.leadTimeHrs}
+                  onChange={(e) => setForm((f) => ({ ...f, leadTimeHrs: e.target.value }))}
+                />
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <input type="checkbox" id="active" checked={form.isActive} onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))} className="rounded" />
+              <input
+                type="checkbox"
+                id="active"
+                checked={form.isActive}
+                onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
+                className="rounded"
+              />
               <Label htmlFor="active">نشط</Label>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={saving}>إلغاء</Button>
-            <Button onClick={save} disabled={saving}>{editingId ? 'حفظ' : 'إضافة'}</Button>
+            <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={saving}>
+              إلغاء
+            </Button>
+            <Button onClick={save} disabled={saving}>
+              {editingId ? 'حفظ' : 'إضافة'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -4,10 +4,10 @@
  * Target: 200 concurrent users (or set stages below).
  */
 
-import http from 'k6/http';
-import { check, sleep } from 'k6';
+import http from 'k6/http'
+import { check, sleep } from 'k6'
 
-const BASE = __ENV.BASE_URL || 'http://localhost:3001';
+const BASE = __ENV.BASE_URL || 'http://localhost:3001'
 
 export const options = {
   stages: [
@@ -20,14 +20,14 @@ export const options = {
     http_req_duration: ['p(95)<3000'],
     http_req_failed: ['rate<0.05'],
   },
-};
+}
 
 export default function () {
-  const res = http.get(`${BASE}/api/public/equipment?limit=10`);
-  check(res, { 'equipment status 200': (r) => r.status === 200 });
-  sleep(0.5);
+  const res = http.get(`${BASE}/api/public/equipment?limit=10`)
+  check(res, { 'equipment status 200': (r) => r.status === 200 })
+  sleep(0.5)
 
-  const catRes = http.get(`${BASE}/api/public/categories`);
-  check(catRes, { 'categories status 200': (r) => r.status === 200 });
-  sleep(0.3);
+  const catRes = http.get(`${BASE}/api/public/categories`)
+  check(catRes, { 'categories status 200': (r) => r.status === 200 })
+  sleep(0.3)
 }

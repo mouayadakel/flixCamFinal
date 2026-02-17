@@ -8,7 +8,9 @@
 All Supabase setup files have been created and are ready to use:
 
 ### 1. **SUPABASE_SETUP.md** ✅
+
 Complete step-by-step guide for setting up Supabase project, including:
+
 - Creating Supabase project
 - Getting API keys
 - Running SQL scripts
@@ -18,7 +20,9 @@ Complete step-by-step guide for setting up Supabase project, including:
 - Troubleshooting guide
 
 ### 2. **supabase/schema.sql** ✅
+
 Complete database schema with:
+
 - ✅ All ENUM types (equipment_condition, booking_state, user_role, etc.)
 - ✅ Core tables (roles, permissions, user_roles, clients)
 - ✅ Equipment tables (equipment_items, equipment_categories, equipment_brands, equipment_pricing, equipment_media)
@@ -37,7 +41,9 @@ Complete database schema with:
 **Total**: 20+ core tables (expandable to 60+ with additional features)
 
 ### 3. **supabase/rls-policies.sql** ✅
+
 Row Level Security policies for:
+
 - ✅ Roles & permissions (viewable by authenticated users)
 - ✅ Clients (users see own, staff see all)
 - ✅ Equipment (all can view, staff can manage)
@@ -49,14 +55,18 @@ Row Level Security policies for:
 - ✅ Helper function: `get_user_role()` for role checking
 
 ### 4. **supabase/storage-setup.sql** ✅
+
 Storage bucket policies for:
+
 - ✅ `equipment-images` (public bucket)
 - ✅ `contracts` (private bucket)
 - ✅ `invoices` (private bucket)
 - ✅ `user-documents` (private bucket)
 
 ### 5. **supabase/seed-data.sql** ✅
+
 Initial seed data:
+
 - ✅ All 7 roles (super_admin, admin, staff, warehouse, driver, technician, client)
 - ✅ Complete permissions matrix (bookings, equipment, payments, clients, invoices, contracts, settings)
 - ✅ Role-permission assignments
@@ -64,6 +74,7 @@ Initial seed data:
 - ✅ Sample equipment brands (Sony, Canon, RED, ARRI, Panasonic)
 
 ### 6. **Updated Supabase Clients** ✅
+
 - ✅ `src/lib/supabase/client.ts` - Enhanced with error handling
 - ✅ `src/lib/supabase/server.ts` - Enhanced with error handling
 - ✅ `src/lib/auth/auth-helpers.ts` - Enhanced with Arabic error messages and better error handling

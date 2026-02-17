@@ -36,7 +36,7 @@ export default async function PackagesListPage() {
   if (!enabled) redirect('/')
   const packages = await getPackages()
   return (
-    <main className="container py-8 px-4">
+    <main className="container px-4 py-8">
       <PackagesListClient packages={packages} />
     </main>
   )

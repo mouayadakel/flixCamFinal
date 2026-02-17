@@ -6,14 +6,7 @@
 
 'use client'
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from 'react'
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 
 export type AuthModalTab = 'register' | 'login'
 
@@ -55,11 +48,7 @@ export function AuthModalProvider({ children }: { children: ReactNode }) {
     [isOpen, tab, openAuthModal, closeAuthModal, setTab]
   )
 
-  return (
-    <AuthModalContext.Provider value={value}>
-      {children}
-    </AuthModalContext.Provider>
-  )
+  return <AuthModalContext.Provider value={value}>{children}</AuthModalContext.Provider>
 }
 
 export function useAuthModal(): AuthModalContextValue {

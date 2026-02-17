@@ -7,10 +7,7 @@ import { prisma } from '@/lib/db/prisma'
 import { rateLimitByTier } from '@/lib/utils/rate-limit'
 import { cacheGet, cacheSet } from '@/lib/cache'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   const rate = rateLimitByTier(request, 'public')
   if (!rate.allowed) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 })

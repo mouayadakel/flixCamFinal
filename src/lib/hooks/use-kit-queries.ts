@@ -5,12 +5,7 @@
 
 'use client'
 
-import {
-  useQuery,
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query'
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { CategoryStepConfig, ShootTypeFullConfig } from '@/lib/stores/kit-wizard.store'
 import type { BudgetTier } from '@/lib/stores/kit-wizard.store'
 
@@ -108,12 +103,17 @@ async function fetchEquipmentPage(params: {
   }
 }
 
-export function useEquipmentInfinite(
-  filters: EquipmentFilters & { categoryId: string | null }
-) {
+export function useEquipmentInfinite(filters: EquipmentFilters & { categoryId: string | null }) {
   const { categoryId, budgetTier, q, sort } = filters
   return useInfiniteQuery({
-    queryKey: ['equipment', 'infinite', categoryId, budgetTier ?? '', q ?? '', sort ?? 'recommended'],
+    queryKey: [
+      'equipment',
+      'infinite',
+      categoryId,
+      budgetTier ?? '',
+      q ?? '',
+      sort ?? 'recommended',
+    ],
     queryFn: ({ pageParam }) =>
       fetchEquipmentPage({
         categoryId: categoryId || undefined,
@@ -126,8 +126,7 @@ export function useEquipmentInfinite(
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       const loaded = allPages.length * EQUIPMENT_PAGE_SIZE
-      if (lastPage.data.length < EQUIPMENT_PAGE_SIZE || loaded >= lastPage.total)
-        return undefined
+      if (lastPage.data.length < EQUIPMENT_PAGE_SIZE || loaded >= lastPage.total) return undefined
       return loaded
     },
     staleTime: 5 * 60 * 1000,
@@ -227,7 +226,9 @@ async function fetchKitAISuggest(params: KitAISuggestParams): Promise<KitAISugge
   const json = await res.json()
   return {
     suggestions: Array.isArray(json?.suggestions) ? json.suggestions : [],
-    matchingPrebuiltKits: Array.isArray(json?.matchingPrebuiltKits) ? json.matchingPrebuiltKits : [],
+    matchingPrebuiltKits: Array.isArray(json?.matchingPrebuiltKits)
+      ? json.matchingPrebuiltKits
+      : [],
   }
 }
 

@@ -11,7 +11,11 @@ const fromName = process.env.RESEND_FROM_NAME ?? process.env.SMTP_FROM_NAME ?? '
 
 const resend = resendApiKey ? new Resend(resendApiKey) : null
 
-const baseUrl = process.env.NEXTAUTH_URL ?? process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+const baseUrl =
+  process.env.NEXTAUTH_URL ??
+  process.env.APP_URL ??
+  process.env.NEXT_PUBLIC_APP_URL ??
+  'http://localhost:3000'
 
 export const EmailService = {
   /**

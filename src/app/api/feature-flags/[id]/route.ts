@@ -9,27 +9,18 @@ import { auth } from '@/lib/auth'
 import { FeatureFlagService } from '@/lib/services/feature-flag.service'
 import { rateLimitAPI } from '@/lib/utils/rate-limit'
 
-export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const rateLimit = rateLimitAPI(request)
-  
+
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: 'Too many requests' },
-      { status: 429 }
-    )
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }
 
   try {
     const session = await auth()
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()
@@ -42,7 +33,7 @@ export async function PATCH(
     // In production, you might want to use Redis cache invalidation here
     const response = NextResponse.json({ flag })
     response.headers.set('Cache-Control', 'no-store, must-revalidate')
-    
+
     return response
   } catch (error: any) {
     return NextResponse.json(
@@ -52,27 +43,18 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: Request, { params }: { params: { id: string } }) {
   const rateLimit = rateLimitAPI(request)
-  
+
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: 'Too many requests' },
-      { status: 429 }
-    )
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }
 
   try {
     const session = await auth()
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     await FeatureFlagService.delete(params.id, session.user.id)

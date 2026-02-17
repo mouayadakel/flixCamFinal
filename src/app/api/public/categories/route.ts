@@ -13,8 +13,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }
 
-  const cached = await cacheGet<unknown>('websiteContent', 'categories')
-  if (cached) return NextResponse.json(cached)
+  const skipCache = process.env.NODE_ENV === 'development'
+  if (!skipCache) {
+    const cached = await cacheGet<unknown>('websiteContent', 'categories')
+    if (cached) return NextResponse.json(cached)
+  }
 
   const categories = await prisma.category.findMany({
     where: { deletedAt: null },

@@ -24,10 +24,7 @@ function slugify(name: string): string {
 /**
  * GET /api/studios/:id
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) {
@@ -62,10 +59,7 @@ export async function GET(
 /**
  * PATCH /api/studios/:id
  */
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) {
@@ -84,7 +78,10 @@ export async function PATCH(
     const parsed = updateStudioSchema.parse(body)
 
     if (parsed.name !== undefined && parsed.name.trim() !== existing.name) {
-      const slug = (parsed.slug && parsed.slug.trim() !== '' ? slugify(parsed.slug.trim()) : slugify(parsed.name))
+      const slug =
+        parsed.slug && parsed.slug.trim() !== ''
+          ? slugify(parsed.slug.trim())
+          : slugify(parsed.name)
       const conflict = await prisma.studio.findFirst({
         where: {
           deletedAt: null,
@@ -112,7 +109,9 @@ export async function PATCH(
       data: {
         ...(parsed.name !== undefined && { name: parsed.name.trim() }),
         ...(slug !== undefined && { slug }),
-        ...(parsed.description !== undefined && { description: parsed.description?.trim() ?? null }),
+        ...(parsed.description !== undefined && {
+          description: parsed.description?.trim() ?? null,
+        }),
         ...(parsed.capacity !== undefined && { capacity: parsed.capacity }),
         ...(parsed.hourlyRate !== undefined && { hourlyRate: parsed.hourlyRate }),
         ...(parsed.setupBuffer !== undefined && { setupBuffer: parsed.setupBuffer }),

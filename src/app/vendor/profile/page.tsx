@@ -21,9 +21,7 @@ export default async function VendorProfilePage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">الملف الشخصي</h1>
-        <p className="text-muted-foreground mt-1">
-          معلومات الشركة والبنك لاستلام المدفوعات
-        </p>
+        <p className="mt-1 text-muted-foreground">معلومات الشركة والبنك لاستلام المدفوعات</p>
       </div>
 
       <Card>

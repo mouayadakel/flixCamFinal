@@ -41,7 +41,9 @@ export function SavedGearList({ items, onRemove, removingId }: SavedGearListProp
       <div className="rounded-lg border border-border-light bg-surface-light p-12 text-center">
         <Heart className="mx-auto h-12 w-12 text-text-muted" />
         <p className="mt-4 font-medium text-text-heading">No saved gear</p>
-        <p className="mt-1 text-sm text-text-muted">Save equipment from the catalog to see it here.</p>
+        <p className="mt-1 text-sm text-text-muted">
+          Save equipment from the catalog to see it here.
+        </p>
         <Button asChild variant="outline" className="mt-4">
           <Link href="/equipment">Browse equipment</Link>
         </Button>
@@ -56,8 +58,11 @@ export function SavedGearList({ items, onRemove, removingId }: SavedGearListProp
         const imgUrl = eq.media[0]?.url || EQUIPMENT_PLACEHOLDER
         const href = `/equipment/${eq.id}`
         return (
-          <li key={item.id} className="rounded-lg border border-border-light bg-white overflow-hidden shadow-sm">
-            <Link href={href} className="block aspect-[4/3] relative bg-muted">
+          <li
+            key={item.id}
+            className="overflow-hidden rounded-lg border border-border-light bg-white shadow-sm"
+          >
+            <Link href={href} className="relative block aspect-[4/3] bg-muted">
               <Image
                 src={imgUrl}
                 alt={eq.model ?? eq.sku}
@@ -71,7 +76,9 @@ export function SavedGearList({ items, onRemove, removingId }: SavedGearListProp
                 {eq.model ?? eq.sku}
               </Link>
               <p className="text-sm text-text-muted">{eq.sku}</p>
-              <p className="mt-1 font-medium">{Number(eq.dailyPrice).toLocaleString('en-SA')} SAR / {t('common.pricePerDay')}</p>
+              <p className="mt-1 font-medium">
+                {Number(eq.dailyPrice).toLocaleString('en-SA')} SAR / {t('common.pricePerDay')}
+              </p>
               <Button
                 variant="ghost"
                 size="sm"
@@ -79,7 +86,7 @@ export function SavedGearList({ items, onRemove, removingId }: SavedGearListProp
                 disabled={removingId === eq.id}
                 onClick={() => onRemove(eq.id)}
               >
-                <Trash2 className="h-4 w-4 ml-1" />
+                <Trash2 className="ml-1 h-4 w-4" />
                 Remove
               </Button>
             </div>

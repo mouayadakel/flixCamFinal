@@ -40,7 +40,10 @@ export interface CartState {
     quantity?: number
     dailyRate?: number
   }) => Promise<void>
-  updateItem: (itemId: string, data: { quantity?: number; startDate?: string; endDate?: string }) => Promise<void>
+  updateItem: (
+    itemId: string,
+    data: { quantity?: number; startDate?: string; endDate?: string }
+  ) => Promise<void>
   removeItem: (itemId: string) => Promise<void>
   applyCoupon: (code: string) => Promise<void>
   removeCoupon: () => Promise<void>
@@ -60,7 +63,13 @@ interface CartApiResponse {
 
 async function apiGetCart(): Promise<CartApiResponse> {
   const res = await fetch('/api/cart')
-  if (!res.ok) throw new Error(await res.json().then((j: { error?: string }) => j.error).catch(() => 'Failed to fetch cart'))
+  if (!res.ok)
+    throw new Error(
+      await res
+        .json()
+        .then((j: { error?: string }) => j.error)
+        .catch(() => 'Failed to fetch cart')
+    )
   return res.json()
 }
 

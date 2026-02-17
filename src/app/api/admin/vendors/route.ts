@@ -51,7 +51,10 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     console.error('[GET /api/admin/vendors]', err)
     const message = err instanceof Error ? err.message : 'Internal server error'
-    const status = err && typeof err === 'object' && 'statusCode' in err ? (err as { statusCode: number }).statusCode : 500
+    const status =
+      err && typeof err === 'object' && 'statusCode' in err
+        ? (err as { statusCode: number }).statusCode
+        : 500
     return NextResponse.json({ error: message }, { status })
   }
 }
@@ -71,10 +74,7 @@ export async function POST(request: NextRequest) {
 
   const parsed = createSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.flatten().fieldErrors },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 })
   }
 
   const vendor = await VendorService.createVendor(parsed.data, session.user.id)

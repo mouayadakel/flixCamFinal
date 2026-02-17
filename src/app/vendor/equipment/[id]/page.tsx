@@ -45,7 +45,7 @@ export default async function VendorEquipmentDetailPage({
       <div>
         <Link
           href="/vendor/equipment"
-          className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1 mb-2"
+          className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowRight className="h-4 w-4" />
           العودة للمعدات
@@ -54,14 +54,22 @@ export default async function VendorEquipmentDetailPage({
           <h1 className="text-3xl font-bold">{equipment.model || equipment.sku}</h1>
           <Badge
             variant={
-              status === 'approved' ? 'default' : status === 'rejected' ? 'destructive' : 'secondary'
+              status === 'approved'
+                ? 'default'
+                : status === 'rejected'
+                  ? 'destructive'
+                  : 'secondary'
             }
           >
-            {status === 'pending_review' ? 'قيد المراجعة' : status === 'approved' ? 'معتمد' : 'مرفوض'}
+            {status === 'pending_review'
+              ? 'قيد المراجعة'
+              : status === 'approved'
+                ? 'معتمد'
+                : 'مرفوض'}
           </Badge>
           {!equipment.isActive && <Badge variant="outline">غير نشط</Badge>}
         </div>
-        <p className="text-muted-foreground mt-1">
+        <p className="mt-1 text-muted-foreground">
           {equipment.category?.name} {equipment.brand?.name && `• ${equipment.brand.name}`}
         </p>
       </div>

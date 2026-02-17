@@ -79,7 +79,11 @@ describe('ZATCA Invoice Generator', () => {
       expect(parsed.Invoice).toBeDefined()
       expect(parsed.Invoice['cbc:ID']).toBe('INV-2026-001')
       expect(parsed.Invoice['cbc:DocumentCurrencyCode']['#text']).toBe('SAR')
-      expect(parsed.Invoice['cac:AccountingSupplierParty']['cac:Party']['cac:PartyLegalEntity']['cbc:RegistrationName']).toBe('FlixCam Rental')
+      expect(
+        parsed.Invoice['cac:AccountingSupplierParty']['cac:Party']['cac:PartyLegalEntity'][
+          'cbc:RegistrationName'
+        ]
+      ).toBe('FlixCam Rental')
     })
 
     it('should generate QR code', async () => {

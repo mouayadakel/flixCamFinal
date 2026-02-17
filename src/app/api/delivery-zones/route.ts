@@ -59,27 +59,33 @@ export async function POST(request: NextRequest) {
         name: name.trim(),
         nameAr: typeof nameAr === 'string' ? nameAr.trim() || null : null,
         baseFee: baseFeeNum,
-        perKmFee: typeof perKmFee === 'number' ? perKmFee : perKmFee != null ? parseFloat(perKmFee) : null,
-        minOrder: typeof minOrder === 'number' ? minOrder : minOrder != null ? parseFloat(minOrder) : null,
-        leadTimeHrs: typeof leadTimeHrs === 'number' ? leadTimeHrs : parseInt(leadTimeHrs, 10) || 24,
+        perKmFee:
+          typeof perKmFee === 'number' ? perKmFee : perKmFee != null ? parseFloat(perKmFee) : null,
+        minOrder:
+          typeof minOrder === 'number' ? minOrder : minOrder != null ? parseFloat(minOrder) : null,
+        leadTimeHrs:
+          typeof leadTimeHrs === 'number' ? leadTimeHrs : parseInt(leadTimeHrs, 10) || 24,
         isActive: typeof isActive === 'boolean' ? isActive : true,
         cities: Array.isArray(cities) ? cities : [],
       },
     })
 
-    return NextResponse.json({
-      id: zone.id,
-      name: zone.name,
-      nameAr: zone.nameAr,
-      baseFee: Number(zone.baseFee),
-      perKmFee: zone.perKmFee != null ? Number(zone.perKmFee) : null,
-      minOrder: zone.minOrder != null ? Number(zone.minOrder) : null,
-      leadTimeHrs: zone.leadTimeHrs,
-      isActive: zone.isActive,
-      cities: zone.cities,
-      createdAt: zone.createdAt.toISOString(),
-      updatedAt: zone.updatedAt.toISOString(),
-    }, { status: 201 })
+    return NextResponse.json(
+      {
+        id: zone.id,
+        name: zone.name,
+        nameAr: zone.nameAr,
+        baseFee: Number(zone.baseFee),
+        perKmFee: zone.perKmFee != null ? Number(zone.perKmFee) : null,
+        minOrder: zone.minOrder != null ? Number(zone.minOrder) : null,
+        leadTimeHrs: zone.leadTimeHrs,
+        isActive: zone.isActive,
+        cities: zone.cities,
+        createdAt: zone.createdAt.toISOString(),
+        updatedAt: zone.updatedAt.toISOString(),
+      },
+      { status: 201 }
+    )
   } catch (e) {
     console.error('Delivery zone create error:', e)
     return NextResponse.json({ error: 'Failed to create delivery zone' }, { status: 500 })

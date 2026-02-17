@@ -19,24 +19,16 @@ export const inspectionChecklistItemSchema = z.object({
 
 export const checkOutSchema = z.object({
   bookingId: z.string().min(1, 'معرف الحجز مطلوب'),
-  equipmentIds: z
-    .array(z.string().min(1))
-    .min(1, 'يجب تحديد معدات واحدة على الأقل'),
-  checklist: z
-    .array(inspectionChecklistItemSchema)
-    .min(1, 'يجب ملء قائمة التحقق'),
+  equipmentIds: z.array(z.string().min(1)).min(1, 'يجب تحديد معدات واحدة على الأقل'),
+  checklist: z.array(inspectionChecklistItemSchema).min(1, 'يجب ملء قائمة التحقق'),
   notes: z.string().optional(),
   warehouseLocation: z.string().optional(),
 })
 
 export const checkInSchema = z.object({
   bookingId: z.string().min(1, 'معرف الحجز مطلوب'),
-  equipmentIds: z
-    .array(z.string().min(1))
-    .min(1, 'يجب تحديد معدات واحدة على الأقل'),
-  checklist: z
-    .array(inspectionChecklistItemSchema)
-    .min(1, 'يجب ملء قائمة التحقق'),
+  equipmentIds: z.array(z.string().min(1)).min(1, 'يجب تحديد معدات واحدة على الأقل'),
+  checklist: z.array(inspectionChecklistItemSchema).min(1, 'يجب ملء قائمة التحقق'),
   notes: z.string().optional(),
   condition: z.nativeEnum(EquipmentCondition).optional(),
   damageReport: z.string().optional(),

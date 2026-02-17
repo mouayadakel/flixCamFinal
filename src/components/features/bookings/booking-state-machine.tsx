@@ -70,7 +70,7 @@ export function BookingStateMachine({
             const isAllowed = allowedTransitions.includes(state)
 
             return (
-              <div key={state} className="flex flex-col items-center flex-1">
+              <div key={state} className="flex flex-1 flex-col items-center">
                 {/* Connection Line */}
                 {index < states.length - 1 && (
                   <div
@@ -86,12 +86,12 @@ export function BookingStateMachine({
 
                 {/* State Circle */}
                 <div
-                  className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center border-2 ${
+                  className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 ${
                     isActive
-                      ? 'bg-primary-500 border-primary-600'
+                      ? 'border-primary-600 bg-primary-500'
                       : isPast
-                        ? 'bg-primary-100 border-primary-300'
-                        : 'bg-white border-neutral-300'
+                        ? 'border-primary-300 bg-primary-100'
+                        : 'border-neutral-300 bg-white'
                   }`}
                   style={
                     isActive
@@ -129,7 +129,7 @@ export function BookingStateMachine({
 
       {/* Allowed Transitions */}
       {!isFinalState && allowedTransitions.length > 0 && onTransition && (
-        <div className="flex flex-wrap gap-2 pt-4 border-t">
+        <div className="flex flex-wrap gap-2 border-t pt-4">
           <span className="text-sm font-medium text-neutral-700">الانتقالات المتاحة:</span>
           {allowedTransitions.map((toState) => {
             const stateConfig = BOOKING_STATES[toState]
@@ -149,9 +149,7 @@ export function BookingStateMachine({
       )}
 
       {isFinalState && (
-        <div className="text-sm text-muted-foreground pt-2">
-          هذه حالة نهائية - لا يمكن تغييرها
-        </div>
+        <div className="pt-2 text-sm text-muted-foreground">هذه حالة نهائية - لا يمكن تغييرها</div>
       )}
     </div>
   )

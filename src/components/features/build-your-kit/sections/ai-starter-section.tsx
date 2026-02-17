@@ -10,7 +10,10 @@ import { useLocale } from '@/hooks/use-locale'
 import { useToast } from '@/hooks/use-toast'
 import { useKitWizardStore } from '@/lib/stores/kit-wizard.store'
 import { useShootTypeConfig } from '@/lib/hooks/use-kit-queries'
-import { KitEquipmentCard, type KitEquipmentItem } from '@/components/features/build-your-kit/kit-equipment-card'
+import {
+  KitEquipmentCard,
+  type KitEquipmentItem,
+} from '@/components/features/build-your-kit/kit-equipment-card'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 
@@ -80,25 +83,22 @@ export function AIStarterSection() {
   }
 
   const recommendationIds = new Set(recsFiltered.map((r) => r.equipmentId))
-  const selectedFromRecs = recsFiltered.filter((r) => (selectedEquipment[r.equipmentId]?.qty ?? 0) > 0)
+  const selectedFromRecs = recsFiltered.filter(
+    (r) => (selectedEquipment[r.equipmentId]?.qty ?? 0) > 0
+  )
   const hasPriorSelections = Object.keys(selectedEquipment).length > 0
 
   const handleAcceptAll = () => {
     recsFiltered.forEach((r) => {
       const current = selectedEquipment[r.equipmentId]?.qty ?? 0
       if (current < 1) {
-        addEquipment(
-          r.equipmentId,
-          r.defaultQuantity,
-          Number(r.equipment.dailyPrice),
-          {
-            model: r.equipment.model ?? undefined,
-            imageUrl: r.equipment.media[0]?.url,
-            categoryId: r.equipment.categoryId,
-            isRecommended: true,
-            budgetTier: r.budgetTier as 'ESSENTIAL' | 'PROFESSIONAL' | 'PREMIUM',
-          }
-        )
+        addEquipment(r.equipmentId, r.defaultQuantity, Number(r.equipment.dailyPrice), {
+          model: r.equipment.model ?? undefined,
+          imageUrl: r.equipment.media[0]?.url,
+          categoryId: r.equipment.categoryId,
+          isRecommended: true,
+          budgetTier: r.budgetTier as 'ESSENTIAL' | 'PROFESSIONAL' | 'PREMIUM',
+        })
       }
     })
   }
@@ -117,8 +117,8 @@ export function AIStarterSection() {
         <h2 className="text-lg font-semibold text-text-heading">
           <span className="rounded bg-brand-primary/10 px-2 py-0.5 text-sm font-medium text-brand-primary">
             {t('kit.recommendedFor')}
-          </span>
-          {' '}{config?.name ?? t('kit.stepEquipment')}
+          </span>{' '}
+          {config?.name ?? t('kit.stepEquipment')}
         </h2>
         <div className="flex items-center gap-2">
           {hasPriorSelections && (
@@ -126,18 +126,27 @@ export function AIStarterSection() {
               {t('kit.startFresh')}
             </Button>
           )}
-          <Button type="button" variant="outline" size="sm" onClick={handleClearAll} disabled={selectedFromRecs.length === 0}>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleClearAll}
+            disabled={selectedFromRecs.length === 0}
+          >
             {t('kit.clearAll')}
           </Button>
-          <Button type="button" size="sm" onClick={handleAcceptAll} disabled={selectedFromRecs.length === recsFiltered.length}>
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleAcceptAll}
+            disabled={selectedFromRecs.length === recsFiltered.length}
+          >
             {t('kit.acceptAll')}
           </Button>
         </div>
       </div>
       {hasPriorSelections && selectedFromRecs.length === 0 && (
-        <p className="text-sm text-text-muted">
-          {t('kit.yourPreviousSelections')}
-        </p>
+        <p className="text-sm text-text-muted">{t('kit.yourPreviousSelections')}</p>
       )}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {recsFiltered.map((r) => {
@@ -151,18 +160,13 @@ export function AIStarterSection() {
                 onToggle={() => {
                   if (selectedQty > 0) removeEquipment(r.equipmentId)
                   else
-                    addEquipment(
-                      r.equipmentId,
-                      r.defaultQuantity,
-                      Number(r.equipment.dailyPrice),
-                      {
-                        model: r.equipment.model ?? undefined,
-                        imageUrl: r.equipment.media[0]?.url,
-                        categoryId: r.equipment.categoryId,
-                        isRecommended: true,
-                        budgetTier: r.budgetTier as 'ESSENTIAL' | 'PROFESSIONAL' | 'PREMIUM',
-                      }
-                    )
+                    addEquipment(r.equipmentId, r.defaultQuantity, Number(r.equipment.dailyPrice), {
+                      model: r.equipment.model ?? undefined,
+                      imageUrl: r.equipment.media[0]?.url,
+                      categoryId: r.equipment.categoryId,
+                      isRecommended: true,
+                      budgetTier: r.budgetTier as 'ESSENTIAL' | 'PROFESSIONAL' | 'PREMIUM',
+                    })
                 }}
                 onQtyChange={(qty) => {
                   if (qty < 1) removeEquipment(r.equipmentId)
@@ -171,9 +175,7 @@ export function AIStarterSection() {
                 multiSelectMode
                 aiRecommended
               />
-              {r.reason && (
-                <p className="mt-1 text-xs text-text-muted">{r.reason}</p>
-              )}
+              {r.reason && <p className="mt-1 text-xs text-text-muted">{r.reason}</p>}
             </div>
           )
         })}

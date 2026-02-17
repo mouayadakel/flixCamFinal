@@ -60,7 +60,9 @@ export default function CalendarPage() {
   const [resourceType, setResourceType] = useState<ResourceFilter>('all')
   const [resourceId, setResourceId] = useState<string>('')
   const [studios, setStudios] = useState<Array<{ id: string; name: string }>>([])
-  const [equipmentList, setEquipmentList] = useState<Array<{ id: string; sku: string; model: string | null }>>([])
+  const [equipmentList, setEquipmentList] = useState<
+    Array<{ id: string; sku: string; model: string | null }>
+  >([])
 
   const loadResources = useCallback(async () => {
     try {
@@ -147,7 +149,9 @@ export default function CalendarPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Resource filter</CardTitle>
-          <CardDescription>View by resource type or a single resource (buffer time shown for studios)</CardDescription>
+          <CardDescription>
+            View by resource type or a single resource (buffer time shown for studios)
+          </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap items-end gap-4">
           <div className="space-y-2">
@@ -175,7 +179,9 @@ export default function CalendarPage() {
               >
                 <option value="">All studios</option>
                 {studios.map((s) => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
                 ))}
               </select>
             </div>
@@ -190,7 +196,9 @@ export default function CalendarPage() {
               >
                 <option value="">All equipment</option>
                 {equipmentList.map((e) => (
-                  <option key={e.id} value={e.id}>{e.sku} {e.model ?? ''}</option>
+                  <option key={e.id} value={e.id}>
+                    {e.sku} {e.model ?? ''}
+                  </option>
                 ))}
               </select>
             </div>
@@ -236,7 +244,7 @@ export default function CalendarPage() {
                       <span className="text-muted-foreground">{ev.resourceType}</span>{' '}
                       {ev.resourceName}
                     </TableCell>
-                    <TableCell className="text-muted-foreground text-sm">
+                    <TableCell className="text-sm text-muted-foreground">
                       {(ev.bufferMinutesBefore ?? 0) > 0 || (ev.bufferMinutesAfter ?? 0) > 0
                         ? `${ev.bufferMinutesBefore}m setup, ${ev.bufferMinutesAfter}m clean`
                         : '—'}

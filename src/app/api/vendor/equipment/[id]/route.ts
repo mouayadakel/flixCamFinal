@@ -33,10 +33,7 @@ const patchSchema = z.object({
     .optional(),
 })
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth()
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -46,10 +43,7 @@ export async function GET(
     where: { userId: session.user.id, deletedAt: null, status: 'APPROVED' },
   })
   if (!vendor) {
-    return NextResponse.json(
-      { error: 'Vendor account not found or not approved' },
-      { status: 403 }
-    )
+    return NextResponse.json({ error: 'Vendor account not found or not approved' }, { status: 403 })
   }
 
   const { id } = await params
@@ -69,10 +63,7 @@ export async function GET(
   return NextResponse.json(equipment)
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth()
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -82,10 +73,7 @@ export async function PATCH(
     where: { userId: session.user.id, deletedAt: null, status: 'APPROVED' },
   })
   if (!vendor) {
-    return NextResponse.json(
-      { error: 'Vendor account not found or not approved' },
-      { status: 403 }
-    )
+    return NextResponse.json({ error: 'Vendor account not found or not approved' }, { status: 403 })
   }
 
   const { id } = await params
@@ -114,10 +102,7 @@ export async function PATCH(
 
   const parsed = patchSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.flatten().fieldErrors },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 })
   }
 
   const sanitized = Object.fromEntries(

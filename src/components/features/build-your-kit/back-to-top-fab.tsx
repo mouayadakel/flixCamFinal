@@ -36,7 +36,7 @@ export function BackToTopFab() {
       size="icon"
       className={cn(
         'fixed bottom-24 end-4 z-30 h-12 w-12 rounded-full shadow-lg lg:bottom-8',
-        'animate-in fade-in slide-in-from-bottom-4 duration-300'
+        'duration-300 animate-in fade-in slide-in-from-bottom-4'
       )}
       onClick={scrollToTop}
       aria-label="Back to top"

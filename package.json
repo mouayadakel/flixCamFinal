@@ -19,6 +19,7 @@
     "deploy:db": "prisma migrate deploy && tsx prisma/seed.ts",
     "db:seed:rbac": "tsx prisma/seed-rbac.ts",
     "db:seed:qsmrent": "tsx scripts/seed-qsmrent-equipment.ts",
+    "db:seed:lighting-subcategories": "tsx scripts/seed-lighting-subcategories.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",

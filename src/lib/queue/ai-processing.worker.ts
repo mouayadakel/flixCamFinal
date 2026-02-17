@@ -130,7 +130,8 @@ export function createAIProcessingWorker() {
                     },
                     data: {
                       seoTitle: autofillResult.seo.metaTitle || enTranslation.seoTitle,
-                      seoDescription: autofillResult.seo.metaDescription || enTranslation.seoDescription,
+                      seoDescription:
+                        autofillResult.seo.metaDescription || enTranslation.seoDescription,
                       seoKeywords: autofillResult.seo.metaKeywords || enTranslation.seoKeywords,
                     },
                   })
@@ -212,7 +213,7 @@ export function createAIProcessingWorker() {
           }
 
           // Update progress
-          await job.updateProgress(Math.round((i + 1) / productIds.length * 100))
+          await job.updateProgress(Math.round(((i + 1) / productIds.length) * 100))
 
           // Update AI job progress
           await prisma.aIProcessingJob.update({

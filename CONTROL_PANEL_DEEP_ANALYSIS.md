@@ -39,7 +39,7 @@
 
 So when:
 
-- The permissions API fails, or  
+- The permissions API fails, or
 - The user has no roles/permissions (empty array),
 
 **every** `hasPermission(...)` check is **true**, and the user sees the full sidebar. That is **fail-open**: no permissions → full access in the UI. Recommendation: treat “empty permissions” as “no access” (fail-closed) unless the user is explicitly a super-admin, and consider showing a minimal or “no access” state while loading.
@@ -58,12 +58,12 @@ So when:
 
 These are either linked from the UI or expected from CRUD flows but have no page:
 
-| Route | Status | Note |
-|-------|--------|------|
-| `/admin/profile` | **Missing** | Header link → 404 |
-| `/admin/orders/new` | Missing | Only list exists |
-| `/admin/orders/[id]` | Missing | Only list exists |
-| `/admin/delivery/schedule` | Missing | Referenced from delivery area |
+| Route                      | Status      | Note                          |
+| -------------------------- | ----------- | ----------------------------- |
+| `/admin/profile`           | **Missing** | Header link → 404             |
+| `/admin/orders/new`        | Missing     | Only list exists              |
+| `/admin/orders/[id]`       | Missing     | Only list exists              |
+| `/admin/delivery/schedule` | Missing     | Referenced from delivery area |
 
 All other previously “missing” items in the old audit (e.g. approvals, action-center, live-ops, kit-builder, dynamic-pricing, ai-recommendations, invoices/new, invoices/[id], payments/[id], contracts/[id], clients/new, clients/[id], coupons, maintenance, warehouse check-in/out/inventory, etc.) **have** corresponding page files. So the main **broken** link is `/admin/profile`; the rest are mostly “list without detail/create” gaps.
 
@@ -191,43 +191,43 @@ Based on PRD, BOOKING_ENGINE, and ROLES_AND_SECURITY:
 
 ### 6.1 Sidebar vs implementation
 
-| Sidebar item | Route | Data source | Status |
-|--------------|-------|------------|--------|
-| Dashboard | /admin/dashboard | DB/API | Live |
-| Action Center | /admin/action-center | API + mock actions | Partial |
-| Approvals | /admin/approvals | API | Live |
-| Live Operations | /admin/live-ops | API | Live |
-| Quotes | /admin/quotes | API | Live |
-| Bookings | /admin/bookings | API | Live |
-| Recurring Bookings | /admin/recurring-bookings | API | Live |
-| Calendar | /admin/calendar | API | Live |
-| AI Features | /admin/ai | API | Live |
-| Kit Builder | /admin/kit-builder | Equipment API + sample kits | Kits not from API |
-| Dynamic Pricing | /admin/dynamic-pricing | API | Live |
-| AI Recommendations | /admin/ai-recommendations | Sample data | Not using API |
-| Equipment | /admin/inventory/equipment | API | Live |
-| Kits & Bundles | /admin/inventory/kits | API | Live |
-| Categories | /admin/inventory/categories | API | Live |
-| Brands | /admin/inventory/brands | API | Live |
-| Studios | /admin/studios | API | Live |
-| Import | /admin/inventory/import | API | Live |
-| Warehouse | /admin/ops/warehouse | API | Live |
-| Delivery | /admin/ops/delivery | API | Live |
-| Technicians | /admin/technicians | Mock | Not using API |
-| Maintenance | /admin/maintenance | API | Live |
-| Damage Claims | /admin/damage-claims | API | Live |
-| Invoices | /admin/invoices | API | Live |
-| Payments | /admin/payments | API | Live |
-| Contracts | /admin/contracts | API | Live |
-| Financial Reports | /admin/finance/reports | API | Live |
-| Analytics | /admin/analytics | API | Live |
-| Clients | /admin/clients | API | Live |
-| Reviews | /admin/reviews | API | Live |
-| Customer Segments | /admin/settings/customer-segments | API | Live |
-| Coupons | /admin/coupons | API | Live |
-| Marketing | /admin/marketing | API | Live |
-| Settings / Integrations / Features / Roles / AI Control | various | API | Live (roles use API) |
-| Notifications | /admin/notifications | API | Live |
+| Sidebar item                                            | Route                             | Data source                 | Status               |
+| ------------------------------------------------------- | --------------------------------- | --------------------------- | -------------------- |
+| Dashboard                                               | /admin/dashboard                  | DB/API                      | Live                 |
+| Action Center                                           | /admin/action-center              | API + mock actions          | Partial              |
+| Approvals                                               | /admin/approvals                  | API                         | Live                 |
+| Live Operations                                         | /admin/live-ops                   | API                         | Live                 |
+| Quotes                                                  | /admin/quotes                     | API                         | Live                 |
+| Bookings                                                | /admin/bookings                   | API                         | Live                 |
+| Recurring Bookings                                      | /admin/recurring-bookings         | API                         | Live                 |
+| Calendar                                                | /admin/calendar                   | API                         | Live                 |
+| AI Features                                             | /admin/ai                         | API                         | Live                 |
+| Kit Builder                                             | /admin/kit-builder                | Equipment API + sample kits | Kits not from API    |
+| Dynamic Pricing                                         | /admin/dynamic-pricing            | API                         | Live                 |
+| AI Recommendations                                      | /admin/ai-recommendations         | Sample data                 | Not using API        |
+| Equipment                                               | /admin/inventory/equipment        | API                         | Live                 |
+| Kits & Bundles                                          | /admin/inventory/kits             | API                         | Live                 |
+| Categories                                              | /admin/inventory/categories       | API                         | Live                 |
+| Brands                                                  | /admin/inventory/brands           | API                         | Live                 |
+| Studios                                                 | /admin/studios                    | API                         | Live                 |
+| Import                                                  | /admin/inventory/import           | API                         | Live                 |
+| Warehouse                                               | /admin/ops/warehouse              | API                         | Live                 |
+| Delivery                                                | /admin/ops/delivery               | API                         | Live                 |
+| Technicians                                             | /admin/technicians                | Mock                        | Not using API        |
+| Maintenance                                             | /admin/maintenance                | API                         | Live                 |
+| Damage Claims                                           | /admin/damage-claims              | API                         | Live                 |
+| Invoices                                                | /admin/invoices                   | API                         | Live                 |
+| Payments                                                | /admin/payments                   | API                         | Live                 |
+| Contracts                                               | /admin/contracts                  | API                         | Live                 |
+| Financial Reports                                       | /admin/finance/reports            | API                         | Live                 |
+| Analytics                                               | /admin/analytics                  | API                         | Live                 |
+| Clients                                                 | /admin/clients                    | API                         | Live                 |
+| Reviews                                                 | /admin/reviews                    | API                         | Live                 |
+| Customer Segments                                       | /admin/settings/customer-segments | API                         | Live                 |
+| Coupons                                                 | /admin/coupons                    | API                         | Live                 |
+| Marketing                                               | /admin/marketing                  | API                         | Live                 |
+| Settings / Integrations / Features / Roles / AI Control | various                           | API                         | Live (roles use API) |
+| Notifications                                           | /admin/notifications              | API                         | Live                 |
 
 ### 6.2 Intentionally “hidden” features
 

@@ -5,12 +5,15 @@
 ### User Story Workflow (5 Phases)
 
 #### ✅ Phase 1: File Upload & Validation
+
 **User Story Requirement:**
+
 - Admin navigates to `/admin/inventory/import`
 - Uploads `.xlsx`, `.xls`, `.csv`, or `.tsv` (max 50MB, 5,000 rows)
 - System validates: MIME type, virus scan, file size, row count
 
 **Current Implementation:**
+
 - ✅ Route exists: `/admin/inventory/import`
 - ✅ Supports `.xlsx`, `.xls`, `.csv`
 - ❌ Missing `.tsv` support
@@ -25,13 +28,16 @@
 ---
 
 #### ⚠️ Phase 2: Sheet Detection & Mapping
+
 **User Story Requirement:**
+
 - Backend parses all sheets and returns metadata (sheet names, row counts, columns)
 - Admin maps **each sheet** to target Category (required) and Subcategory (optional)
 - Auto-detects column mappings (SKU, Product_Name, Brand, Daily_Price, Image_URL)
 - Preview first 10 rows per sheet for verification
 
 **Current Implementation:**
+
 - ✅ Parses all sheets
 - ✅ Returns sheet names
 - ❌ Does NOT return row counts per sheet
@@ -46,12 +52,15 @@
 ---
 
 #### ❌ Phase 3: Dry Run Validation (Optional)
+
 **User Story Requirement:**
+
 - Validates all data without creating products
 - Checks SKU duplicates, required fields, data types, image URLs
 - Returns downloadable error report with row-level issues
 
 **Current Implementation:**
+
 - ❌ No dry-run validation endpoint
 - ❌ No validation before import
 - ❌ No duplicate SKU check before import
@@ -62,7 +71,9 @@
 ---
 
 #### ⚠️ Phase 4: Background Processing
+
 **User Story Requirement:**
+
 - Job queued (POST `/api/admin/imports/excel`) returns `jobId` immediately
 - Worker processes rows in batches of 100 within transactions
 - For each valid row:
@@ -74,6 +85,7 @@
   - NEVER populate box_contents (always NULL) ✅
 
 **Current Implementation:**
+
 - ✅ Returns `jobId` immediately
 - ⚠️ Uses `setImmediate()` (fire-and-forget, not proper queue)
 - ⚠️ Processes row-by-row (not in batches of 100)
@@ -89,12 +101,15 @@
 ---
 
 #### ✅ Phase 5: Real-Time Monitoring
+
 **User Story Requirement:**
+
 - Frontend polls `GET /api/admin/imports/{jobId}/status` every 2 seconds
 - Displays: Progress bar, current row, success/failure counts, ETA
 - Admin can cancel job or navigate away (job continues in background)
 
 **Current Implementation:**
+
 - ✅ Polls every 2 seconds
 - ✅ Shows progress, success/failure counts
 - ❌ No progress bar visualization
@@ -109,15 +124,18 @@
 ## 🚨 CRITICAL WORKFLOW ISSUES
 
 ### Issue 1: Multi-Sheet Mapping Workflow Mismatch
+
 **Problem**: User story requires mapping ALL sheets before import starts. Current implementation forces sequential mapping (one sheet at a time).
 
-**Impact**: 
+**Impact**:
+
 - Users must import sheets one-by-one
 - Cannot see all mappings at once
 - No way to validate all mappings before starting
 - Doesn't match user story requirements
 
-**Fix Required**: 
+**Fix Required**:
+
 - Create table-based UI showing all sheets
 - Allow mapping all sheets before import
 - Validate all sheets are mapped before proceeding
@@ -125,14 +143,17 @@
 ---
 
 ### Issue 2: Missing Dry-Run Validation
+
 **Problem**: No way to validate data before import starts.
 
 **Impact**:
+
 - Users discover errors only after import starts
 - Wasted time and resources
 - Poor user experience
 
 **Fix Required**:
+
 - Add `POST /api/admin/imports/validate` endpoint
 - Validate all rows without creating products
 - Return comprehensive error report
@@ -140,15 +161,18 @@
 ---
 
 ### Issue 3: Background Processing Not Production-Ready
+
 **Problem**: Uses `setImmediate()` instead of proper job queue.
 
 **Impact**:
+
 - Jobs lost on server restart
 - No retry mechanism
 - No concurrency control
 - No job persistence
 
 **Fix Required**:
+
 - Implement BullMQ/Bull with Redis
 - Proper job queue infrastructure
 
@@ -159,6 +183,7 @@
 ### 🔴 P0 - CRITICAL (Blocking Production)
 
 #### Infrastructure & Architecture
+
 - [ ] **Job Queue System** - Replace `setImmediate()` with BullMQ/Bull
   - [ ] Redis setup and configuration
   - [ ] Job persistence
@@ -203,6 +228,7 @@
 ### 🟠 P1 - HIGH PRIORITY (Production Quality)
 
 #### Security
+
 - [ ] **Virus Scanning** - ClamAV integration
   - [ ] Scan files before processing
   - [ ] Reject infected files
@@ -229,6 +255,7 @@
   - [ ] Clear error messages
 
 #### Error Handling & Recovery
+
 - [ ] **Error Report Download** - CSV export
   - [ ] `GET /api/admin/imports/:id/errors.csv` endpoint
   - [ ] Row-level error details
@@ -247,6 +274,7 @@
   - [ ] Audit trail
 
 #### Performance
+
 - [ ] **Redis Caching** - Pre-load data
   - [ ] Cache existing SKUs
   - [ ] Cache existing brands
@@ -265,6 +293,7 @@
   - [ ] Read replicas for validation
 
 #### User Experience
+
 - [ ] **Column Auto-Detection** - Better UX
   - [ ] Auto-detect column mappings
   - [ ] Visual column mapping UI
@@ -288,24 +317,28 @@
 ### 🟡 P2 - MEDIUM PRIORITY (Nice to Have)
 
 #### File Format Support
+
 - [ ] **TSV Support** - Add `.tsv` file type
   - [ ] MIME type validation
   - [ ] Parser for TSV format
   - [ ] Error handling
 
 #### Validation Enhancements
+
 - [ ] **413 Error for Large Files** - Proper HTTP status
   - [ ] Return 413 Payload Too Large
   - [ ] Clear error message
   - [ ] Suggest file splitting
 
 #### Preview Improvements
+
 - [ ] **Preview All Sheets** - Better UX
   - [ ] Show preview for all sheets
   - [ ] First 10 rows per sheet (as per spec)
   - [ ] Expandable preview sections
 
 #### Monitoring & Analytics
+
 - [ ] **Import Analytics** - Performance tracking
   - [ ] Success rate over time
   - [ ] Average import time
@@ -317,6 +350,7 @@
 ## 🔧 IMPLEMENTATION PRIORITY
 
 ### Week 1: Critical Foundation
+
 1. ✅ Set up BullMQ job queue with Redis
 2. ✅ Fix multi-sheet mapping UI (all sheets upfront)
 3. ✅ Add dry-run validation endpoint
@@ -324,6 +358,7 @@
 5. ✅ Implement image processing pipeline
 
 ### Week 2: Security & Quality
+
 6. ✅ Virus scanning (ClamAV)
 7. ✅ SSRF protection for image URLs
 8. ✅ XSS sanitization
@@ -331,6 +366,7 @@
 10. ✅ Retry failed rows functionality
 
 ### Week 3: Performance & UX
+
 11. ✅ Redis caching for SKUs/brands
 12. ✅ Proper batch processing (100 per transaction)
 13. ✅ Column auto-detection UI
@@ -338,6 +374,7 @@
 15. ✅ Cancel job functionality
 
 ### Week 4: Polish & Enhancement
+
 16. ✅ Rollback functionality
 17. ✅ TSV support
 18. ✅ File size validation (50MB)
@@ -349,6 +386,7 @@
 ## ✅ WORKFLOW VERIFICATION
 
 ### Current Workflow (INCORRECT)
+
 ```
 1. Upload file
 2. Select one sheet
@@ -364,6 +402,7 @@
 ---
 
 ### Required Workflow (Per User Story)
+
 ```
 1. Upload file
 2. System detects all sheets
@@ -381,15 +420,15 @@
 
 ## 🎯 PRODUCTION READINESS SCORE
 
-| Category | Current | Required | Gap |
-|----------|---------|---------|-----|
-| **Infrastructure** | 30% | 100% | 70% |
-| **Workflow** | 40% | 100% | 60% |
-| **Security** | 20% | 100% | 80% |
-| **Performance** | 50% | 100% | 50% |
-| **User Experience** | 60% | 100% | 40% |
-| **Error Handling** | 40% | 100% | 60% |
-| **Overall** | **38%** | **100%** | **62%** |
+| Category            | Current | Required | Gap     |
+| ------------------- | ------- | -------- | ------- |
+| **Infrastructure**  | 30%     | 100%     | 70%     |
+| **Workflow**        | 40%     | 100%     | 60%     |
+| **Security**        | 20%     | 100%     | 80%     |
+| **Performance**     | 50%     | 100%     | 50%     |
+| **User Experience** | 60%     | 100%     | 40%     |
+| **Error Handling**  | 40%     | 100%     | 60%     |
+| **Overall**         | **38%** | **100%** | **62%** |
 
 ---
 
@@ -397,13 +436,15 @@
 
 **Current State**: Not production-ready (38% complete)
 
-**Minimum for Production**: 
+**Minimum for Production**:
+
 - Complete all P0 items (Critical)
 - Complete 80% of P1 items (High Priority)
 
 **Estimated Time**: 3-4 weeks of focused development
 
-**Risk Assessment**: 
+**Risk Assessment**:
+
 - **HIGH RISK** if deployed as-is
 - Jobs can be lost
 - Security vulnerabilities
@@ -411,6 +452,7 @@
 - Poor user experience
 
 **Action Plan**:
+
 1. **STOP** - Do not deploy to production
 2. **FIX** - Complete P0 items first (Week 1)
 3. **TEST** - Thorough testing after P0 completion

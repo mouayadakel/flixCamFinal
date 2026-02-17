@@ -33,25 +33,31 @@ Output:
 ### Change Type: [SAFE/CAUTION/BREAKING]
 
 ### What's Changing:
+
 - Model: [name]
 - Field: [name]
 - Change: [description]
 
 ### Data Impact:
+
 - Existing records: [count]
 - Records that need update: [count]
 - Null values found: [count]
 
 ### Migration Strategy:
+
 [Prisma steps and code snippets]
 
 ### Files to Update:
+
 - [ ] [list app/service files that use this field]
 
 ### Rollback Plan:
+
 [SQL or steps to revert if needed]
 
 ### Warnings:
+
 - Postgres enums are hard to modify
 - Test in development first
 ```

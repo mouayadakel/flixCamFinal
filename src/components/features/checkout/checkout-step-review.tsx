@@ -69,14 +69,14 @@ export function CheckoutStepReview() {
   return (
     <div className="space-y-6">
       <div className="rounded-lg border bg-card p-6">
-        <h2 className="font-semibold mb-3">{t('checkout.orderSummary')}</h2>
+        <h2 className="mb-3 font-semibold">{t('checkout.orderSummary')}</h2>
         <ul className="space-y-2 text-sm">
           {items.map((item) => (
             <li key={item.id} className="flex justify-between">
               <span>
                 {item.itemType} × {item.quantity}
                 {item.startDate && (
-                  <span className="text-muted-foreground ms-1">
+                  <span className="ms-1 text-muted-foreground">
                     ({item.startDate} – {item.endDate})
                   </span>
                 )}
@@ -85,7 +85,7 @@ export function CheckoutStepReview() {
             </li>
           ))}
         </ul>
-        <div className="mt-3 pt-3 border-t space-y-1 text-sm">
+        <div className="mt-3 space-y-1 border-t pt-3 text-sm">
           <div className="flex justify-between">
             <span>{t('cart.subtotal')}</span>
             <span>{subtotal.toLocaleString()} SAR</span>
@@ -104,7 +104,7 @@ export function CheckoutStepReview() {
       </div>
 
       <div className="rounded-lg border bg-card p-6">
-        <h2 className="font-semibold mb-3">{t('checkout.contactSummary')}</h2>
+        <h2 className="mb-3 font-semibold">{t('checkout.contactSummary')}</h2>
         <p className="text-sm">{details.name}</p>
         <p className="text-sm text-muted-foreground" dir="ltr">
           {details.email}
@@ -112,7 +112,7 @@ export function CheckoutStepReview() {
         <p className="text-sm text-muted-foreground" dir="ltr">
           {details.phone}
         </p>
-        <p className="text-sm mt-2">
+        <p className="mt-2 text-sm">
           {details.deliveryMethod === 'PICKUP'
             ? t('checkout.deliveryPickup')
             : t('checkout.deliveryDelivery')}
@@ -126,10 +126,7 @@ export function CheckoutStepReview() {
       </div>
 
       {!lockLoading && (
-        <PriceLockNotice
-          lockedAt={lockedAt}
-          onExpired={() => setLockExpired(true)}
-        />
+        <PriceLockNotice lockedAt={lockedAt} onExpired={() => setLockExpired(true)} />
       )}
 
       <div className="flex items-start gap-2">
@@ -138,7 +135,7 @@ export function CheckoutStepReview() {
           checked={termsAccepted}
           onCheckedChange={(v) => setTermsAccepted(v === true)}
         />
-        <label htmlFor="terms" className="text-sm leading-none cursor-pointer">
+        <label htmlFor="terms" className="cursor-pointer text-sm leading-none">
           {t('checkout.termsAccept')}{' '}
           <Link href="/policies" className="text-primary underline" target="_blank" rel="noopener">
             {t('checkout.termsLink')}
@@ -146,12 +143,7 @@ export function CheckoutStepReview() {
         </label>
       </div>
 
-      <Button
-        size="lg"
-        className="w-full"
-        disabled={!canPay}
-        onClick={handlePayNow}
-      >
+      <Button size="lg" className="w-full" disabled={!canPay} onClick={handlePayNow}>
         {t('checkout.payNow')} – {total.toLocaleString()} SAR
       </Button>
     </div>

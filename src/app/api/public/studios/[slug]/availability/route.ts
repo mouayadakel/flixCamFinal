@@ -84,7 +84,10 @@ export async function POST(
     const startMs = start.getTime()
     const endMs = end.getTime()
     const isBlocked = blockedRanges.some(
-      (r) => (startMs >= r.start && startMs < r.end) || (endMs > r.start && endMs <= r.end) || (startMs <= r.start && endMs >= r.end)
+      (r) =>
+        (startMs >= r.start && startMs < r.end) ||
+        (endMs > r.start && endMs <= r.end) ||
+        (startMs <= r.start && endMs >= r.end)
     )
     if (!isBlocked) {
       slots.push({

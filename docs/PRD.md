@@ -5,6 +5,7 @@
 Building an **Operating System for Cinematic Production**, not just a booking website.
 
 The platform must:
+
 - Understand production projects (type, risks, needs)
 - Make intelligent, explainable decisions
 - Minimize human intervention
@@ -29,6 +30,7 @@ The platform must:
 ## Target Users
 
 ### External Users
+
 - Production Houses
 - Agencies
 - Freelancers
@@ -36,6 +38,7 @@ The platform must:
 - Content Creators
 
 ### Internal Roles
+
 - admin
 - warehouse-manager
 - technician
@@ -46,6 +49,7 @@ The platform must:
 - data-entry
 
 ### AI-Aware Roles (New)
+
 - risk-manager
 - approval-agent
 - auditor

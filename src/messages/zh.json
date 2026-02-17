@@ -15,6 +15,7 @@
     "account": "我的账户",
     "howItWorks": "如何运作",
     "support": "支持",
+    "faq": "常见问题",
     "policies": "条款与隐私"
   },
   "common": {
@@ -93,7 +94,11 @@
     "ctaButton": "立即预订",
     "testimonialsTitle": "客户评价",
     "testimonials": [
-      { "quote": "设备很棒，预订流程顺畅。强烈推荐用于电影项目。", "authorName": "Sarah M.", "rating": 5 },
+      {
+        "quote": "设备很棒，预订流程顺畅。强烈推荐用于电影项目。",
+        "authorName": "Sarah M.",
+        "rating": 5
+      },
       { "quote": "专业服务，设备维护良好。会再次租赁。", "authorName": "Ahmed K.", "rating": 5 },
       { "quote": "从预订到归还都很简单。团队非常帮忙。", "authorName": "Lisa T.", "rating": 5 }
     ],
@@ -104,7 +109,19 @@
     "trustRentalsCount": "{count}+ 次完成租赁",
     "trustYears": "自 {year} 年起",
     "trustInsured": "全面保险",
-    "trustSupport": "24/7 支持"
+    "trustSupport": "24/7 支持",
+    "categoriesSubtitle": "按类型找设备 — 从相机到灯光",
+    "featuredSubtitle": "团队精选，为您的下一次拍摄",
+    "howItWorksSubtitle": "五步完成租赁",
+    "testimonialsSubtitle": "听听信赖我们的电影人怎么说",
+    "faqSubtitle": "关于租赁的常见问题",
+    "ctaSubtitle": "浏览完整目录，开启您的下一个项目",
+    "topBrandsSubtitle": "租赁您信赖的品牌",
+    "newArrivalsTitle": "新品上架",
+    "newArrivalsSubtitle": "最新加入我们目录的设备",
+    "kitTeaserTitle": "打造您的完美套件",
+    "kitTeaserSubtitle": "为您的拍摄自由搭配设备。获取智能推荐，套装更优惠。",
+    "kitTeaserButton": "打造套件"
   },
   "footer": {
     "links": "快速链接",

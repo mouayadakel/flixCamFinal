@@ -11,7 +11,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Loader2, Search, Filter } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -102,9 +108,7 @@ export function AuditTrailViewer({
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>Audit Trail</CardTitle>
-            <CardDescription>
-              History of all changes and actions for this resource
-            </CardDescription>
+            <CardDescription>History of all changes and actions for this resource</CardDescription>
           </div>
           <Button variant="outline" size="sm" onClick={fetchLogs}>
             Refresh
@@ -136,16 +140,14 @@ export function AuditTrailViewer({
           </Select>
         </div>
 
-        <div className="space-y-2 max-h-[600px] overflow-y-auto">
+        <div className="max-h-[600px] space-y-2 overflow-y-auto">
           {filteredLogs.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No audit logs found
-            </div>
+            <div className="py-8 text-center text-muted-foreground">No audit logs found</div>
           ) : (
             filteredLogs.map((log) => (
               <div
                 key={log.id}
-                className="flex items-start gap-4 p-3 border rounded-md hover:bg-muted/50"
+                className="flex items-start gap-4 rounded-md border p-3 hover:bg-muted/50"
               >
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center gap-2">
@@ -160,7 +162,7 @@ export function AuditTrailViewer({
                     </div>
                   )}
                   {log.metadata && Object.keys(log.metadata).length > 0 && (
-                    <div className="text-xs text-muted-foreground font-mono bg-muted p-2 rounded">
+                    <div className="rounded bg-muted p-2 font-mono text-xs text-muted-foreground">
                       {JSON.stringify(log.metadata, null, 2)}
                     </div>
                   )}

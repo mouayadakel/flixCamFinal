@@ -9,10 +9,10 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { 
-  ArrowRight, 
-  FileText, 
-  DollarSign, 
+import {
+  ArrowRight,
+  FileText,
+  DollarSign,
   Calendar,
   User,
   Download,
@@ -22,7 +22,7 @@ import {
   AlertCircle,
   Printer,
   CreditCard,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -259,8 +259,8 @@ export default function InvoiceDetailPage() {
 
   if (!invoice) {
     return (
-      <div className="text-center py-12" dir="rtl">
-        <AlertCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+      <div className="py-12 text-center" dir="rtl">
+        <AlertCircle className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
         <p className="text-lg font-medium">الفاتورة غير موجودة</p>
         <Button asChild className="mt-4">
           <Link href="/admin/invoices">العودة إلى الفواتير</Link>
@@ -279,29 +279,27 @@ export default function InvoiceDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <FileText className="h-8 w-8" />
             فاتورة #{invoice.invoiceNumber}
           </h1>
-          <div className="flex items-center gap-2 mt-2">
+          <div className="mt-2 flex items-center gap-2">
             <Badge className={statusConfig.color}>
-              <StatusIcon className="h-3 w-3 ml-1" />
+              <StatusIcon className="ml-1 h-3 w-3" />
               {statusConfig.label}
             </Badge>
-            {isOverdue && invoice.status !== 'paid' && (
-              <Badge variant="destructive">متأخرة</Badge>
-            )}
+            {isOverdue && invoice.status !== 'paid' && <Badge variant="destructive">متأخرة</Badge>}
           </div>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
             <Link href="/admin/invoices">
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <ArrowRight className="ml-2 h-4 w-4" />
               العودة
             </Link>
           </Button>
           <Button variant="outline">
-            <Printer className="h-4 w-4 ml-2" />
+            <Printer className="ml-2 h-4 w-4" />
             طباعة
           </Button>
           <Button
@@ -311,14 +309,14 @@ export default function InvoiceDetailPage() {
               window.open(url, '_blank', 'noopener,noreferrer')
             }}
           >
-            <Download className="h-4 w-4 ml-2" />
+            <Download className="ml-2 h-4 w-4" />
             تحميل PDF
           </Button>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
@@ -335,7 +333,9 @@ export default function InvoiceDetailPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">المدفوع</p>
-                <p className="text-2xl font-bold text-green-600">{formatCurrency(invoice.paidAmount)}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {formatCurrency(invoice.paidAmount)}
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-500 opacity-50" />
             </div>
@@ -346,7 +346,9 @@ export default function InvoiceDetailPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">المتبقي</p>
-                <p className={`text-2xl font-bold ${remainingAmount > 0 ? 'text-orange-600' : 'text-green-600'}`}>
+                <p
+                  className={`text-2xl font-bold ${remainingAmount > 0 ? 'text-orange-600' : 'text-green-600'}`}
+                >
                   {formatCurrency(remainingAmount)}
                 </p>
               </div>
@@ -369,9 +371,9 @@ export default function InvoiceDetailPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           {/* Customer Info */}
           <Card>
             <CardHeader>
@@ -393,7 +395,9 @@ export default function InvoiceDetailPage() {
                 {invoice.customer.phone && (
                   <div>
                     <p className="text-sm text-muted-foreground">الهاتف</p>
-                    <p className="font-medium" dir="ltr">{invoice.customer.phone}</p>
+                    <p className="font-medium" dir="ltr">
+                      {invoice.customer.phone}
+                    </p>
                   </div>
                 )}
                 {invoice.customer.companyName && (
@@ -433,13 +437,15 @@ export default function InvoiceDetailPage() {
                       <TableCell>{item.description}</TableCell>
                       <TableCell className="text-center">{item.quantity}</TableCell>
                       <TableCell className="text-left">{formatCurrency(item.unitPrice)}</TableCell>
-                      <TableCell className="text-left font-medium">{formatCurrency(item.total)}</TableCell>
+                      <TableCell className="text-left font-medium">
+                        {formatCurrency(item.total)}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
 
-              <div className="border-t my-4" />
+              <div className="my-4 border-t" />
 
               <div className="space-y-2">
                 <div className="flex justify-between">
@@ -456,7 +462,7 @@ export default function InvoiceDetailPage() {
                   <span className="text-muted-foreground">ضريبة القيمة المضافة (15%)</span>
                   <span>{formatCurrency(invoice.vatAmount)}</span>
                 </div>
-                <div className="border-t my-2" />
+                <div className="my-2 border-t" />
                 <div className="flex justify-between text-lg font-bold">
                   <span>الإجمالي</span>
                   <span>{formatCurrency(invoice.totalAmount)}</span>
@@ -482,8 +488,8 @@ export default function InvoiceDetailPage() {
             </CardHeader>
             <CardContent>
               {invoice.payments.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <CreditCard className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <div className="py-8 text-center text-muted-foreground">
+                  <CreditCard className="mx-auto mb-4 h-12 w-12 opacity-50" />
                   <p>لا توجد مدفوعات مسجلة</p>
                 </div>
               ) : (
@@ -499,7 +505,9 @@ export default function InvoiceDetailPage() {
                   <TableBody>
                     {invoice.payments.map((payment) => (
                       <TableRow key={payment.id}>
-                        <TableCell className="font-medium">{formatCurrency(payment.amount)}</TableCell>
+                        <TableCell className="font-medium">
+                          {formatCurrency(payment.amount)}
+                        </TableCell>
                         <TableCell>{payment.method}</TableCell>
                         <TableCell>
                           <Badge variant={payment.status === 'SUCCESS' ? 'default' : 'secondary'}>
@@ -526,30 +534,42 @@ export default function InvoiceDetailPage() {
             <CardContent className="space-y-3">
               {invoice.status === 'draft' && (
                 <Button className="w-full" onClick={handleSendInvoice}>
-                  <Send className="h-4 w-4 ml-2" />
+                  <Send className="ml-2 h-4 w-4" />
                   إرسال للعميل
                 </Button>
               )}
               {remainingAmount > 0 && invoice.status !== 'cancelled' && (
-                <Button className="w-full" variant="outline" onClick={() => setPaymentDialogOpen(true)}>
-                  <CreditCard className="h-4 w-4 ml-2" />
+                <Button
+                  className="w-full"
+                  variant="outline"
+                  onClick={() => setPaymentDialogOpen(true)}
+                >
+                  <CreditCard className="ml-2 h-4 w-4" />
                   تسجيل دفعة
                 </Button>
               )}
               {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
-                <Button className="w-full" variant="outline" onClick={() => handleStatusChange('paid')}>
-                  <CheckCircle className="h-4 w-4 ml-2" />
+                <Button
+                  className="w-full"
+                  variant="outline"
+                  onClick={() => handleStatusChange('paid')}
+                >
+                  <CheckCircle className="ml-2 h-4 w-4" />
                   تحديد كمدفوعة
                 </Button>
               )}
               {invoice.status !== 'cancelled' && (
-                <Button className="w-full" variant="outline" onClick={() => handleStatusChange('cancelled')}>
-                  <AlertCircle className="h-4 w-4 ml-2" />
+                <Button
+                  className="w-full"
+                  variant="outline"
+                  onClick={() => handleStatusChange('cancelled')}
+                >
+                  <AlertCircle className="ml-2 h-4 w-4" />
                   إلغاء الفاتورة
                 </Button>
               )}
               <Button className="w-full" variant="outline" onClick={loadInvoice}>
-                <RefreshCw className="h-4 w-4 ml-2" />
+                <RefreshCw className="ml-2 h-4 w-4" />
                 تحديث
               </Button>
             </CardContent>
@@ -574,7 +594,7 @@ export default function InvoiceDetailPage() {
               {invoice.booking && (
                 <div>
                   <p className="text-sm text-muted-foreground">الحجز المرتبط</p>
-                  <Link 
+                  <Link
                     href={`/admin/bookings/${invoice.booking.id}`}
                     className="font-medium text-primary hover:underline"
                   >
@@ -585,7 +605,7 @@ export default function InvoiceDetailPage() {
               {invoice.notes && (
                 <div>
                   <p className="text-sm text-muted-foreground">ملاحظات</p>
-                  <p className="text-sm bg-muted p-2 rounded mt-1">{invoice.notes}</p>
+                  <p className="mt-1 rounded bg-muted p-2 text-sm">{invoice.notes}</p>
                 </div>
               )}
             </CardContent>
@@ -598,9 +618,7 @@ export default function InvoiceDetailPage() {
         <DialogContent dir="rtl">
           <DialogHeader>
             <DialogTitle>تسجيل دفعة</DialogTitle>
-            <DialogDescription>
-              المتبقي: {formatCurrency(remainingAmount)}
-            </DialogDescription>
+            <DialogDescription>المتبقي: {formatCurrency(remainingAmount)}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">

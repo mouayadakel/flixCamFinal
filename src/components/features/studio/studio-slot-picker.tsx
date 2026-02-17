@@ -50,12 +50,13 @@ export function StudioSlotPicker({
   tomorrow.setDate(tomorrow.getDate() + 1)
   const minDate = tomorrow.toISOString().slice(0, 10)
 
-  const formatTime = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const formatTime = (iso: string) =>
+    new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
   return (
     <div className="space-y-4">
       <div>
-        <label className="text-sm font-medium block mb-1">Date</label>
+        <label className="mb-1 block text-sm font-medium">Date</label>
         <input
           type="date"
           min={minDate}
@@ -66,7 +67,7 @@ export function StudioSlotPicker({
       </div>
       {selectedDate && (
         <div>
-          <label className="text-sm font-medium block mb-2">Available times</label>
+          <label className="mb-2 block text-sm font-medium">Available times</label>
           {loading ? (
             <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
           ) : slots.length === 0 ? (

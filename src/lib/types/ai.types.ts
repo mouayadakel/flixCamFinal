@@ -125,7 +125,12 @@ export interface ChatbotResponse {
 }
 
 export interface ChatbotAction {
-  type: 'equipment_search' | 'booking_creation' | 'price_inquiry' | 'availability_check' | 'support_ticket'
+  type:
+    | 'equipment_search'
+    | 'booking_creation'
+    | 'price_inquiry'
+    | 'availability_check'
+    | 'support_ticket'
   data?: Record<string, unknown>
   label: string
 }
@@ -139,7 +144,13 @@ export interface AIConfig {
 }
 
 export interface AIRequest {
-  type: 'risk_assessment' | 'kit_builder' | 'pricing' | 'demand_forecast' | 'chatbot' | 'equipment_recommendation'
+  type:
+    | 'risk_assessment'
+    | 'kit_builder'
+    | 'pricing'
+    | 'demand_forecast'
+    | 'chatbot'
+    | 'equipment_recommendation'
   input: Record<string, unknown>
   userId: string
   metadata?: Record<string, unknown>

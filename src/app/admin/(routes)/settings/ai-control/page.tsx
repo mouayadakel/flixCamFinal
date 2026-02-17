@@ -11,7 +11,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Switch } from '@/components/ui/switch'
@@ -66,7 +72,11 @@ export default function AIControlPage() {
       const data = await res.json()
       setSettings(data.settings || [])
     } catch (error: any) {
-      toast({ title: 'Failed to load AI settings', description: error.message, variant: 'destructive' })
+      toast({
+        title: 'Failed to load AI settings',
+        description: error.message,
+        variant: 'destructive',
+      })
     } finally {
       setLoading(false)
     }
@@ -97,7 +107,11 @@ export default function AIControlPage() {
       toast({ title: 'Settings saved successfully' })
       await loadSettings()
     } catch (error: any) {
-      toast({ title: 'Failed to save settings', description: error.message, variant: 'destructive' })
+      toast({
+        title: 'Failed to save settings',
+        description: error.message,
+        variant: 'destructive',
+      })
     } finally {
       setSaving(false)
     }
@@ -121,7 +135,7 @@ export default function AIControlPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     )
@@ -132,21 +146,21 @@ export default function AIControlPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">AI Control Dashboard</h1>
-          </div>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="settings">
-            <Settings className="h-4 w-4 mr-2" />
+            <Settings className="mr-2 h-4 w-4" />
             Settings
           </TabsTrigger>
           <TabsTrigger value="analytics">
-            <BarChart3 className="h-4 w-4 mr-2" />
+            <BarChart3 className="mr-2 h-4 w-4" />
             Analytics
           </TabsTrigger>
           <TabsTrigger value="history">
-            <History className="h-4 w-4 mr-2" />
+            <History className="mr-2 h-4 w-4" />
             Job History
           </TabsTrigger>
         </TabsList>
@@ -169,7 +183,7 @@ export default function AIControlPage() {
         <TabsContent value="analytics" className="space-y-4">
           {analytics ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-sm font-medium">Total Jobs</CardTitle>
@@ -199,7 +213,9 @@ export default function AIControlPage() {
                     <CardTitle className="text-sm font-medium">Total Cost</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">${analytics.summary.totalCost.toFixed(2)}</div>
+                    <div className="text-2xl font-bold">
+                      ${analytics.summary.totalCost.toFixed(2)}
+                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -211,7 +227,10 @@ export default function AIControlPage() {
                 <CardContent>
                   <div className="space-y-2">
                     {Object.entries(analytics.byProvider).map(([provider, stats]) => (
-                      <div key={provider} className="flex items-center justify-between p-2 border rounded">
+                      <div
+                        key={provider}
+                        className="flex items-center justify-between rounded border p-2"
+                      >
                         <Badge variant="outline">{provider}</Badge>
                         <div className="flex gap-4 text-sm">
                           <span>{stats.jobs} jobs</span>
@@ -239,7 +258,7 @@ export default function AIControlPage() {
               <CardTitle>Recent AI Processing Jobs</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center text-muted-foreground py-8">
+              <div className="py-8 text-center text-muted-foreground">
                 Job history will be displayed here
               </div>
             </CardContent>

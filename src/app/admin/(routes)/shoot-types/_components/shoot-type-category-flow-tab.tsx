@@ -46,14 +46,33 @@ export function ShootTypeCategoryFlowTab({
   const { toast } = useToast()
   const [saving, setSaving] = useState(false)
   const [categories, setCategories] = useState<CategoryOption[]>([])
-  const [flows, setFlows] = useState<{ categoryId: string; categoryName: string; sortOrder: number; isRequired: boolean; minRecommended: number | null; maxRecommended: number | null; stepTitle: string; stepTitleAr: string; stepDescription: string; stepDescriptionAr: string }[]>([])
+  const [flows, setFlows] = useState<
+    {
+      categoryId: string
+      categoryName: string
+      sortOrder: number
+      isRequired: boolean
+      minRecommended: number | null
+      maxRecommended: number | null
+      stepTitle: string
+      stepTitleAr: string
+      stepDescription: string
+      stepDescriptionAr: string
+    }[]
+  >([])
 
   useEffect(() => {
     fetch('/api/public/categories')
       .then((res) => res.json())
       .then((json) => {
         const data = Array.isArray(json?.data) ? json.data : []
-        setCategories(data.map((c: { id: string; name: string; slug: string }) => ({ id: c.id, name: c.name, slug: c.slug })))
+        setCategories(
+          data.map((c: { id: string; name: string; slug: string }) => ({
+            id: c.id,
+            name: c.name,
+            slug: c.slug,
+          }))
+        )
       })
       .catch(() => setCategories([]))
   }, [])
@@ -150,18 +169,27 @@ export function ShootTypeCategoryFlowTab({
               <GripVertical className="h-4 w-4" />
               <span className="text-sm font-medium">{index + 1}</span>
             </div>
-            <div className="flex-1 min-w-[200px] space-y-2">
+            <div className="min-w-[200px] flex-1 space-y-2">
               <Label>Category</Label>
               <select
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 value={f.categoryId}
                 onChange={(e) => {
                   const cat = categories.find((c) => c.id === e.target.value)
-                  if (cat) setFlows((prev) => prev.map((x, i) => (i === index ? { ...x, categoryId: cat.id, categoryName: cat.name } : x)))
+                  if (cat)
+                    setFlows((prev) =>
+                      prev.map((x, i) =>
+                        i === index ? { ...x, categoryId: cat.id, categoryName: cat.name } : x
+                      )
+                    )
                 }}
               >
                 {categories.map((c) => (
-                  <option key={c.id} value={c.id} disabled={flows.some((x, i) => i !== index && x.categoryId === c.id)}>
+                  <option
+                    key={c.id}
+                    value={c.id}
+                    disabled={flows.some((x, i) => i !== index && x.categoryId === c.id)}
+                  >
                     {c.name}
                   </option>
                 ))}
@@ -169,25 +197,90 @@ export function ShootTypeCategoryFlowTab({
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <Label className="text-xs">Step title (EN)</Label>
-                  <Input value={f.stepTitle} onChange={(e) => setFlows((prev) => prev.map((x, i) => (i === index ? { ...x, stepTitle: e.target.value } : x)))} placeholder="e.g. Choose cameras" />
+                  <Input
+                    value={f.stepTitle}
+                    onChange={(e) =>
+                      setFlows((prev) =>
+                        prev.map((x, i) => (i === index ? { ...x, stepTitle: e.target.value } : x))
+                      )
+                    }
+                    placeholder="e.g. Choose cameras"
+                  />
                 </div>
                 <div>
                   <Label className="text-xs">Step title (AR)</Label>
-                  <Input value={f.stepTitleAr} onChange={(e) => setFlows((prev) => prev.map((x, i) => (i === index ? { ...x, stepTitleAr: e.target.value } : x)))} />
+                  <Input
+                    value={f.stepTitleAr}
+                    onChange={(e) =>
+                      setFlows((prev) =>
+                        prev.map((x, i) =>
+                          i === index ? { ...x, stepTitleAr: e.target.value } : x
+                        )
+                      )
+                    }
+                  />
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-4">
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" checked={f.isRequired} onChange={(e) => setFlows((prev) => prev.map((x, i) => (i === index ? { ...x, isRequired: e.target.checked } : x)))} />
+                  <input
+                    type="checkbox"
+                    checked={f.isRequired}
+                    onChange={(e) =>
+                      setFlows((prev) =>
+                        prev.map((x, i) =>
+                          i === index ? { ...x, isRequired: e.target.checked } : x
+                        )
+                      )
+                    }
+                  />
                   <span className="text-sm">Required</span>
                 </label>
                 <div className="flex items-center gap-2">
                   <Label className="text-xs">Min</Label>
-                  <Input type="number" min={0} className="w-16" value={f.minRecommended ?? ''} onChange={(e) => setFlows((prev) => prev.map((x, i) => (i === index ? { ...x, minRecommended: e.target.value ? parseInt(e.target.value, 10) : null } : x)))} />
+                  <Input
+                    type="number"
+                    min={0}
+                    className="w-16"
+                    value={f.minRecommended ?? ''}
+                    onChange={(e) =>
+                      setFlows((prev) =>
+                        prev.map((x, i) =>
+                          i === index
+                            ? {
+                                ...x,
+                                minRecommended: e.target.value
+                                  ? parseInt(e.target.value, 10)
+                                  : null,
+                              }
+                            : x
+                        )
+                      )
+                    }
+                  />
                 </div>
                 <div className="flex items-center gap-2">
                   <Label className="text-xs">Max</Label>
-                  <Input type="number" min={0} className="w-16" value={f.maxRecommended ?? ''} onChange={(e) => setFlows((prev) => prev.map((x, i) => (i === index ? { ...x, maxRecommended: e.target.value ? parseInt(e.target.value, 10) : null } : x)))} />
+                  <Input
+                    type="number"
+                    min={0}
+                    className="w-16"
+                    value={f.maxRecommended ?? ''}
+                    onChange={(e) =>
+                      setFlows((prev) =>
+                        prev.map((x, i) =>
+                          i === index
+                            ? {
+                                ...x,
+                                maxRecommended: e.target.value
+                                  ? parseInt(e.target.value, 10)
+                                  : null,
+                              }
+                            : x
+                        )
+                      )
+                    }
+                  />
                 </div>
               </div>
             </div>
@@ -197,7 +290,13 @@ export function ShootTypeCategoryFlowTab({
           </div>
         ))}
         <div className="flex gap-2">
-          <Button type="button" variant="outline" size="sm" onClick={addCategory} disabled={flows.length >= categories.length}>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addCategory}
+            disabled={flows.length >= categories.length}
+          >
             Add category
           </Button>
           <Button onClick={handleSave} disabled={saving}>

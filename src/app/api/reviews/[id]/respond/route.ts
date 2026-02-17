@@ -11,10 +11,7 @@ import { respondToReviewSchema } from '@/lib/validators/review.validator'
 import { handleApiError } from '@/lib/utils/api-helpers'
 import { UnauthorizedError, NotFoundError } from '@/lib/errors'
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()

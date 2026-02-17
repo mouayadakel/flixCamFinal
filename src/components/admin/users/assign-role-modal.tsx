@@ -124,12 +124,12 @@ export function AssignRoleModal({
             </div>
           )}
           {warning && (
-            <div className="rounded-md border border-amber-500/50 bg-amber-500/10 p-3 text-sm flex gap-2">
-              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+            <div className="flex gap-2 rounded-md border border-amber-500/50 bg-amber-500/10 p-3 text-sm">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               <div>
                 {warning.message}
                 {warning.permissions && (
-                  <span className="block mt-1 text-xs text-muted-foreground">
+                  <span className="mt-1 block text-xs text-muted-foreground">
                     {warning.permissions.join(', ')}
                   </span>
                 )}
@@ -145,7 +145,7 @@ export function AssignRoleModal({
               <SelectContent>
                 {loading ? (
                   <div className="p-4 text-center">
-                    <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+                    <Loader2 className="mx-auto h-4 w-4 animate-spin" />
                   </div>
                 ) : (
                   availableRoles.map((r) => (
@@ -180,7 +180,7 @@ export function AssignRoleModal({
               إلغاء
             </Button>
             <Button type="submit" disabled={submitting}>
-              {submitting ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : null}
+              {submitting ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
               تعيين
             </Button>
           </DialogFooter>

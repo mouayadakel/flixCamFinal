@@ -53,10 +53,13 @@ export function KitWizard() {
   const nextCategory = useKitWizardStore((s) => s.nextCategory)
   const prevCategory = useKitWizardStore((s) => s.prevCategory)
 
-  const questionnaire = Array.isArray(shootTypeData?.questionnaire) ? shootTypeData!.questionnaire : []
+  const questionnaire = Array.isArray(shootTypeData?.questionnaire)
+    ? shootTypeData!.questionnaire
+    : []
   const hasQuestionnaire = questionnaire.length > 0
   const currentCategoryStep = getCurrentCategoryStep({ categorySteps, currentCategoryIndex })
-  const isLastCategory = categorySteps.length > 0 && currentCategoryIndex >= categorySteps.length - 1
+  const isLastCategory =
+    categorySteps.length > 0 && currentCategoryIndex >= categorySteps.length - 1
   const isFirstCategory = currentCategoryIndex <= 0
 
   const totalAmount = getKitWizardTotalAmount({ selectedEquipment, durationDays })
@@ -133,16 +136,36 @@ export function KitWizard() {
     }
     if (phase === 'duration') return [t('kit.stepDuration'), '', '', '']
     if (phase === 'summary') return [t('kit.stepSummary'), '', '', '']
-    return [t('kit.stepCategory'), t('kit.stepEquipment'), t('kit.stepDuration'), t('kit.stepSummary')]
+    return [
+      t('kit.stepCategory'),
+      t('kit.stepEquipment'),
+      t('kit.stepDuration'),
+      t('kit.stepSummary'),
+    ]
   })()
 
   const steps = stepLabels.filter(Boolean).map((label, i) => ({ id: `step-${i}`, label }))
-  const currentStepIndex = phase === 'shoot-type' ? 0 : phase === 'budget' ? 1 : phase === 'questionnaire' ? 2 : phase === 'categories' ? 2 : phase === 'duration' ? 2 : 3
+  const currentStepIndex =
+    phase === 'shoot-type'
+      ? 0
+      : phase === 'budget'
+        ? 1
+        : phase === 'questionnaire'
+          ? 2
+          : phase === 'categories'
+            ? 2
+            : phase === 'duration'
+              ? 2
+              : 3
 
   return (
     <div className="flex flex-col gap-8 lg:grid lg:grid-cols-12 lg:gap-8">
-      <div className="lg:col-span-8 space-y-8">
-        <Stepper steps={steps.length ? steps : [{ id: '0', label: stepLabels[0] || 'Step' }]} currentStep={Math.min(currentStepIndex, Math.max(0, steps.length - 1))} onStepClick={() => {}} />
+      <div className="space-y-8 lg:col-span-8">
+        <Stepper
+          steps={steps.length ? steps : [{ id: '0', label: stepLabels[0] || 'Step' }]}
+          currentStep={Math.min(currentStepIndex, Math.max(0, steps.length - 1))}
+          onStepClick={() => {}}
+        />
 
         <div className="min-h-[320px]">
           {phase === 'shoot-type' && <StepShootType />}
@@ -154,8 +177,14 @@ export function KitWizard() {
         </div>
 
         {phase !== 'summary' && (
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-border-light">
-            <Button type="button" variant="outline" onClick={goBack} disabled={phase === 'shoot-type'} className="gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border-light pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={goBack}
+              disabled={phase === 'shoot-type'}
+              className="gap-2"
+            >
               <ChevronLeft className="h-4 w-4" />
               {t('common.back')}
             </Button>
@@ -167,7 +196,7 @@ export function KitWizard() {
                 (phase === 'budget' && !canNextBudget) ||
                 (phase === 'duration' && !canNextDuration)
               }
-              className="bg-brand-primary hover:bg-brand-primary-hover gap-2"
+              className="gap-2 bg-brand-primary hover:bg-brand-primary-hover"
             >
               {t('common.next')}
               <ChevronRight className="h-4 w-4" />
@@ -176,7 +205,7 @@ export function KitWizard() {
         )}
       </div>
 
-      <aside className="hidden lg:block lg:col-span-4">
+      <aside className="hidden lg:col-span-4 lg:block">
         <KitSummarySidebar />
       </aside>
 
@@ -184,16 +213,21 @@ export function KitWizard() {
 
       {selectedCount > 0 && (
         <>
-          <div className="fixed bottom-0 start-0 end-0 z-40 flex items-center justify-between gap-4 border-t border-border-light bg-white/95 p-4 shadow-card-elevated backdrop-blur-sm lg:hidden">
+          <div className="fixed bottom-0 end-0 start-0 z-40 flex items-center justify-between gap-4 border-t border-border-light bg-white/95 p-4 shadow-card-elevated backdrop-blur-sm lg:hidden">
             <div>
               <p className="text-sm font-medium text-text-heading">
                 {totalUnits} {t('kit.items')} · {formatSar(totalWithVat)}
               </p>
               <p className="text-xs text-text-muted">
-                {t('kit.duration')}: {durationDays} {durationDays === 1 ? t('kit.day') : t('kit.days')}
+                {t('kit.duration')}: {durationDays}{' '}
+                {durationDays === 1 ? t('kit.day') : t('kit.days')}
               </p>
             </div>
-            <Button size="sm" className="shrink-0 bg-brand-primary hover:bg-brand-primary-hover" onClick={() => setPhase('summary')}>
+            <Button
+              size="sm"
+              className="shrink-0 bg-brand-primary hover:bg-brand-primary-hover"
+              onClick={() => setPhase('summary')}
+            >
               {t('kit.stepSummary')}
             </Button>
           </div>

@@ -52,21 +52,12 @@
     "Comprehensive audit logging and event-driven notifications trigger on all critical state changes and financial transactions."
   ],
   "code_summary": {
-    "tech_stack": [
-      "TypeScript",
-      "Next.js 14",
-      "PostgreSQL",
-      "Prisma",
-      "NextAuth.js"
-    ],
+    "tech_stack": ["TypeScript", "Next.js 14", "PostgreSQL", "Prisma", "NextAuth.js"],
     "features": [
       {
         "name": "Authentication",
         "description": "NextAuth.js signin, signout, session. Auth via /api/auth/*.",
-        "files": [
-          "src/app/api/auth/[...nextauth]/route.ts",
-          "src/lib/auth/index.ts"
-        ],
+        "files": ["src/app/api/auth/[...nextauth]/route.ts", "src/lib/auth/index.ts"],
         "api_doc": {
           "openapi": "3.0.0",
           "paths": {
@@ -193,10 +184,7 @@
       {
         "name": "Clients",
         "description": "Client CRUD for admin dashboard.",
-        "files": [
-          "src/app/api/clients/route.ts",
-          "src/app/api/clients/[id]/route.ts"
-        ],
+        "files": ["src/app/api/clients/route.ts", "src/app/api/clients/[id]/route.ts"],
         "api_doc": {
           "openapi": "3.0.0",
           "paths": {
@@ -238,9 +226,7 @@
       {
         "name": "Admin Health",
         "description": "Admin health check endpoint.",
-        "files": [
-          "src/app/api/admin/health/route.ts"
-        ],
+        "files": ["src/app/api/admin/health/route.ts"],
         "api_doc": {
           "openapi": "3.0.0",
           "paths": {

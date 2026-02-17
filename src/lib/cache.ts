@@ -5,13 +5,42 @@
  * @module lib
  */
 
+import type Redis from 'ioredis'
 import { getRedisClient } from '@/lib/queue/redis.client'
 import { logger } from '@/lib/logger'
+
+/** Wait for Redis to be ready before running commands (avoids "Stream isn't writeable" when enableOfflineQueue is false). */
+async function redisWhenReady(redis: Redis): Promise<void> {
+  if (redis.status === 'ready') return
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      redis.off('ready', onReady)
+      redis.off('error', onError)
+      reject(new Error('Redis connection timeout'))
+    }, 5000)
+    const onReady = () => {
+      clearTimeout(timeout)
+      redis.off('error', onError)
+      resolve()
+    }
+    const onError = (err: Error) => {
+      clearTimeout(timeout)
+      redis.off('ready', onReady)
+      reject(err)
+    }
+    redis.once('ready', onReady)
+    redis.once('error', onError)
+  })
+}
 
 const memoryStore = new Map<string, { value: unknown; expiresAt: number }>()
 
 const TTL = {
   websiteContent: 3600,
+  /** FAQ list (short TTL so admin changes appear quickly). */
+  faq: 60,
+  /** Policy list (short TTL so admin changes appear quickly). */
+  policy: 60,
   equipmentList: 300,
   equipmentDetail: 600,
   availability: 60,
@@ -34,14 +63,20 @@ function isRedisAvailable(): boolean {
   return Boolean(process.env.REDIS_URL)
 }
 
+function serializeError(e: unknown): string {
+  if (e instanceof Error) return e.message
+  return String(e)
+}
+
 async function redisGet<T>(key: string): Promise<T | null> {
   try {
     const redis = getRedisClient()
+    await redisWhenReady(redis)
     const raw = await redis.get(key)
     if (raw == null) return null
     return JSON.parse(raw) as T
   } catch (e) {
-    logger.warn('Cache redis get error', { key, error: e })
+    logger.warn('Cache redis get error', { key, error: serializeError(e) })
     return null
   }
 }
@@ -49,18 +84,20 @@ async function redisGet<T>(key: string): Promise<T | null> {
 async function redisSet(key: string, value: unknown, ttlSeconds: number): Promise<void> {
   try {
     const redis = getRedisClient()
+    await redisWhenReady(redis)
     await redis.setex(key, ttlSeconds, JSON.stringify(value))
   } catch (e) {
-    logger.warn('Cache redis set error', { key, error: e })
+    logger.warn('Cache redis set error', { key, error: serializeError(e) })
   }
 }
 
 async function redisDel(key: string): Promise<void> {
   try {
     const redis = getRedisClient()
+    await redisWhenReady(redis)
     await redis.del(key)
   } catch (e) {
-    logger.warn('Cache redis del error', { key, error: e })
+    logger.warn('Cache redis del error', { key, error: serializeError(e) })
   }
 }
 

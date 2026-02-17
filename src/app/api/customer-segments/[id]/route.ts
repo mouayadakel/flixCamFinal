@@ -12,10 +12,7 @@ import { handleApiError } from '@/lib/utils/api-helpers'
 import { UnauthorizedError, NotFoundError } from '@/lib/errors'
 import { Decimal } from '@prisma/client/runtime/library'
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()
@@ -37,10 +34,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()
@@ -55,7 +49,9 @@ export async function PATCH(
     if (parsed.name !== undefined) updateData.name = parsed.name
     if (parsed.slug !== undefined) updateData.slug = parsed.slug
     if (parsed.description !== undefined) updateData.description = parsed.description
-    if (parsed.discountPercent !== undefined) updateData.discountPercent = parsed.discountPercent != null ? new Decimal(parsed.discountPercent) : null
+    if (parsed.discountPercent !== undefined)
+      updateData.discountPercent =
+        parsed.discountPercent != null ? new Decimal(parsed.discountPercent) : null
     if (parsed.priorityBooking !== undefined) updateData.priorityBooking = parsed.priorityBooking
     if (parsed.extendedTerms !== undefined) updateData.extendedTerms = parsed.extendedTerms
     if (parsed.autoAssignRules !== undefined) updateData.autoAssignRules = parsed.autoAssignRules

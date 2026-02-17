@@ -159,10 +159,10 @@ export function ImageGallery({
         <TabsContent value="file" className="space-y-4">
           {!equipmentId && (
             <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-              <p className="font-medium mb-1">ملاحظة: للمعدات الجديدة</p>
+              <p className="mb-1 font-medium">ملاحظة: للمعدات الجديدة</p>
               <p className="text-xs">
-                رفع الملفات متاح فقط بعد إنشاء المعدة. يُفضل استخدام روابط URLs للصور في هذه المرحلة.
-                يمكنك رفع الملفات لاحقاً من صفحة التعديل.
+                رفع الملفات متاح فقط بعد إنشاء المعدة. يُفضل استخدام روابط URLs للصور في هذه
+                المرحلة. يمكنك رفع الملفات لاحقاً من صفحة التعديل.
               </p>
             </div>
           )}
@@ -199,7 +199,7 @@ export function ImageGallery({
             </Button>
           </div>
           <p className="text-sm text-neutral-500">
-            {equipmentId 
+            {equipmentId
               ? 'الحد الأقصى: 10MB لكل صورة. أنواع الصور المدعومة: JPG, PNG, WebP, GIF, SVG'
               : 'للمعدات الجديدة: استخدم روابط URLs للصور. يمكنك رفع الملفات بعد إنشاء المعدة.'}
           </p>
@@ -207,9 +207,12 @@ export function ImageGallery({
       </Tabs>
 
       {images.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
           {images.map((url, index) => (
-            <div key={index} className="relative group rounded-lg border border-neutral-200 overflow-hidden">
+            <div
+              key={index}
+              className="group relative overflow-hidden rounded-lg border border-neutral-200"
+            >
               <div className="relative aspect-square bg-neutral-100">
                 <Image
                   src={url}
@@ -219,7 +222,7 @@ export function ImageGallery({
                   unoptimized
                 />
               </div>
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+              <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
                 {index > 0 && (
                   <Button
                     type="button"
@@ -249,7 +252,7 @@ export function ImageGallery({
                   <X className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-2 py-1 rounded">
+              <div className="absolute left-1 top-1 rounded bg-black/70 px-2 py-1 text-xs text-white">
                 {index + 1}
               </div>
             </div>
@@ -258,7 +261,7 @@ export function ImageGallery({
       )}
 
       {images.length === 0 && (
-        <div className="text-center py-8 text-neutral-500 border border-dashed rounded-lg">
+        <div className="rounded-lg border border-dashed py-8 text-center text-neutral-500">
           لا توجد صور في المعرض
         </div>
       )}

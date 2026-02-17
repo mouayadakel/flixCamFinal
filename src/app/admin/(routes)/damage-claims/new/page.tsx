@@ -40,7 +40,17 @@ function NewDamageClaimForm() {
   const searchParams = useSearchParams()
   const bookingIdParam = searchParams?.get('bookingId')
   const { toast } = useToast()
-  const [booking, setBooking] = useState<{ id: string; bookingNumber: string; equipment?: Array<{ id: string; quantity: number; equipment: { id: string; sku: string; model: string | null } }>; studioId?: string | null; studio?: { id: string; name: string } | null } | null>(null)
+  const [booking, setBooking] = useState<{
+    id: string
+    bookingNumber: string
+    equipment?: Array<{
+      id: string
+      quantity: number
+      equipment: { id: string; sku: string; model: string | null }
+    }>
+    studioId?: string | null
+    studio?: { id: string; name: string } | null
+  } | null>(null)
   const [loadingBooking, setLoadingBooking] = useState(!!bookingIdParam)
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState({
@@ -79,7 +89,11 @@ function NewDamageClaimForm() {
     }
     const cost = parseFloat(form.estimatedCost)
     if (isNaN(cost) || cost < 0) {
-      toast({ title: 'Error', description: 'Valid estimated cost is required', variant: 'destructive' })
+      toast({
+        title: 'Error',
+        description: 'Valid estimated cost is required',
+        variant: 'destructive',
+      })
       return
     }
     setSubmitting(true)
@@ -121,16 +135,18 @@ function NewDamageClaimForm() {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild>
-          <Link href={bookingIdParam ? `/admin/bookings/${bookingIdParam}` : '/admin/damage-claims'}>
+          <Link
+            href={bookingIdParam ? `/admin/bookings/${bookingIdParam}` : '/admin/damage-claims'}
+          >
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <AlertTriangle className="h-8 w-8" />
             Report Damage
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             {bookingIdParam && booking
               ? `Booking #${booking.bookingNumber}`
               : 'Create a new damage claim for a booking'}
@@ -160,17 +176,25 @@ function NewDamageClaimForm() {
             {booking?.equipment && booking.equipment.length > 0 && (
               <div className="space-y-2">
                 <Label>Equipment (optional)</Label>
-                <Select value={form.equipmentId} onValueChange={(v) => setForm({ ...form, equipmentId: v })}>
+                <Select
+                  value={form.equipmentId}
+                  onValueChange={(v) => setForm({ ...form, equipmentId: v })}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select equipment" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">None</SelectItem>
-                    {booking.equipment.map((be: { id: string; equipment: { id: string; sku: string; model: string | null } }) => (
-                      <SelectItem key={be.equipment.id} value={be.equipment.id}>
-                        {be.equipment.sku} {be.equipment.model ?? ''}
-                      </SelectItem>
-                    ))}
+                    {booking.equipment.map(
+                      (be: {
+                        id: string
+                        equipment: { id: string; sku: string; model: string | null }
+                      }) => (
+                        <SelectItem key={be.equipment.id} value={be.equipment.id}>
+                          {be.equipment.sku} {be.equipment.model ?? ''}
+                        </SelectItem>
+                      )
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -179,7 +203,10 @@ function NewDamageClaimForm() {
             {booking?.studio && (
               <div className="space-y-2">
                 <Label>Studio (optional)</Label>
-                <Select value={form.studioId} onValueChange={(v) => setForm({ ...form, studioId: v })}>
+                <Select
+                  value={form.studioId}
+                  onValueChange={(v) => setForm({ ...form, studioId: v })}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select studio" />
                   </SelectTrigger>
@@ -191,29 +218,43 @@ function NewDamageClaimForm() {
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>Damage type *</Label>
-                <Select value={form.damageType} onValueChange={(v) => setForm({ ...form, damageType: v as (typeof DAMAGE_TYPES)[number] })}>
+                <Select
+                  value={form.damageType}
+                  onValueChange={(v) =>
+                    setForm({ ...form, damageType: v as (typeof DAMAGE_TYPES)[number] })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {DAMAGE_TYPES.map((t) => (
-                      <SelectItem key={t} value={t}>{t.replace(/_/g, ' ')}</SelectItem>
+                      <SelectItem key={t} value={t}>
+                        {t.replace(/_/g, ' ')}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
                 <Label>Severity *</Label>
-                <Select value={form.severity} onValueChange={(v) => setForm({ ...form, severity: v as (typeof SEVERITIES)[number] })}>
+                <Select
+                  value={form.severity}
+                  onValueChange={(v) =>
+                    setForm({ ...form, severity: v as (typeof SEVERITIES)[number] })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {SEVERITIES.map((s) => (
-                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                      <SelectItem key={s} value={s}>
+                        {s}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -259,7 +300,13 @@ function NewDamageClaimForm() {
                 {submitting ? 'Creating...' : 'Create claim'}
               </Button>
               <Button type="button" variant="outline" asChild>
-                <Link href={form.bookingId ? `/admin/bookings/${form.bookingId}` : '/admin/damage-claims'}>Cancel</Link>
+                <Link
+                  href={
+                    form.bookingId ? `/admin/bookings/${form.bookingId}` : '/admin/damage-claims'
+                  }
+                >
+                  Cancel
+                </Link>
               </Button>
             </div>
           </form>

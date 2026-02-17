@@ -88,15 +88,17 @@ export default function CustomerSegmentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <Users className="h-8 w-8" />
             Customer Segments
           </h1>
-          <p className="text-muted-foreground mt-1">Group customers for pricing, marketing, and terms</p>
+          <p className="mt-1 text-muted-foreground">
+            Group customers for pricing, marketing, and terms
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={loadSegments}>
-            <RefreshCw className="h-4 w-4 mr-2" />
+            <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
           </Button>
         </div>
@@ -105,7 +107,9 @@ export default function CustomerSegmentsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Segments</CardTitle>
-          <CardDescription>Assign users to segments in user edit. Use segments in pricing rules.</CardDescription>
+          <CardDescription>
+            Assign users to segments in user edit. Use segments in pricing rules.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">
@@ -123,11 +127,13 @@ export default function CustomerSegmentsPage() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={6}><Skeleton className="h-10 w-full" /></TableCell>
+                    <TableCell colSpan={6}>
+                      <Skeleton className="h-10 w-full" />
+                    </TableCell>
                   </TableRow>
                 ) : segments.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
                       No segments. Create via API or add a create form here.
                     </TableCell>
                   </TableRow>

@@ -91,21 +91,26 @@ export default function TechniciansPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">الفنيون</h1>
-          <p className="text-muted-foreground mt-1">إدارة الفنيين والمهام</p>
+          <p className="mt-1 text-muted-foreground">إدارة الفنيين والمهام</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleExportCSV} disabled={data.length === 0}>
-            <Download className="h-4 w-4 ml-2" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportCSV}
+            disabled={data.length === 0}
+          >
+            <Download className="ml-2 h-4 w-4" />
             تصدير CSV
           </Button>
           <Button asChild>
             <Link href="/admin/technicians/new">
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="ml-2 h-4 w-4" />
               فني جديد
             </Link>
           </Button>
           <Button variant="outline" onClick={fetchTechnicians} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 ml-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
         </div>
@@ -119,8 +124,8 @@ export default function TechniciansPage() {
       />
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 flex items-center gap-2">
-          <AlertCircle className="h-5 w-5 text-red-600 shrink-0" />
+        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
+          <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />
           <p className="text-red-800">{error}</p>
           <Button variant="outline" size="sm" onClick={fetchTechnicians}>
             إعادة المحاولة
@@ -145,14 +150,14 @@ export default function TechniciansPage() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground mt-2">جاري التحميل...</p>
+                <TableCell colSpan={8} className="py-12 text-center">
+                  <Loader2 className="mx-auto h-8 w-8 animate-spin text-muted-foreground" />
+                  <p className="mt-2 text-sm text-muted-foreground">جاري التحميل...</p>
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
+                <TableCell colSpan={8} className="py-12 text-center text-muted-foreground">
                   لا يوجد فنيون
                 </TableCell>
               </TableRow>

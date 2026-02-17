@@ -103,7 +103,7 @@ export default function UserDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[280px]">
+      <div className="flex min-h-[280px] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
@@ -123,7 +123,9 @@ export default function UserDetailPage() {
   return (
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/admin/users" className="hover:text-foreground">المستخدمون</Link>
+        <Link href="/admin/users" className="hover:text-foreground">
+          المستخدمون
+        </Link>
         <ArrowRight className="h-4 w-4 rtl:rotate-180" />
         <span>{user.name || user.email}</span>
       </div>
@@ -133,9 +135,15 @@ export default function UserDetailPage() {
           <CardTitle>معلومات المستخدم</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-          <p><span className="font-medium">الاسم:</span> {user.name || '-'}</p>
-          <p><span className="font-medium">البريد:</span> {user.email}</p>
-          <p><span className="font-medium">الدور (legacy):</span> {user.role}</p>
+          <p>
+            <span className="font-medium">الاسم:</span> {user.name || '-'}
+          </p>
+          <p>
+            <span className="font-medium">البريد:</span> {user.email}
+          </p>
+          <p>
+            <span className="font-medium">الدور (legacy):</span> {user.role}
+          </p>
         </CardContent>
       </Card>
 
@@ -147,7 +155,7 @@ export default function UserDetailPage() {
               <CardDescription>الأدوار المعيّنة لهذا المستخدم</CardDescription>
             </div>
             <Button size="sm" onClick={() => setAssignModalOpen(true)}>
-              <UserPlus className="h-4 w-4 ml-2" />
+              <UserPlus className="ml-2 h-4 w-4" />
               تعيين دور
             </Button>
           </div>
@@ -158,10 +166,7 @@ export default function UserDetailPage() {
           ) : (
             <div className="flex flex-wrap gap-2">
               {roles.map((ur) => (
-                <div
-                  key={ur.id}
-                  className="flex items-center gap-1 rounded-md border px-2 py-1"
-                >
+                <div key={ur.id} className="flex items-center gap-1 rounded-md border px-2 py-1">
                   <RoleBadge
                     name={ur.role.name}
                     displayName={ur.role.displayName}
@@ -169,7 +174,9 @@ export default function UserDetailPage() {
                     color={ur.role.color}
                   />
                   {ur.isPrimary && (
-                    <Badge variant="secondary" className="text-xs">أساسي</Badge>
+                    <Badge variant="secondary" className="text-xs">
+                      أساسي
+                    </Badge>
                   )}
                   <Button
                     variant="ghost"
@@ -190,9 +197,7 @@ export default function UserDetailPage() {
       <Card>
         <CardHeader>
           <CardTitle>الصلاحيات الفعّالة</CardTitle>
-          <CardDescription>
-            اتحاد الصلاحيات من جميع الأدوار والتداخلات
-          </CardDescription>
+          <CardDescription>اتحاد الصلاحيات من جميع الأدوار والتداخلات</CardDescription>
         </CardHeader>
         <CardContent>
           <Button
@@ -200,11 +205,15 @@ export default function UserDetailPage() {
             size="sm"
             onClick={() => setShowEffectivePerms(!showEffectivePerms)}
           >
-            {showEffectivePerms ? <ChevronUp className="h-4 w-4 ml-2" /> : <ChevronDown className="h-4 w-4 ml-2" />}
+            {showEffectivePerms ? (
+              <ChevronUp className="ml-2 h-4 w-4" />
+            ) : (
+              <ChevronDown className="ml-2 h-4 w-4" />
+            )}
             {showEffectivePerms ? 'إخفاء' : 'عرض'} ({effectivePerms.length})
           </Button>
           {showEffectivePerms && (
-            <div className="flex flex-wrap gap-1 mt-2">
+            <div className="mt-2 flex flex-wrap gap-1">
               {effectivePerms.map((p) => (
                 <Badge key={p} variant="outline" className="font-mono text-xs">
                   {p}

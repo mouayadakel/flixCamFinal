@@ -72,7 +72,9 @@ export default function CheckoutPage() {
         if (!complete) router.replace(`/portal/profile?complete=true`)
       })
       .catch(() => setProfileChecked(true))
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [status, session?.user?.id, router])
 
   useEffect(() => {
@@ -87,15 +89,19 @@ export default function CheckoutPage() {
       .then((data: { depositAmount?: number }) => {
         if (!cancelled) setDepositAmount(data.depositAmount ?? 0)
       })
-      .catch(() => { if (!cancelled) setDepositAmount(0) })
-    return () => { cancelled = true }
+      .catch(() => {
+        if (!cancelled) setDepositAmount(0)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [session, items.length])
 
   const stepsWithLabels = STEP_LABELS.map((s) => ({ id: s.id, label: t(s.labelKey) }))
 
   if (status === 'loading') {
     return (
-      <main className="container mx-auto py-12 px-4">
+      <main className="container mx-auto px-4 py-12">
         <p className="text-muted-foreground">{t('common.loading')}</p>
       </main>
     )
@@ -103,7 +109,7 @@ export default function CheckoutPage() {
 
   if (!session) {
     return (
-      <main className="container mx-auto max-w-xl py-12 px-4">
+      <main className="container mx-auto max-w-xl px-4 py-12">
         <h1 className="mb-6 text-2xl font-bold">{t('checkout.title')}</h1>
         <CheckoutStepContact onSuccess={() => setProfileChecked(false)} />
       </main>
@@ -112,7 +118,7 @@ export default function CheckoutPage() {
 
   if (!profileChecked || !profileComplete) {
     return (
-      <main className="container mx-auto max-w-xl py-12 px-4">
+      <main className="container mx-auto max-w-xl px-4 py-12">
         <p className="text-muted-foreground">{t('common.loading')}</p>
         <p className="mt-2 text-sm text-muted-foreground">
           Complete your profile to continue checkout.
@@ -123,14 +129,14 @@ export default function CheckoutPage() {
 
   if (!showFiveSteps) {
     return (
-      <main className="container mx-auto max-w-6xl py-8 px-4">
+      <main className="container mx-auto max-w-6xl px-4 py-8">
         <p className="text-muted-foreground">{t('common.loading')}</p>
       </main>
     )
   }
 
   return (
-    <main className="container mx-auto max-w-6xl py-8 px-4">
+    <main className="container mx-auto max-w-6xl px-4 py-8">
       <h1 className="mb-6 text-2xl font-bold">{t('checkout.title')}</h1>
       <Stepper
         steps={stepsWithLabels}

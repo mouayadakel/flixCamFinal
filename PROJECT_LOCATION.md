@@ -13,9 +13,10 @@ Use this path when opening the project in Cursor: **File → Open Folder** → p
 ## Directory Structure Status
 
 ✅ All directories created:
+
 - `src/` - Source code
 - `prisma/` - Database
-- `public/` - Static assets  
+- `public/` - Static assets
 - `docs/` - Documentation
 - `tests/` - Test files
 
@@ -26,6 +27,7 @@ Use this path when opening the project in Cursor: **File → Open Folder** → p
 ## Updated Files
 
 ✅ **`.cursorrules`** - Updated with:
+
 - New project name: FlixCam.rent
 - New working directory path
 - All path references updated

@@ -88,7 +88,9 @@ export async function GET(request: NextRequest) {
 
   let data = rows
   if (search) {
-    data = data.filter((r) => r.user.toLowerCase().includes(search) || r.note?.toLowerCase().includes(search))
+    data = data.filter(
+      (r) => r.user.toLowerCase().includes(search) || r.note?.toLowerCase().includes(search)
+    )
   }
   if (type === 'credit' || type === 'debit') {
     data = data.filter((r) => r.type === type)

@@ -11,11 +11,7 @@ import { VendorSidebar } from '@/components/layouts/vendor-sidebar'
 import { LogOut } from 'lucide-react'
 import { prisma } from '@/lib/db/prisma'
 
-export default async function VendorLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function VendorLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
 
   if (!session?.user?.id) {
@@ -54,7 +50,7 @@ export default async function VendorLayout({
               }}
             >
               <Button type="submit" variant="ghost" size="sm">
-                <LogOut className="h-4 w-4 ml-2" />
+                <LogOut className="ml-2 h-4 w-4" />
                 تسجيل الخروج
               </Button>
             </form>

@@ -13,10 +13,7 @@ import { QuotePolicy } from '@/lib/policies/quote.policy'
 import { quoteStatusSchema } from '@/lib/validators/quote.validator'
 import { ValidationError, ForbiddenError } from '@/lib/errors'
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await auth()
 
@@ -29,20 +26,14 @@ export async function PATCH(
     // Check policy
     const policy = await QuotePolicy.canUpdate(userId, params.id)
     if (!policy.allowed) {
-      return NextResponse.json(
-        { error: policy.reason || 'Forbidden' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: policy.reason || 'Forbidden' }, { status: 403 })
     }
 
     const body = await req.json()
     const { status } = body
 
     if (!status) {
-      return NextResponse.json(
-        { error: 'Status is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Status is required' }, { status: 400 })
     }
 
     const validatedStatus = quoteStatusSchema.parse(status)
@@ -54,12 +45,7 @@ export async function PATCH(
       userAgent: headers.get('user-agent') || undefined,
     }
 
-    const quote = await QuoteService.updateStatus(
-      params.id,
-      validatedStatus,
-      userId,
-      auditContext
-    )
+    const quote = await QuoteService.updateStatus(params.id, validatedStatus, userId, auditContext)
 
     return NextResponse.json({
       success: true,
@@ -68,17 +54,11 @@ export async function PATCH(
     })
   } catch (error: any) {
     if (error instanceof ValidationError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     if (error instanceof ForbiddenError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 403 })
     }
 
     if (error.name === 'ZodError') {
@@ -89,9 +69,6 @@ export async function PATCH(
     }
 
     console.error('Update quote status error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

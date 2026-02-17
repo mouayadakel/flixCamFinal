@@ -52,7 +52,13 @@ interface Review {
   respondedAt: string | null
   createdAt: string
   user?: { id: string; name: string | null; email: string }
-  booking?: { id: string; bookingNumber: string; status: string; startDate: string; endDate: string }
+  booking?: {
+    id: string
+    bookingNumber: string
+    status: string
+    startDate: string
+    endDate: string
+  }
 }
 
 export default function ReviewsPage() {
@@ -118,16 +124,22 @@ export default function ReviewsPage() {
       createdAt: formatDate(r.createdAt),
       userEmail: r.user?.email ?? '',
     }))
-    exportToCSV(rows, selectedIds.size ? `reviews-selected-${new Date().toISOString().slice(0, 10)}` : `reviews-${new Date().toISOString().slice(0, 10)}`, [
-      { key: 'id', label: 'المعرف' },
-      { key: 'bookingNumber', label: 'رقم الحجز' },
-      { key: 'rating', label: 'التقييم' },
-      { key: 'comment', label: 'التعليق' },
-      { key: 'status', label: 'الحالة' },
-      { key: 'equipmentNames', label: 'المعدات' },
-      { key: 'createdAt', label: 'التاريخ' },
-      { key: 'userEmail', label: 'البريد' },
-    ])
+    exportToCSV(
+      rows,
+      selectedIds.size
+        ? `reviews-selected-${new Date().toISOString().slice(0, 10)}`
+        : `reviews-${new Date().toISOString().slice(0, 10)}`,
+      [
+        { key: 'id', label: 'المعرف' },
+        { key: 'bookingNumber', label: 'رقم الحجز' },
+        { key: 'rating', label: 'التقييم' },
+        { key: 'comment', label: 'التعليق' },
+        { key: 'status', label: 'الحالة' },
+        { key: 'equipmentNames', label: 'المعدات' },
+        { key: 'createdAt', label: 'التاريخ' },
+        { key: 'userEmail', label: 'البريد' },
+      ]
+    )
   }
   const bulkSetStatus = async (status: 'APPROVED' | 'REJECTED') => {
     if (selectedIds.size === 0) return
@@ -144,7 +156,11 @@ export default function ReviewsPage() {
       )
       const failed = results.filter((r) => r.status === 'rejected').length
       if (failed > 0) {
-        toast({ title: 'تنبيه', description: `تم تحديث ${selectedIds.size - failed}، فشل ${failed}`, variant: 'destructive' })
+        toast({
+          title: 'تنبيه',
+          description: `تم تحديث ${selectedIds.size - failed}، فشل ${failed}`,
+          variant: 'destructive',
+        })
       } else {
         toast({ title: 'تم', description: `تم تحديث ${selectedIds.size} تقييماً` })
       }
@@ -161,23 +177,37 @@ export default function ReviewsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <Star className="h-8 w-8" />
             Reviews
           </h1>
-          <p className="text-muted-foreground mt-1">Customer reviews and ratings; moderate and respond</p>
+          <p className="mt-1 text-muted-foreground">
+            Customer reviews and ratings; moderate and respond
+          </p>
         </div>
         {selectedIds.size > 0 && (
           <>
-            <span className="text-sm text-muted-foreground self-center">{selectedIds.size} محدد</span>
-            <Button variant="outline" size="sm" onClick={() => exportSelected()} disabled={reviews.length === 0}>
-              <Download className="h-4 w-4 ml-2" />
+            <span className="self-center text-sm text-muted-foreground">
+              {selectedIds.size} محدد
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => exportSelected()}
+              disabled={reviews.length === 0}
+            >
+              <Download className="ml-2 h-4 w-4" />
               تصدير المحدد
             </Button>
             <Button size="sm" onClick={() => bulkSetStatus('APPROVED')} disabled={bulkUpdating}>
               الموافقة على المحدد
             </Button>
-            <Button variant="destructive" size="sm" onClick={() => bulkSetStatus('REJECTED')} disabled={bulkUpdating}>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => bulkSetStatus('REJECTED')}
+              disabled={bulkUpdating}
+            >
               رفض المحدد
             </Button>
             <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>
@@ -185,12 +215,17 @@ export default function ReviewsPage() {
             </Button>
           </>
         )}
-        <Button variant="outline" size="sm" onClick={exportSelected} disabled={reviews.length === 0}>
-          <Download className="h-4 w-4 ml-2" />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={exportSelected}
+          disabled={reviews.length === 0}
+        >
+          <Download className="ml-2 h-4 w-4" />
           تصدير CSV
         </Button>
         <Button variant="outline" onClick={loadReviews}>
-          <RefreshCw className="h-4 w-4 mr-2" />
+          <RefreshCw className="mr-2 h-4 w-4" />
           Refresh
         </Button>
       </div>
@@ -213,17 +248,21 @@ export default function ReviewsPage() {
       <Card>
         <CardHeader>
           <CardTitle>All reviews</CardTitle>
-          <CardDescription>Approve, reject, or reply to reviews from the detail page</CardDescription>
+          <CardDescription>
+            Approve, reject, or reply to reviews from the detail page
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4 mb-4">
+          <div className="mb-4 flex gap-4">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
                 {STATUS_OPTIONS.map((o) => (
-                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -252,36 +291,43 @@ export default function ReviewsPage() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={8}><Skeleton className="h-8 w-full" /></TableCell>
+                    <TableCell colSpan={8}>
+                      <Skeleton className="h-8 w-full" />
+                    </TableCell>
                   </TableRow>
                 ) : reviews.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">No reviews found</TableCell>
+                    <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
+                      No reviews found
+                    </TableCell>
                   </TableRow>
                 ) : (
-reviews.map((r) => (
-                <TableRow key={r.id}>
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedIds.has(r.id)}
-                      onCheckedChange={() => toggleSelectOne(r.id)}
-                      aria-label={`Select ${r.id}`}
-                    />
-                  </TableCell>
-                  <TableCell>
+                  reviews.map((r) => (
+                    <TableRow key={r.id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedIds.has(r.id)}
+                          onCheckedChange={() => toggleSelectOne(r.id)}
+                          aria-label={`Select ${r.id}`}
+                        />
+                      </TableCell>
+                      <TableCell>
                         {r.booking ? (
-                          <Link href={`/admin/bookings/${r.bookingId}`} className="text-primary hover:underline">
+                          <Link
+                            href={`/admin/bookings/${r.bookingId}`}
+                            className="text-primary hover:underline"
+                          >
                             {r.booking.bookingNumber}
                           </Link>
-                        ) : r.bookingId}
+                        ) : (
+                          r.bookingId
+                        )}
                       </TableCell>
-                      <TableCell className="text-muted-foreground text-sm max-w-[140px] truncate">
+                      <TableCell className="max-w-[140px] truncate text-sm text-muted-foreground">
                         {r.equipmentNames || '—'}
                       </TableCell>
                       <TableCell>
-                        {r.user ? (
-                          <span>{r.user.name || r.user.email}</span>
-                        ) : r.userId}
+                        {r.user ? <span>{r.user.name || r.user.email}</span> : r.userId}
                       </TableCell>
                       <TableCell>
                         <span className="flex items-center gap-1">
@@ -291,13 +337,15 @@ reviews.map((r) => (
                       </TableCell>
                       <TableCell className="max-w-[200px] truncate">{r.comment || '—'}</TableCell>
                       <TableCell>
-                        <Badge className={statusColor[r.status] ?? 'bg-gray-100 text-gray-800'}>{r.status.replace(/_/g, ' ')}</Badge>
+                        <Badge className={statusColor[r.status] ?? 'bg-gray-100 text-gray-800'}>
+                          {r.status.replace(/_/g, ' ')}
+                        </Badge>
                       </TableCell>
                       <TableCell>{formatDate(r.createdAt)}</TableCell>
                       <TableCell>
                         <Button variant="ghost" size="sm" asChild>
                           <Link href={`/admin/reviews/${r.id}`}>
-                            <Eye className="h-4 w-4 mr-1" /> View
+                            <Eye className="mr-1 h-4 w-4" /> View
                           </Link>
                         </Button>
                       </TableCell>

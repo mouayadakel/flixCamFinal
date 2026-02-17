@@ -61,9 +61,7 @@ export default async function PortalDocumentsPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold">المستندات</h1>
-        <p className="text-muted-foreground mt-2">
-          العقود والفواتير والملفات المتعلقة بحجوزاتك
-        </p>
+        <p className="mt-2 text-muted-foreground">العقود والفواتير والملفات المتعلقة بحجوزاتك</p>
       </div>
 
       <Card>
@@ -76,17 +74,17 @@ export default async function PortalDocumentsPage() {
         </CardHeader>
         <CardContent>
           {contracts.length === 0 ? (
-            <p className="text-muted-foreground text-center py-6">لا توجد عقود</p>
+            <p className="py-6 text-center text-muted-foreground">لا توجد عقود</p>
           ) : (
             <ul className="space-y-3">
               {contracts.map((c) => (
                 <li
                   key={c.id}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
+                  className="flex items-center justify-between rounded-lg border p-3 hover:bg-muted/50"
                 >
                   <div>
                     <span className="font-medium">عقد حجز #{c.booking.bookingNumber}</span>
-                    <span className="text-muted-foreground text-sm mr-2">
+                    <span className="mr-2 text-sm text-muted-foreground">
                       — {formatDate(c.createdAt)}
                       {c.signedAt && ` · موقع ${formatDate(c.signedAt)}`}
                     </span>
@@ -120,7 +118,7 @@ export default async function PortalDocumentsPage() {
         </CardHeader>
         <CardContent>
           {invoiceItems.length === 0 ? (
-            <p className="text-muted-foreground text-center py-6">لا توجد فواتير</p>
+            <p className="py-6 text-center text-muted-foreground">لا توجد فواتير</p>
           ) : (
             <ul className="space-y-3">
               {invoiceItems.map((inv) => {
@@ -131,11 +129,11 @@ export default async function PortalDocumentsPage() {
                 return (
                   <li
                     key={inv.id}
-                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
+                    className="flex items-center justify-between rounded-lg border p-3 hover:bg-muted/50"
                   >
                     <div>
                       <span className="font-medium">{inv.label}</span>
-                      <span className="text-muted-foreground text-sm mr-2">
+                      <span className="mr-2 text-sm text-muted-foreground">
                         — {formatCurrency(inv.totalAmount.toNumber())}
                         {isPaid ? ' · مدفوعة' : ''}
                       </span>
@@ -147,7 +145,7 @@ export default async function PortalDocumentsPage() {
                         </Button>
                       </Link>
                       <Button variant="outline" size="sm">
-                        <Download className="h-4 w-4 ml-1" />
+                        <Download className="ml-1 h-4 w-4" />
                         PDF
                       </Button>
                     </div>

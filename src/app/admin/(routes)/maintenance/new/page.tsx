@@ -43,7 +43,7 @@ export default function NewMaintenancePage() {
   const [loading, setLoading] = useState(false)
   const [equipment, setEquipment] = useState<Equipment[]>([])
   const [technicians, setTechnicians] = useState<User[]>([])
-  
+
   const [formData, setFormData] = useState({
     equipmentId: searchParams?.get('equipmentId') || '',
     type: 'preventive',
@@ -151,14 +151,14 @@ export default function NewMaintenancePage() {
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
+          <h1 className="flex items-center gap-2 text-3xl font-bold">
             <Wrench className="h-8 w-8" />
             طلب صيانة جديد
           </h1>
-          </div>
+        </div>
         <Button variant="outline" asChild>
           <Link href="/admin/maintenance">
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="ml-2 h-4 w-4" />
             إلغاء
           </Link>
         </Button>
@@ -199,7 +199,7 @@ export default function NewMaintenancePage() {
             <CardTitle>تفاصيل الصيانة</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <div className="space-y-2">
                 <Label>نوع الصيانة</Label>
                 <Select
@@ -298,12 +298,12 @@ export default function NewMaintenancePage() {
           <Button type="submit" disabled={loading}>
             {loading ? (
               <>
-                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
                 جاري الحفظ...
               </>
             ) : (
               <>
-                <Plus className="h-4 w-4 ml-2" />
+                <Plus className="ml-2 h-4 w-4" />
                 إنشاء طلب الصيانة
               </>
             )}

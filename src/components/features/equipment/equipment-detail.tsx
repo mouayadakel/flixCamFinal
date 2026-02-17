@@ -29,7 +29,6 @@ import {
   ArrowRight,
   Calendar,
   CheckCircle2,
-  Shield,
   Clock,
   Truck,
 } from 'lucide-react'
@@ -57,7 +56,10 @@ interface EquipmentDetailProps {
     category: { name: string; slug: string } | null
     brand: { name: string; slug: string } | null
     media: { id: string; url: string; type: string }[]
-    specifications?: Record<string, unknown> | import('@/lib/types/specifications.types').StructuredSpecifications | null
+    specifications?:
+      | Record<string, unknown>
+      | import('@/lib/types/specifications.types').StructuredSpecifications
+      | null
     customFields?: Record<string, unknown> | null
     vendor?: { companyName: string; logo?: string | null } | null
   }
@@ -146,10 +148,7 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px] lg:gap-10">
         {/* Left column: Gallery + Tabs */}
         <div className="min-w-0 space-y-8">
-          <EquipmentGallery
-            media={equipment.media}
-            alt={title}
-          />
+          <EquipmentGallery media={equipment.media} alt={title} />
 
           {/* Quick spec pills (between gallery and tabs, structured specs only) */}
           {equipment.specifications &&
@@ -161,28 +160,28 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
 
           {/* Product info tabs */}
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="w-full justify-start gap-0 rounded-2xl border border-border-light/60 bg-surface-light p-1 h-auto">
+            <TabsList className="h-auto w-full justify-start gap-0 rounded-2xl border border-border-light/60 bg-surface-light p-1">
               <TabsTrigger
                 value="overview"
-                className="rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-text-heading"
+                className="rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-text-heading data-[state=active]:shadow-sm"
               >
                 {t('equipment.tabOverview') ?? 'Overview'}
               </TabsTrigger>
               <TabsTrigger
                 value="specs"
-                className="rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-text-heading"
+                className="rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-text-heading data-[state=active]:shadow-sm"
               >
                 {t('equipment.tabSpecs') ?? 'Specifications'}
               </TabsTrigger>
               <TabsTrigger
                 value="included"
-                className="rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-text-heading"
+                className="rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-text-heading data-[state=active]:shadow-sm"
               >
                 {t('equipment.tabIncluded') ?? "What's Included"}
               </TabsTrigger>
               <TabsTrigger
                 value="addons"
-                className="rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-text-heading"
+                className="rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-text-heading data-[state=active]:shadow-sm"
               >
                 {t('equipment.tabAddons') ?? 'Add-ons'}
               </TabsTrigger>
@@ -191,8 +190,8 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
             <TabsContent value="overview" className="pt-6">
               <div className="rounded-2xl border border-border-light/60 bg-white p-6 shadow-card">
                 <p className="text-body-main leading-relaxed text-text-body">
-                  {title} — {equipment.brand?.name ?? ''} {equipment.category?.name ?? ''}.
-                  SKU: <span className="font-mono text-sm text-text-muted">{equipment.sku}</span>.
+                  {title} — {equipment.brand?.name ?? ''} {equipment.category?.name ?? ''}. SKU:{' '}
+                  <span className="font-mono text-sm text-text-muted">{equipment.sku}</span>.
                   Available for daily, weekly, and monthly rental.
                 </p>
               </div>
@@ -211,7 +210,8 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
             <TabsContent value="included" className="pt-6">
               <div className="rounded-2xl border border-border-light/60 bg-white p-6 shadow-card">
                 <p className="text-body-main text-text-body">
-                  {t('equipment.includedPlaceholder') ?? 'Standard rental includes the unit as described. Accessories or cases may be listed in specifications.'}
+                  {t('equipment.includedPlaceholder') ??
+                    'Standard rental includes the unit as described. Accessories or cases may be listed in specifications.'}
                 </p>
               </div>
             </TabsContent>
@@ -219,7 +219,8 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
             <TabsContent value="addons" className="pt-6">
               <div className="rounded-2xl border border-border-light/60 bg-white p-6 shadow-card">
                 <p className="text-body-main text-text-body">
-                  {t('equipment.addonsPlaceholder') ?? 'Insurance and optional accessories can be added at checkout.'}
+                  {t('equipment.addonsPlaceholder') ??
+                    'Insurance and optional accessories can be added at checkout.'}
                 </p>
               </div>
             </TabsContent>
@@ -228,7 +229,7 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
 
         {/* Right column: Sticky booking sidebar */}
         <div className="lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-2xl border border-border-light/60 bg-white p-6 shadow-card-elevated space-y-5">
+          <div className="space-y-5 rounded-2xl border border-border-light/60 bg-white p-6 shadow-card-elevated">
             {/* Title + brand */}
             <div>
               <div className="flex items-start justify-between gap-3">
@@ -238,7 +239,7 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
                       {equipment.brand.name}
                     </p>
                   )}
-                  <h1 className="mt-1 text-xl font-bold text-text-heading leading-tight">
+                  <h1 className="mt-1 text-xl font-bold leading-tight text-text-heading">
                     {title}
                   </h1>
                 </div>
@@ -247,7 +248,7 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
               {equipment.category && (
                 <Link
                   href={`/equipment?categoryId=${equipment.category.slug}`}
-                  className="mt-1 inline-block text-sm text-brand-primary hover:text-brand-primary-hover transition-colors"
+                  className="mt-1 inline-block text-sm text-brand-primary transition-colors hover:text-brand-primary-hover"
                 >
                   {equipment.category.name}
                 </Link>
@@ -278,7 +279,7 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
 
             {/* Date selection */}
             <div className="space-y-3">
-              <p className="text-sm font-semibold text-text-heading flex items-center gap-2">
+              <p className="flex items-center gap-2 text-sm font-semibold text-text-heading">
                 <Calendar className="h-4 w-4 text-brand-primary" />
                 Select rental dates
               </p>
@@ -318,7 +319,7 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
                 size="lg"
                 disabled={!available || isAdding}
                 onClick={handleAddToCart}
-                className="w-full bg-brand-primary hover:bg-brand-primary-hover rounded-xl h-12 font-semibold shadow-md transition-all hover:shadow-lg active:scale-[0.98] disabled:opacity-50"
+                className="h-12 w-full rounded-xl bg-brand-primary font-semibold shadow-md transition-all hover:bg-brand-primary-hover hover:shadow-lg active:scale-[0.98] disabled:opacity-50"
               >
                 {isAdding ? (
                   <span className="flex items-center gap-2">
@@ -338,7 +339,7 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
                   size="lg"
                   variant="outline"
                   asChild
-                  className="w-full rounded-xl h-12 border-brand-primary/20 text-brand-primary hover:bg-brand-primary/5 font-semibold"
+                  className="h-12 w-full rounded-xl border-brand-primary/20 font-semibold text-brand-primary hover:bg-brand-primary/5"
                 >
                   <Link href="/cart" className="flex items-center gap-2">
                     {t('cart.viewCart')}
@@ -349,9 +350,8 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
             </div>
 
             {/* Trust signals */}
-            <div className="border-t border-border-light/60 pt-4 space-y-2.5">
+            <div className="space-y-2.5 border-t border-border-light/60 pt-4">
               {[
-                { Icon: Shield, text: t('home.trustInsured') || 'Insured rentals' },
                 { Icon: Clock, text: t('home.trustSupport') || '24/7 support' },
                 { Icon: Truck, text: 'Delivery available' },
                 { Icon: CheckCircle2, text: 'Tested & verified equipment' },
@@ -374,13 +374,11 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
               <h2 className="text-section-title text-text-heading">
                 {t('common.recommendations')}
               </h2>
-              <p className="mt-1 text-sm text-text-muted">
-                Similar equipment you might like
-              </p>
+              <p className="mt-1 text-sm text-text-muted">Similar equipment you might like</p>
             </div>
             <Button
               variant="ghost"
-              className="hidden sm:inline-flex items-center gap-1 text-brand-primary hover:text-brand-primary-hover hover:bg-brand-primary/5 font-semibold"
+              className="hidden items-center gap-1 font-semibold text-brand-primary hover:bg-brand-primary/5 hover:text-brand-primary-hover sm:inline-flex"
               asChild
             >
               <Link href="/equipment">
@@ -389,7 +387,7 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
               </Link>
             </Button>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {recommendations.map((item) => (
               <EquipmentCard key={item.id} item={item} />
             ))}

@@ -46,19 +46,23 @@ Output:
 ## Dependency Chain for [item]
 
 ### Direct Dependencies (files that import this):
+
 1. file1.ts - line 12 (imports function X)
 2. file2.tsx - line 45 (uses component Y)
 
 ### Indirect Dependencies (affected downstream):
+
 1. Page: /admin/bookings (uses file1.ts)
 2. API: /api/bookings (calls this function)
 3. Component: BookingCard (renders this data)
 
 ### User-Facing Impact:
+
 - ⚠️ Bookings page will break
 - ⚠️ Dashboard widget will show errors
 
 ### Safe Deletion Checklist:
+
 - [ ] Remove from file1.ts imports
 - [ ] Update file2.tsx to use alternative
 - [ ] Add migration for database changes

@@ -346,7 +346,7 @@ export class VendorService {
     const data: Record<string, unknown> = { updatedAt: new Date(), updatedBy: userId }
     for (const key of allowedFields) {
       if (input[key] !== undefined) {
-        (data as Record<string, unknown>)[key] = input[key]
+        ;(data as Record<string, unknown>)[key] = input[key]
       }
     }
 

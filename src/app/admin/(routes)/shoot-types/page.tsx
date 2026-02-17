@@ -65,7 +65,8 @@ export default function ShootTypesPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Shoot Types</h1>
           <p className="text-muted-foreground">
-            Manage shoot types for the Smart Kit Builder. Configure categories, recommendations, and questionnaires.
+            Manage shoot types for the Smart Kit Builder. Configure categories, recommendations, and
+            questionnaires.
           </p>
         </div>
         <div className="flex gap-2">
@@ -105,9 +106,7 @@ export default function ShootTypesPage() {
             </div>
           ) : error ? (
             <Card>
-              <CardContent className="py-8 text-center text-destructive">
-                {error}
-              </CardContent>
+              <CardContent className="py-8 text-center text-destructive">{error}</CardContent>
             </Card>
           ) : (
             <ShootTypeCardGrid items={list} onUpdated={fetchList} />
@@ -119,7 +118,8 @@ export default function ShootTypesPage() {
             <CardHeader>
               <CardTitle>Form editor</CardTitle>
               <CardDescription>
-                Edit a single shoot type with full control: general info, category flow, recommendations, and questionnaire.
+                Edit a single shoot type with full control: general info, category flow,
+                recommendations, and questionnaire.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

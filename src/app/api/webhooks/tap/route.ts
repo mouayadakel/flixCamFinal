@@ -23,20 +23,14 @@ export async function POST(req: NextRequest) {
     const webhookSecret = process.env.TAP_WEBHOOK_SECRET
 
     if (!apiKey || !webhookSecret) {
-      return NextResponse.json(
-        { error: 'Tap credentials not configured' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Tap credentials not configured' }, { status: 500 })
     }
 
     const tapClient = new TapClient(apiKey, webhookSecret)
 
     // Verify webhook signature
     if (!tapClient.verifyWebhook(signature, payload)) {
-      return NextResponse.json(
-        { error: 'Invalid signature' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
     }
 
     // Parse webhook event
@@ -47,10 +41,7 @@ export async function POST(req: NextRequest) {
       const bookingId = event.object.metadata?.booking_id
 
       if (!bookingId) {
-        return NextResponse.json(
-          { error: 'Booking ID not found in metadata' },
-          { status: 400 }
-        )
+        return NextResponse.json({ error: 'Booking ID not found in metadata' }, { status: 400 })
       }
 
       // Update payment record
@@ -65,11 +56,7 @@ export async function POST(req: NextRequest) {
 
       // Transition booking state: payment_pending → confirmed
       try {
-        await BookingService.transitionState(
-          bookingId,
-          'CONFIRMED',
-          'system'
-        )
+        await BookingService.transitionState(bookingId, 'CONFIRMED', 'system')
       } catch (transitionError: any) {
         // Log error but don't fail the webhook
         console.error('Failed to transition booking state:', transitionError)
@@ -96,9 +83,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true })
   } catch (error: any) {
     console.error('Tap webhook error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

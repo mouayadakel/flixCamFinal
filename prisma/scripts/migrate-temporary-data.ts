@@ -157,7 +157,7 @@ interface DeliveryData {
 
 async function migrateQuotes() {
   console.log('Migrating quotes from Booking.notes...')
-  
+
   const bookings = await prisma.booking.findMany({
     where: {
       notes: {
@@ -321,7 +321,9 @@ async function migrateMaintenance() {
       for (const maintData of customFields.maintenance) {
         const maintenance = await prisma.maintenance.create({
           data: {
-            maintenanceNumber: maintData.maintenanceNumber || `MAINT-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
+            maintenanceNumber:
+              maintData.maintenanceNumber ||
+              `MAINT-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
             equipmentId: eq.id,
             type: maintData.type.toUpperCase() as any,
             status: maintData.status.toUpperCase().replace('_', '_') as any,
@@ -333,8 +335,10 @@ async function migrateMaintenance() {
             notes: maintData.notes || null,
             cost: maintData.cost || null,
             partsUsed: maintData.partsUsed || null,
-            equipmentConditionBefore: maintData.equipmentConditionBefore?.toUpperCase() as any || null,
-            equipmentConditionAfter: maintData.equipmentConditionAfter?.toUpperCase() as any || null,
+            equipmentConditionBefore:
+              (maintData.equipmentConditionBefore?.toUpperCase() as any) || null,
+            equipmentConditionAfter:
+              (maintData.equipmentConditionAfter?.toUpperCase() as any) || null,
             createdBy: maintData.createdBy || 'system',
             createdAt: new Date(maintData.createdAt || new Date()),
             updatedAt: new Date(maintData.updatedAt || new Date()),
@@ -387,7 +391,8 @@ async function migrateCoupons() {
           usageLimit: couponData.usageLimit || null,
           usedCount: couponData.usedCount || 0,
           status: couponData.status.toUpperCase() as any,
-          applicableEquipmentIds: (couponData.applicableEquipmentIds ?? undefined) as Prisma.InputJsonValue,
+          applicableEquipmentIds: (couponData.applicableEquipmentIds ??
+            undefined) as Prisma.InputJsonValue,
           description: couponData.description || null,
           createdBy: couponData.createdBy || 'system',
           createdAt: new Date(couponData.createdAt || flag.createdAt),
@@ -536,4 +541,11 @@ if (require.main === module) {
   main()
 }
 
-export { migrateQuotes, migrateInvoices, migrateMaintenance, migrateCoupons, migrateCampaigns, migrateDeliveries }
+export {
+  migrateQuotes,
+  migrateInvoices,
+  migrateMaintenance,
+  migrateCoupons,
+  migrateCampaigns,
+  migrateDeliveries,
+}

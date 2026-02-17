@@ -10,11 +10,7 @@ import { EquipmentService } from './equipment.service'
 import { StudioService } from './studio.service'
 import { EventBus } from '@/lib/events/event-bus'
 import { PayoutService } from './payout.service'
-import {
-  NotFoundError,
-  ValidationError,
-  ForbiddenError,
-} from '@/lib/errors'
+import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
 import { BookingStatus } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
@@ -148,7 +144,8 @@ export class BookingService {
         input.endDate
       )
 
-      const freeInPeriod = (availability.availableQuantity ?? 0) - (availability.rentedQuantity ?? 0)
+      const freeInPeriod =
+        (availability.availableQuantity ?? 0) - (availability.rentedQuantity ?? 0)
       if (!availability.available || freeInPeriod < eq.quantity) {
         throw new ValidationError(
           `Equipment ${eq.equipmentId} is not available. Available quantity: ${freeInPeriod}`
@@ -193,12 +190,8 @@ export class BookingService {
         studioId: input.studioId,
         studioStartTime: input.studioStartTime,
         studioEndTime: input.studioEndTime,
-        totalAmount: input.totalAmount
-          ? new Decimal(input.totalAmount)
-          : new Decimal(0),
-        depositAmount: input.depositAmount
-          ? new Decimal(input.depositAmount)
-          : null,
+        totalAmount: input.totalAmount ? new Decimal(input.totalAmount) : new Decimal(0),
+        depositAmount: input.depositAmount ? new Decimal(input.depositAmount) : null,
         vatAmount: input.vatAmount ? new Decimal(input.vatAmount) : new Decimal(0),
         notes: input.notes,
         softLockExpiresAt,
@@ -350,20 +343,10 @@ export class BookingService {
     // Update booking status
     if (!requiresManualReview) {
       // Auto-approve: move to PAYMENT_PENDING
-      await this.transitionState(
-        bookingId,
-        BookingStatus.PAYMENT_PENDING,
-        userId,
-        auditContext
-      )
+      await this.transitionState(bookingId, BookingStatus.PAYMENT_PENDING, userId, auditContext)
     } else {
       // Manual review: move to RISK_CHECK
-      await this.transitionState(
-        bookingId,
-        BookingStatus.RISK_CHECK,
-        userId,
-        auditContext
-      )
+      await this.transitionState(bookingId, BookingStatus.RISK_CHECK, userId, auditContext)
     }
 
     // Audit log
@@ -410,9 +393,7 @@ export class BookingService {
     // Validate transition
     const validTransitions = this.VALID_TRANSITIONS[booking.status]
     if (!validTransitions.includes(newStatus)) {
-      throw new ValidationError(
-        `Invalid state transition from ${booking.status} to ${newStatus}`
-      )
+      throw new ValidationError(`Invalid state transition from ${booking.status} to ${newStatus}`)
     }
 
     // Special validations
@@ -463,10 +444,7 @@ export class BookingService {
         })
 
         if (equipment) {
-          const newAvailable = Math.max(
-            0,
-            equipment.quantityAvailable - be.quantity
-          )
+          const newAvailable = Math.max(0, equipment.quantityAvailable - be.quantity)
           await prisma.equipment.update({
             where: { id: be.equipmentId },
             data: {
@@ -479,10 +457,7 @@ export class BookingService {
     }
 
     // Restore equipment availability if booking is cancelled/closed
-    if (
-      newStatus === BookingStatus.CANCELLED ||
-      newStatus === BookingStatus.CLOSED
-    ) {
+    if (newStatus === BookingStatus.CANCELLED || newStatus === BookingStatus.CLOSED) {
       const bookingEquipment = await prisma.bookingEquipment.findMany({
         where: {
           bookingId,
@@ -533,11 +508,9 @@ export class BookingService {
         userId,
       })
       // Create vendor payouts for equipment with vendors
-      await PayoutService.createVendorPayoutsForBooking(bookingId, userId).catch(
-        (err) => {
-          console.error('[BookingService] Failed to create vendor payouts:', err)
-        }
-      )
+      await PayoutService.createVendorPayoutsForBooking(bookingId, userId).catch((err) => {
+        console.error('[BookingService] Failed to create vendor payouts:', err)
+      })
     } else if (newStatus === BookingStatus.CANCELLED) {
       await EventBus.emit('booking.cancelled', {
         booking: updated,
@@ -639,10 +612,7 @@ export class BookingService {
     if (filters.startDate || filters.endDate) {
       where.OR = [
         {
-          AND: [
-            { startDate: { lte: filters.endDate } },
-            { endDate: { gte: filters.startDate } },
-          ],
+          AND: [{ startDate: { lte: filters.endDate } }, { endDate: { gte: filters.startDate } }],
         },
       ]
     }
@@ -736,13 +706,7 @@ export class BookingService {
     }
 
     // Transition to cancelled
-    await this.transitionState(
-      bookingId,
-      BookingStatus.CANCELLED,
-      userId,
-      auditContext,
-      reason
-    )
+    await this.transitionState(bookingId, BookingStatus.CANCELLED, userId, auditContext, reason)
 
     return this.getById(bookingId, userId)
   }

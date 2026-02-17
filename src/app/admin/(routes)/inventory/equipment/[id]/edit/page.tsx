@@ -92,7 +92,10 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
 
       // Get featured image (first image)
       const featuredImage = equipmentData.media?.find((m: any) => m.type === 'image')?.url || ''
-      const galleryImages = equipmentData.media?.filter((m: any, i: number) => m.type === 'image' && i > 0).map((m: any) => m.url) || []
+      const galleryImages =
+        equipmentData.media
+          ?.filter((m: any, i: number) => m.type === 'image' && i > 0)
+          .map((m: any) => m.url) || []
       const video = equipmentData.media?.find((m: any) => m.type === 'video')?.url || ''
 
       // Format translations from the translations object
@@ -147,7 +150,6 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
         dailyPrice: Number(equipmentData.dailyPrice),
         weeklyPrice: equipmentData.weeklyPrice ? Number(equipmentData.weeklyPrice) : undefined,
         monthlyPrice: equipmentData.monthlyPrice ? Number(equipmentData.monthlyPrice) : undefined,
-        featured: equipmentData.featured,
         isActive: equipmentData.isActive,
         warehouseLocation: equipmentData.warehouseLocation || undefined,
         barcode: equipmentData.barcode || undefined,
@@ -300,24 +302,13 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="sku">SKU *</Label>
-                    <Input
-                      id="sku"
-                      {...register('sku')}
-                      placeholder="EQ-001"
-                      dir="ltr"
-                    />
-                    {errors.sku && (
-                      <p className="text-sm text-error-600">{errors.sku.message}</p>
-                    )}
+                    <Input id="sku" {...register('sku')} placeholder="EQ-001" dir="ltr" />
+                    {errors.sku && <p className="text-sm text-error-600">{errors.sku.message}</p>}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="model">الموديل</Label>
-                    <Input
-                      id="model"
-                      {...register('model')}
-                      placeholder="Sony FX3"
-                    />
+                    <Input id="model" {...register('model')} placeholder="Sony FX3" />
                     {errors.model && (
                       <p className="text-sm text-error-600">{errors.model.message}</p>
                     )}
@@ -515,18 +506,6 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
                       نشط
                     </Label>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="featured"
-                      {...register('featured')}
-                      defaultChecked={equipment.featured}
-                      className="h-4 w-4 rounded border-neutral-300"
-                    />
-                    <Label htmlFor="featured" className="cursor-pointer">
-                      مميز
-                    </Label>
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -537,7 +516,7 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
             <Card>
               <CardHeader>
                 <CardTitle>الترجمات</CardTitle>
-                <p className="text-sm text-neutral-600 mt-2">
+                <p className="mt-2 text-sm text-neutral-600">
                   أدخل معلومات المعدة بلغات متعددة. العربية مطلوبة كحد أدنى.
                 </p>
               </CardHeader>
@@ -563,7 +542,10 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
                           updated[index] = { ...updated[index], ...newValue }
                           setValue('translations', updated)
                         } else {
-                          setValue('translations', [...current, { locale, name: newValue.name ?? '', ...newValue }])
+                          setValue('translations', [
+                            ...current,
+                            { locale, name: newValue.name ?? '', ...newValue },
+                          ])
                         }
                       }}
                       defaultExpanded={locale === 'ar'}
@@ -582,7 +564,7 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
             <Card>
               <CardHeader>
                 <CardTitle>SEO (تحسين محركات البحث)</CardTitle>
-                <p className="text-sm text-neutral-600 mt-2">
+                <p className="mt-2 text-sm text-neutral-600">
                   أدخل معلومات SEO لكل لغة لتحسين ظهور المعدة في نتائج البحث.
                 </p>
               </CardHeader>
@@ -612,11 +594,20 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
                           updated[index] = { ...updated[index], ...newValue }
                           setValue('translations', updated)
                         } else {
-                          setValue('translations', [...current, { name: ('name' in translation ? translation.name : '') ?? '', ...translation, ...newValue }])
+                          setValue('translations', [
+                            ...current,
+                            {
+                              name: ('name' in translation ? translation.name : '') ?? '',
+                              ...translation,
+                              ...newValue,
+                            },
+                          ])
                         }
                       }}
                       name={'name' in translation ? translation.name : ''}
-                      shortDescription={'shortDescription' in translation ? translation.shortDescription : ''}
+                      shortDescription={
+                        'shortDescription' in translation ? translation.shortDescription : ''
+                      }
                       defaultExpanded={locale === 'ar'}
                     />
                   )
@@ -660,14 +651,14 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
             <Card>
               <CardHeader>
                 <CardTitle>المواصفات</CardTitle>
-                <p className="text-sm text-neutral-600 mt-2">
+                <p className="mt-2 text-sm text-neutral-600">
                   أدخل مواصفات المعدة باستخدام أي من الطرق المتاحة.
                 </p>
               </CardHeader>
               <CardContent>
                 <SpecificationsEditor
-                  value={watchedSpecifications as Record<string, unknown>}
-                  onChange={(specs) => setValue('specifications', specs as unknown as Record<string, unknown>)}
+                  value={watchedSpecifications ?? undefined}
+                  onChange={(specs) => setValue('specifications', specs)}
                   categoryHint={categoryHint}
                 />
               </CardContent>
@@ -679,7 +670,7 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
             <Card>
               <CardHeader>
                 <CardTitle>المعدات ذات الصلة</CardTitle>
-                <p className="text-sm text-neutral-600 mt-2">
+                <p className="mt-2 text-sm text-neutral-600">
                   اختر المعدات المرتبطة بهذه المعدة (معدات موصى بها).
                 </p>
               </CardHeader>
@@ -733,7 +724,9 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
                     <Label htmlFor="bufferTimeUnit">وحدة الوقت</Label>
                     <Select
                       defaultValue={equipment.bufferTimeUnit || 'hours'}
-                      onValueChange={(value) => setValue('bufferTimeUnit', value as 'hours' | 'days')}
+                      onValueChange={(value) =>
+                        setValue('bufferTimeUnit', value as 'hours' | 'days')
+                      }
                     >
                       <SelectTrigger id="bufferTimeUnit">
                         <SelectValue />
@@ -751,7 +744,7 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
         </Tabs>
 
         {/* Form Actions */}
-        <div className="flex justify-end gap-3 pt-6 border-t">
+        <div className="flex justify-end gap-3 border-t pt-6">
           <Button type="button" variant="outline" onClick={() => router.back()}>
             إلغاء
           </Button>

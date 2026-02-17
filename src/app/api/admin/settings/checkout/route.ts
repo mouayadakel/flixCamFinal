@@ -54,15 +54,33 @@ export async function PATCH(request: NextRequest) {
     if (!canWrite) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const body = await request.json()
-    const price_lock_ttl_minutes = typeof body.price_lock_ttl_minutes === 'number' ? body.price_lock_ttl_minutes : parseInt(body.price_lock_ttl_minutes, 10)
-    const cancellation_window_hours = typeof body.cancellation_window_hours === 'number' ? body.cancellation_window_hours : parseInt(body.cancellation_window_hours, 10)
-    const min_deposit_percent = typeof body.min_deposit_percent === 'number' ? body.min_deposit_percent : parseInt(body.min_deposit_percent, 10)
-    const max_rental_days = typeof body.max_rental_days === 'number' ? body.max_rental_days : parseInt(body.max_rental_days, 10)
+    const price_lock_ttl_minutes =
+      typeof body.price_lock_ttl_minutes === 'number'
+        ? body.price_lock_ttl_minutes
+        : parseInt(body.price_lock_ttl_minutes, 10)
+    const cancellation_window_hours =
+      typeof body.cancellation_window_hours === 'number'
+        ? body.cancellation_window_hours
+        : parseInt(body.cancellation_window_hours, 10)
+    const min_deposit_percent =
+      typeof body.min_deposit_percent === 'number'
+        ? body.min_deposit_percent
+        : parseInt(body.min_deposit_percent, 10)
+    const max_rental_days =
+      typeof body.max_rental_days === 'number'
+        ? body.max_rental_days
+        : parseInt(body.max_rental_days, 10)
 
     const value = JSON.stringify({
-      price_lock_ttl_minutes: Number.isNaN(price_lock_ttl_minutes) ? DEFAULTS.price_lock_ttl_minutes : price_lock_ttl_minutes,
-      cancellation_window_hours: Number.isNaN(cancellation_window_hours) ? DEFAULTS.cancellation_window_hours : cancellation_window_hours,
-      min_deposit_percent: Number.isNaN(min_deposit_percent) ? DEFAULTS.min_deposit_percent : min_deposit_percent,
+      price_lock_ttl_minutes: Number.isNaN(price_lock_ttl_minutes)
+        ? DEFAULTS.price_lock_ttl_minutes
+        : price_lock_ttl_minutes,
+      cancellation_window_hours: Number.isNaN(cancellation_window_hours)
+        ? DEFAULTS.cancellation_window_hours
+        : cancellation_window_hours,
+      min_deposit_percent: Number.isNaN(min_deposit_percent)
+        ? DEFAULTS.min_deposit_percent
+        : min_deposit_percent,
       max_rental_days: Number.isNaN(max_rental_days) ? DEFAULTS.max_rental_days : max_rental_days,
     })
 

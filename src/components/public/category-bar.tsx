@@ -25,8 +25,9 @@ interface CategoryBarProps {
 export function CategoryBar({ hiddenRoutes }: CategoryBarProps = {}) {
   const { t } = useLocale()
   const pathname = usePathname()
-  const visibleLinks =
-    hiddenRoutes?.size ? CATEGORY_LINKS.filter(({ href }) => !hiddenRoutes.has(href)) : CATEGORY_LINKS
+  const visibleLinks = hiddenRoutes?.size
+    ? CATEGORY_LINKS.filter(({ href }) => !hiddenRoutes.has(href))
+    : CATEGORY_LINKS
 
   return (
     <nav
@@ -35,7 +36,7 @@ export function CategoryBar({ hiddenRoutes }: CategoryBarProps = {}) {
     >
       <div className="mx-auto flex w-full max-w-public-container items-center gap-1 overflow-x-auto px-4 py-1">
         {visibleLinks.map(({ href, key }) => {
-          const isActive = pathname ? (pathname === href || pathname.startsWith(href + '/')) : false
+          const isActive = pathname ? pathname === href || pathname.startsWith(href + '/') : false
           return (
             <Link
               key={href}
@@ -43,8 +44,8 @@ export function CategoryBar({ hiddenRoutes }: CategoryBarProps = {}) {
               className={cn(
                 'relative whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-200',
                 isActive
-                  ? 'text-brand-primary bg-brand-primary/5'
-                  : 'text-text-body hover:text-brand-primary hover:bg-brand-primary/5'
+                  ? 'bg-brand-primary/5 text-brand-primary'
+                  : 'text-text-body hover:bg-brand-primary/5 hover:text-brand-primary'
               )}
             >
               {t(key)}

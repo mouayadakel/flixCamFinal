@@ -218,10 +218,7 @@ export class RoleService {
   /**
    * Check role assignment conflicts (static from RoleConflict + dynamic overlap)
    */
-  static async checkRoleConflicts(
-    userId: string,
-    newRoleId: string
-  ): Promise<RoleConflictCheck> {
+  static async checkRoleConflicts(userId: string, newRoleId: string): Promise<RoleConflictCheck> {
     const newRole = await prisma.role.findUnique({
       where: { id: newRoleId },
       include: { rolePermissions: { include: { permission: true } } },

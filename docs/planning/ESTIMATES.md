@@ -3,31 +3,37 @@
 ## Phase Estimates
 
 ### Phase 0: Foundation
+
 **Duration**: 1-2 days  
 **Effort**: Low  
 **Dependencies**: None
 
 ### Phase 1: Technical Foundation
+
 **Duration**: 1 week  
 **Effort**: High  
 **Dependencies**: Phase 0
 
 ### Phase 2: Admin Panel UI
+
 **Duration**: 1 week  
 **Effort**: Medium  
 **Dependencies**: Phase 1
 
 ### Phase 3: Core Services
+
 **Duration**: 1 week  
 **Effort**: High  
 **Dependencies**: Phase 2
 
 ### Phase 4: Payments & Notifications
+
 **Duration**: 1 week  
 **Effort**: Medium  
 **Dependencies**: Phase 3
 
 ### Phase 5: Public MVP
+
 **Duration**: 1 week  
 **Effort**: Medium  
 **Dependencies**: Phase 4

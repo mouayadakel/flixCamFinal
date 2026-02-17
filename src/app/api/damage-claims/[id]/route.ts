@@ -66,10 +66,7 @@ function shapeClaim(c: {
   }
 }
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()
@@ -93,10 +90,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()
@@ -113,8 +107,10 @@ export async function PATCH(
     if (parsed.severity !== undefined) updateData.severity = parsed.severity
     if (parsed.description !== undefined) updateData.description = parsed.description
     if (parsed.photos !== undefined) updateData.photos = parsed.photos
-    if (parsed.estimatedCost !== undefined) updateData.estimatedCost = new Decimal(parsed.estimatedCost)
-    if (parsed.actualCost !== undefined) updateData.actualCost = parsed.actualCost == null ? null : new Decimal(parsed.actualCost)
+    if (parsed.estimatedCost !== undefined)
+      updateData.estimatedCost = new Decimal(parsed.estimatedCost)
+    if (parsed.actualCost !== undefined)
+      updateData.actualCost = parsed.actualCost == null ? null : new Decimal(parsed.actualCost)
     if (parsed.status !== undefined) updateData.status = parsed.status
     if (parsed.resolution !== undefined) updateData.resolution = parsed.resolution
     if (parsed.customerNotified !== undefined) updateData.customerNotified = parsed.customerNotified

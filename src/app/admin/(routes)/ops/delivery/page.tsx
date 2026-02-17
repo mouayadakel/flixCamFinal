@@ -51,7 +51,10 @@ interface Delivery {
   updatedAt: string
 }
 
-const STATUS_LABELS: Record<string, { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_LABELS: Record<
+  string,
+  { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   pending: { ar: 'قيد الانتظار', en: 'Pending', variant: 'outline' },
   scheduled: { ar: 'مجدولة', en: 'Scheduled', variant: 'secondary' },
   in_transit: { ar: 'قيد التوصيل', en: 'In Transit', variant: 'default' },
@@ -135,13 +138,11 @@ export default function DeliveryPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">إدارة التوصيلات</h1>
-          <p className="text-muted-foreground mt-2">
-            جدولة ومتابعة توصيل المعدات
-          </p>
+          <p className="mt-2 text-muted-foreground">جدولة ومتابعة توصيل المعدات</p>
         </div>
         <Link href="/admin/ops/delivery/schedule">
           <Button>
-            <Plus className="h-4 w-4 ml-2" />
+            <Plus className="ml-2 h-4 w-4" />
             جدولة توصيل
           </Button>
         </Link>
@@ -192,9 +193,7 @@ export default function DeliveryPage() {
               <Skeleton className="h-12 w-full" />
             </div>
           ) : deliveries.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">
-              لا توجد توصيلات
-            </p>
+            <p className="py-8 text-center text-sm text-muted-foreground">لا توجد توصيلات</p>
           ) : (
             <Table>
               <TableHeader>
@@ -230,9 +229,7 @@ export default function DeliveryPage() {
                         {STATUS_LABELS[delivery.status]?.ar || delivery.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>
-                      {formatDate(delivery.scheduledDate)}
-                    </TableCell>
+                    <TableCell>{formatDate(delivery.scheduledDate)}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <MapPin className="h-3 w-3 text-muted-foreground" />
@@ -283,10 +280,7 @@ export default function DeliveryPage() {
                           </Button>
                         )}
                         {delivery.status === 'in_transit' && (
-                          <Button
-                            size="sm"
-                            onClick={() => updateStatus(delivery.id, 'delivered')}
-                          >
+                          <Button size="sm" onClick={() => updateStatus(delivery.id, 'delivered')}>
                             تم التوصيل
                           </Button>
                         )}

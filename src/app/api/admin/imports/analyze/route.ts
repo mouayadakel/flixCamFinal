@@ -57,12 +57,8 @@ export async function POST(request: NextRequest) {
       const columns = data.length > 0 ? Object.keys(data[0]) : []
 
       // Check for common field names
-      const hasName = columns.some((col) =>
-        /name|product|title|اسم/i.test(col)
-      )
-      const hasDescription = columns.some((col) =>
-        /description|desc|وصف/i.test(col)
-      )
+      const hasName = columns.some((col) => /name|product|title|اسم/i.test(col))
+      const hasDescription = columns.some((col) => /description|desc|وصف/i.test(col))
       const hasBrand = columns.some((col) => /brand|manufacturer|الماركة/i.test(col))
       const hasPrice = columns.some((col) => /price|pricing|سعر/i.test(col))
       const hasImage = columns.some((col) => /image|photo|img|صورة/i.test(col))
@@ -97,13 +93,13 @@ export async function POST(request: NextRequest) {
           hasImage,
           hasSEO,
           completeness: Math.round(
-            ((hasName ? 1 : 0) +
+            (((hasName ? 1 : 0) +
               (hasDescription ? 1 : 0) +
               (hasBrand ? 1 : 0) +
               (hasPrice ? 1 : 0) +
               (hasImage ? 1 : 0) +
               (hasSEO ? 1 : 0)) /
-              6 *
+              6) *
               100
           ),
         },
@@ -130,9 +126,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(analysis)
   } catch (error: any) {
     console.error('Sheet analysis failed:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to analyze sheet' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Failed to analyze sheet' }, { status: 500 })
   }
 }

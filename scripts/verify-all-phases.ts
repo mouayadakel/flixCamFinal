@@ -43,7 +43,7 @@ function hasFiles(dir: string, minFiles: number = 1): boolean {
 }
 
 console.log('🔍 Verifying All Implementation Phases...\n')
-console.log('=' .repeat(60))
+console.log('='.repeat(60))
 
 // ============================================
 // Phase 1: Technical Foundation
@@ -87,7 +87,8 @@ if (exists('src/lib/auth/permissions.ts')) phase1.files.push('src/lib/auth/permi
 if (exists('src/lib/policies/base.policy.ts')) phase1.files.push('src/lib/policies/base.policy.ts')
 
 // Check services
-if (exists('src/lib/services/audit.service.ts')) phase1.files.push('src/lib/services/audit.service.ts')
+if (exists('src/lib/services/audit.service.ts'))
+  phase1.files.push('src/lib/services/audit.service.ts')
 if (exists('src/lib/events/event-bus.ts')) phase1.files.push('src/lib/events/event-bus.ts')
 
 if (phase1.files.length >= 10) {
@@ -119,13 +120,16 @@ if (exists('src/components/layouts/mobile-nav.tsx')) phase2.files.push('Mobile n
 
 // Check admin pages
 if (exists('src/app/admin/(routes)/dashboard/page.tsx')) phase2.files.push('Dashboard page')
-if (exists('src/app/admin/(routes)/settings/features/page.tsx')) phase2.files.push('Feature flags page')
-if (exists('src/app/admin/(routes)/settings/integrations/page.tsx')) phase2.files.push('Integrations page')
+if (exists('src/app/admin/(routes)/settings/features/page.tsx'))
+  phase2.files.push('Feature flags page')
+if (exists('src/app/admin/(routes)/settings/integrations/page.tsx'))
+  phase2.files.push('Integrations page')
 if (exists('src/app/admin/(routes)/super/page.tsx')) phase2.files.push('Super admin page')
 
 // Check feature flags API
 if (exists('src/app/api/feature-flags/route.ts')) phase2.files.push('Feature flags API')
-if (exists('src/app/api/feature-flags/[id]/request-approval/route.ts')) phase2.files.push('Approval request API')
+if (exists('src/app/api/feature-flags/[id]/request-approval/route.ts'))
+  phase2.files.push('Approval request API')
 
 // Check audit trail
 if (exists('src/app/api/audit-logs/route.ts')) phase2.files.push('Audit logs API')
@@ -133,7 +137,8 @@ if (exists('src/components/admin/audit-trail-viewer.tsx')) phase2.files.push('Au
 
 // Check integrations
 if (exists('src/app/api/integrations/route.ts')) phase2.files.push('Integrations API')
-if (exists('src/lib/services/integration-config.service.ts')) phase2.files.push('Integration config service')
+if (exists('src/lib/services/integration-config.service.ts'))
+  phase2.files.push('Integration config service')
 
 // Check super admin
 if (exists('src/app/api/admin/health/route.ts')) phase2.files.push('Health check API')
@@ -210,11 +215,11 @@ const phase4: PhaseCheck = {
 // Check public directory structure
 if (exists('public')) {
   phase4.files.push('public/ directory')
-  
+
   if (exists('public/images')) phase4.files.push('images/')
   if (exists('public/fonts')) phase4.files.push('fonts/')
   if (exists('public/files')) phase4.files.push('files/')
-  
+
   if (phase4.files.length >= 3) {
     phase4.status = 'complete'
     phase4.details.push('✅ Public directory structure complete')
@@ -294,10 +299,10 @@ const phase6: PhaseCheck = {
 // Check tests directory
 if (exists('tests')) {
   phase6.files.push('tests/ directory')
-  
+
   if (exists('tests/unit')) phase6.files.push('tests/unit/')
   if (exists('tests/integration')) phase6.files.push('tests/integration/')
-  
+
   if (phase6.files.length >= 2) {
     phase6.details.push('✅ Test directory structure present')
   } else {
@@ -322,21 +327,21 @@ let missingCount = 0
 checks.forEach((check) => {
   const icon = check.status === 'complete' ? '✅' : check.status === 'partial' ? '⚠️' : '❌'
   console.log(`${icon} ${check.phase}: ${check.status.toUpperCase()}`)
-  
+
   if (check.details.length > 0) {
     check.details.forEach((detail) => {
       console.log(`   ${detail}`)
     })
   }
-  
+
   if (check.files.length > 0 && check.files.length <= 10) {
     console.log(`   Files: ${check.files.join(', ')}`)
   } else if (check.files.length > 10) {
     console.log(`   Files: ${check.files.length} files verified`)
   }
-  
+
   console.log()
-  
+
   if (check.status === 'complete') completeCount++
   else if (check.status === 'partial') partialCount++
   else missingCount++

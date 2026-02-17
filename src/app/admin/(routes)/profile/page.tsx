@@ -134,7 +134,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[300px]" dir="rtl">
+      <div className="flex min-h-[300px] items-center justify-center" dir="rtl">
         <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
       </div>
     )
@@ -142,7 +142,7 @@ export default function ProfilePage() {
 
   if (!profile) {
     return (
-      <div className="flex items-center justify-center min-h-[300px]" dir="rtl">
+      <div className="flex min-h-[300px] items-center justify-center" dir="rtl">
         <p className="text-muted-foreground">لم يتم العثور على الملف الشخصي</p>
       </div>
     )
@@ -152,19 +152,17 @@ export default function ProfilePage() {
     <div className="space-y-6" dir="rtl">
       <div>
         <h1 className="text-3xl font-bold">الملف الشخصي</h1>
-        <p className="text-muted-foreground mt-1">
-          إدارة معلوماتك الشخصية وكلمة المرور
-        </p>
+        <p className="mt-1 text-muted-foreground">إدارة معلوماتك الشخصية وكلمة المرور</p>
       </div>
 
       <Tabs defaultValue="info" className="space-y-4">
         <TabsList>
           <TabsTrigger value="info">
-            <User className="h-4 w-4 ml-2" />
+            <User className="ml-2 h-4 w-4" />
             المعلومات الشخصية
           </TabsTrigger>
           <TabsTrigger value="security">
-            <Shield className="h-4 w-4 ml-2" />
+            <Shield className="ml-2 h-4 w-4" />
             الأمان
           </TabsTrigger>
         </TabsList>
@@ -173,9 +171,7 @@ export default function ProfilePage() {
           <Card>
             <CardHeader>
               <CardTitle>المعلومات الشخصية</CardTitle>
-              <CardDescription>
-                تحديث اسمك ورقم الهاتف
-              </CardDescription>
+              <CardDescription>تحديث اسمك ورقم الهاتف</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -209,7 +205,7 @@ export default function ProfilePage() {
                 />
               </div>
               <Button onClick={handleSave} disabled={saving}>
-                {saving && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+                {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
                 حفظ التغييرات
               </Button>
             </CardContent>
@@ -220,9 +216,7 @@ export default function ProfilePage() {
           <Card>
             <CardHeader>
               <CardTitle>تغيير كلمة المرور</CardTitle>
-              <CardDescription>
-                أدخل كلمة المرور الحالية والجديدة
-              </CardDescription>
+              <CardDescription>أدخل كلمة المرور الحالية والجديدة</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -259,7 +253,7 @@ export default function ProfilePage() {
                 />
               </div>
               <Button onClick={handlePasswordChange} disabled={changingPassword}>
-                {changingPassword && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+                {changingPassword && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
                 تغيير كلمة المرور
               </Button>
             </CardContent>

@@ -115,7 +115,7 @@ async function getRevenueData() {
   try {
     const days = 30
     const revenueData = []
-    
+
     for (let i = days - 1; i >= 0; i--) {
       const date = subDays(new Date(), i)
       const dayStart = new Date(date)
@@ -263,7 +263,7 @@ export default async function DashboardPage() {
           <h1 className="text-3xl font-bold text-neutral-900">لوحة التحكم</h1>
           <p className="mt-1 text-sm text-neutral-600">نظرة عامة على الأداء والأنشطة</p>
         </div>
-        
+
         <div className="flex gap-3">
           <Button asChild>
             <Link href="/admin/bookings/new">
@@ -321,7 +321,7 @@ export default async function DashboardPage() {
         <Suspense fallback={<Skeleton className="h-96" />}>
           <RevenueChart data={revenueData} />
         </Suspense>
-        
+
         <Suspense fallback={<Skeleton className="h-96" />}>
           <BookingStateChart data={bookingStateData} />
         </Suspense>

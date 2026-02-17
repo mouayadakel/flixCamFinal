@@ -7,14 +7,14 @@
 
 ## 1. Executive Summary
 
-| Area | Status | Notes |
-|------|--------|--------|
-| **Public website** | Live | Home, equipment, studios, packages, cart, checkout, auth modal, RTL/Arabic-first |
-| **Control panel** | Live | 8 sections, 40+ routes, permission-driven sidebar, RTL UI |
-| **Permissions** | **Fail-closed** | Empty/error → no access; super-admin bypass; sidebar shows loading/error states |
-| **Admin profile** | **Implemented** | `/admin/profile` exists (info + password), uses `/api/me` and `/api/user/profile/password` |
-| **Mock data** | Partial | Wallet, Users list, Technicians, Kit Builder kits, AI Recommendations still use mock/sample data |
-| **Security** | Layered | Middleware (session + role), API auth, route-level permission checks, no admin bypass in policies |
+| Area               | Status          | Notes                                                                                             |
+| ------------------ | --------------- | ------------------------------------------------------------------------------------------------- |
+| **Public website** | Live            | Home, equipment, studios, packages, cart, checkout, auth modal, RTL/Arabic-first                  |
+| **Control panel**  | Live            | 8 sections, 40+ routes, permission-driven sidebar, RTL UI                                         |
+| **Permissions**    | **Fail-closed** | Empty/error → no access; super-admin bypass; sidebar shows loading/error states                   |
+| **Admin profile**  | **Implemented** | `/admin/profile` exists (info + password), uses `/api/me` and `/api/user/profile/password`        |
+| **Mock data**      | Partial         | Wallet, Users list, Technicians, Kit Builder kits, AI Recommendations still use mock/sample data  |
+| **Security**       | Layered         | Middleware (session + role), API auth, route-level permission checks, no admin bypass in policies |
 
 ---
 
@@ -27,12 +27,12 @@
 
 ### 2.2 Route Groups
 
-| Group | Path | Purpose |
-|-------|------|--------|
-| **Public** | `(public)` / `/` | Home, equipment, studios, packages, cart, checkout – unauthenticated + auth modal |
-| **Auth** | `(auth)` | `/login`, `/register` – standalone auth pages |
-| **Admin** | `/admin` | Control panel – sidebar, header, breadcrumbs, permission-based access |
-| **Portal** | `/portal` | Client-facing dashboard (bookings, profile) – authenticated users with role `client` |
+| Group      | Path             | Purpose                                                                              |
+| ---------- | ---------------- | ------------------------------------------------------------------------------------ |
+| **Public** | `(public)` / `/` | Home, equipment, studios, packages, cart, checkout – unauthenticated + auth modal    |
+| **Auth**   | `(auth)`         | `/login`, `/register` – standalone auth pages                                        |
+| **Admin**  | `/admin`         | Control panel – sidebar, header, breadcrumbs, permission-based access                |
+| **Portal** | `/portal`        | Client-facing dashboard (bookings, profile) – authenticated users with role `client` |
 
 ### 2.3 Public Website (Landing & Catalog)
 
@@ -139,13 +139,13 @@ src/app/admin/
 
 ### 5.2 Still Using Mock / Sample Data
 
-| Page | Data | Real API Available |
-|------|------|---------------------|
-| **Wallet** | `mockWalletTx` hardcoded | `/api/wallet` (existence confirmed in docs) |
-| **Users** | `mockUsers` from `@/lib/utils/mock-data` | `/api/admin/users` and user/roles APIs |
-| **Technicians** | Local `mockTechnicians` array | `GET /api/technicians` |
-| **Kit Builder** | `sampleKits` in code (comment: “in production would come from /api/kits”) | `GET/POST/DELETE /api/kits`, `/api/kits/[id]` |
-| **AI Recommendations** | Sample recommendations in code | `/api/ai/recommendations` |
+| Page                   | Data                                                                      | Real API Available                            |
+| ---------------------- | ------------------------------------------------------------------------- | --------------------------------------------- |
+| **Wallet**             | `mockWalletTx` hardcoded                                                  | `/api/wallet` (existence confirmed in docs)   |
+| **Users**              | `mockUsers` from `@/lib/utils/mock-data`                                  | `/api/admin/users` and user/roles APIs        |
+| **Technicians**        | Local `mockTechnicians` array                                             | `GET /api/technicians`                        |
+| **Kit Builder**        | `sampleKits` in code (comment: “in production would come from /api/kits”) | `GET/POST/DELETE /api/kits`, `/api/kits/[id]` |
+| **AI Recommendations** | Sample recommendations in code                                            | `/api/ai/recommendations`                     |
 
 ### 5.3 Placeholder / Skeleton Content
 
@@ -184,14 +184,14 @@ src/app/admin/
 
 ## 8. Public vs Control Panel – Quick Reference
 
-| Concern | Public website | Control panel |
-|--------|----------------|---------------|
-| **Entry** | `/` | `/admin` → redirect to `/admin/dashboard` |
-| **Auth** | Optional (modal or login/register pages) | Required (middleware); role must be staff-side |
-| **Layout** | Public header/footer, RTL | Admin sidebar + header + breadcrumbs, RTL |
-| **Access control** | None for catalog; session for cart/checkout | Permission per route + per sidebar item |
-| **i18n** | ar / en / zh messages | Arabic-first UI, sidebar ar/en labels |
-| **Data** | DB (featured equipment, etc.) + public APIs | Mix of live APIs and mock (wallet, users, technicians, kit builder, AI recommendations) |
+| Concern            | Public website                              | Control panel                                                                           |
+| ------------------ | ------------------------------------------- | --------------------------------------------------------------------------------------- |
+| **Entry**          | `/`                                         | `/admin` → redirect to `/admin/dashboard`                                               |
+| **Auth**           | Optional (modal or login/register pages)    | Required (middleware); role must be staff-side                                          |
+| **Layout**         | Public header/footer, RTL                   | Admin sidebar + header + breadcrumbs, RTL                                               |
+| **Access control** | None for catalog; session for cart/checkout | Permission per route + per sidebar item                                                 |
+| **i18n**           | ar / en / zh messages                       | Arabic-first UI, sidebar ar/en labels                                                   |
+| **Data**           | DB (featured equipment, etc.) + public APIs | Mix of live APIs and mock (wallet, users, technicians, kit builder, AI recommendations) |
 
 ---
 

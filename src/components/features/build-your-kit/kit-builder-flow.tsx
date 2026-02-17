@@ -32,7 +32,7 @@ export function KitBuilderFlow() {
 
   return (
     <div className="flex flex-col gap-8 lg:grid lg:grid-cols-12 lg:gap-8">
-      <div className="lg:col-span-8 space-y-12">
+      <div className="space-y-12 lg:col-span-8">
         <SetupSection />
 
         {setupComplete && (
@@ -47,7 +47,7 @@ export function KitBuilderFlow() {
         <ReviewSection />
       </div>
 
-      <aside className="hidden lg:block lg:col-span-4">
+      <aside className="hidden lg:col-span-4 lg:block">
         <div className="sticky top-24">
           <KitSummarySidebar />
         </div>

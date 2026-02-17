@@ -147,12 +147,12 @@ export function RiskAssessmentTab() {
           <CardContent className="space-y-4">
             <div className="flex items-center gap-4">
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
+                <div className="mb-2 flex items-center gap-2">
                   <span className="text-sm font-medium">Risk Score:</span>
                   <Badge className={getRiskColor(assessment.level)}>{assessment.score}/100</Badge>
                   <Badge variant="outline">{assessment.level.toUpperCase()}</Badge>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="h-2 w-full rounded-full bg-gray-200">
                   <div
                     className={`h-2 rounded-full ${getRiskColor(assessment.level)}`}
                     style={{ width: `${assessment.score}%` }}
@@ -164,31 +164,43 @@ export function RiskAssessmentTab() {
             <div>
               <Label>Recommendation:</Label>
               <div className="mt-1 flex items-center gap-2">
-                {assessment.recommendation === 'approve' && <CheckCircle className="h-4 w-4 text-green-500" />}
-                {assessment.recommendation === 'review' && <Info className="h-4 w-4 text-yellow-500" />}
-                {assessment.recommendation === 'reject' && <XCircle className="h-4 w-4 text-red-500" />}
-                {assessment.recommendation === 'require_deposit' && <AlertCircle className="h-4 w-4 text-orange-500" />}
-                <span className="font-medium capitalize">{assessment.recommendation.replace('_', ' ')}</span>
+                {assessment.recommendation === 'approve' && (
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                )}
+                {assessment.recommendation === 'review' && (
+                  <Info className="h-4 w-4 text-yellow-500" />
+                )}
+                {assessment.recommendation === 'reject' && (
+                  <XCircle className="h-4 w-4 text-red-500" />
+                )}
+                {assessment.recommendation === 'require_deposit' && (
+                  <AlertCircle className="h-4 w-4 text-orange-500" />
+                )}
+                <span className="font-medium capitalize">
+                  {assessment.recommendation.replace('_', ' ')}
+                </span>
               </div>
             </div>
 
             {assessment.suggestedDeposit && (
               <div>
                 <Label>Suggested Deposit:</Label>
-                <p className="text-lg font-semibold mt-1">{assessment.suggestedDeposit.toLocaleString()} SAR</p>
+                <p className="mt-1 text-lg font-semibold">
+                  {assessment.suggestedDeposit.toLocaleString()} SAR
+                </p>
               </div>
             )}
 
             <div>
               <Label>Reasoning:</Label>
-              <p className="text-sm text-muted-foreground mt-1">{assessment.reasoning}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{assessment.reasoning}</p>
             </div>
 
             <div>
               <Label>Risk Factors:</Label>
               <div className="mt-2 space-y-2">
                 {assessment.factors.map((factor, index) => (
-                  <div key={index} className="flex items-start gap-2 p-2 bg-muted rounded">
+                  <div key={index} className="flex items-start gap-2 rounded bg-muted p-2">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{factor.name}</span>
@@ -196,12 +208,18 @@ export function RiskAssessmentTab() {
                           Weight: {factor.weight}%
                         </Badge>
                         <Badge
-                          variant={factor.impact === 'positive' ? 'default' : factor.impact === 'negative' ? 'destructive' : 'secondary'}
+                          variant={
+                            factor.impact === 'positive'
+                              ? 'default'
+                              : factor.impact === 'negative'
+                                ? 'destructive'
+                                : 'secondary'
+                          }
                         >
                           {factor.impact}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">{factor.description}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{factor.description}</p>
                     </div>
                   </div>
                 ))}

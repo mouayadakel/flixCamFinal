@@ -7,10 +7,7 @@ import { prisma } from '@/lib/db/prisma'
 import { rateLimitByTier } from '@/lib/utils/rate-limit'
 import { cacheGet, cacheSet, cacheKeys } from '@/lib/cache'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const rate = rateLimitByTier(request, 'public')
   if (!rate.allowed) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
@@ -36,7 +33,11 @@ export async function GET(
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  const v = equipment.vendor as { companyName: string; logo: string | null; isNameVisible: boolean } | null
+  const v = equipment.vendor as {
+    companyName: string
+    logo: string | null
+    isNameVisible: boolean
+  } | null
   const vendor = v?.isNameVisible ? { companyName: v.companyName, logo: v.logo } : null
 
   const out = {

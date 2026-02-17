@@ -54,10 +54,7 @@ export async function GET(request: NextRequest) {
     const totalItems = jobs.reduce((sum, j) => sum + j.totalItems, 0)
     const processedItems = jobs.reduce((sum, j) => sum + j.processedItems, 0)
     const failedItems = jobs.reduce((sum, j) => sum + j.failedItems, 0)
-    const totalCost = jobs.reduce(
-      (sum, j) => sum + (j.cost ? Number(j.cost) : 0),
-      0
-    )
+    const totalCost = jobs.reduce((sum, j) => sum + (j.cost ? Number(j.cost) : 0), 0)
 
     // Provider breakdown
     const byProvider = jobs.reduce(
@@ -78,16 +75,19 @@ export async function GET(request: NextRequest) {
     )
 
     // Daily breakdown
-    const dailyStats = jobs.reduce((acc, job) => {
-      const date = job.createdAt.toISOString().split('T')[0]
-      if (!acc[date]) {
-        acc[date] = { jobs: 0, items: 0, cost: 0 }
-      }
-      acc[date].jobs++
-      acc[date].items += job.processedItems
-      acc[date].cost += job.cost ? Number(job.cost) : 0
-      return acc
-    }, {} as Record<string, { jobs: number; items: number; cost: number }>)
+    const dailyStats = jobs.reduce(
+      (acc, job) => {
+        const date = job.createdAt.toISOString().split('T')[0]
+        if (!acc[date]) {
+          acc[date] = { jobs: 0, items: 0, cost: 0 }
+        }
+        acc[date].jobs++
+        acc[date].items += job.processedItems
+        acc[date].cost += job.cost ? Number(job.cost) : 0
+        return acc
+      },
+      {} as Record<string, { jobs: number; items: number; cost: number }>
+    )
 
     return NextResponse.json({
       period: {

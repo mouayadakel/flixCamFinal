@@ -14,7 +14,11 @@ import { z } from 'zod'
 export const dynamic = 'force-dynamic'
 
 const createRoleSchema = z.object({
-  name: z.string().min(1).max(100).regex(/^[a-z0-9_]+$/, 'Use lowercase letters, numbers, underscore only'),
+  name: z
+    .string()
+    .min(1)
+    .max(100)
+    .regex(/^[a-z0-9_]+$/, 'Use lowercase letters, numbers, underscore only'),
   displayName: z.string().min(1).max(100),
   displayNameAr: z.string().max(100).optional(),
   description: z.string().max(500).optional(),
@@ -29,7 +33,12 @@ async function requireAuthAndRolesPermission() {
   }
   const canManage = await hasPermission(session.user.id, PERMISSIONS.SETTINGS_MANAGE_ROLES)
   if (!canManage) {
-    return { error: NextResponse.json({ error: 'Forbidden - Missing settings.manage_roles permission' }, { status: 403 }) }
+    return {
+      error: NextResponse.json(
+        { error: 'Forbidden - Missing settings.manage_roles permission' },
+        { status: 403 }
+      ),
+    }
   }
   return { session }
 }
@@ -47,9 +56,8 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const isSystem = searchParams.get('isSystem')
-    const filters = isSystem !== null && isSystem !== undefined
-      ? { isSystem: isSystem === 'true' }
-      : undefined
+    const filters =
+      isSystem !== null && isSystem !== undefined ? { isSystem: isSystem === 'true' } : undefined
 
     const roles = await RoleService.list(filters)
     return NextResponse.json({ success: true, data: roles })
@@ -91,7 +99,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, data: role })
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validation error', details: error.errors }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Validation error', details: error.errors },
+        { status: 400 }
+      )
     }
     console.error('Error creating role:', error)
     return NextResponse.json(

@@ -2,9 +2,10 @@
 
 > **Scope:** Studio booking only (public website + optional add-ons/equipment)
 >
-> **Goal:** Cover *all realistic scenarios* a client might face from first visit → post-payment
+> **Goal:** Cover _all realistic scenarios_ a client might face from first visit → post-payment
 >
 > **Includes:**
+>
 > - User Stories (detailed)
 > - Use Cases (main + alternate/error flows)
 > - State Machine (booking lifecycle)
@@ -15,19 +16,23 @@
 ## 0) Definitions & Concepts
 
 ### Booking Types (Duration Models)
+
 - **Hourly**: e.g., 2h, 3h, 4h
 - **Half-day**: e.g., 4h or 5h (config)
 - **Full-day**: e.g., 8h or 10h (config)
 
 ### Buffers
+
 - **Auto Buffer** between bookings (e.g., 30 min cleaning/setup) — configurable
 
 ### Add-ons vs Packages vs Presets
+
 - **Add-ons:** single optional extras (technician, extra lights, deep cleaning, props)
 - **Studio Package / Preset:** curated bundle of add-ons and/or fixed setup (Podcast, Product, Interview)
 - **Cross-sell Equipment:** equipment added from catalog to complement the studio session
 
 ### Key Pages (Public)
+
 - **/studios** (studio landing/list)
 - **/studio/{slug}** (studio details)
 - **/studio/{slug}/book** (booking)
@@ -40,11 +45,13 @@
 # 1) Scenario A — Studio Only (Hourly / Half-Day / Full-Day)
 
 ## 🧑‍💻 User Story (US-ST-A01)
+
 **As a** client
 **I want** to book a studio for a chosen date/time and duration (hourly/half-day/full-day)
 **So that** I can reserve the space without contacting support
 
 ### Step-by-Step Journey (Entry → Post-Payment)
+
 1. Client enters **Home** and clicks **Studios** (or direct `/studios`)
 2. Client opens a studio **/studio/{slug}**
 3. Client clicks **Check availability / Book now** → `/studio/{slug}/book`
@@ -65,15 +72,18 @@
 ---
 
 ## ⚙️ Use Case (UC-ST-A01)
+
 **Actor:** Client
 
 ### Preconditions
+
 - Studio is published and active
 - Business hours configured
 - Buffer rules configured
 - Payment gateway active
 
 ### Main Success Flow
+
 1. Client selects date/time + duration
 2. System checks conflicts (including buffer)
 3. System computes price (hourly/half/full)
@@ -81,13 +91,15 @@
 5. Booking becomes **Confirmed**
 
 ### Alternate / Error Flows
+
 - **A1:** Selected time overlaps with existing booking → show conflict + suggest nearest available times
 - **A2:** Selected start time violates buffer window → system blocks and suggests valid times
 - **A3:** Selected time outside opening hours → system blocks and shows available hours
 - **A4:** Client changes duration after selecting time → system re-validates availability + recomputes price
-- **A5:** Payment fails → keep booking as *Payment Failed* with retry link
+- **A5:** Payment fails → keep booking as _Payment Failed_ with retry link
 
 ### Postconditions
+
 - Booking status = Confirmed
 - Calendar slot locked
 - Confirmation sent (WhatsApp/SMS/Email based on toggles)
@@ -95,6 +107,7 @@
 ---
 
 ## 🔁 Diagram (Studio Only)
+
 ```
 [Studios List]
    ↓
@@ -118,11 +131,13 @@
 # 2) Scenario B — Studio + Studio Package (Podcast / Product / Flash Setup …)
 
 ## 🧑‍💻 User Story (US-ST-B01)
+
 **As a** client
 **I want** to book the studio using a ready package (e.g., Podcast / Product / Flash)
 **So that** the session is prepared and priced clearly with one click
 
 ### Step-by-Step Journey
+
 1. Client opens `/studio/{slug}/book`
 2. Client selects a **package card**:
    - Podcast Session
@@ -139,13 +154,16 @@
 ---
 
 ## ⚙️ Use Case (UC-ST-B01)
+
 **Actor:** Client
 
 ### Preconditions
+
 - Packages are configured and enabled
 - Package includes defined add-ons and pricing rules
 
 ### Main Success Flow
+
 1. Client chooses package
 2. System sets defaults (duration + included add-ons)
 3. Client selects time slot
@@ -153,17 +171,20 @@
 5. Payment and confirmation
 
 ### Alternate / Error Flows
+
 - **B1:** Package requires minimum duration → system enforces
 - **B2:** Add-on not available (e.g., technician busy) → show “unavailable” and offer alternatives
 - **B3:** Client removes included add-on → allow or disallow based on package rules
 
 ### Postconditions
+
 - Booking confirmed
 - Package + add-ons recorded
 
 ---
 
 ## 🔁 Diagram (Studio + Package)
+
 ```
 [Book Studio]
    ↓
@@ -185,11 +206,13 @@
 # 3) Scenario C — Studio + Equipment added from Equipment Catalog
 
 ## 🧑‍💻 User Story (US-ST-C01)
+
 **As a** client
 **I want** to add equipment from the catalog to my studio booking
 **So that** I can shoot with the gear I need in the same reservation
 
 ### Step-by-Step Journey
+
 1. Client books studio (Scenario A or B)
 2. System offers **Add equipment** link
 3. Client opens equipment selection (modal or `/equipment?mode=studio&dates=...`)
@@ -201,13 +224,16 @@
 ---
 
 ## ⚙️ Use Case (UC-ST-C01)
+
 **Actor:** Client
 
 ### Preconditions
+
 - Equipment rental is enabled
 - Equipment availability check supports same date/time window
 
 ### Main Success Flow
+
 1. Client selects studio slot
 2. Client adds equipment
 3. System validates equipment availability for that time window
@@ -216,17 +242,20 @@
 6. Confirmed
 
 ### Alternate / Error Flows
+
 - **C1:** Equipment unavailable for chosen slot → show alternatives
 - **C2:** Client changes studio time after adding equipment → system re-checks equipment availability
 - **C3:** Partial availability → allow removing unavailable items or changing time
 
 ### Postconditions
+
 - Studio slot locked
 - Equipment locked
 
 ---
 
 ## 🔁 Diagram (Studio + Equipment)
+
 ```
 [Select Studio Slot]
    ↓
@@ -246,14 +275,17 @@
 # 4) Scenario D — Studio with Add-ons (No package)
 
 ## 🧑‍💻 User Story (US-ST-D01)
+
 **As a** client
 **I want** to book a studio and optionally add add-ons (technician, extra lighting, deep cleaning)
 **So that** I can tailor the session to my needs
 
 ## ⚙️ Use Case (UC-ST-D01)
+
 - Same as Scenario A but with add-on selection before cart
 
 ### Alternate / Error Flows
+
 - **D1:** Add-on requires staff availability → if staff not available, block selection and show next available
 
 ---
@@ -261,7 +293,9 @@
 # 5) Studio Booking State Machine (Lifecycle)
 
 ## 🧠 State Machine (High-Level)
+
 **Core states:**
+
 - **Draft**: booking being built (dates/time not finalized)
 - **Validated**: slot valid and price computed
 - **Payment Pending**: user sent to payment gateway
@@ -273,6 +307,7 @@
 - **Expired**: payment not completed within TTL
 
 ### Transitions
+
 - Draft → Validated (when slot passes validation)
 - Validated → Payment Pending (when user clicks Pay)
 - Payment Pending → Confirmed (payment success callback)
@@ -283,6 +318,7 @@
 - Active → Completed (end time)
 
 ## 🔁 Diagram (State Machine)
+
 ```
            ┌────────────┐
            │   Draft    │
@@ -324,6 +360,7 @@
 > Format: **TC-ID | Scenario | Steps | Expected Result**
 
 ## A) Studio Only
+
 - **TC-ST-A-01 | Hourly booking success**
   - Steps: select date/time, duration=2h, pay
   - Expected: booking Confirmed + message sent + slot locked
@@ -359,6 +396,7 @@
 ---
 
 ## B) Studio + Package
+
 - **TC-ST-B-01 | Podcast package success**
   - Steps: select Podcast package, choose slot, pay
   - Expected: default duration + included add-ons + confirmed
@@ -378,6 +416,7 @@
 ---
 
 ## C) Studio + Equipment
+
 - **TC-ST-C-01 | Add equipment success**
   - Steps: book studio slot, add camera available, pay
   - Expected: both studio + equipment confirmed
@@ -397,6 +436,7 @@
 ---
 
 ## D) Studio + Add-ons (no package)
+
 - **TC-ST-D-01 | Add-on pricing applied**
   - Steps: choose add-ons (extra lights, deep cleaning)
   - Expected: totals updated instantly
@@ -408,6 +448,7 @@
 ---
 
 ## E) General / Edge
+
 - **TC-ST-E-01 | Guest checkout**
   - Steps: complete booking without account
   - Expected: allowed + confirmation via phone/email
@@ -431,6 +472,7 @@
 ---
 
 ## 7) Implementation Notes (Optional)
+
 - Always validate slot + buffer **server-side** before creating Payment Pending
 - Maintain a payment session TTL to prevent dead locks
 - For add-ons requiring staff, model availability similarly to studio slots
@@ -439,4 +481,3 @@
 ---
 
 ✅ End of document
-

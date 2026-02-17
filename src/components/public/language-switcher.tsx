@@ -25,12 +25,7 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="gap-2"
-          aria-label="Switch language"
-        >
+        <Button variant="ghost" size="sm" className="gap-2" aria-label="Switch language">
           <Languages className="h-4 w-4" />
           <span className="font-medium">{LOCALE_LABELS[locale]}</span>
         </Button>

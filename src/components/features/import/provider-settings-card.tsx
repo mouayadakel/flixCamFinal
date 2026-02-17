@@ -11,7 +11,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Sparkles } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
@@ -33,7 +39,12 @@ interface ProviderSettingsCardProps {
   saving: boolean
 }
 
-export function ProviderSettingsCard({ provider, setting, onSave, saving }: ProviderSettingsCardProps) {
+export function ProviderSettingsCard({
+  provider,
+  setting,
+  onSave,
+  saving,
+}: ProviderSettingsCardProps) {
   const [localSetting, setLocalSetting] = useState(setting)
 
   const handleSave = async () => {
@@ -56,7 +67,9 @@ export function ProviderSettingsCard({ provider, setting, onSave, saving }: Prov
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
-          <Label htmlFor={`${provider}-enabled`}>Enable {provider === 'openai' ? 'OpenAI' : 'Gemini'}</Label>
+          <Label htmlFor={`${provider}-enabled`}>
+            Enable {provider === 'openai' ? 'OpenAI' : 'Gemini'}
+          </Label>
           <Switch
             id={`${provider}-enabled`}
             checked={localSetting.enabled}

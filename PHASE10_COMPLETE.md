@@ -10,6 +10,7 @@
 ### ✅ What Was Implemented
 
 **1. Maintenance Types** (`src/lib/types/maintenance.types.ts`)
+
 - `MaintenanceStatus` enum (scheduled, in_progress, completed, cancelled, overdue)
 - `MaintenanceType` enum (preventive, corrective, inspection, repair, calibration)
 - `MaintenancePriority` enum (low, medium, high, urgent)
@@ -17,6 +18,7 @@
 - `MaintenanceCreateInput`, `MaintenanceUpdateInput`, and `MaintenanceCompleteInput` interfaces
 
 **2. Maintenance Service** (`src/lib/services/maintenance.service.ts`)
+
 - `create()` - Create new maintenance requests with equipment condition tracking
 - `getById()` - Get maintenance by ID
 - `list()` - List maintenance with filters and pagination
@@ -25,9 +27,10 @@
 - `delete()` - Delete maintenance records
 - Automatic equipment condition management (sets to MAINTENANCE when scheduled)
 - Overdue detection (scheduled maintenance past due date)
-- Maintenance number generation (MT-* format)
+- Maintenance number generation (MT-\* format)
 
 **3. Maintenance Policy** (`src/lib/policies/maintenance.policy.ts`)
+
 - `canCreate()` - Authorization for creating maintenance
 - `canView()` - Authorization for viewing maintenance
 - `canUpdate()` - Authorization for updating maintenance
@@ -35,12 +38,14 @@
 - `canDelete()` - Authorization for deleting maintenance
 
 **4. Maintenance Validators** (`src/lib/validators/maintenance.validator.ts`)
+
 - `createMaintenanceSchema` - Validation for creating maintenance
 - `updateMaintenanceSchema` - Validation for updating maintenance
 - `completeMaintenanceSchema` - Validation for completing maintenance
 - `maintenanceFilterSchema` - Validation for maintenance filters
 
 **5. API Routes**
+
 - `GET /api/maintenance` - List maintenance with filters
 - `POST /api/maintenance` - Create new maintenance
 - `GET /api/maintenance/[id]` - Get maintenance by ID
@@ -49,9 +54,11 @@
 - `POST /api/maintenance/[id]/complete` - Complete maintenance
 
 **6. Admin Pages**
+
 - `GET /admin/maintenance` - Maintenance list page with filters (status, type, priority), search, and actions
 
 **7. Integration**
+
 - Added maintenance events to EventBus (`maintenance.created`, `maintenance.updated`, `maintenance.completed`, `maintenance.deleted`)
 - Sidebar already includes maintenance link (`/admin/maintenance`)
 - Equipment condition automatically set to MAINTENANCE when maintenance scheduled
@@ -62,11 +69,13 @@
 ## Features
 
 ### Maintenance Lifecycle
+
 - **Scheduled** → **In Progress** → **Completed** or **Cancelled**
 - Automatic overdue detection
 - Status transitions with proper validation
 
 ### Maintenance Management
+
 - Create maintenance requests with equipment selection
 - Assign technicians to maintenance tasks
 - Track maintenance costs and parts used
@@ -75,12 +84,14 @@
 - Type-based categorization (preventive, corrective, inspection, repair, calibration)
 
 ### Equipment Condition Management
+
 - Automatically sets equipment condition to MAINTENANCE when scheduled
 - Restores equipment condition when maintenance completed
 - Tracks condition before and after maintenance
 
 ### Maintenance Tracking
-- Maintenance number generation (MT-* format)
+
+- Maintenance number generation (MT-\* format)
 - Scheduled date tracking
 - Completion date tracking
 - Cost tracking
@@ -92,16 +103,19 @@
 ## Technical Implementation Notes
 
 ### Current Implementation (Temporary)
+
 - **Storage**: Maintenance records stored in equipment `customFields` JSON field
 - **Maintenance Data**: Array of maintenance objects in `customFields.maintenance`
 - **Future Enhancement**: Create proper `Maintenance` model in Prisma schema
 
 ### Equipment Condition Integration
+
 - Equipment condition automatically set to `MAINTENANCE` when maintenance scheduled
 - Condition restored to specified value when maintenance completed
 - Tracks condition before and after maintenance
 
 ### Technician Assignment
+
 - Validates technician role (TECHNICIAN)
 - Links maintenance to technician user
 - Supports unassigned maintenance
@@ -123,12 +137,14 @@
 ## Test Results
 
 ### ✅ Static Analysis: **PASSED**
+
 - **Files**: 4 core files (types, service, policy, validator)
 - **API Routes**: 3 routes
 - **Admin Pages**: 1 page
 - **TypeScript Errors**: 0
 
 ### ✅ File Structure: **COMPLETE**
+
 - ✅ Maintenance types defined
 - ✅ Maintenance service implemented
 - ✅ Maintenance policy implemented
@@ -145,7 +161,7 @@
 1. **Maintenance Storage**: Currently uses equipment `customFields` to store maintenance data (temporary solution)
    - **Future**: Create proper `Maintenance` model in Prisma schema
 
-2. **Maintenance Number**: Uses generated MT-* format
+2. **Maintenance Number**: Uses generated MT-\* format
    - **Future**: Dedicated maintenance number field in Maintenance model
 
 3. **Status Management**: Status stored in JSON within customFields
@@ -159,6 +175,7 @@
 ## Next Steps for Runtime Testing
 
 1. **Start Dev Server**:
+
    ```bash
    npm run dev
    ```
@@ -184,6 +201,7 @@
 **Phase 10: Maintenance Management** - ✅ **100% COMPLETE**
 
 All maintenance management features are:
+
 - ✅ Fully implemented
 - ✅ Type-safe
 - ✅ Following best practices

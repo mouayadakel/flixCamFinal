@@ -25,7 +25,8 @@ export function KPICard({
   icon: Icon,
   description,
 }: KPICardProps) {
-  const TrendIcon = trendDirection === 'up' ? ArrowUp : trendDirection === 'down' ? ArrowDown : Minus
+  const TrendIcon =
+    trendDirection === 'up' ? ArrowUp : trendDirection === 'down' ? ArrowDown : Minus
 
   return (
     <Card>
@@ -52,9 +53,7 @@ export function KPICard({
             {trend}
           </p>
         )}
-        {description && (
-          <p className="mt-1 text-xs text-neutral-500">{description}</p>
-        )}
+        {description && <p className="mt-1 text-xs text-neutral-500">{description}</p>}
       </CardContent>
     </Card>
   )

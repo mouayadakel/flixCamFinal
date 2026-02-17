@@ -8,7 +8,12 @@ import { prisma } from '@/lib/db/prisma'
 import { cacheGet, cacheSet, cacheDelete } from '@/lib/cache'
 import { NotFoundError, ValidationError } from '@/lib/errors'
 import type { BudgetTier } from '@prisma/client'
-import type { CreateShootTypeInput, UpdateShootTypeInput, CategoryFlowItemInput, RecommendationItemInput } from '@/lib/validators/shoot-type.validator'
+import type {
+  CreateShootTypeInput,
+  UpdateShootTypeInput,
+  CategoryFlowItemInput,
+  RecommendationItemInput,
+} from '@/lib/validators/shoot-type.validator'
 
 const CACHE_NS = 'websiteContent' as const
 const LIST_KEY = 'shoot-types-list'
@@ -297,8 +302,13 @@ export class ShootTypeService {
   }
 
   static async create(data: CreateShootTypeInput, userId?: string): Promise<ShootTypeFullConfig> {
-    const existing = await prisma.shootType.findFirst({ where: { slug: data.slug, deletedAt: null } })
-    if (existing) throw new ValidationError('A shoot type with this slug already exists', { slug: ['Slug must be unique'] })
+    const existing = await prisma.shootType.findFirst({
+      where: { slug: data.slug, deletedAt: null },
+    })
+    if (existing)
+      throw new ValidationError('A shoot type with this slug already exists', {
+        slug: ['Slug must be unique'],
+      })
 
     const st = await prisma.shootType.create({
       data: {
@@ -322,12 +332,21 @@ export class ShootTypeService {
     return this.getById(st.id)
   }
 
-  static async update(id: string, data: UpdateShootTypeInput, userId?: string): Promise<ShootTypeFullConfig> {
+  static async update(
+    id: string,
+    data: UpdateShootTypeInput,
+    userId?: string
+  ): Promise<ShootTypeFullConfig> {
     const existing = await prisma.shootType.findFirst({ where: { id, deletedAt: null } })
     if (!existing) throw new NotFoundError('Shoot type', id)
     if (data.slug && data.slug !== existing.slug) {
-      const slugTaken = await prisma.shootType.findFirst({ where: { slug: data.slug, deletedAt: null } })
-      if (slugTaken) throw new ValidationError('A shoot type with this slug already exists', { slug: ['Slug must be unique'] })
+      const slugTaken = await prisma.shootType.findFirst({
+        where: { slug: data.slug, deletedAt: null },
+      })
+      if (slugTaken)
+        throw new ValidationError('A shoot type with this slug already exists', {
+          slug: ['Slug must be unique'],
+        })
     }
 
     await prisma.shootType.update({
@@ -363,7 +382,10 @@ export class ShootTypeService {
     await this.invalidateCache(st.slug)
   }
 
-  static async updateCategoryFlow(shootTypeId: string, flows: CategoryFlowItemInput[]): Promise<void> {
+  static async updateCategoryFlow(
+    shootTypeId: string,
+    flows: CategoryFlowItemInput[]
+  ): Promise<void> {
     const st = await prisma.shootType.findFirst({ where: { id: shootTypeId, deletedAt: null } })
     if (!st) throw new NotFoundError('Shoot type', shootTypeId)
 

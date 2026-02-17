@@ -62,9 +62,7 @@ export default async function PortalInvoicesPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">فواتيري</h1>
-        <p className="text-muted-foreground mt-2">
-          عرض وتحميل جميع فواتيرك
-        </p>
+        <p className="mt-2 text-muted-foreground">عرض وتحميل جميع فواتيرك</p>
       </div>
 
       <Card>
@@ -73,7 +71,7 @@ export default async function PortalInvoicesPage() {
         </CardHeader>
         <CardContent>
           {invoices.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="py-12 text-center">
               <p className="text-muted-foreground">لا توجد فواتير</p>
             </div>
           ) : (
@@ -88,34 +86,21 @@ export default async function PortalInvoicesPage() {
                 return (
                   <div
                     key={invoice.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-neutral-50 transition-colors"
+                    className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-neutral-50"
                   >
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
+                      <div className="mb-2 flex items-center gap-3">
                         <Receipt className="h-5 w-5 text-muted-foreground" />
-                        <span className="font-medium text-lg">
-                          فاتورة #{invoice.invoiceNumber}
-                        </span>
+                        <span className="text-lg font-medium">فاتورة #{invoice.invoiceNumber}</span>
                         <Badge
-                          variant={
-                            isPaid
-                              ? 'default'
-                              : isPartiallyPaid
-                              ? 'secondary'
-                              : 'outline'
-                          }
+                          variant={isPaid ? 'default' : isPartiallyPaid ? 'secondary' : 'outline'}
                         >
-                          {isPaid
-                            ? 'مدفوعة'
-                            : isPartiallyPaid
-                            ? 'مدفوعة جزئياً'
-                            : 'غير مدفوعة'}
+                          {isPaid ? 'مدفوعة' : isPartiallyPaid ? 'مدفوعة جزئياً' : 'غير مدفوعة'}
                         </Badge>
                       </div>
-                      <div className="text-sm text-muted-foreground space-y-1">
+                      <div className="space-y-1 text-sm text-muted-foreground">
                         <div>
-                          <span className="font-medium">الحجز:</span> #
-                          {invoice.bookingNumber}
+                          <span className="font-medium">الحجز:</span> #{invoice.bookingNumber}
                         </div>
                         <div>
                           <span className="font-medium">المبلغ:</span>{' '}
@@ -147,7 +132,7 @@ export default async function PortalInvoicesPage() {
                         </Button>
                       </Link>
                       <Button variant="outline" size="sm">
-                        <Download className="h-4 w-4 ml-2" />
+                        <Download className="ml-2 h-4 w-4" />
                         تحميل
                       </Button>
                     </div>

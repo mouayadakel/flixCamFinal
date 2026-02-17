@@ -88,8 +88,7 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : 'Failed to extract specifications',
+        error: error instanceof Error ? error.message : 'Failed to extract specifications',
       },
       { status: 500 }
     )

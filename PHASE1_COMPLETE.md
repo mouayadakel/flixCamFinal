@@ -52,11 +52,13 @@
 ## Files Created/Modified
 
 ### Created:
+
 1. `src/lib/validators/auth.validator.ts` - Zod validation schemas for authentication
 2. `src/app/403/page.tsx` - 403 Forbidden error page
 3. `src/app/(auth)/forgot-password/page.tsx` - Forgot password page
 
 ### Modified:
+
 1. `src/app/(auth)/login/page.tsx` - Complete rewrite with:
    - Zod validation
    - React Hook Form
@@ -84,6 +86,7 @@
 ## Features Implemented
 
 ### Login Page
+
 - ✅ **Zod Validation**: Client-side validation with Arabic error messages
 - ✅ **React Hook Form**: Form state management
 - ✅ **Error Handling**: Network errors, validation errors, authentication errors
@@ -94,6 +97,7 @@
 - ✅ **Toast Notifications**: User-friendly error/success messages
 
 ### RBAC Middleware
+
 - ✅ **Route Protection**: All `/admin` routes require authentication
 - ✅ **Role Verification**: Checks user role against route requirements
 - ✅ **Role Hierarchy**: super_admin > admin > staff > warehouse/driver/technician > client
@@ -103,6 +107,7 @@
 - ✅ **Public Routes**: Login, register, forgot-password remain public
 
 ### Permission System
+
 - ✅ **Permission Constants**: All permissions defined (bookings, equipment, payments, etc.)
 - ✅ **Role Matrix**: Default permissions for each role
 - ✅ **Database Integration**: Checks user_permissions table
@@ -110,24 +115,26 @@
 - ✅ **Helper Functions**: hasAnyPermission, hasAllPermissions for complex checks
 
 ### Error Pages
+
 - ✅ **403 Page**: Beautiful, accessible error page in Arabic
 - ✅ **Navigation**: Links back to dashboard and home
 
 ## Role Permissions Matrix
 
-| Role | Bookings | Equipment | Payments | Clients | Invoices | Contracts | Settings |
-|------|----------|-----------|----------|---------|----------|-----------|----------|
-| super_admin | All | All | All | All | All | All | All |
-| admin | All | All | Create/Read/Refund | All | All | All | Read/Update/Manage Users |
-| staff | Create/Read/Update | Read/Update | Read | Create/Read/Update | Read | Read | - |
-| warehouse | Read/Update | Read/Checkout/Checkin | - | - | - | - | - |
-| driver | Read | - | - | - | - | - | - |
-| technician | - | Read/Update | - | - | - | - | - |
-| client | Create/Read | - | Read | - | Read | Read/Sign | - |
+| Role        | Bookings           | Equipment             | Payments           | Clients            | Invoices | Contracts | Settings                 |
+| ----------- | ------------------ | --------------------- | ------------------ | ------------------ | -------- | --------- | ------------------------ |
+| super_admin | All                | All                   | All                | All                | All      | All       | All                      |
+| admin       | All                | All                   | Create/Read/Refund | All                | All      | All       | Read/Update/Manage Users |
+| staff       | Create/Read/Update | Read/Update           | Read               | Create/Read/Update | Read     | Read      | -                        |
+| warehouse   | Read/Update        | Read/Checkout/Checkin | -                  | -                  | -        | -         | -                        |
+| driver      | Read               | -                     | -                  | -                  | -        | -         | -                        |
+| technician  | -                  | Read/Update           | -                  | -                  | -        | -         | -                        |
+| client      | Create/Read        | -                     | Read               | -                  | Read     | Read/Sign | -                        |
 
 ## Testing Checklist
 
 ### Login Page
+
 - [ ] Valid credentials → redirects to dashboard
 - [ ] Invalid credentials → shows error message in Arabic
 - [ ] Empty fields → shows validation errors
@@ -139,6 +146,7 @@
 - [ ] RTL layout correct in Arabic mode
 
 ### Middleware
+
 - [ ] Non-authenticated user → redirected to /login
 - [ ] Client role trying /admin → redirected to /portal
 - [ ] Admin trying /admin/settings → redirected (only super_admin)
@@ -147,6 +155,7 @@
 - [ ] API routes protected correctly
 
 ### Permissions
+
 - [ ] hasPermission() works with database permissions
 - [ ] hasPermission() falls back to role permissions
 - [ ] getUserPermissions() returns all permissions
@@ -158,6 +167,7 @@
 **Phase 2: Admin Dashboard & Layout** is ready to begin.
 
 ### Required Before Phase 2:
+
 1. Test login functionality with real user accounts
 2. Verify middleware works with all 7 roles
 3. Test permission checking in API routes

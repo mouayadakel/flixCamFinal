@@ -37,20 +37,22 @@ export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>
 /**
  * Reset password validation schema
  */
-export const resetPasswordSchema = z.object({
-  password: z
-    .string()
-    .min(6, { message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' })
-    .max(100, { message: 'كلمة المرور طويلة جداً' })
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
-      message: 'كلمة المرور يجب أن تحتوي على حرف صغير، حرف كبير، ورقم',
-    }),
-  confirmPassword: z.string(),
-  token: z.string().min(1, { message: 'رمز إعادة التعيين مطلوب' }),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'كلمات المرور غير متطابقة',
-  path: ['confirmPassword'],
-})
+export const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(6, { message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' })
+      .max(100, { message: 'كلمة المرور طويلة جداً' })
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+        message: 'كلمة المرور يجب أن تحتوي على حرف صغير، حرف كبير، ورقم',
+      }),
+    confirmPassword: z.string(),
+    token: z.string().min(1, { message: 'رمز إعادة التعيين مطلوب' }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'كلمات المرور غير متطابقة',
+    path: ['confirmPassword'],
+  })
 
 export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>
 
@@ -90,7 +92,10 @@ export const verifyOtpSchema = z.object({
  * Deferred registration (email + password) at checkout (Phase 3.2).
  */
 export const deferredRegisterSchema = z.object({
-  email: z.string().min(1, { message: 'البريد الإلكتروني مطلوب' }).email({ message: 'البريد غير صالح' }),
+  email: z
+    .string()
+    .min(1, { message: 'البريد الإلكتروني مطلوب' })
+    .email({ message: 'البريد غير صالح' }),
   password: z.string().min(6, { message: 'كلمة المرور 6 أحرف على الأقل' }).max(100),
   name: z.string().max(100).optional(),
 })
@@ -98,12 +103,14 @@ export const deferredRegisterSchema = z.object({
 /**
  * Register page form schema (includes confirm password).
  */
-export const registerFormSchema = deferredRegisterSchema.extend({
-  confirmPassword: z.string().min(1, { message: 'تأكيد كلمة المرور مطلوب' }),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'كلمات المرور غير متطابقة',
-  path: ['confirmPassword'],
-})
+export const registerFormSchema = deferredRegisterSchema
+  .extend({
+    confirmPassword: z.string().min(1, { message: 'تأكيد كلمة المرور مطلوب' }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'كلمات المرور غير متطابقة',
+    path: ['confirmPassword'],
+  })
 
 export type SendOtpInput = z.infer<typeof sendOtpSchema>
 export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>

@@ -10,11 +10,7 @@
 import { prisma } from '@/lib/db/prisma'
 import { AuditService } from './audit.service'
 import { EventBus } from '@/lib/events/event-bus'
-import {
-  NotFoundError,
-  ValidationError,
-  ForbiddenError,
-} from '@/lib/errors'
+import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission } from '@/lib/auth/permissions'
 import type {
   Maintenance,
@@ -25,12 +21,17 @@ import type {
   MaintenanceUpdateInput,
   MaintenanceCompleteInput,
 } from '@/lib/types/maintenance.types'
-import { Prisma, EquipmentCondition, MaintenanceType as PrismaMaintenanceType, MaintenanceStatus as PrismaMaintenanceStatus } from '@prisma/client'
+import {
+  Prisma,
+  EquipmentCondition,
+  MaintenanceType as PrismaMaintenanceType,
+  MaintenanceStatus as PrismaMaintenanceStatus,
+} from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 
 /**
  * Maintenance Service
- * 
+ *
  * Uses the Maintenance model for proper data storage
  */
 export class MaintenanceService {
@@ -477,7 +478,8 @@ export class MaintenanceService {
         notes: input.notes || maintenance.notes,
         cost: input.cost ? new Decimal(input.cost) : maintenance.cost,
         partsUsed: input.partsUsed ?? Prisma.JsonNull,
-        equipmentConditionAfter: input.equipmentConditionAfter || maintenance.equipmentConditionAfter,
+        equipmentConditionAfter:
+          input.equipmentConditionAfter || maintenance.equipmentConditionAfter,
         updatedBy: userId,
       },
       include: {

@@ -10,45 +10,30 @@ import { ApprovalService } from '@/lib/services/approval.service'
 import { FeatureFlagService } from '@/lib/services/feature-flag.service'
 import { rateLimitAPI } from '@/lib/utils/rate-limit'
 
-export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: Request, { params }: { params: { id: string } }) {
   const rateLimit = rateLimitAPI(request)
-  
+
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: 'Too many requests' },
-      { status: 429 }
-    )
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }
 
   try {
     const session = await auth()
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()
     const { reason, targetState } = body
 
     if (!reason) {
-      return NextResponse.json(
-        { error: 'Reason is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Reason is required' }, { status: 400 })
     }
 
     const flag = await FeatureFlagService.getById(params.id)
     if (!flag) {
-      return NextResponse.json(
-        { error: 'Feature flag not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Feature flag not found' }, { status: 404 })
     }
 
     const approval = await ApprovalService.request({

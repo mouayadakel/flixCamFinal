@@ -8,10 +8,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { EquipmentService } from '@/lib/services/equipment.service'
 import { rateLimitByTier } from '@/lib/utils/rate-limit'
 
-export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const rate = rateLimitByTier(request, 'public')
   if (!rate.allowed) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
@@ -53,9 +50,6 @@ export async function GET(
     })
   } catch (error) {
     console.error('Public availability check error:', error)
-    return NextResponse.json(
-      { error: 'Failed to check availability' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to check availability' }, { status: 500 })
   }
 }

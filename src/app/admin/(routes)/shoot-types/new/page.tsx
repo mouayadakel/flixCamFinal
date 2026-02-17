@@ -55,7 +55,10 @@ export default function NewShootTypePage() {
         throw new Error(err.error ?? 'Failed to create')
       }
       const data = await res.json()
-      toast({ title: 'Created', description: 'Shoot type created. Configure categories and recommendations next.' })
+      toast({
+        title: 'Created',
+        description: 'Shoot type created. Configure categories and recommendations next.',
+      })
       router.push(`/admin/shoot-types/${data.id}`)
     } catch (e) {
       toast({
@@ -78,7 +81,8 @@ export default function NewShootTypePage() {
         <CardHeader>
           <CardTitle>New Shoot Type</CardTitle>
           <CardDescription>
-            Create a shoot type for the Smart Kit Builder. You can add category flow and recommendations in the next step.
+            Create a shoot type for the Smart Kit Builder. You can add category flow and
+            recommendations in the next step.
           </CardDescription>
         </CardHeader>
         <CardContent>

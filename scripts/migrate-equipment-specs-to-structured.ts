@@ -48,16 +48,15 @@ async function migrate() {
 
     const categoryHint = eq.category?.slug ?? eq.category?.name ?? undefined
     try {
-      const structured = convertFlatToStructured(
-        specs as Record<string, unknown>,
-        categoryHint
-      )
+      const structured = convertFlatToStructured(specs as Record<string, unknown>, categoryHint)
       await prisma.equipment.update({
         where: { id: eq.id },
         data: { specifications: structured as object },
       })
       updated++
-      console.log(`  ✓ ${eq.sku} (${eq.model ?? eq.id}) → structured (${structured.groups.length} groups)`)
+      console.log(
+        `  ✓ ${eq.sku} (${eq.model ?? eq.id}) → structured (${structured.groups.length} groups)`
+      )
     } catch (e) {
       errors++
       console.error(`  ✗ ${eq.sku}:`, e instanceof Error ? e.message : e)

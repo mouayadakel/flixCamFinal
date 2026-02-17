@@ -16,12 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { ShootTypeEditorSheet } from './shoot-type-editor-sheet'
 
 interface ShootTypeListItem {
@@ -77,7 +72,7 @@ export function ShootTypeCardGrid({ items, onUpdated }: ShootTypeCardGridProps) 
                 </p>
               </div>
               {!st.isActive && (
-                <Badge variant="secondary" className="absolute top-2 right-2">
+                <Badge variant="secondary" className="absolute right-2 top-2">
                   Inactive
                 </Badge>
               )}

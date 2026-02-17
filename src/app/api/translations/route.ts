@@ -24,10 +24,7 @@ export async function GET(request: NextRequest) {
     const entityId = searchParams.get('entityId')
 
     if (!entityType || !entityId) {
-      return NextResponse.json(
-        { error: 'entityType and entityId are required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'entityType and entityId are required' }, { status: 400 })
     }
 
     const translations = await TranslationService.getTranslationsByLocale(entityType, entityId)
@@ -64,7 +61,12 @@ export async function POST(request: NextRequest) {
     }
 
     const translationInputs = TranslationService.formatTranslationsForSave(translations)
-    await TranslationService.saveTranslations(entityType, entityId, translationInputs, session.user.id)
+    await TranslationService.saveTranslations(
+      entityType,
+      entityId,
+      translationInputs,
+      session.user.id
+    )
 
     return NextResponse.json({ success: true })
   } catch (error) {
@@ -92,10 +94,7 @@ export async function DELETE(request: NextRequest) {
     const entityId = searchParams.get('entityId')
 
     if (!entityType || !entityId) {
-      return NextResponse.json(
-        { error: 'entityType and entityId are required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'entityType and entityId are required' }, { status: 400 })
     }
 
     await TranslationService.deleteTranslations(entityType, entityId, session.user.id)

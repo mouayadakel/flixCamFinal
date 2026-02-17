@@ -97,7 +97,10 @@ export default function NewKitPage() {
   }
 
   const totalDaily = items.reduce((sum, i) => {
-    const price = typeof i.equipment?.dailyPrice === 'string' ? parseFloat(i.equipment.dailyPrice) : (i.equipment?.dailyPrice ?? 0)
+    const price =
+      typeof i.equipment?.dailyPrice === 'string'
+        ? parseFloat(i.equipment.dailyPrice)
+        : (i.equipment?.dailyPrice ?? 0)
     return sum + price * i.quantity
   }, 0)
   const discount = discountPercent / 100
@@ -110,7 +113,11 @@ export default function NewKitPage() {
       return
     }
     if (!/^[a-z0-9_-]+$/.test(slug)) {
-      toast({ title: 'خطأ', description: 'الرابط (slug) يجب أن يكون أحرف إنجليزية صغيرة وأرقام و - _', variant: 'destructive' })
+      toast({
+        title: 'خطأ',
+        description: 'الرابط (slug) يجب أن يكون أحرف إنجليزية صغيرة وأرقام و - _',
+        variant: 'destructive',
+      })
       return
     }
     if (items.length === 0) {
@@ -153,7 +160,9 @@ export default function NewKitPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/admin/inventory/kits" className="hover:text-foreground">الحزم</Link>
+        <Link href="/admin/inventory/kits" className="hover:text-foreground">
+          الحزم
+        </Link>
         <ArrowRight className="h-4 w-4 rtl:rotate-180" />
         <span>حزمة جديدة</span>
       </div>
@@ -166,7 +175,7 @@ export default function NewKitPage() {
             <CardDescription>الاسم والرابط والخصم</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="name">اسم الحزمة</Label>
                 <Input
@@ -184,12 +193,19 @@ export default function NewKitPage() {
                   onChange={(e) => setSlug(e.target.value)}
                   placeholder="camera-basic-kit"
                 />
-                <p className="text-xs text-muted-foreground">أحرف إنجليزية صغيرة، أرقام، - و _ فقط</p>
+                <p className="text-xs text-muted-foreground">
+                  أحرف إنجليزية صغيرة، أرقام، - و _ فقط
+                </p>
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">الوصف (اختياري)</Label>
-              <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={2} />
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={2}
+              />
             </div>
             <div className="flex flex-wrap items-center gap-4">
               <div className="space-y-2">
@@ -215,7 +231,9 @@ export default function NewKitPage() {
         <Card className="mt-6">
           <CardHeader>
             <CardTitle>معدات الحزمة</CardTitle>
-            <CardDescription>أضف المعدات والكميات. السعر اليومي الإجمالي يُحسب تلقائياً مع الخصم.</CardDescription>
+            <CardDescription>
+              أضف المعدات والكميات. السعر اليومي الإجمالي يُحسب تلقائياً مع الخصم.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-wrap gap-2">
@@ -228,7 +246,11 @@ export default function NewKitPage() {
                     .filter((e) => !items.some((i) => i.equipmentId === e.id))
                     .map((e) => (
                       <SelectItem key={e.id} value={e.id}>
-                        {e.sku} {e.model ?? ''} — {formatCurrency(typeof e.dailyPrice === 'string' ? parseFloat(e.dailyPrice) : e.dailyPrice)}/يوم
+                        {e.sku} {e.model ?? ''} —{' '}
+                        {formatCurrency(
+                          typeof e.dailyPrice === 'string' ? parseFloat(e.dailyPrice) : e.dailyPrice
+                        )}
+                        /يوم
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -241,21 +263,33 @@ export default function NewKitPage() {
                 onChange={(e) => setSelectedQuantity(parseInt(e.target.value, 10) || 1)}
               />
               <Button type="button" variant="secondary" onClick={addItem}>
-                <Plus className="h-4 w-4 ml-1" />
+                <Plus className="ml-1 h-4 w-4" />
                 إضافة
               </Button>
             </div>
             {items.length > 0 && (
               <>
-                <ul className="border rounded-md divide-y">
+                <ul className="divide-y rounded-md border">
                   {items.map((item) => {
-                    const price = typeof item.equipment?.dailyPrice === 'string' ? parseFloat(item.equipment.dailyPrice) : (item.equipment?.dailyPrice ?? 0)
+                    const price =
+                      typeof item.equipment?.dailyPrice === 'string'
+                        ? parseFloat(item.equipment.dailyPrice)
+                        : (item.equipment?.dailyPrice ?? 0)
                     return (
-                      <li key={item.equipmentId} className="flex items-center justify-between px-3 py-2">
+                      <li
+                        key={item.equipmentId}
+                        className="flex items-center justify-between px-3 py-2"
+                      >
                         <span>
-                          {item.equipment?.sku ?? item.equipmentId} × {item.quantity} — {formatCurrency(price * item.quantity)}/يوم
+                          {item.equipment?.sku ?? item.equipmentId} × {item.quantity} —{' '}
+                          {formatCurrency(price * item.quantity)}/يوم
                         </span>
-                        <Button type="button" variant="ghost" size="sm" onClick={() => removeItem(item.equipmentId)}>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeItem(item.equipmentId)}
+                        >
                           <X className="h-4 w-4" />
                         </Button>
                       </li>
@@ -263,11 +297,15 @@ export default function NewKitPage() {
                   })}
                 </ul>
                 <div className="text-sm">
-                  <span className="text-muted-foreground">المجموع اليومي (قبل خصم):</span> {formatCurrency(totalDaily)}
+                  <span className="text-muted-foreground">المجموع اليومي (قبل خصم):</span>{' '}
+                  {formatCurrency(totalDaily)}
                   {discountPercent > 0 && (
                     <>
                       {' — '}
-                      <span className="text-muted-foreground">بعد خصم {discountPercent}%:</span> {formatCurrency(finalDaily)}
+                      <span className="text-muted-foreground">
+                        بعد خصم {discountPercent}%:
+                      </span>{' '}
+                      {formatCurrency(finalDaily)}
                     </>
                   )}
                 </div>
@@ -278,7 +316,7 @@ export default function NewKitPage() {
 
         <div className="mt-6 flex gap-2">
           <Button type="submit" disabled={loading}>
-            {loading && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+            {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
             إنشاء الحزمة
           </Button>
           <Button type="button" variant="outline" asChild>

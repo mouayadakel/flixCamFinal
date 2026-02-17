@@ -9,11 +9,30 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowRight, Edit, Trash2, Calendar, Package, DollarSign, Image as ImageIcon, Video, Languages, FileText, Link as LinkIcon } from 'lucide-react'
+import {
+  ArrowRight,
+  Edit,
+  Trash2,
+  Calendar,
+  Package,
+  DollarSign,
+  Image as ImageIcon,
+  Video,
+  Languages,
+  FileText,
+  Link as LinkIcon,
+} from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -22,7 +41,21 @@ import DOMPurify from 'dompurify'
 import { SpecificationsDisplay } from '@/components/features/equipment/specifications-display'
 import type { Equipment, EquipmentCondition } from '@prisma/client'
 
-const ALLOWED_HTML_TAGS = ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'a', 'h1', 'h2', 'h3', 'span', 'div']
+const ALLOWED_HTML_TAGS = [
+  'p',
+  'br',
+  'strong',
+  'em',
+  'ul',
+  'ol',
+  'li',
+  'a',
+  'h1',
+  'h2',
+  'h3',
+  'span',
+  'div',
+]
 
 function sanitizeHtml(html: string | null | undefined): string {
   if (html == null || html === '') return ''
@@ -44,14 +77,17 @@ interface EquipmentWithRelations extends Equipment {
     }
     quantity: number
   }>
-  translations?: Record<string, {
-    name?: string
-    description?: string
-    shortDescription?: string
-    seoTitle?: string
-    seoDescription?: string
-    seoKeywords?: string
-  }>
+  translations?: Record<
+    string,
+    {
+      name?: string
+      description?: string
+      shortDescription?: string
+      seoTitle?: string
+      seoDescription?: string
+      seoKeywords?: string
+    }
+  >
   relatedEquipment?: Array<{
     id: string
     sku: string
@@ -207,7 +243,11 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
           </p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={handleDelete} className="text-error-600 hover:text-error-700">
+          <Button
+            variant="outline"
+            onClick={handleDelete}
+            className="text-error-600 hover:text-error-700"
+          >
             <Trash2 className="ml-2 h-4 w-4" />
             حذف
           </Button>
@@ -373,7 +413,7 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
                   {equipment.media.find((m) => m.type === 'image') && (
                     <div>
                       <h4 className="mb-3 font-semibold">الصورة المميزة</h4>
-                      <div className="relative w-full max-w-md aspect-video rounded-lg border border-neutral-200 overflow-hidden">
+                      <div className="relative aspect-video w-full max-w-md overflow-hidden rounded-lg border border-neutral-200">
                         <Image
                           src={equipment.media.find((m) => m.type === 'image')?.url || ''}
                           alt="Featured"
@@ -389,12 +429,15 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
                   {equipment.media.filter((m) => m.type === 'image').length > 1 && (
                     <div>
                       <h4 className="mb-3 font-semibold">معرض الصور</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
                         {equipment.media
                           .filter((m) => m.type === 'image')
                           .slice(1)
                           .map((media, index) => (
-                            <div key={media.id} className="relative aspect-square rounded-lg border border-neutral-200 overflow-hidden">
+                            <div
+                              key={media.id}
+                              className="relative aspect-square overflow-hidden rounded-lg border border-neutral-200"
+                            >
                               <Image
                                 src={media.url}
                                 alt={`Gallery ${index + 2}`}
@@ -412,18 +455,18 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
                   {equipment.media.find((m) => m.type === 'video') && (
                     <div>
                       <h4 className="mb-3 font-semibold">الفيديو</h4>
-                      <div className="relative aspect-video rounded-lg border border-neutral-200 overflow-hidden bg-neutral-100">
+                      <div className="relative aspect-video overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100">
                         <video
                           src={equipment.media.find((m) => m.type === 'video')?.url}
                           controls
-                          className="w-full h-full"
+                          className="h-full w-full"
                         />
                       </div>
                     </div>
                   )}
                 </>
               ) : (
-                <p className="text-center py-8 text-neutral-500">لا توجد وسائط</p>
+                <p className="py-8 text-center text-neutral-500">لا توجد وسائط</p>
               )}
             </CardContent>
           </Card>
@@ -453,18 +496,18 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div>
-                          <p className="text-sm text-neutral-600 mb-1">الاسم</p>
+                          <p className="mb-1 text-sm text-neutral-600">الاسم</p>
                           <p className="text-lg font-semibold">{trans.name}</p>
                         </div>
                         {trans.shortDescription && (
                           <div>
-                            <p className="text-sm text-neutral-600 mb-1">الوصف المختصر</p>
+                            <p className="mb-1 text-sm text-neutral-600">الوصف المختصر</p>
                             <p className="text-base">{trans.shortDescription}</p>
                           </div>
                         )}
                         {trans.description && (
                           <div>
-                            <p className="text-sm text-neutral-600 mb-1">الوصف الكامل</p>
+                            <p className="mb-1 text-sm text-neutral-600">الوصف الكامل</p>
                             <div
                               className="prose prose-sm max-w-none"
                               dangerouslySetInnerHTML={{ __html: sanitizeHtml(trans.description) }}
@@ -476,7 +519,7 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
                   )
                 })
               ) : (
-                <p className="text-center py-8 text-neutral-500">لا توجد ترجمات</p>
+                <p className="py-8 text-center text-neutral-500">لا توجد ترجمات</p>
               )}
             </CardContent>
           </Card>
@@ -493,7 +536,10 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
             </CardHeader>
             <CardContent>
               <SpecificationsDisplay
-                specifications={equipment.specifications as import('@/lib/types/specifications.types').AnySpecifications ?? null}
+                specifications={
+                  (equipment.specifications as import('@/lib/types/specifications.types').AnySpecifications) ??
+                  null
+                }
                 locale="ar"
                 showQuickSpecPills={true}
               />
@@ -512,7 +558,7 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
             </CardHeader>
             <CardContent>
               {equipment.relatedEquipment && equipment.relatedEquipment.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {equipment.relatedEquipment.map((item) => (
                     <Card key={item.id}>
                       <CardContent className="pt-6">
@@ -532,7 +578,7 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
                   ))}
                 </div>
               ) : (
-                <p className="text-center py-8 text-neutral-500">لا توجد معدات ذات صلة</p>
+                <p className="py-8 text-center text-neutral-500">لا توجد معدات ذات صلة</p>
               )}
             </CardContent>
           </Card>
@@ -547,16 +593,16 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
             <CardContent className="space-y-4">
               {equipment.boxContents && (
                 <div>
-                  <p className="text-sm text-neutral-600 mb-2">محتوى الصندوق</p>
+                  <p className="mb-2 text-sm text-neutral-600">محتوى الصندوق</p>
                   <div
-                    className="prose prose-sm max-w-none p-4 bg-neutral-50 rounded-lg"
+                    className="prose prose-sm max-w-none rounded-lg bg-neutral-50 p-4"
                     dangerouslySetInnerHTML={{ __html: sanitizeHtml(equipment.boxContents) }}
                   />
                 </div>
               )}
               {equipment.bufferTime !== undefined && (
                 <div>
-                  <p className="text-sm text-neutral-600 mb-1">وقت الفاصل</p>
+                  <p className="mb-1 text-sm text-neutral-600">وقت الفاصل</p>
                   <p className="text-lg">
                     {equipment.bufferTime} {equipment.bufferTimeUnit === 'days' ? 'أيام' : 'ساعات'}
                   </p>

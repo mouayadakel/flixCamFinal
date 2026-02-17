@@ -109,7 +109,11 @@ export class IntegrationConfigService {
       case 'analytics':
         return {
           type: 'analytics',
-          enabled: !!(process.env.GTM_CONTAINER_ID || process.env.GA4_MEASUREMENT_ID || process.env.META_PIXEL_ID),
+          enabled: !!(
+            process.env.GTM_CONTAINER_ID ||
+            process.env.GA4_MEASUREMENT_ID ||
+            process.env.META_PIXEL_ID
+          ),
           config: {
             gtmContainerId: process.env.GTM_CONTAINER_ID || undefined,
             ga4MeasurementId: process.env.GA4_MEASUREMENT_ID || undefined,

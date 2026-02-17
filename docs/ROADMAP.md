@@ -3,11 +3,13 @@
 ## Phase 0: Foundation (Day 1-2)
 
 ### Goals
+
 - Repository setup
 - Documentation structure
 - Environment configuration
 
 ### Deliverables
+
 - GitHub repository with branch protection
 - Core documentation files
 - `.env.example` with all variables
@@ -16,12 +18,14 @@
 ## Phase 1: Technical Foundation (Week 1)
 
 ### Goals
+
 - Next.js project setup
 - Database schema
 - Authentication system
 - Core infrastructure
 
 ### Deliverables
+
 - Next.js 14 project with TypeScript
 - Prisma schema with 16 models
 - NextAuth.js v5 authentication
@@ -34,11 +38,13 @@
 ## Phase 2: Admin Control Panel (Week 2)
 
 ### Goals
+
 - Admin UI scaffolding
 - Component library
 - Admin pages (UI only)
 
 ### Deliverables
+
 - Admin layout with dual sidebar
 - UI component library (15+ components)
 - Admin pages (Dashboard, Inventory, Bookings, Finance, Settings)
@@ -48,6 +54,7 @@
 ## Phase 3: Core Business Services (Week 3)
 
 ### Goals
+
 - Equipment service
 - Studio service
 - Booking engine
@@ -56,6 +63,7 @@
 - Inspection system (basic)
 
 ### Deliverables
+
 - EquipmentService with CRUD
 - StudioService with flexible booking
 - BookingService with state machine
@@ -66,11 +74,13 @@
 ## Phase 4: Payments & Notifications (Week 4)
 
 ### Goals
+
 - Tap Payments integration
 - Notification system
 - Approval workflows
 
 ### Deliverables
+
 - PaymentService with Tap integration
 - Webhook handling
 - NotificationService (email, WhatsApp, in-app)
@@ -79,12 +89,14 @@
 ## Phase 5: Public Website MVP (Week 5)
 
 ### Goals
+
 - Public pages
 - Equipment listing
 - Booking flow
 - SEO & tracking
 
 ### Deliverables
+
 - Home page with hero
 - Equipment listing/detail pages
 - Studio pages
@@ -95,11 +107,13 @@
 ## Phase 6: AI + Growth (Future)
 
 ### Goals
+
 - AI integration
 - Advanced features
 - Performance optimization
 
 ### Deliverables
+
 - AI risk scoring
 - Equipment recommendations
 - Smart bundles
@@ -108,11 +122,13 @@
 ## Phase 7: Hardening & Scale (Future)
 
 ### Goals
+
 - Security hardening
 - Performance optimization
 - Scalability improvements
 
 ### Deliverables
+
 - Security audit
 - Performance testing
 - Load testing
@@ -120,16 +136,16 @@
 
 ## Timeline Summary
 
-| Phase | Duration | Status |
-|-------|----------|--------|
-| Phase 0 | Day 1-2 | In Progress |
-| Phase 1 | Week 1 | Pending |
-| Phase 2 | Week 2 | Pending |
-| Phase 3 | Week 3 | Pending |
-| Phase 4 | Week 4 | Pending |
-| Phase 5 | Week 5 | Pending |
-| Phase 6 | Future | Planned |
-| Phase 7 | Future | Planned |
+| Phase   | Duration | Status      |
+| ------- | -------- | ----------- |
+| Phase 0 | Day 1-2  | In Progress |
+| Phase 1 | Week 1   | Pending     |
+| Phase 2 | Week 2   | Pending     |
+| Phase 3 | Week 3   | Pending     |
+| Phase 4 | Week 4   | Pending     |
+| Phase 5 | Week 5   | Pending     |
+| Phase 6 | Future   | Planned     |
+| Phase 7 | Future   | Planned     |
 
 ## Dependencies
 

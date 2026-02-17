@@ -7,28 +7,28 @@
  */
 export interface SpecItem {
   /** Unique key for the specification (e.g., 'sensor', 'weight') */
-  key: string;
-  
+  key: string
+
   /** Display label in English */
-  label: string;
-  
+  label: string
+
   /** Display label in Arabic (optional) */
-  labelAr?: string;
-  
+  labelAr?: string
+
   /** The value of the specification */
-  value: string;
-  
+  value: string
+
   /** Visual type for rendering */
-  type?: 'text' | 'boolean' | 'range' | 'colorTemp';
-  
+  type?: 'text' | 'boolean' | 'range' | 'colorTemp'
+
   /** Whether this spec should be visually highlighted as important */
-  highlight?: boolean;
-  
+  highlight?: boolean
+
   /** For type='range': percentage fill (0-100) */
-  rangePercent?: number;
-  
+  rangePercent?: number
+
   /** Unit of measurement (optional, can be embedded in value) */
-  unit?: string;
+  unit?: string
 }
 
 /**
@@ -36,19 +36,19 @@ export interface SpecItem {
  */
 export interface SpecGroup {
   /** Group label in English */
-  label: string;
-  
+  label: string
+
   /** Group label in Arabic (optional) */
-  labelAr?: string;
-  
+  labelAr?: string
+
   /** Icon identifier (maps to lucide-react icon) */
-  icon: string;
-  
+  icon: string
+
   /** Display priority (lower numbers appear first) */
-  priority: number;
-  
+  priority: number
+
   /** Array of specifications in this group */
-  specs: SpecItem[];
+  specs: SpecItem[]
 }
 
 /**
@@ -56,16 +56,16 @@ export interface SpecGroup {
  */
 export interface SpecHighlight {
   /** Icon identifier */
-  icon: string;
-  
+  icon: string
+
   /** Main label */
-  label: string;
-  
+  label: string
+
   /** Main value to display */
-  value: string;
-  
+  value: string
+
   /** Optional secondary text */
-  sublabel?: string;
+  sublabel?: string
 }
 
 /**
@@ -73,13 +73,13 @@ export interface SpecHighlight {
  */
 export interface QuickSpec {
   /** Icon identifier */
-  icon: string;
-  
+  icon: string
+
   /** Label text */
-  label: string;
-  
+  label: string
+
   /** Value text */
-  value: string;
+  value: string
 }
 
 /**
@@ -87,50 +87,43 @@ export interface QuickSpec {
  */
 export interface StructuredSpecifications {
   /** Hero highlights (3-4 max, shown at top) */
-  highlights?: SpecHighlight[];
-  
+  highlights?: SpecHighlight[]
+
   /** Quick spec pills (4-6 max, shown above tabs) */
-  quickSpecs?: QuickSpec[];
-  
+  quickSpecs?: QuickSpec[]
+
   /** Detailed specification groups */
-  groups: SpecGroup[];
+  groups: SpecGroup[]
 }
 
 /**
  * Legacy flat specifications format
  * (for backward compatibility)
  */
-export type FlatSpecifications = Record<string, any>;
+export type FlatSpecifications = Record<string, any>
 
 /**
  * Union type for all specification formats
  */
-export type AnySpecifications = StructuredSpecifications | FlatSpecifications;
+export type AnySpecifications = StructuredSpecifications | FlatSpecifications
 
 /**
  * Type guard to check if specifications are structured
  */
-export function isStructuredSpecifications(
-  specs: any
-): specs is StructuredSpecifications {
+export function isStructuredSpecifications(specs: any): specs is StructuredSpecifications {
   return (
-    specs &&
-    typeof specs === 'object' &&
-    Array.isArray(specs.groups) &&
-    specs.groups.length > 0
-  );
+    specs && typeof specs === 'object' && Array.isArray(specs.groups) && specs.groups.length > 0
+  )
 }
 
 /**
  * Type guard to check if specifications are flat
  */
-export function isFlatSpecifications(
-  specs: any
-): specs is FlatSpecifications {
+export function isFlatSpecifications(specs: any): specs is FlatSpecifications {
   return (
     specs &&
     typeof specs === 'object' &&
     !Array.isArray(specs.groups) &&
     Object.keys(specs).length > 0
-  );
+  )
 }

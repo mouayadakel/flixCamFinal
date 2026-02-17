@@ -15,6 +15,7 @@
     "account": "حسابي",
     "howItWorks": "كيف يعمل",
     "support": "الدعم",
+    "faq": "الأسئلة الشائعة",
     "policies": "الشروط والخصوصية"
   },
   "common": {
@@ -31,6 +32,7 @@
     "apply": "تطبيق",
     "clear": "مسح",
     "viewAll": "عرض الكل",
+    "viewDetails": "عرض التفاصيل",
     "noResults": "لا توجد نتائج",
     "resultsFor": "نتائج البحث عن: {query}",
     "productsCount": "منتج",
@@ -75,13 +77,16 @@
     "specShowAll": "عرض كل المواصفات",
     "specShowLess": "عرض أقل",
     "includedPlaceholder": "الإيجار يشمل الوحدة كما هو موضح.",
-    "addonsPlaceholder": "يمكن إضافة التأمين والإكسسوارات عند الدفع."
+    "addonsPlaceholder": "يمكن إضافة التأمين والإكسسوارات عند الدفع.",
+    "noSubcategories": "لا توجد أقسام فرعية",
+    "selectCategoryForSubcategories": "اختر تصنيفاً أعلاه لرؤية الأقسام الفرعية"
   },
   "home": {
     "heroTitle": "تأجير معدات سينمائية واستوديوهات",
     "heroSubtitle": "احجز المعدات والاستوديوهات المناسبة لمشروعك في الرياض",
     "featuredEquipment": "معدات مميزة",
     "topBrandsTitle": "أبرز العلامات",
+    "topBrandsSubtitle": "استأجر من العلامات التي تثق بها",
     "exploreStudios": "استكشف الاستوديوهات",
     "howItWorksTitle": "كيف يعمل",
     "howItWorksStep1": "اختر",
@@ -93,9 +98,21 @@
     "ctaButton": "احجز الآن",
     "testimonialsTitle": "ماذا يقول العملاء",
     "testimonials": [
-      { "quote": "معدات ممتازة وحجز سلس. أنصح بها لمشاريع الأفلام.", "authorName": "سارة م.", "rating": 5 },
-      { "quote": "خدمة احترافية ومعدات محفوظة جيداً. سأستأجر مرة أخرى.", "authorName": "أحمد خ.", "rating": 5 },
-      { "quote": "عملية سهلة من الحجز حتى الإرجاع. الفريق كان مساعداً جداً.", "authorName": "ليزا ت.", "rating": 5 }
+      {
+        "quote": "معدات ممتازة وحجز سلس. أنصح بها لمشاريع الأفلام.",
+        "authorName": "سارة م.",
+        "rating": 5
+      },
+      {
+        "quote": "خدمة احترافية ومعدات محفوظة جيداً. سأستأجر مرة أخرى.",
+        "authorName": "أحمد خ.",
+        "rating": 5
+      },
+      {
+        "quote": "عملية سهلة من الحجز حتى الإرجاع. الفريق كان مساعداً جداً.",
+        "authorName": "ليزا ت.",
+        "rating": 5
+      }
     ],
     "heroSearchPlaceholder": "ابحث عن معدات...",
     "categoriesTitle": "تصفح حسب الفئة",
@@ -104,7 +121,18 @@
     "trustRentalsCount": "{count}+ إيجار مكتمل",
     "trustYears": "منذ {year}",
     "trustInsured": "مؤمن بالكامل",
-    "trustSupport": "دعم 24/7"
+    "trustSupport": "دعم 24/7",
+    "categoriesSubtitle": "اعثر على المعدات حسب النوع — من الكاميرات إلى الإضاءة",
+    "featuredSubtitle": "مختارة من فريقنا لتصويرك القادم",
+    "howItWorksSubtitle": "استأجر في 5 خطوات بسيطة",
+    "testimonialsSubtitle": "استمع من صناع الأفلام الذين يثقون بنا",
+    "faqSubtitle": "أسئلة شائعة عن التأجير معنا",
+    "ctaSubtitle": "تصفح كتالوجنا وابدأ مشروعك القادم",
+    "newArrivalsTitle": "وصل حديثاً",
+    "newArrivalsSubtitle": "أحدث المعدات المضافة إلى كتالوجنا",
+    "kitTeaserTitle": "ابنِ كيتك المثالي",
+    "kitTeaserSubtitle": "امزج المعدات لتصويرك. احصل على اقتراحات ذكية ووفر مع الباقات.",
+    "kitTeaserButton": "ابنِ كيتك"
   },
   "footer": {
     "links": "روابط سريعة",

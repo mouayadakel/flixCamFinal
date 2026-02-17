@@ -9,6 +9,7 @@
 ---
 
 ## Global UX Rules (Applies to All Pages)
+
 - One **primary CTA** per page
 - One **secondary CTA** (WhatsApp / Support)
 - Price is always visible **before payment**
@@ -21,9 +22,11 @@
 ## 0) Home `/`
 
 ### Goal
+
 Immediate understanding + routing user to the correct journey
 
 ### Components
+
 - Hero section
 - Quick paths:
   - Browse Equipment
@@ -37,6 +40,7 @@ Immediate understanding + routing user to the correct journey
 - Footer
 
 ### States
+
 - Normal
 - No inventory (empty state + support CTA)
 
@@ -45,9 +49,11 @@ Immediate understanding + routing user to the correct journey
 ## 1) Equipment Catalog `/equipment`
 
 ### Goal
+
 Explore, filter, and navigate to equipment details
 
 ### Components
+
 - Filters:
   - Date range (optional)
   - Toggle: Available only
@@ -56,6 +62,7 @@ Explore, filter, and navigate to equipment details
 - Equipment grid
 
 ### Equipment Card
+
 - Image
 - Name
 - Price per day
@@ -63,6 +70,7 @@ Explore, filter, and navigate to equipment details
 - CTA: View
 
 ### States
+
 - Loading
 - Empty results (suggest filter change + WhatsApp)
 - API error
@@ -72,9 +80,11 @@ Explore, filter, and navigate to equipment details
 ## 2) Equipment Category `/equipment/{category}`
 
 ### Goal
+
 SEO-focused browsing by category
 
 ### Components
+
 - Category title + short description
 - Category-specific filters
 - Equipment grid
@@ -84,9 +94,11 @@ SEO-focused browsing by category
 ## 3) Equipment Details `/equipment/{slug}`
 
 ### Goal
+
 Decision-making + add to cart
 
 ### Components
+
 - Image gallery
 - Price block + date picker + availability
 - Primary CTA:
@@ -101,6 +113,7 @@ Decision-making + add to cart
 - FAQ (5–8 items)
 
 ### States
+
 - Out of stock
 - Partial availability
 - Price change warning
@@ -110,9 +123,11 @@ Decision-making + add to cart
 ## 4) Packages `/packages`
 
 ### Goal
+
 Provide ready-made solutions
 
 ### Components
+
 - Package cards:
   - Name
   - Included items summary
@@ -121,6 +136,7 @@ Provide ready-made solutions
 - Optional filters
 
 ### States
+
 - No packages available
 
 ---
@@ -128,9 +144,11 @@ Provide ready-made solutions
 ## 5) Package Details `/packages/{slug}`
 
 ### Goal
+
 Book a package with availability validation
 
 ### Components
+
 - Package overview
 - Included items list
 - Date picker
@@ -139,6 +157,7 @@ Book a package with availability validation
 - Optional add-ons
 
 ### States
+
 - Some items unavailable (replace / change dates)
 
 ---
@@ -146,9 +165,11 @@ Book a package with availability validation
 ## 6) Build Your Kit `/build-your-kit`
 
 ### Goal
+
 Guide user to build a custom kit
 
 ### Steps
+
 1. Select use case
 2. Choose camera
 3. Choose lens (compatibility enforced)
@@ -157,12 +178,14 @@ Guide user to build a custom kit
 6. Review kit
 
 ### Components
+
 - Step progress indicator
 - Recommended + alternative options per step
 - Live price updates
 - CTA: Add kit to booking
 
 ### States
+
 - Compatibility conflict
 - No availability for selected dates
 
@@ -171,9 +194,11 @@ Guide user to build a custom kit
 ## 7) Cart `/cart`
 
 ### Goal
+
 Review and finalize booking before checkout
 
 ### Components
+
 - Items list (equipment / packages / kits)
 - Editable dates (with revalidation)
 - Quantity controls
@@ -182,6 +207,7 @@ Review and finalize booking before checkout
 - CTA: Proceed to checkout
 
 ### States
+
 - Partial availability detected
 - Price recalculation notice
 
@@ -190,9 +216,11 @@ Review and finalize booking before checkout
 ## 8) Checkout `/checkout`
 
 ### Goal
+
 Collect customer details and lock price
 
 ### Components
+
 - Customer info (name, phone, email)
 - Delivery / pickup options (if enabled)
 - Terms & conditions checkbox
@@ -200,6 +228,7 @@ Collect customer details and lock price
 - CTA: Pay now
 
 ### States
+
 - Price change before lock
 - Missing required info
 - Identity verification required
@@ -209,9 +238,11 @@ Collect customer details and lock price
 ## 9) Payment Redirect `/payment/*`
 
 ### Goal
+
 Prevent duplicate payments
 
 ### Components
+
 - Redirect notice
 - Order reference
 - Disabled navigation
@@ -221,14 +252,17 @@ Prevent duplicate payments
 ## 10) Payment Processing `/payment/processing`
 
 ### Goal
+
 Handle delayed payment callbacks
 
 ### Components
+
 - Processing message
 - Polling status indicator
 - Support CTA with order reference
 
 ### States
+
 - Timeout
 - Callback pending
 
@@ -237,9 +271,11 @@ Handle delayed payment callbacks
 ## 11) Booking Confirmation `/booking/confirmation/{id}`
 
 ### Goal
+
 Reassure user and provide next steps
 
 ### Components
+
 - Status: Confirmed
 - Booking summary
 - Download PDF
@@ -248,6 +284,7 @@ Reassure user and provide next steps
 - Pickup / return instructions
 
 ### States
+
 - Payment failed (retry)
 - Verification hold
 
@@ -256,9 +293,11 @@ Reassure user and provide next steps
 ## 12) Support / Contact `/support`
 
 ### Goal
+
 Reduce friction and support load
 
 ### Components
+
 - WhatsApp primary CTA
 - Contact form
 - FAQ index
@@ -269,9 +308,11 @@ Reduce friction and support load
 ## 13) Client Portal – Login `/login`
 
 ### Goal
+
 Fast access to bookings
 
 ### Components
+
 - OTP login (phone/email)
 
 ---
@@ -279,9 +320,11 @@ Fast access to bookings
 ## 14) Client Portal – My Bookings `/me/bookings`
 
 ### Goal
+
 Booking overview
 
 ### Components
+
 - List of bookings
 - Status indicators
 
@@ -290,9 +333,11 @@ Booking overview
 ## 15) Client Portal – Booking Details `/me/bookings/{id}`
 
 ### Goal
+
 Self-service actions
 
 ### Components
+
 - Booking summary
 - Documents
 - Actions:
@@ -303,6 +348,7 @@ Self-service actions
 ---
 
 ## UX State Library (Reusable)
+
 - Loading skeleton
 - Empty state with CTA
 - Error state with retry
@@ -316,4 +362,3 @@ Self-service actions
 ---
 
 ## ✅ End of Frontend UX Map
-

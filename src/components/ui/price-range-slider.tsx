@@ -37,7 +37,7 @@ export function PriceRangeSlider({
 
   return (
     <div className={cn('space-y-3', className)}>
-      <Label className="text-xs font-medium uppercase tracking-wider text-text-muted flex items-center gap-1.5">
+      <Label className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-text-muted">
         <DollarSign className="h-3.5 w-3.5" />
         {label}
       </Label>
@@ -56,7 +56,7 @@ export function PriceRangeSlider({
       {/* Inputs */}
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
-          <span className="absolute start-3 top-1/2 -translate-y-1/2 text-xs font-medium text-text-muted pointer-events-none">
+          <span className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-xs font-medium text-text-muted">
             SAR
           </span>
           <Input
@@ -69,12 +69,12 @@ export function PriceRangeSlider({
               const v = e.target.value ? parseInt(e.target.value, 10) : absoluteMin
               if (!Number.isNaN(v)) onMinChange(Math.max(absoluteMin, Math.min(v, absoluteMax)))
             }}
-            className="w-full ps-11 rounded-xl border-border-light bg-surface-light text-sm focus-visible:ring-brand-primary/20"
+            className="w-full rounded-xl border-border-light bg-surface-light ps-11 text-sm focus-visible:ring-brand-primary/20"
           />
         </div>
-        <span className="text-text-muted shrink-0 text-sm font-medium">&ndash;</span>
+        <span className="shrink-0 text-sm font-medium text-text-muted">&ndash;</span>
         <div className="relative flex-1">
-          <span className="absolute start-3 top-1/2 -translate-y-1/2 text-xs font-medium text-text-muted pointer-events-none">
+          <span className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-xs font-medium text-text-muted">
             SAR
           </span>
           <Input
@@ -87,7 +87,7 @@ export function PriceRangeSlider({
               const v = e.target.value ? parseInt(e.target.value, 10) : absoluteMax
               if (!Number.isNaN(v)) onMaxChange(Math.max(absoluteMin, Math.min(v, absoluteMax)))
             }}
-            className="w-full ps-11 rounded-xl border-border-light bg-surface-light text-sm focus-visible:ring-brand-primary/20"
+            className="w-full rounded-xl border-border-light bg-surface-light ps-11 text-sm focus-visible:ring-brand-primary/20"
           />
         </div>
       </div>

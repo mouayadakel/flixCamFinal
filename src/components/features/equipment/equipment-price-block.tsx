@@ -88,9 +88,7 @@ export function EquipmentPriceBlock({
           <span className="text-3xl font-extrabold tracking-tight text-brand-primary">
             {format(dailyPrice)}
           </span>
-          <span className="text-sm font-medium text-text-muted">
-            / {t('common.pricePerDay')}
-          </span>
+          <span className="text-sm font-medium text-text-muted">/ {t('common.pricePerDay')}</span>
         </div>
       </div>
     )
@@ -103,7 +101,10 @@ export function EquipmentPriceBlock({
         <Tag className="h-4 w-4" />
         <span className="font-medium">Rental pricing</span>
       </div>
-      <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${tiers.length}, minmax(0, 1fr))` }}>
+      <div
+        className="grid gap-2"
+        style={{ gridTemplateColumns: `repeat(${tiers.length}, minmax(0, 1fr))` }}
+      >
         {tiers.map((tier) => (
           <div
             key={tier.label}
@@ -115,18 +116,20 @@ export function EquipmentPriceBlock({
             )}
           >
             {tier.isBestValue && (
-              <span className="absolute -top-2.5 inset-x-0 mx-auto w-fit rounded-full bg-brand-primary px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm flex items-center gap-1">
+              <span className="absolute inset-x-0 -top-2.5 mx-auto flex w-fit items-center gap-1 rounded-full bg-brand-primary px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
                 <TrendingDown className="h-3 w-3" />
                 Best Value
               </span>
             )}
-            <p className="text-xs font-semibold uppercase tracking-wider text-text-muted mt-1">
+            <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-text-muted">
               {tier.label}
             </p>
-            <p className={cn(
-              'mt-2 text-xl font-extrabold tracking-tight',
-              tier.isBestValue ? 'text-brand-primary' : 'text-text-heading'
-            )}>
+            <p
+              className={cn(
+                'mt-2 text-xl font-extrabold tracking-tight',
+                tier.isBestValue ? 'text-brand-primary' : 'text-text-heading'
+              )}
+            >
               {format(tier.price)}
             </p>
             {tiers.length > 1 && (

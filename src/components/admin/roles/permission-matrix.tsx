@@ -83,9 +83,7 @@ export function PermissionMatrix({
       .map((cat) => ({
         ...cat,
         permissions: cat.permissions.filter(
-          (p) =>
-            p.name.toLowerCase().includes(q) ||
-            (p.description || '').toLowerCase().includes(q)
+          (p) => p.name.toLowerCase().includes(q) || (p.description || '').toLowerCase().includes(q)
         ),
       }))
       .filter((c) => c.permissions.length > 0)
@@ -97,8 +95,8 @@ export function PermissionMatrix({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="relative max-w-sm flex-1">
+          <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="البحث في الصلاحيات..."
             value={search}
@@ -111,7 +109,11 @@ export function PermissionMatrix({
         </Badge>
       </div>
 
-      <Accordion type="multiple" defaultValue={filtered.slice(0, 3).map((c) => c.id)} className="w-full">
+      <Accordion
+        type="multiple"
+        defaultValue={filtered.slice(0, 3).map((c) => c.id)}
+        className="w-full"
+      >
         {filtered.map((cat) => {
           const selectedCount = cat.permissions.filter((p) =>
             selectedPermissionIds.has(p.id)
@@ -130,7 +132,7 @@ export function PermissionMatrix({
                 </div>
               </AccordionTrigger>
               <AccordionContent>
-                <div className="flex items-center gap-2 mb-2">
+                <div className="mb-2 flex items-center gap-2">
                   <Checkbox
                     id={`grant-all-${cat.id}`}
                     checked={allSelected}
@@ -139,7 +141,7 @@ export function PermissionMatrix({
                   />
                   <label
                     htmlFor={`grant-all-${cat.id}`}
-                    className="text-sm font-medium cursor-pointer"
+                    className="cursor-pointer text-sm font-medium"
                   >
                     منح الكل
                   </label>
@@ -155,10 +157,7 @@ export function PermissionMatrix({
                   {cat.permissions.map((perm) => (
                     <div
                       key={perm.id}
-                      className={cn(
-                        'flex items-start gap-2 py-1',
-                        disabled && 'opacity-70'
-                      )}
+                      className={cn('flex items-start gap-2 py-1', disabled && 'opacity-70')}
                     >
                       <Checkbox
                         id={perm.id}
@@ -166,13 +165,10 @@ export function PermissionMatrix({
                         onCheckedChange={() => togglePermission(perm.id)}
                         disabled={disabled}
                       />
-                      <label
-                        htmlFor={perm.id}
-                        className="text-sm cursor-pointer flex-1"
-                      >
+                      <label htmlFor={perm.id} className="flex-1 cursor-pointer text-sm">
                         <span className="font-mono text-xs">{perm.name}</span>
                         {perm.description && (
-                          <span className="block text-muted-foreground text-xs mt-0.5">
+                          <span className="mt-0.5 block text-xs text-muted-foreground">
                             {perm.description}
                           </span>
                         )}

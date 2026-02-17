@@ -28,11 +28,7 @@ export function PlaceholderCard({
   return (
     <Card>
       <CardHeader>
-        {icon && (
-          <div className="mb-2 text-muted-foreground [&_svg]:h-10 [&_svg]:w-10">
-            {icon}
-          </div>
-        )}
+        {icon && <div className="mb-2 text-muted-foreground [&_svg]:h-10 [&_svg]:w-10">{icon}</div>}
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>

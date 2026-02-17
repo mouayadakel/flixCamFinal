@@ -278,10 +278,10 @@ Optional: after account exists, support **email verification** and **email/passw
 
 **Discount priority (no double discount)**
 
-1. Package price  
-2. Bundle discount  
-3. Offer  
-4. Coupon  
+1. Package price
+2. Bundle discount
+3. Offer
+4. Coupon
 
 **Payment callback delay**
 

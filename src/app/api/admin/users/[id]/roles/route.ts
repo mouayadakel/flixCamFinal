@@ -28,7 +28,12 @@ async function requireAuthAndAssignRole() {
   }
   const canAssign = await hasPermission(session.user.id, PERMISSIONS.USER_ASSIGN_ROLE)
   if (!canAssign) {
-    return { error: NextResponse.json({ error: 'Forbidden - Missing user.assign_role permission' }, { status: 403 }) }
+    return {
+      error: NextResponse.json(
+        { error: 'Forbidden - Missing user.assign_role permission' },
+        { status: 403 }
+      ),
+    }
   }
   return { session }
 }
@@ -152,12 +157,18 @@ export async function POST(
       success: true,
       data: userRole,
       warning: conflict.hasDynamicWarning
-        ? { message: 'Permission overlap with existing roles', permissions: conflict.dynamicWarningPermissions }
+        ? {
+            message: 'Permission overlap with existing roles',
+            permissions: conflict.dynamicWarningPermissions,
+          }
         : undefined,
     })
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validation error', details: error.errors }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Validation error', details: error.errors },
+        { status: 400 }
+      )
     }
     console.error('Error assigning role:', error)
     return NextResponse.json(

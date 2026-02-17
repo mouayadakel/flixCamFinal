@@ -20,10 +20,10 @@ export async function getSession() {
 
 export async function requireAuth(): Promise<SessionUser> {
   const session = await getSession()
-  
+
   if (!session?.user) {
     throw new UnauthorizedError('You must be logged in')
   }
-  
+
   return session.user as SessionUser
 }

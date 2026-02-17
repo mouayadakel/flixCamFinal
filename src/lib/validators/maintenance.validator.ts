@@ -23,12 +23,9 @@ export const maintenanceTypeSchema = z.enum(
   }
 )
 
-export const maintenancePrioritySchema = z.enum(
-  ['low', 'medium', 'high', 'urgent'],
-  {
-    errorMap: () => ({ message: 'أولوية الصيانة غير صالحة' }),
-  }
-)
+export const maintenancePrioritySchema = z.enum(['low', 'medium', 'high', 'urgent'], {
+  errorMap: () => ({ message: 'أولوية الصيانة غير صالحة' }),
+})
 
 export const createMaintenanceSchema = z.object({
   equipmentId: z.string().min(1, 'معرف المعدات مطلوب'),

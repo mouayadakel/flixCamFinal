@@ -17,10 +17,7 @@ import { AppError } from '@/lib/errors'
  */
 export function handleApiError(error: unknown): NextResponse {
   if (error instanceof AppError) {
-    return NextResponse.json(
-      { error: error.message },
-      { status: error.statusCode }
-    )
+    return NextResponse.json({ error: error.message }, { status: error.statusCode })
   }
 
   if (error instanceof z.ZodError) {

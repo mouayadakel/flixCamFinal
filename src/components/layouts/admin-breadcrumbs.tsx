@@ -54,24 +54,24 @@ export function AdminBreadcrumbs() {
     }
 
     const segments = pathname.split('/').filter(Boolean)
-    
+
     // Skip 'admin' segment
     if (segments[0] === 'admin') {
       segments.shift()
     }
 
     let currentPath = '/admin'
-    
+
     segments.forEach((segment, index) => {
       currentPath += `/${segment}`
-      
+
       // Skip numeric IDs
       if (!/^\d+$/.test(segment)) {
         const label = routeLabels[segment] || {
           ar: segment.replace(/-/g, ' '),
           en: segment.replace(/-/g, ' '),
         }
-        
+
         items.push({
           label,
           href: currentPath,
@@ -89,16 +89,20 @@ export function AdminBreadcrumbs() {
   }
 
   return (
-    <nav className="flex items-center gap-2 text-sm text-neutral-600" dir="rtl" aria-label="Breadcrumb">
+    <nav
+      className="flex items-center gap-2 text-sm text-neutral-600"
+      dir="rtl"
+      aria-label="Breadcrumb"
+    >
       {breadcrumbs.map((item, index) => {
         const isLast = index === breadcrumbs.length - 1
-        
+
         return (
           <div key={item.href} className="flex items-center gap-2">
             {index === 0 ? (
               <Link
                 href={item.href}
-                className="flex items-center gap-1 hover:text-primary-600 transition-colors"
+                className="flex items-center gap-1 transition-colors hover:text-primary-600"
               >
                 <Home className="h-4 w-4" />
                 <span className="sr-only">{item.label[language]}</span>
@@ -109,10 +113,7 @@ export function AdminBreadcrumbs() {
                 {isLast ? (
                   <span className="font-medium text-neutral-900">{item.label[language]}</span>
                 ) : (
-                  <Link
-                    href={item.href}
-                    className="hover:text-primary-600 transition-colors"
-                  >
+                  <Link href={item.href} className="transition-colors hover:text-primary-600">
                     {item.label[language]}
                   </Link>
                 )}

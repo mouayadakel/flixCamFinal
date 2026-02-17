@@ -42,7 +42,10 @@ interface Quote {
   createdAt: string
 }
 
-const STATUS_LABELS: Record<QuoteStatus, { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_LABELS: Record<
+  QuoteStatus,
+  { ar: string; en: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   draft: { ar: 'مسودة', en: 'Draft', variant: 'outline' },
   sent: { ar: 'مرسل', en: 'Sent', variant: 'secondary' },
   accepted: { ar: 'مقبول', en: 'Accepted', variant: 'default' },
@@ -148,33 +151,31 @@ export default function QuotesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">عروض الأسعار</h1>
-          <p className="text-muted-foreground mt-2">
-            إدارة عروض الأسعار وتحويلها إلى حجوزات
-          </p>
+          <p className="mt-2 text-muted-foreground">إدارة عروض الأسعار وتحويلها إلى حجوزات</p>
         </div>
         <Button asChild>
           <Link href="/admin/quotes/new">
-            <Plus className="h-4 w-4 ml-2" />
+            <Plus className="ml-2 h-4 w-4" />
             عرض جديد
           </Link>
         </Button>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4 items-center">
+      <div className="flex items-center gap-4">
         <div className="flex-1">
           <input
             type="text"
             placeholder="البحث برقم العرض أو العميل..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-4 py-2 border rounded-lg"
+            className="w-full rounded-lg border px-4 py-2"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border rounded-lg"
+          className="rounded-lg border px-4 py-2"
         >
           {statuses.map((status) => (
             <option key={status} value={status}>
@@ -185,7 +186,7 @@ export default function QuotesPage() {
       </div>
 
       {/* Quotes Table */}
-      <div className="border rounded-lg">
+      <div className="rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -211,7 +212,7 @@ export default function QuotesPage() {
               </TableRow>
             ) : filteredQuotes.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
                   لا توجد عروض أسعار
                 </TableCell>
               </TableRow>
@@ -224,9 +225,7 @@ export default function QuotesPage() {
                       <div className="font-medium">
                         {quote.customer.name || quote.customer.email}
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        {quote.customer.email}
-                      </div>
+                      <div className="text-sm text-muted-foreground">{quote.customer.email}</div>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -242,7 +241,9 @@ export default function QuotesPage() {
                   </TableCell>
                   <TableCell>{formatCurrency(quote.totalAmount)}</TableCell>
                   <TableCell>
-                    <span className={new Date(quote.validUntil) < new Date() ? 'text-destructive' : ''}>
+                    <span
+                      className={new Date(quote.validUntil) < new Date() ? 'text-destructive' : ''}
+                    >
                       {formatDate(quote.validUntil)}
                     </span>
                   </TableCell>
@@ -250,16 +251,15 @@ export default function QuotesPage() {
                     <div className="flex gap-2">
                       <Link href={`/admin/quotes/${quote.id}`}>
                         <Button size="sm" variant="ghost">
-                          <Eye className="h-4 w-4 ml-1" />
+                          <Eye className="ml-1 h-4 w-4" />
                           عرض
                         </Button>
                       </Link>
-                      {quote.status !== 'converted' && quote.status !== 'rejected' && quote.status !== 'expired' ? (
-                        <Button
-                          size="sm"
-                          onClick={() => handleConvert(quote.id)}
-                        >
-                          <ArrowRight className="h-4 w-4 ml-1" />
+                      {quote.status !== 'converted' &&
+                      quote.status !== 'rejected' &&
+                      quote.status !== 'expired' ? (
+                        <Button size="sm" onClick={() => handleConvert(quote.id)}>
+                          <ArrowRight className="ml-1 h-4 w-4" />
                           تحويل
                         </Button>
                       ) : null}
@@ -275,9 +275,7 @@ export default function QuotesPage() {
       {/* Pagination */}
       {total > 50 && (
         <div className="flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
-            إجمالي {total} عرض
-          </div>
+          <div className="text-sm text-muted-foreground">إجمالي {total} عرض</div>
         </div>
       )}
     </div>

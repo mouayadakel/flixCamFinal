@@ -17,10 +17,7 @@ export async function GET(request: NextRequest) {
 
   const vendor = await VendorService.getVendorByUserId(session.user.id)
   if (!vendor) {
-    return NextResponse.json(
-      { error: 'Vendor account not found or not approved' },
-      { status: 403 }
-    )
+    return NextResponse.json({ error: 'Vendor account not found or not approved' }, { status: 403 })
   }
 
   const { searchParams } = new URL(request.url)

@@ -234,7 +234,7 @@ export const mockEquipment: MockEquipment[] = [
     category: ['Cameras', 'Lenses', 'Lighting', 'Audio', 'Grip'][i % 5],
     brand: ['Sony', 'Canon', 'ARRI', 'RED', 'Blackmagic'][i % 5],
     status: i % 3 === 0 ? 'active' : 'active',
-    stock: ((i % 10) + 1), // Deterministic stock value based on index
+    stock: (i % 10) + 1, // Deterministic stock value based on index
     updatedAt: `2026-01-${String(15 - i).padStart(2, '0')}`,
   })),
 ]
@@ -402,8 +402,20 @@ export const mockUsers: MockUser[] = [
   { id: '2', name: 'Jane Smith', email: 'jane@example.com', role: 'Manager', status: 'active' },
   { id: '3', name: 'Ali Ahmed', email: 'ali@example.com', role: 'Viewer', status: 'inactive' },
   { id: '4', name: 'Sara Alqahtani', email: 'sara@example.com', role: 'Support', status: 'active' },
-  { id: '5', name: 'Mohammed Al Anzi', email: 'mohammed@example.com', role: 'Customer Service', status: 'active' },
-  { id: '6', name: 'Noura Al Saud', email: 'noura@example.com', role: 'Marketing', status: 'active' },
+  {
+    id: '5',
+    name: 'Mohammed Al Anzi',
+    email: 'mohammed@example.com',
+    role: 'Customer Service',
+    status: 'active',
+  },
+  {
+    id: '6',
+    name: 'Noura Al Saud',
+    email: 'noura@example.com',
+    role: 'Marketing',
+    status: 'active',
+  },
 ]
 
 export const mockOrders: MockOrder[] = mockBookings.map((b, idx) => ({
@@ -426,25 +438,104 @@ export const mockInvoices: MockInvoice[] = mockBookings.slice(0, 10).map((b, idx
 }))
 
 export const mockWalletTransactions: MockWalletTx[] = [
-  { id: '1', user: 'John Doe', type: 'credit', amount: 500, balance: 1200, note: 'Top-up', createdAt: '2026-01-25' },
-  { id: '2', user: 'Jane Smith', type: 'debit', amount: 250, balance: 450, note: 'Order payment', createdAt: '2026-01-24' },
-  { id: '3', user: 'Ali Ahmed', type: 'credit', amount: 800, balance: 1300, note: 'Refund', createdAt: '2026-01-23' },
+  {
+    id: '1',
+    user: 'John Doe',
+    type: 'credit',
+    amount: 500,
+    balance: 1200,
+    note: 'Top-up',
+    createdAt: '2026-01-25',
+  },
+  {
+    id: '2',
+    user: 'Jane Smith',
+    type: 'debit',
+    amount: 250,
+    balance: 450,
+    note: 'Order payment',
+    createdAt: '2026-01-24',
+  },
+  {
+    id: '3',
+    user: 'Ali Ahmed',
+    type: 'credit',
+    amount: 800,
+    balance: 1300,
+    note: 'Refund',
+    createdAt: '2026-01-23',
+  },
 ]
 
 export const mockStudios: MockStudio[] = [
   { id: '1', name: 'Studio A', location: 'Riyadh', status: 'active', rate: 1500, capacity: 12 },
-  { id: '2', name: 'Studio B', location: 'Jeddah', status: 'maintenance', rate: 1200, capacity: 10 },
+  {
+    id: '2',
+    name: 'Studio B',
+    location: 'Jeddah',
+    status: 'maintenance',
+    rate: 1200,
+    capacity: 10,
+  },
   { id: '3', name: 'Studio C', location: 'Dammam', status: 'active', rate: 900, capacity: 8 },
 ]
 
 export const mockTechnicians: MockTechnician[] = [
-  { id: '1', name: 'Omar Khalid', email: 'omar.k@example.com', phone: '+96650000001', specialty: 'Lighting', status: 'active', jobs: 34 },
-  { id: '2', name: 'Maha Ali', email: 'maha.ali@example.com', phone: '+96650000002', specialty: 'Camera', status: 'on-leave', jobs: 18 },
-  { id: '3', name: 'Abdulaziz Fahad', email: 'abdulaziz@example.com', phone: '+96650000003', specialty: 'Audio', status: 'active', jobs: 25 },
+  {
+    id: '1',
+    name: 'Omar Khalid',
+    email: 'omar.k@example.com',
+    phone: '+96650000001',
+    specialty: 'Lighting',
+    status: 'active',
+    jobs: 34,
+  },
+  {
+    id: '2',
+    name: 'Maha Ali',
+    email: 'maha.ali@example.com',
+    phone: '+96650000002',
+    specialty: 'Camera',
+    status: 'on-leave',
+    jobs: 18,
+  },
+  {
+    id: '3',
+    name: 'Abdulaziz Fahad',
+    email: 'abdulaziz@example.com',
+    phone: '+96650000003',
+    specialty: 'Audio',
+    status: 'active',
+    jobs: 25,
+  },
 ]
 
 export const mockCoupons: MockCoupon[] = [
-  { id: '1', code: 'WELCOME15', type: 'percent', value: 15, usage: '3 / 100', status: 'active', expiresAt: '2026-03-01' },
-  { id: '2', code: 'WINTER200', type: 'fixed', value: 200, usage: '20 / 50', status: 'expired', expiresAt: '2026-01-15' },
-  { id: '3', code: 'SPRING10', type: 'percent', value: 10, usage: '0 / 200', status: 'scheduled', expiresAt: '2026-04-15' },
+  {
+    id: '1',
+    code: 'WELCOME15',
+    type: 'percent',
+    value: 15,
+    usage: '3 / 100',
+    status: 'active',
+    expiresAt: '2026-03-01',
+  },
+  {
+    id: '2',
+    code: 'WINTER200',
+    type: 'fixed',
+    value: 200,
+    usage: '20 / 50',
+    status: 'expired',
+    expiresAt: '2026-01-15',
+  },
+  {
+    id: '3',
+    code: 'SPRING10',
+    type: 'percent',
+    value: 10,
+    usage: '0 / 200',
+    status: 'scheduled',
+    expiresAt: '2026-04-15',
+  },
 ]

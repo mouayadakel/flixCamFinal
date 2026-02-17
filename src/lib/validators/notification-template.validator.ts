@@ -23,7 +23,11 @@ const channelEnum = z.enum(['IN_APP', 'EMAIL', 'WHATSAPP', 'SMS'])
 
 export const createNotificationTemplateSchema = z.object({
   name: z.string().min(1).max(120),
-  slug: z.string().min(1).max(80).regex(/^[a-z0-9_-]+$/),
+  slug: z
+    .string()
+    .min(1)
+    .max(80)
+    .regex(/^[a-z0-9_-]+$/),
   description: z.string().max(500).optional().nullable(),
   trigger: triggerEnum,
   channel: channelEnum,

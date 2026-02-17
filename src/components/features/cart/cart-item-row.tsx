@@ -32,7 +32,8 @@ export function CartItemRow({ item, onUpdateQuantity, onRemove }: CartItemRowPro
       <div>
         <p className="font-medium">{label}</p>
         <p className="text-sm text-muted-foreground">
-          {item.quantity} × {item.dailyRate != null ? `${item.dailyRate.toLocaleString()} SAR` : '—'}
+          {item.quantity} ×{' '}
+          {item.dailyRate != null ? `${item.dailyRate.toLocaleString()} SAR` : '—'}
         </p>
         {!item.isAvailable && (
           <p className="text-sm text-amber-600 dark:text-amber-400">{t('common.unavailable')}</p>

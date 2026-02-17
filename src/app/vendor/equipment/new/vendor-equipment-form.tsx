@@ -130,7 +130,7 @@ export function VendorEquipmentForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <Label htmlFor="sku">رمز SKU *</Label>
           <Input
@@ -152,7 +152,7 @@ export function VendorEquipmentForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <Label htmlFor="categoryId">الفئة *</Label>
           <Select
@@ -191,7 +191,7 @@ export function VendorEquipmentForm({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <Label htmlFor="condition">الحالة</Label>
           <Select
@@ -250,7 +250,7 @@ export function VendorEquipmentForm({
       <div className="space-y-2">
         <Label>الترجمات</Label>
         {form.translations.map((t, i) => (
-          <div key={t.locale} className="p-3 border rounded-lg space-y-2">
+          <div key={t.locale} className="space-y-2 rounded-lg border p-3">
             <span className="text-xs font-medium text-muted-foreground">
               {t.locale === 'ar' ? 'العربية' : 'English'}
             </span>
@@ -283,14 +283,10 @@ export function VendorEquipmentForm({
 
       <div className="flex gap-4">
         <Button type="submit" disabled={loading}>
-          {loading && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+          {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
           إرسال للمراجعة
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.push('/vendor/equipment')}
-        >
+        <Button type="button" variant="outline" onClick={() => router.push('/vendor/equipment')}>
           إلغاء
         </Button>
       </div>

@@ -54,7 +54,11 @@ export default function RegisterPage() {
         if (res.status === 409) {
           toast({
             title: language === 'ar' ? 'البريد مسجل مسبقاً' : 'Email already registered',
-            description: message || (language === 'ar' ? 'سجّل الدخول أو استخدم بريداً آخر.' : 'Sign in or use another email.'),
+            description:
+              message ||
+              (language === 'ar'
+                ? 'سجّل الدخول أو استخدم بريداً آخر.'
+                : 'Sign in or use another email.'),
             variant: 'destructive',
           })
           return
@@ -62,14 +66,19 @@ export default function RegisterPage() {
         if (res.status === 429) {
           toast({
             title: language === 'ar' ? 'محاولات كثيرة' : 'Too many attempts',
-            description: language === 'ar' ? 'انتظر قليلاً ثم حاول مجدداً.' : 'Please wait and try again.',
+            description:
+              language === 'ar' ? 'انتظر قليلاً ثم حاول مجدداً.' : 'Please wait and try again.',
             variant: 'destructive',
           })
           return
         }
         toast({
           title: language === 'ar' ? 'خطأ في التسجيل' : 'Registration error',
-          description: message || (language === 'ar' ? 'تحقق من البيانات وحاول مجدداً.' : 'Check your data and try again.'),
+          description:
+            message ||
+            (language === 'ar'
+              ? 'تحقق من البيانات وحاول مجدداً.'
+              : 'Check your data and try again.'),
           variant: 'destructive',
         })
         return
@@ -84,7 +93,10 @@ export default function RegisterPage() {
       if (signInResult?.error) {
         toast({
           title: language === 'ar' ? 'تم إنشاء الحساب' : 'Account created',
-          description: language === 'ar' ? 'سجّل الدخول من الصفحة التالية.' : 'Please sign in on the next page.',
+          description:
+            language === 'ar'
+              ? 'سجّل الدخول من الصفحة التالية.'
+              : 'Please sign in on the next page.',
         })
         router.push('/login?email=' + encodeURIComponent(data.email))
         return
@@ -105,7 +117,10 @@ export default function RegisterPage() {
       console.error('Register error:', error)
       toast({
         title: language === 'ar' ? 'خطأ' : 'Error',
-        description: language === 'ar' ? 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.',
+        description:
+          language === 'ar'
+            ? 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.'
+            : 'Something went wrong. Please try again.',
         variant: 'destructive',
       })
     } finally {
@@ -228,7 +243,9 @@ export default function RegisterPage() {
               type="password"
               autoComplete="new-password"
               disabled={isLoading}
-              className={errors.confirmPassword ? 'border-error-500 focus-visible:ring-error-500' : ''}
+              className={
+                errors.confirmPassword ? 'border-error-500 focus-visible:ring-error-500' : ''
+              }
               {...register('confirmPassword')}
             />
             {errors.confirmPassword && (
@@ -238,12 +255,7 @@ export default function RegisterPage() {
             )}
           </div>
 
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isLoading}
-            aria-label={t.submit}
-          >
+          <Button type="submit" className="w-full" disabled={isLoading} aria-label={t.submit}>
             {isLoading ? (
               <>
                 <Loader2 className="ml-2 h-4 w-4 animate-spin" />

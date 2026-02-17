@@ -11,7 +11,10 @@ export const equipmentConditionSchema = z.enum(['EXCELLENT', 'GOOD', 'FAIR', 'PO
 // Translation schema for multi-language support
 export const equipmentTranslationSchema = z.object({
   locale: z.enum(['ar', 'en', 'zh'], { required_error: 'Locale is required' }),
-  name: z.string().min(1, { message: 'Name is required' }).max(200, { message: 'Name is too long' }),
+  name: z
+    .string()
+    .min(1, { message: 'Name is required' })
+    .max(200, { message: 'Name is too long' }),
   description: z.string().max(5000, { message: 'Description is too long' }).optional(),
   shortDescription: z.string().max(500, { message: 'Short description is too long' }).optional(),
   seoTitle: z.string().max(200, { message: 'SEO title is too long' }).optional(),
@@ -27,7 +30,11 @@ const baseEquipmentSchema = z.object({
   brandId: z.string().optional(),
   condition: equipmentConditionSchema.optional(),
   quantityTotal: z.number().int().min(1, { message: 'Quantity must be at least 1' }).optional(),
-  quantityAvailable: z.number().int().min(0, { message: 'Available quantity cannot be negative' }).optional(),
+  quantityAvailable: z
+    .number()
+    .int()
+    .min(0, { message: 'Available quantity cannot be negative' })
+    .optional(),
   dailyPrice: z.number().min(0, { message: 'Daily price must be positive' }),
   weeklyPrice: z.number().min(0, { message: 'Weekly price must be positive' }).optional(),
   monthlyPrice: z.number().min(0, { message: 'Monthly price must be positive' }).optional(),
@@ -35,16 +42,34 @@ const baseEquipmentSchema = z.object({
   isActive: z.boolean().optional(),
   warehouseLocation: z.string().max(200, { message: 'Warehouse location is too long' }).optional(),
   barcode: z.string().max(100, { message: 'Barcode is too long' }).optional(),
-  specifications: z.record(z.unknown()).optional(),
+  /** Accepts both StructuredSpecifications (from SpecificationsEditor) and flat Record format */
+  specifications: z
+    .union([
+      z.record(z.string(), z.unknown()),
+      z.object({
+        groups: z.array(z.any()),
+        highlights: z.array(z.any()).optional(),
+        quickSpecs: z.array(z.any()).optional(),
+      }),
+    ])
+    .optional(),
   customFields: z.record(z.unknown()).optional(),
   // Media fields
-  featuredImageUrl: z.string().url({ message: 'Featured image must be a valid URL' }).optional().or(z.literal('')),
-  galleryImageUrls: z.array(z.string().url({ message: 'Gallery images must be valid URLs' })).optional(),
+  featuredImageUrl: z
+    .string()
+    .url({ message: 'Featured image must be a valid URL' })
+    .optional()
+    .or(z.literal('')),
+  galleryImageUrls: z
+    .array(z.string().url({ message: 'Gallery images must be valid URLs' }))
+    .optional(),
   videoUrl: z.string().url({ message: 'Video URL must be valid' }).optional().or(z.literal('')),
   // Translations
   translations: z.array(equipmentTranslationSchema).optional(),
   // Related/Recommended equipment
-  relatedEquipmentIds: z.array(z.string().min(1, { message: 'Equipment ID cannot be empty' })).optional(),
+  relatedEquipmentIds: z
+    .array(z.string().min(1, { message: 'Equipment ID cannot be empty' }))
+    .optional(),
   // Box contents and buffer time
   boxContents: z.string().max(2000, { message: 'Box contents is too long' }).optional(),
   bufferTime: z.number().int().min(0, { message: 'Buffer time cannot be negative' }).optional(),

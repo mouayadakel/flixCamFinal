@@ -18,10 +18,23 @@ export const authConfig: NextAuthConfig = {
       async authorize(credentials) {
         // #region agent log
         const log = (loc: string, msg: string, data: Record<string, unknown>) =>
-          fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: loc, message: msg, data, timestamp: Date.now(), hypothesisId: 'H4' }) }).catch(() => {})
+          fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              location: loc,
+              message: msg,
+              data,
+              timestamp: Date.now(),
+              hypothesisId: 'H4',
+            }),
+          }).catch(() => {})
         // #endregion
         if (!credentials?.email || !credentials?.password) {
-          log('auth/config.ts:authorize', 'missing credentials', { hasEmail: !!credentials?.email, hasPassword: !!credentials?.password })
+          log('auth/config.ts:authorize', 'missing credentials', {
+            hasEmail: !!credentials?.email,
+            hasPassword: !!credentials?.password,
+          })
           return null
         }
 
@@ -119,7 +132,10 @@ export const authConfig: NextAuthConfig = {
   },
   cookies: {
     sessionToken: {
-      name: process.env.NODE_ENV === 'production' ? '__Secure-authjs.session-token' : 'authjs.session-token',
+      name:
+        process.env.NODE_ENV === 'production'
+          ? '__Secure-authjs.session-token'
+          : 'authjs.session-token',
       options: {
         httpOnly: true,
         sameSite: 'lax',

@@ -32,13 +32,13 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center min-h-[200px] ${className}`}
+      className={`flex min-h-[200px] flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center ${className}`}
       role="status"
       aria-label={title}
     >
       {icon && <div className="mb-3 text-muted-foreground [&_svg]:h-12 [&_svg]:w-12">{icon}</div>}
       <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="mt-2 text-sm text-muted-foreground max-w-sm">{description}</p>
+      <p className="mt-2 max-w-sm text-sm text-muted-foreground">{description}</p>
       {actionLabel && (actionHref || onAction) && (
         <div className="mt-4">
           {actionHref ? (

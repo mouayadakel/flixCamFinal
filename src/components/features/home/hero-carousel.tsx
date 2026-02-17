@@ -55,27 +55,27 @@ function getSlideText(
   const isAr = locale === 'ar'
   const isZh = locale === 'zh'
   return {
-    title: isAr ? slide.titleAr : isZh ? (slide.titleZh || slide.titleEn) : slide.titleEn,
+    title: isAr ? slide.titleAr : isZh ? slide.titleZh || slide.titleEn : slide.titleEn,
     subtitle: isAr
-      ? (slide.subtitleAr || slide.subtitleEn || '')
+      ? slide.subtitleAr || slide.subtitleEn || ''
       : isZh
-        ? (slide.subtitleZh || slide.subtitleEn || '')
-        : (slide.subtitleEn || slide.subtitleAr || ''),
+        ? slide.subtitleZh || slide.subtitleEn || ''
+        : slide.subtitleEn || slide.subtitleAr || '',
     badge: isAr
-      ? (slide.badgeTextAr || slide.badgeTextEn || '')
+      ? slide.badgeTextAr || slide.badgeTextEn || ''
       : isZh
-        ? (slide.badgeTextZh || slide.badgeTextEn || '')
-        : (slide.badgeTextEn || slide.badgeTextAr || ''),
+        ? slide.badgeTextZh || slide.badgeTextEn || ''
+        : slide.badgeTextEn || slide.badgeTextAr || '',
     ctaText: isAr
-      ? (slide.ctaTextAr || slide.ctaTextEn || '')
+      ? slide.ctaTextAr || slide.ctaTextEn || ''
       : isZh
-        ? (slide.ctaTextZh || slide.ctaTextEn || '')
-        : (slide.ctaTextEn || slide.ctaTextAr || ''),
+        ? slide.ctaTextZh || slide.ctaTextEn || ''
+        : slide.ctaTextEn || slide.ctaTextAr || '',
     cta2Text: isAr
-      ? (slide.cta2TextAr || slide.cta2TextEn || '')
+      ? slide.cta2TextAr || slide.cta2TextEn || ''
       : isZh
-        ? (slide.cta2TextZh || slide.cta2TextEn || '')
-        : (slide.cta2TextEn || slide.cta2TextAr || ''),
+        ? slide.cta2TextZh || slide.cta2TextEn || ''
+        : slide.cta2TextEn || slide.cta2TextAr || '',
   }
 }
 
@@ -86,18 +86,22 @@ export function HeroCarousel({
   slides: HeroSlideData[]
   settings: HeroCarouselSettings
 }) {
-  const { locale } = useLocale()
+  const { locale, dir } = useLocale()
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
       loop: true,
       align: 'start',
+      direction: dir === 'rtl' ? 'rtl' : 'ltr',
       duration: settings.transitionType === 'slide' ? 30 : 20,
     },
     [
       Autoplay({
         delay: settings.autoPlayInterval,
         stopOnInteraction: true,
-        playOnInit: settings.autoPlay && typeof window !== 'undefined' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+        playOnInit:
+          settings.autoPlay &&
+          typeof window !== 'undefined' &&
+          !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
       }),
     ]
   )
@@ -139,7 +143,8 @@ export function HeroCarousel({
   // Autoplay progress bar (resets each slide)
   useEffect(() => {
     if (!settings.autoPlay || !emblaApi || slides.length === 0) return
-    const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const reducedMotion =
+      typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reducedMotion) return
 
     const start = Date.now()
@@ -165,7 +170,9 @@ export function HeroCarousel({
   if (slides.length === 0) return null
 
   const hasValidImageUrl = (url: string | null | undefined) =>
-    typeof url === 'string' && url.trim().length > 0 && (url.startsWith('http://') || url.startsWith('https://'))
+    typeof url === 'string' &&
+    url.trim().length > 0 &&
+    (url.startsWith('http://') || url.startsWith('https://'))
 
   return (
     <section
@@ -174,26 +181,29 @@ export function HeroCarousel({
       aria-label="Hero Banner"
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.1)_0%,_transparent_60%)]" />
-      <div className="absolute -top-24 -end-24 h-96 w-96 rounded-full bg-white/5 blur-3xl" />
+      <div className="absolute -end-24 -top-24 h-96 w-96 rounded-full bg-white/5 blur-3xl" />
       <div className="absolute -bottom-32 -start-32 h-80 w-80 rounded-full bg-black/10 blur-3xl" />
 
       <div className="embla relative">
-        <div className="embla__viewport overflow-hidden" ref={emblaRef}>
+        <div
+          className="embla__viewport min-h-[400px] overflow-hidden md:min-h-[440px]"
+          ref={emblaRef}
+        >
           <div className="embla__container flex touch-pan-y">
             {slides.map((slide, index) => (
               <div
                 key={slide.id}
-                className="embla__slide min-w-0 flex-[0_0_100%]"
+                className="embla__slide flex min-w-0 flex-[0_0_100%] flex-col"
                 role="group"
                 aria-roledescription="slide"
                 aria-label={`Slide ${index + 1} of ${slides.length}`}
               >
-                <div className="relative min-h-[400px] md:min-h-[440px] w-full min-w-0">
-                  {/* Background: video or image */}
+                <div className="relative min-h-[400px] w-full min-w-0 flex-1 md:min-h-[440px]">
+                  {/* Background: video or image or fallback (hero gradient so text stays visible) */}
                   {hasValidImageUrl(slide.videoUrl) ? (
                     <div className="absolute inset-0">
                       <video
-                        className="absolute inset-0 w-full h-full object-cover"
+                        className="absolute inset-0 h-full w-full object-cover"
                         autoPlay
                         muted
                         loop
@@ -204,7 +214,7 @@ export function HeroCarousel({
                       </video>
                       {failedVideoMobileIds.has(slide.id) || !hasValidImageUrl(slide.imageUrl) ? (
                         <div
-                          className="absolute inset-0 bg-neutral-800 md:hidden"
+                          className="absolute inset-0 bg-hero-gradient md:hidden"
                           aria-hidden
                           role="img"
                           aria-label="Image unavailable"
@@ -213,7 +223,7 @@ export function HeroCarousel({
                         <img
                           src={slide.imageUrl}
                           alt=""
-                          className="absolute inset-0 w-full h-full object-cover md:hidden"
+                          className="absolute inset-0 h-full w-full object-cover md:hidden"
                           aria-hidden
                           onError={() => handleVideoMobileImageError(slide.id)}
                         />
@@ -221,7 +231,7 @@ export function HeroCarousel({
                     </div>
                   ) : !hasValidImageUrl(slide.imageUrl) || failedImageIds.has(slide.id) ? (
                     <div
-                      className="absolute inset-0 bg-neutral-800"
+                      className="absolute inset-0 bg-hero-gradient"
                       aria-hidden
                       role="img"
                       aria-label="Image unavailable"
@@ -230,15 +240,12 @@ export function HeroCarousel({
                     <>
                       {hasValidImageUrl(slide.mobileImageUrl) ? (
                         <picture>
-                          <source
-                            media="(max-width: 768px)"
-                            srcSet={slide.mobileImageUrl!}
-                          />
+                          <source media="(max-width: 768px)" srcSet={slide.mobileImageUrl!} />
                           <img
                             src={slide.imageUrl}
                             alt=""
-                            className="absolute inset-0 w-full h-full object-cover"
-                            loading={index === 0 ? 'eager' : 'lazy'}
+                            className="absolute inset-0 h-full w-full object-cover"
+                            loading="eager"
                             aria-hidden
                             onError={() => handleImageError(slide.id)}
                           />
@@ -247,8 +254,8 @@ export function HeroCarousel({
                         <img
                           src={slide.imageUrl}
                           alt=""
-                          className="absolute inset-0 w-full h-full object-cover"
-                          loading={index === 0 ? 'eager' : 'lazy'}
+                          className="absolute inset-0 h-full w-full object-cover"
+                          loading="eager"
                           aria-hidden
                           onError={() => handleImageError(slide.id)}
                         />
@@ -257,33 +264,31 @@ export function HeroCarousel({
                   )}
                   {/* Overlay */}
                   <div
-                    className="absolute inset-0 z-[1] bg-black transition-opacity pointer-events-none"
+                    className="pointer-events-none absolute inset-0 z-[1] bg-black transition-opacity"
                     style={{ opacity: slide.overlayOpacity }}
                     aria-hidden
                   />
                   {/* Content */}
                   <PublicContainer className="relative z-[2]">
                     <div
-                      className={`relative flex min-h-[400px] flex-col items-center justify-center gap-10 py-16 md:min-h-[440px] md:flex-row md:items-center md:gap-16 lg:py-20 ${
-                        slide.textPosition === 'center'
+                      className={`relative flex min-h-[400px] flex-col items-center justify-center gap-10 py-16 md:min-h-[440px] md:flex-row md:items-center md:gap-16 lg:py-20 ${slide.textPosition === 'center'
                           ? 'text-center'
                           : slide.textPosition === 'end'
                             ? 'text-end md:flex-row-reverse'
                             : 'text-center md:text-start'
-                      }`}
+                        }`}
                     >
                       <div
-                        className={`flex-1 flex flex-col ${
-                          slide.textPosition === 'center'
+                        className={`flex flex-1 flex-col ${slide.textPosition === 'center'
                             ? 'items-center'
                             : slide.textPosition === 'end'
                               ? 'items-end'
                               : 'items-center md:items-start'
-                        }`}
+                          }`}
                       >
                         {getSlideText(slide, locale).badge && (
                           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-sm font-medium text-white/90 backdrop-blur-sm">
-                            <span className="h-1.5 w-1.5 rounded-full bg-brand-secondary-accent animate-pulse-subtle" />
+                            <span className="h-1.5 w-1.5 animate-pulse-subtle rounded-full bg-brand-secondary-accent" />
                             {getSlideText(slide, locale).badge}
                           </div>
                         )}
@@ -302,8 +307,8 @@ export function HeroCarousel({
                               variant={slide.ctaStyle === 'outline' ? 'outline' : 'default'}
                               className={
                                 slide.ctaStyle === 'outline'
-                                  ? 'border-white/30 text-white hover:bg-white/10 hover:text-white rounded-xl px-8 font-semibold backdrop-blur-sm'
-                                  : 'bg-white text-brand-primary hover:bg-white/90 rounded-xl px-8 font-semibold shadow-lg'
+                                  ? 'rounded-xl border-white/30 px-8 font-semibold text-white backdrop-blur-sm hover:bg-white/10 hover:text-white'
+                                  : 'rounded-xl bg-white px-8 font-semibold text-brand-primary shadow-lg hover:bg-white/90'
                               }
                               asChild
                             >
@@ -317,7 +322,7 @@ export function HeroCarousel({
                             <Button
                               size="lg"
                               variant="outline"
-                              className="border-white/30 text-white hover:bg-white/10 hover:text-white rounded-xl px-8 font-semibold backdrop-blur-sm"
+                              className="rounded-xl border-white/30 px-8 font-semibold text-white backdrop-blur-sm hover:bg-white/10 hover:text-white"
                               asChild
                             >
                               <Link href={slide.cta2Url}>
@@ -341,9 +346,8 @@ export function HeroCarousel({
             <button
               key={index}
               type="button"
-              className={`h-2 rounded-full transition-all hover:bg-white/80 focus:outline-none focus:ring-2 focus:ring-white ${
-                selectedIndex === index ? 'w-6 bg-white' : 'w-2 bg-white/50'
-              }`}
+              className={`h-2 rounded-full transition-all hover:bg-white/80 focus:outline-none focus:ring-2 focus:ring-white ${selectedIndex === index ? 'w-6 bg-white' : 'w-2 bg-white/50'
+                }`}
               aria-label={`Go to slide ${index + 1}`}
               aria-current={selectedIndex === index ? 'true' : undefined}
               onClick={() => scrollTo(index)}
@@ -354,7 +358,7 @@ export function HeroCarousel({
         {/* Autoplay progress bar (current slide) */}
         {settings.autoPlay && slides.length > 0 && (
           <div
-            className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-10"
+            className="absolute bottom-0 left-0 right-0 z-10 h-1 bg-white/20"
             role="presentation"
           >
             <div

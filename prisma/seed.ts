@@ -5,8 +5,20 @@
  * @module prisma/seed
  */
 
-import { PrismaClient, EquipmentCondition, FeatureFlagScope, NotificationChannel, BudgetTier } from '@prisma/client'
+import {
+  PrismaClient,
+  EquipmentCondition,
+  FeatureFlagScope,
+  NotificationChannel,
+  BudgetTier,
+} from '@prisma/client'
 import * as bcrypt from 'bcryptjs'
+import {
+  TERMS_TITLE_AR,
+  TERMS_TITLE_EN,
+  TERMS_BODY_AR,
+  TERMS_BODY_EN,
+} from '../scripts/data/terms-policy-body'
 
 const prisma = new PrismaClient()
 
@@ -42,48 +54,62 @@ interface EquipmentSeedData {
 
 const IMAGES = {
   // Cameras
-  sonyA7S3: 'https://d1ncau8tqf99kp.cloudfront.net/converted/149047_original_local_1200x1050_v3_converted.webp',
-  sonyA7R5: 'https://d1ncau8tqf99kp.cloudfront.net/converted/169563_original_local_1200x1050_v3_converted.webp',
+  sonyA7S3:
+    'https://d1ncau8tqf99kp.cloudfront.net/converted/149047_original_local_1200x1050_v3_converted.webp',
+  sonyA7R5:
+    'https://d1ncau8tqf99kp.cloudfront.net/converted/169563_original_local_1200x1050_v3_converted.webp',
   brinno: 'https://bfrcdn.bfrreview.com/img/brinno/brinno-bcc200-body-only.jpg',
 
   // Camera Accessories
   ikanHandle: 'https://ikancorp.com/wp-content/uploads/2021/04/HB-DRS-1.jpg',
   teradekBolt6: 'https://teradek.com/cdn/shop/files/Bolt6_Family_Hero_1200x.jpg',
-  tiltaNucleusM: 'https://cdn.tilta.com/wp-content/uploads/2017/07/01050312/WLC-T03-K5_01_legacy2.jpg',
-  directorCage: 'https://cdn.shopify.com/s/files/1/0012/6971/2544/products/directors-monitor-cage-v2_1200x.jpg',
+  tiltaNucleusM:
+    'https://cdn.tilta.com/wp-content/uploads/2017/07/01050312/WLC-T03-K5_01_legacy2.jpg',
+  directorCage:
+    'https://cdn.shopify.com/s/files/1/0012/6971/2544/products/directors-monitor-cage-v2_1200x.jpg',
   sekonicC800: 'https://www.sekonic.com/portals/0/Images/products/C-800/gallery/c800_01.jpg',
-  sonyCfexReader: 'https://d1ncau8tqf99kp.cloudfront.net/converted/107990_original_local_1200x1050_v3_converted.webp',
+  sonyCfexReader:
+    'https://d1ncau8tqf99kp.cloudfront.net/converted/107990_original_local_1200x1050_v3_converted.webp',
   polarProFilter: 'https://cdn.shopify.com/s/files/1/0745/1032/products/PMVND-82-6-9_1200x.jpg',
   tiffenFilter: 'https://tiffen.com/cdn/shop/files/W82BPM14_1200x.jpg',
-  schneiderFilter: 'https://schneideroptics.com/wp-content/uploads/2023/01/hollywood-black-magic-filter.jpg',
+  schneiderFilter:
+    'https://schneideroptics.com/wp-content/uploads/2023/01/hollywood-black-magic-filter.jpg',
   revarCinePola: 'https://revarcine.com/wp-content/uploads/2021/03/rota-pola-138mm.jpg',
-  tiltaMatteBox: 'https://cdn.tilta.com/wp-content/uploads/2022/11/28190000/MB-T16_angle1_legacy2.jpg',
+  tiltaMatteBox:
+    'https://cdn.tilta.com/wp-content/uploads/2022/11/28190000/MB-T16_angle1_legacy2.jpg',
   cameraSaddle: 'https://www.rmcinema.com/wp-content/uploads/2021/05/camera-saddle-main.jpg',
 
   // Lenses
-  arriUltraPrime: 'https://www.arri.com/resource/image/34170/landscape_ratio1x0_418/1680/706/fce01b656de62026bde471f95ca75be9/32CDE49E8105DE1477287516A04D11DB/lenses-ultra-primes-overview-image.jpg',
+  arriUltraPrime:
+    'https://www.arri.com/resource/image/34170/landscape_ratio1x0_418/1680/706/fce01b656de62026bde471f95ca75be9/32CDE49E8105DE1477287516A04D11DB/lenses-ultra-primes-overview-image.jpg',
   dzofilmPictor: 'https://www.dzofilm.com/Public/Uploads/Products/2022-06-09/62a1ea4f3b2ed.jpg',
   sigma2470: 'https://www.sigma-global.com/common/products/lenses/a021/a021_main.jpg',
   sigma135: 'https://www.sigma-global.com/common/products/lenses/a017/a017_main.jpg',
   sigma50: 'https://www.sigma-global.com/common/products/lenses/a020/a020_main.jpg',
   sigma35: 'https://www.sigma-global.com/common/products/lenses/a040/a040_main.jpg',
   sigma1424: 'https://www.sigma-global.com/common/products/lenses/a018/a018_main.jpg',
-  laowa12: 'https://www.venuslens.net/wp-content/uploads/2021/07/Laowa-12mm-T2.9-Zero-D-Cine-01.jpg',
-  sonyGM90: 'https://d1ncau8tqf99kp.cloudfront.net/converted/102430_original_local_1200x1050_v3_converted.webp',
+  laowa12:
+    'https://www.venuslens.net/wp-content/uploads/2021/07/Laowa-12mm-T2.9-Zero-D-Cine-01.jpg',
+  sonyGM90:
+    'https://d1ncau8tqf99kp.cloudfront.net/converted/102430_original_local_1200x1050_v3_converted.webp',
 
   // Tripods & Gimbals
   djiRS4Pro: 'https://dji-official-fe.djicdn.com/dps/bef24b413e60bb8f23cf81bec27f5837.png',
-  tiltaSlider: 'https://cdn.tilta.com/wp-content/uploads/2022/07/28200000/TSS-T01_angle1_legacy2.jpg',
+  tiltaSlider:
+    'https://cdn.tilta.com/wp-content/uploads/2022/07/28200000/TSS-T01_angle1_legacy2.jpg',
   tiltaFloat: 'https://cdn.tilta.com/wp-content/uploads/2022/03/28214240/GSS-T02_main_legacy2.jpg',
-  tiltaHydra: 'https://cdn.tilta.com/wp-content/uploads/2023/01/28192500/HDA-T08-A-V_angle66_legacy2.jpg',
+  tiltaHydra:
+    'https://cdn.tilta.com/wp-content/uploads/2023/01/28192500/HDA-T08-A-V_angle66_legacy2.jpg',
   flycamFlowline: 'https://www.flycam.com/wp-content/uploads/2020/09/flowline-master-main.jpg',
-  easyrigV5: 'https://easyrig.se/wp-content/uploads/2019/03/Easyrig-Vario-5-Strong-with-Stabil-G2-1-768x576.jpeg',
+  easyrigV5:
+    'https://easyrig.se/wp-content/uploads/2019/03/Easyrig-Vario-5-Strong-with-Stabil-G2-1-768x576.jpeg',
   benroTripod: 'https://www.benro.com/uploads/product/2022-07-11/product_62cbe4a16fe90.jpg',
   eimageSlider: 'https://www.eimageglobal.com/upload/product/2021-03-18/16160906131.jpg',
 
   // Lighting
   gvm50rs: 'https://gvm-led.com/wp-content/uploads/2021/05/GVM-50RS-1.jpg',
-  mc12Kit: 'https://cdn.shopify.com/s/files/1/1343/1935/products/mc-12-light-production-kit_1200x.jpg',
+  mc12Kit:
+    'https://cdn.shopify.com/s/files/1/1343/1935/products/mc-12-light-production-kit_1200x.jpg',
   aputure300D: 'https://cdn.shopify.com/s/files/1/1343/1935/files/LS_300d_II.png',
   amaranF22c: 'https://cdn.shopify.com/s/files/1/1343/1935/files/Amaran-F22c_1.png',
   asteraTitan: 'https://media.astera-led.com/wp-content/uploads/FP1_TitanTube_V2.png',
@@ -125,19 +151,23 @@ const IMAGES = {
 
   // Sound
   xlrCable: 'https://images-na.ssl-images-amazon.com/images/I/61Mq5+WLj2L._AC_SL1500_.jpg',
-  rodeLink: 'https://cdn.rode.com/website/images/products/rodelink-filmmaker-kit/rodelink-filmmaker-kit-hero.jpg',
+  rodeLink:
+    'https://cdn.rode.com/website/images/products/rodelink-filmmaker-kit/rodelink-filmmaker-kit-hero.jpg',
   sennheiserEW: 'https://assets.sennheiser.com/img/12091/x1_desktop_ew_100_ENG_G4_01_sq.jpg',
   sennMKE600: 'https://assets.sennheiser.com/img/3620/x1_desktop_MKE_600_01_sq.jpg',
   sennMZX8060: 'https://assets.sennheiser.com/img/12082/x1_desktop_MKH_8060_01_sq.jpg',
-  rodeMic: 'https://cdn.rode.com/website/images/products/videomic-pro-plus/videomic-pro-plus-hero.jpg',
+  rodeMic:
+    'https://cdn.rode.com/website/images/products/videomic-pro-plus/videomic-pro-plus-hero.jpg',
   saramonicXLR9: 'https://saramonic.com/wp-content/uploads/2023/02/blink900-b2-1.jpg',
   zoomF6: 'https://zoomcorp.com/media/images/product-images/f6/hero/zoom-f6-angle.png',
   sennLavGold: 'https://assets.sennheiser.com/img/8928/x1_desktop_MKE_Essential_Omni_01_sq.jpg',
   lavMic: 'https://images-na.ssl-images-amazon.com/images/I/51G6Z5gLmNL._AC_SL1000_.jpg',
 
   // Live & Mixing
-  bmUltimatte: 'https://images.blackmagicdesign.com/images/products/ultimatte/landing/hero/hero-lg.jpg',
-  bmAtem4K8: 'https://images.blackmagicdesign.com/images/products/atemtelevisionstudio/landing/hero/hero-1-lg.jpg',
+  bmUltimatte:
+    'https://images.blackmagicdesign.com/images/products/ultimatte/landing/hero/hero-lg.jpg',
+  bmAtem4K8:
+    'https://images.blackmagicdesign.com/images/products/atemtelevisionstudio/landing/hero/hero-1-lg.jpg',
   autoQ: 'https://autocue.com/wp-content/uploads/2023/05/Starter-Series-Package-1200x1200.jpg',
 
   // Cases
@@ -149,18 +179,62 @@ const IMAGES = {
 // ============================================
 
 const CATEGORIES = [
-  { name: 'Cameras', slug: 'cameras', description: 'Cinema & mirrorless cameras for film production' },
-  { name: 'Camera Accessories', slug: 'camera-accessories', description: 'Follow focus, wireless video, filters, matte boxes, and camera support' },
+  {
+    name: 'Cameras',
+    slug: 'cameras',
+    description: 'Cinema & mirrorless cameras for film production',
+  },
+  {
+    name: 'Camera Accessories',
+    slug: 'camera-accessories',
+    description: 'Follow focus, wireless video, filters, matte boxes, and camera support',
+  },
   { name: 'Lenses', slug: 'lenses', description: 'Cinema primes, zooms, and photo lenses' },
-  { name: 'Tripods & Gimbals', slug: 'tripods-gimbals', description: 'Stabilizers, gimbals, sliders, and camera support systems' },
-  { name: 'Lighting', slug: 'lighting', description: 'LED panels, COB lights, fresnels, and flash units' },
-  { name: 'Light Accessories', slug: 'light-accessories', description: 'Modifiers, diffusers, gels, cloths, and fog machines' },
-  { name: 'Audio', slug: 'audio', description: 'Wireless microphones, boom mics, recorders, and cables' },
-  { name: 'Monitors', slug: 'monitors', description: 'On-camera monitors, production monitors, and recorders' },
-  { name: 'Batteries & Power', slug: 'batteries-power', description: 'V-mount, B-mount batteries, chargers, and power distribution' },
-  { name: 'Grip & Support', slug: 'grip', description: 'C-stands, apple boxes, clamps, and rigging' },
-  { name: 'Cases & Bags', slug: 'cases-bags', description: 'Hard cases, soft bags, and transport solutions' },
-  { name: 'Live & Mixing', slug: 'live-mixing', description: 'Video switchers, keyers, teleprompters, and live production' },
+  {
+    name: 'Tripods & Gimbals',
+    slug: 'tripods-gimbals',
+    description: 'Stabilizers, gimbals, sliders, and camera support systems',
+  },
+  {
+    name: 'Lighting',
+    slug: 'lighting',
+    description: 'LED panels, COB lights, fresnels, and flash units',
+  },
+  {
+    name: 'Light Accessories',
+    slug: 'light-accessories',
+    description: 'Modifiers, diffusers, gels, cloths, and fog machines',
+  },
+  {
+    name: 'Audio',
+    slug: 'audio',
+    description: 'Wireless microphones, boom mics, recorders, and cables',
+  },
+  {
+    name: 'Monitors',
+    slug: 'monitors',
+    description: 'On-camera monitors, production monitors, and recorders',
+  },
+  {
+    name: 'Batteries & Power',
+    slug: 'batteries-power',
+    description: 'V-mount, B-mount batteries, chargers, and power distribution',
+  },
+  {
+    name: 'Grip & Support',
+    slug: 'grip',
+    description: 'C-stands, apple boxes, clamps, and rigging',
+  },
+  {
+    name: 'Cases & Bags',
+    slug: 'cases-bags',
+    description: 'Hard cases, soft bags, and transport solutions',
+  },
+  {
+    name: 'Live & Mixing',
+    slug: 'live-mixing',
+    description: 'Video switchers, keyers, teleprompters, and live production',
+  },
 ]
 
 // ============================================
@@ -168,16 +242,28 @@ const CATEGORIES = [
 // ============================================
 
 const BRANDS = [
-  { name: 'Sony', slug: 'sony', description: 'Industry-leading mirrorless cameras and cinema solutions' },
+  {
+    name: 'Sony',
+    slug: 'sony',
+    description: 'Industry-leading mirrorless cameras and cinema solutions',
+  },
   { name: 'Canon', slug: 'canon', description: 'Professional cinema cameras and EF/RF lenses' },
   { name: 'ARRI', slug: 'arri', description: 'Premium cinema cameras and lighting' },
   { name: 'RED', slug: 'red', description: 'High-end digital cinema cameras' },
-  { name: 'Blackmagic Design', slug: 'blackmagic', description: 'Cinema cameras, switchers, and post-production tools' },
+  {
+    name: 'Blackmagic Design',
+    slug: 'blackmagic',
+    description: 'Cinema cameras, switchers, and post-production tools',
+  },
   { name: 'DJI', slug: 'dji', description: 'Gimbals, drones, and camera stabilizers' },
   { name: 'Tilta', slug: 'tilta', description: 'Cinema accessories, rigs, follow focus systems' },
   { name: 'Godox', slug: 'godox', description: 'Professional flash and continuous lighting' },
   { name: 'Aputure', slug: 'aputure', description: 'Premium LED lighting for film production' },
-  { name: 'Sennheiser', slug: 'sennheiser', description: 'Professional wireless microphones and audio' },
+  {
+    name: 'Sennheiser',
+    slug: 'sennheiser',
+    description: 'Professional wireless microphones and audio',
+  },
   { name: 'Rode', slug: 'rode', description: 'Microphones and audio solutions for filmmakers' },
   { name: 'Saramonic', slug: 'saramonic', description: 'Wireless audio and microphone systems' },
   { name: 'Sigma', slug: 'sigma', description: 'Art series and cinema lenses' },
@@ -202,7 +288,11 @@ const BRANDS = [
   { name: 'Tiffen', slug: 'tiffen', description: 'Camera filters and lens accessories' },
   { name: 'Schneider', slug: 'schneider', description: 'Premium cinema and optical filters' },
   { name: 'PolarPro', slug: 'polarpro', description: 'Variable ND and cinema filters' },
-  { name: 'Wooden Camera', slug: 'wooden-camera', description: 'Director cages and cinema accessories' },
+  {
+    name: 'Wooden Camera',
+    slug: 'wooden-camera',
+    description: 'Director cages and cinema accessories',
+  },
   { name: 'Ikan', slug: 'ikan', description: 'Cinema accessories and LED lighting' },
   { name: 'ZEISS', slug: 'zeiss', description: 'Premium optical lenses for cinema' },
   { name: 'Autocue', slug: 'autocue', description: 'Professional teleprompter systems' },
@@ -251,11 +341,40 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
           icon: 'star',
           priority: 1,
           specs: [
-            { key: 'sensor', label: 'Sensor', labelAr: 'المستشعر', value: '12.1MP Full-Frame Exmor R BSI CMOS', highlight: true },
-            { key: 'video', label: 'Video', labelAr: 'الفيديو', value: '4K 120p 10-bit 4:2:2', highlight: true },
-            { key: 'iso', label: 'ISO Range', labelAr: 'نطاق ISO', value: '80-102,400 (Exp: 40-409,600)', type: 'range', rangePercent: 85 },
-            { key: 'autofocus', label: 'Autofocus', labelAr: 'التركيز التلقائي', value: '759-Point Fast Hybrid AF' },
-            { key: 'stabilization', label: 'Stabilization', labelAr: 'الاستقرار', value: '5-Axis In-Body (5.5 stops)' },
+            {
+              key: 'sensor',
+              label: 'Sensor',
+              labelAr: 'المستشعر',
+              value: '12.1MP Full-Frame Exmor R BSI CMOS',
+              highlight: true,
+            },
+            {
+              key: 'video',
+              label: 'Video',
+              labelAr: 'الفيديو',
+              value: '4K 120p 10-bit 4:2:2',
+              highlight: true,
+            },
+            {
+              key: 'iso',
+              label: 'ISO Range',
+              labelAr: 'نطاق ISO',
+              value: '80-102,400 (Exp: 40-409,600)',
+              type: 'range',
+              rangePercent: 85,
+            },
+            {
+              key: 'autofocus',
+              label: 'Autofocus',
+              labelAr: 'التركيز التلقائي',
+              value: '759-Point Fast Hybrid AF',
+            },
+            {
+              key: 'stabilization',
+              label: 'Stabilization',
+              labelAr: 'الاستقرار',
+              value: '5-Axis In-Body (5.5 stops)',
+            },
           ],
         },
         {
@@ -264,11 +383,29 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
           icon: 'monitor',
           priority: 2,
           specs: [
-            { key: 'weight', label: 'Weight', labelAr: 'الوزن', value: '699g (body only)', type: 'range', rangePercent: 25 },
+            {
+              key: 'weight',
+              label: 'Weight',
+              labelAr: 'الوزن',
+              value: '699g (body only)',
+              type: 'range',
+              rangePercent: 25,
+            },
             { key: 'dimensions', label: 'Dimensions', labelAr: 'الأبعاد', value: '-' },
-            { key: 'display', label: 'Display', labelAr: 'الشاشة', value: '3.0" Vari-angle Touchscreen LCD' },
+            {
+              key: 'display',
+              label: 'Display',
+              labelAr: 'الشاشة',
+              value: '3.0" Vari-angle Touchscreen LCD',
+            },
             { key: 'evf', label: 'EVF', labelAr: 'المنظار الإلكتروني', value: '9.44M-dot OLED' },
-            { key: 'mount', label: 'Lens Mount', labelAr: 'قاعدة العدسة', value: 'Sony E-Mount', highlight: true },
+            {
+              key: 'mount',
+              label: 'Lens Mount',
+              labelAr: 'قاعدة العدسة',
+              value: 'Sony E-Mount',
+              highlight: true,
+            },
           ],
         },
         {
@@ -277,13 +414,19 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
           icon: 'hard-drive',
           priority: 3,
           specs: [
-            { key: 'recording', label: 'Card Slots', labelAr: 'منافذ الذاكرة', value: 'Dual CFexpress Type A / SD UHS-II' },
+            {
+              key: 'recording',
+              label: 'Card Slots',
+              labelAr: 'منافذ الذاكرة',
+              value: 'Dual CFexpress Type A / SD UHS-II',
+            },
             { key: 'battery', label: 'Battery', labelAr: 'البطارية', value: 'NP-FZ100' },
           ],
         },
       ],
     },
-    boxContents: 'Camera body, 2x Camera battery (NP-FZ100), 2x CFexpress 160GB memory card, 1x Battery charger, Camera tripod plate',
+    boxContents:
+      'Camera body, 2x Camera battery (NP-FZ100), 2x CFexpress 160GB memory card, 1x Battery charger, Camera tripod plate',
     imageUrl: IMAGES.sonyA7S3,
   },
   {
@@ -338,7 +481,8 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
       weatherproof: 'IPX5',
       fieldOfView: '140°',
     },
-    boxContents: 'Camera, Camera housing (weather-resistant), Cage grip, USB cable, Manual, Battery grip, Safety cable',
+    boxContents:
+      'Camera, Camera housing (weather-resistant), Cage grip, USB cable, Manual, Battery grip, Safety cable',
     imageUrl: IMAGES.brinno,
   },
 
@@ -409,7 +553,8 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
       torque: '1.2N·m motor torque',
       power: 'Rechargeable Li-ion',
     },
-    boxContents: '2x Tilta Nucleus-M FIZ Motor, 19mm Rod Adapter, 19mm to 15mm Bushing, 2x DSLR Lens Follow Focus Adapter, D-Tap to 7-Pin Motor Power Cable, Motor-to-Motor Connection Cable (21.65"), 2x Follow Focus Marking Disk, Lanyard for Hand Unit, Battery Charger, AC Power Cable',
+    boxContents:
+      '2x Tilta Nucleus-M FIZ Motor, 19mm Rod Adapter, 19mm to 15mm Bushing, 2x DSLR Lens Follow Focus Adapter, D-Tap to 7-Pin Motor Power Cable, Motor-to-Motor Connection Cable (21.65"), 2x Follow Focus Marking Disk, Lanyard for Hand Unit, Battery Charger, AC Power Cable',
     imageUrl: IMAGES.tiltaNucleusM,
   },
   {
@@ -485,7 +630,12 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'B2-01',
     barcode: '20000007',
-    specifications: { diameter: '82mm', stops: '6-9 stops', glass: 'Fused quartz', coating: 'Multi-layer anti-reflective' },
+    specifications: {
+      diameter: '82mm',
+      stops: '6-9 stops',
+      glass: 'Fused quartz',
+      coating: 'Multi-layer anti-reflective',
+    },
     imageUrl: IMAGES.polarProFilter,
   },
   {
@@ -502,7 +652,12 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'B2-02',
     barcode: '20000008',
-    specifications: { diameter: '82mm', stops: '2-5 stops', glass: 'Fused quartz', coating: 'Multi-layer anti-reflective' },
+    specifications: {
+      diameter: '82mm',
+      stops: '2-5 stops',
+      glass: 'Fused quartz',
+      coating: 'Multi-layer anti-reflective',
+    },
     imageUrl: IMAGES.polarProFilter,
   },
   {
@@ -672,7 +827,11 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'B3-04',
     barcode: '20000019',
-    specifications: { size: '4x5.65"', type: 'Black Pro-Mist 1/4', effect: 'Highlight halation, reduced contrast' },
+    specifications: {
+      size: '4x5.65"',
+      type: 'Black Pro-Mist 1/4',
+      effect: 'Highlight halation, reduced contrast',
+    },
     imageUrl: IMAGES.tiffenFilter,
   },
   {
@@ -689,7 +848,11 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'B3-05',
     barcode: '20000020',
-    specifications: { size: '4x5.65"', type: 'Black Pro-Mist 1/8', effect: 'Subtle halation, minimal contrast reduction' },
+    specifications: {
+      size: '4x5.65"',
+      type: 'Black Pro-Mist 1/8',
+      effect: 'Subtle halation, minimal contrast reduction',
+    },
     imageUrl: IMAGES.tiffenFilter,
   },
   {
@@ -706,7 +869,11 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'B3-06',
     barcode: '20000021',
-    specifications: { size: '4x5.65"', type: 'Hollywood Black Magic', effect: 'Glow, halation, skin smoothing' },
+    specifications: {
+      size: '4x5.65"',
+      type: 'Hollywood Black Magic',
+      effect: 'Glow, halation, skin smoothing',
+    },
     imageUrl: IMAGES.schneiderFilter,
   },
   {
@@ -740,7 +907,11 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'B3-08',
     barcode: '20000023',
-    specifications: { filterSlots: '4x5.65" (2 slots)', compatibility: '15mm LWS rods', flags: 'Top and side flags included' },
+    specifications: {
+      filterSlots: '4x5.65" (2 slots)',
+      compatibility: '15mm LWS rods',
+      flags: 'Top and side flags included',
+    },
     imageUrl: IMAGES.tiltaMatteBox,
   },
 
@@ -769,7 +940,8 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
       coverage: 'Super 35 / Full Frame',
       focus: 'Manual cinema focus with smooth rotation',
     },
-    boxContents: '6x Ultra Prime lenses (16, 24, 32, 50, 58, 135mm), 6x Front/rear caps, Custom hard case',
+    boxContents:
+      '6x Ultra Prime lenses (16, 24, 32, 50, 58, 135mm), 6x Front/rear caps, Custom hard case',
     imageUrl: IMAGES.arriUltraPrime,
   },
   {
@@ -814,7 +986,15 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     warehouseLocation: 'C1-03',
     barcode: '30000003',
     budgetTier: BudgetTier.ESSENTIAL,
-    specifications: { focalLength: '24-70mm', aperture: 'f/2.8', mount: 'Sony E-Mount', format: 'Full Frame', filterThread: '82mm', weight: '830g', elements: '19 elements / 15 groups' },
+    specifications: {
+      focalLength: '24-70mm',
+      aperture: 'f/2.8',
+      mount: 'Sony E-Mount',
+      format: 'Full Frame',
+      filterThread: '82mm',
+      weight: '830g',
+      elements: '19 elements / 15 groups',
+    },
     imageUrl: IMAGES.sigma2470,
   },
   {
@@ -832,7 +1012,14 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'C1-04',
     barcode: '30000004',
-    specifications: { focalLength: '12mm', aperture: 'T2.9', mount: 'Sony E-Mount', distortion: 'Near zero distortion', format: 'Full Frame', filterThread: '77mm' },
+    specifications: {
+      focalLength: '12mm',
+      aperture: 'T2.9',
+      mount: 'Sony E-Mount',
+      distortion: 'Near zero distortion',
+      format: 'Full Frame',
+      filterThread: '77mm',
+    },
     imageUrl: IMAGES.laowa12,
   },
   {
@@ -850,7 +1037,15 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'C1-05',
     barcode: '30000005',
-    specifications: { focalLength: '90mm', aperture: 'f/2.8', mount: 'Sony E-Mount', macro: '1:1 life-size magnification', oss: 'Optical SteadyShot', filterThread: '62mm', weight: '602g' },
+    specifications: {
+      focalLength: '90mm',
+      aperture: 'f/2.8',
+      mount: 'Sony E-Mount',
+      macro: '1:1 life-size magnification',
+      oss: 'Optical SteadyShot',
+      filterThread: '62mm',
+      weight: '602g',
+    },
     imageUrl: IMAGES.sonyGM90,
   },
   {
@@ -868,7 +1063,14 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'C1-06',
     barcode: '30000006',
-    specifications: { focalLength: '135mm', aperture: 'f/1.8', mount: 'Sony E-Mount', format: 'Full Frame', filterThread: '82mm', weight: '1130g' },
+    specifications: {
+      focalLength: '135mm',
+      aperture: 'f/1.8',
+      mount: 'Sony E-Mount',
+      format: 'Full Frame',
+      filterThread: '82mm',
+      weight: '1130g',
+    },
     imageUrl: IMAGES.sigma135,
   },
   {
@@ -886,7 +1088,14 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'C1-07',
     barcode: '30000007',
-    specifications: { focalLength: '50mm', aperture: 'f/1.4', mount: 'Sony E-Mount', format: 'Full Frame', filterThread: '72mm', weight: '670g' },
+    specifications: {
+      focalLength: '50mm',
+      aperture: 'f/1.4',
+      mount: 'Sony E-Mount',
+      format: 'Full Frame',
+      filterThread: '72mm',
+      weight: '670g',
+    },
     imageUrl: IMAGES.sigma50,
   },
   {
@@ -904,7 +1113,14 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'C1-08',
     barcode: '30000008',
-    specifications: { focalLength: '35mm', aperture: 'f/1.4', mount: 'Sony E-Mount', format: 'Full Frame', filterThread: '67mm', weight: '645g' },
+    specifications: {
+      focalLength: '35mm',
+      aperture: 'f/1.4',
+      mount: 'Sony E-Mount',
+      format: 'Full Frame',
+      filterThread: '67mm',
+      weight: '645g',
+    },
     imageUrl: IMAGES.sigma35,
   },
   {
@@ -922,7 +1138,14 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'C1-09',
     barcode: '30000009',
-    specifications: { focalLength: '14-24mm', aperture: 'f/2.8', mount: 'Sony E-Mount', format: 'Full Frame', rearFilter: 'Rear gel filter holder', weight: '795g' },
+    specifications: {
+      focalLength: '14-24mm',
+      aperture: 'f/2.8',
+      mount: 'Sony E-Mount',
+      format: 'Full Frame',
+      rearFilter: 'Rear gel filter holder',
+      weight: '795g',
+    },
     imageUrl: IMAGES.sigma1424,
   },
 
@@ -949,7 +1172,8 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
       features: '2nd-Gen Native Vertical, LiDAR Focus (76,800 points)',
       connectivity: 'Bluetooth 5.0, Wi-Fi 6',
     },
-    boxContents: 'DJI RS4 PRO Gimbal, BG30 Battery Grip, Quick-Release Plate (Arca-Swiss/Manfrotto), Extended Grip/Tripod (Metal), Briefcase Handle, Lens-Fastening Support, Multi-Camera Control Cable (USB-C), USB-C Charging Cable, Ronin Image Transmitter, Focus Pro Motor, Focus Gear Strip, Phone Holder, Carrying Case',
+    boxContents:
+      'DJI RS4 PRO Gimbal, BG30 Battery Grip, Quick-Release Plate (Arca-Swiss/Manfrotto), Extended Grip/Tripod (Metal), Briefcase Handle, Lens-Fastening Support, Multi-Camera Control Cable (USB-C), USB-C Charging Cable, Ronin Image Transmitter, Focus Pro Motor, Focus Gear Strip, Phone Holder, Carrying Case',
     imageUrl: IMAGES.djiRS4Pro,
   },
   {
@@ -966,7 +1190,8 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'D1-02',
     barcode: '40000002',
-    boxContents: '1x Bowl, 8x 40mm Rod, 4x Adapter, 6x Rail connector, 2x Slider Supporter, 4x Aluminum legs, 1x Rail extension Support',
+    boxContents:
+      '1x Bowl, 8x 40mm Rod, 4x Adapter, 6x Rail connector, 2x Slider Supporter, 4x Aluminum legs, 1x Rail extension Support',
     imageUrl: IMAGES.tiltaSlider,
   },
   {
@@ -985,8 +1210,13 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     warehouseLocation: 'D1-03',
     barcode: '40000003',
     budgetTier: BudgetTier.PREMIUM,
-    specifications: { type: 'Gimbal Support Vest + Spring Arm', payload: 'Up to 8.8 lbs (4kg)', compatibility: 'DJI RS series, Zhiyun, Moza' },
-    boxContents: 'Support Vest, Stabilizer Arm, Mounting Post, Monitor Bracket, Power Supply Baseplate, 2-Pin to 2-Pin LEMO Cable, D-Tap to 2-Pin LEMO Cable, Wireless Thumb Controller, Wireless Control Module Receiver, V-Mount Battery Plate, Phone Mount Bracket, Tool Kit, Carry Case',
+    specifications: {
+      type: 'Gimbal Support Vest + Spring Arm',
+      payload: 'Up to 8.8 lbs (4kg)',
+      compatibility: 'DJI RS series, Zhiyun, Moza',
+    },
+    boxContents:
+      'Support Vest, Stabilizer Arm, Mounting Post, Monitor Bracket, Power Supply Baseplate, 2-Pin to 2-Pin LEMO Cable, D-Tap to 2-Pin LEMO Cable, Wireless Thumb Controller, Wireless Control Module Receiver, V-Mount Battery Plate, Phone Mount Bracket, Tool Kit, Carry Case',
     imageUrl: IMAGES.tiltaFloat,
   },
   {
@@ -1005,8 +1235,13 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     warehouseLocation: 'D1-04',
     barcode: '40000004',
     budgetTier: BudgetTier.PREMIUM,
-    specifications: { type: 'Suction cup car mount + shock absorbing arm', payload: 'Up to 15kg', suctions: '1 large + 2 small' },
-    boxContents: 'Hydra Alien Dovetail Plate Kit (L1-L4), Dovetail Connector Plate, Large Suction Cup, 2x Small Suction Cups, Shock-Absorbing Arm with Hydraulic Damping, Shock-Absorbing Head, 90° Adapter, Power Supply Baseplate, 2x V-Mount Battery Plates, 8x Counterweight (7.8oz), 10x Cable Clamp Suction Cups, Safety Belt, Tool Kit',
+    specifications: {
+      type: 'Suction cup car mount + shock absorbing arm',
+      payload: 'Up to 15kg',
+      suctions: '1 large + 2 small',
+    },
+    boxContents:
+      'Hydra Alien Dovetail Plate Kit (L1-L4), Dovetail Connector Plate, Large Suction Cup, 2x Small Suction Cups, Shock-Absorbing Arm with Hydraulic Damping, Shock-Absorbing Head, 90° Adapter, Power Supply Baseplate, 2x V-Mount Battery Plates, 8x Counterweight (7.8oz), 10x Cable Clamp Suction Cups, Safety Belt, Tool Kit',
     imageUrl: IMAGES.tiltaHydra,
   },
   {
@@ -1043,7 +1278,11 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     warehouseLocation: 'D1-06',
     barcode: '40000006',
     budgetTier: BudgetTier.PREMIUM,
-    specifications: { payload: '5-17kg (11-38 lbs)', type: 'Camera support vest', adjustment: 'Variable tension spring' },
+    specifications: {
+      payload: '5-17kg (11-38 lbs)',
+      type: 'Camera support vest',
+      adjustment: 'Variable tension spring',
+    },
     imageUrl: IMAGES.easyrigV5,
   },
   {
@@ -1061,7 +1300,11 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     warehouseLocation: 'D1-07',
     barcode: '40000007',
     budgetTier: BudgetTier.ESSENTIAL,
-    specifications: { type: 'Video tripod with fluid head', payload: 'Up to 12kg', height: 'Up to 170cm' },
+    specifications: {
+      type: 'Video tripod with fluid head',
+      payload: 'Up to 12kg',
+      height: 'Up to 170cm',
+    },
     imageUrl: IMAGES.benroTripod,
   },
   {
@@ -1078,7 +1321,12 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'D1-08',
     barcode: '40000008',
-    specifications: { length: '120cm', type: 'Motorized slider', payload: 'Up to 10kg', control: 'App + remote' },
+    specifications: {
+      length: '120cm',
+      type: 'Motorized slider',
+      payload: 'Up to 10kg',
+      control: 'App + remote',
+    },
     imageUrl: IMAGES.eimageSlider,
   },
 
@@ -1118,7 +1366,12 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     warehouseLocation: 'E1-02',
     barcode: '60000002',
     budgetTier: BudgetTier.PROFESSIONAL,
-    specifications: { lights: '12x Aputure MC RGB lights', output: '~500 lux per unit', cri: 'CRI 96+', control: 'Sidus Link App, Bluetooth' },
+    specifications: {
+      lights: '12x Aputure MC RGB lights',
+      output: '~500 lux per unit',
+      cri: 'CRI 96+',
+      control: 'Sidus Link App, Bluetooth',
+    },
     boxContents: '12x MC lights, Charging cables, 2x Softeners, 4x Velcro strips, D-Tap charger',
     imageUrl: IMAGES.mc12Kit,
   },
@@ -1158,13 +1411,49 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
           icon: 'star',
           priority: 1,
           specs: [
-            { key: 'type', label: 'Type', labelAr: 'النوع', value: '1x COB LED Monolight', highlight: true },
-            { key: 'colorTemp', label: 'Color Temperature', labelAr: 'درجة اللون', value: '5500K Daylight', type: 'colorTemp', highlight: true },
-            { key: 'cri', label: 'CRI / TLCI', labelAr: 'دقة الألوان', value: 'CRI 96+ / TLCI 96+', highlight: true },
+            {
+              key: 'type',
+              label: 'Type',
+              labelAr: 'النوع',
+              value: '1x COB LED Monolight',
+              highlight: true,
+            },
+            {
+              key: 'colorTemp',
+              label: 'Color Temperature',
+              labelAr: 'درجة اللون',
+              value: '5500K Daylight',
+              type: 'colorTemp',
+              highlight: true,
+            },
+            {
+              key: 'cri',
+              label: 'CRI / TLCI',
+              labelAr: 'دقة الألوان',
+              value: 'CRI 96+ / TLCI 96+',
+              highlight: true,
+            },
             { key: 'beamAngle', label: 'Beam Angle', labelAr: 'زاوية الإضاءة', value: '105°' },
-            { key: 'dimming', label: 'Dimming', labelAr: 'التعتيم', value: '0–100% (App / DMX / 2.4GHz remote)', type: 'range', rangePercent: 100 },
-            { key: 'accessoryMount', label: 'Front Accessory Mount', labelAr: 'قاعدة الإكسسوار', value: 'Bowens S' },
-            { key: 'powerSource', label: 'Power Source', labelAr: 'مصدر الطاقة', value: 'AC (cable included) / V-Mount battery (not included)' },
+            {
+              key: 'dimming',
+              label: 'Dimming',
+              labelAr: 'التعتيم',
+              value: '0–100% (App / DMX / 2.4GHz remote)',
+              type: 'range',
+              rangePercent: 100,
+            },
+            {
+              key: 'accessoryMount',
+              label: 'Front Accessory Mount',
+              labelAr: 'قاعدة الإكسسوار',
+              value: 'Bowens S',
+            },
+            {
+              key: 'powerSource',
+              label: 'Power Source',
+              labelAr: 'مصدر الطاقة',
+              value: 'AC (cable included) / V-Mount battery (not included)',
+            },
           ],
         },
         {
@@ -1173,10 +1462,25 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
           icon: 'sun',
           priority: 2,
           specs: [
-            { key: 'output', label: 'Output / Lux', labelAr: 'الإضاءة / لوكس', value: '45,000+ lux @ 1 m (with Hyper Reflector)' },
+            {
+              key: 'output',
+              label: 'Output / Lux',
+              labelAr: 'الإضاءة / لوكس',
+              value: '45,000+ lux @ 1 m (with Hyper Reflector)',
+            },
             { key: 'lumens', label: 'Lumens', labelAr: 'لومن', value: '—' },
-            { key: 'colorModes', label: 'Color Modes', labelAr: 'أوضاع اللون', value: 'Daylight (5600K)' },
-            { key: 'photometrics', label: 'Photometrics', labelAr: 'القياس عند المسافات', value: '~16,200 lux @ 1 m (3200K) / ~20,500 lux @ 1 m (5600K) with reflector' },
+            {
+              key: 'colorModes',
+              label: 'Color Modes',
+              labelAr: 'أوضاع اللون',
+              value: 'Daylight (5600K)',
+            },
+            {
+              key: 'photometrics',
+              label: 'Photometrics',
+              labelAr: 'القياس عند المسافات',
+              value: '~16,200 lux @ 1 m (3200K) / ~20,500 lux @ 1 m (5600K) with reflector',
+            },
           ],
         },
         {
@@ -1185,11 +1489,32 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
           icon: 'wifi',
           priority: 3,
           specs: [
-            { key: 'wireless', label: 'Wireless Remote', labelAr: 'التحكم اللاسلكي', value: 'Bluetooth (Sidus Link), 2.4 GHz remote (included)' },
-            { key: 'app', label: 'App Control', labelAr: 'التحكم بالتطبيق', value: 'Yes', type: 'boolean' },
+            {
+              key: 'wireless',
+              label: 'Wireless Remote',
+              labelAr: 'التحكم اللاسلكي',
+              value: 'Bluetooth (Sidus Link), 2.4 GHz remote (included)',
+            },
+            {
+              key: 'app',
+              label: 'App Control',
+              labelAr: 'التحكم بالتطبيق',
+              value: 'Yes',
+              type: 'boolean',
+            },
             { key: 'dmx', label: 'DMX Channels', labelAr: 'قنوات DMX', value: '6' },
-            { key: 'wirelessRange', label: 'Wireless Range', labelAr: 'مدى اللاسلكي', value: 'Up to 100 m' },
-            { key: 'wirelessFreq', label: 'Wireless Frequency', labelAr: 'تردد اللاسلكي', value: '2.4 GHz' },
+            {
+              key: 'wirelessRange',
+              label: 'Wireless Range',
+              labelAr: 'مدى اللاسلكي',
+              value: 'Up to 100 m',
+            },
+            {
+              key: 'wirelessFreq',
+              label: 'Wireless Frequency',
+              labelAr: 'تردد اللاسلكي',
+              value: '2.4 GHz',
+            },
           ],
         },
         {
@@ -1198,12 +1523,43 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
           icon: 'zap',
           priority: 4,
           specs: [
-            { key: 'power', label: 'Power Consumption', labelAr: 'استهلاك الطاقة', value: '300 W', highlight: true },
-            { key: 'acInput', label: 'AC Input', labelAr: 'مدخل التيار', value: '100–240 VAC, 50/60 Hz' },
-            { key: 'batteryPlate', label: 'Battery Plate', labelAr: 'قاعدة البطارية', value: 'V-Mount (optional)' },
-            { key: 'battery', label: 'Battery', labelAr: 'البطارية', value: 'V-Mount 14.4 VDC (not included)' },
-            { key: 'io', label: 'Inputs/Outputs', labelAr: 'المداخل/المخارج', value: 'XLR 5-pin power, powerCON, DMX In/Out' },
-            { key: 'includedCables', label: 'Included Cables', labelAr: 'الكابلات المرفقة', value: 'Power cable, head cable, XLR 5-pin cable (3 m)' },
+            {
+              key: 'power',
+              label: 'Power Consumption',
+              labelAr: 'استهلاك الطاقة',
+              value: '300 W',
+              highlight: true,
+            },
+            {
+              key: 'acInput',
+              label: 'AC Input',
+              labelAr: 'مدخل التيار',
+              value: '100–240 VAC, 50/60 Hz',
+            },
+            {
+              key: 'batteryPlate',
+              label: 'Battery Plate',
+              labelAr: 'قاعدة البطارية',
+              value: 'V-Mount (optional)',
+            },
+            {
+              key: 'battery',
+              label: 'Battery',
+              labelAr: 'البطارية',
+              value: 'V-Mount 14.4 VDC (not included)',
+            },
+            {
+              key: 'io',
+              label: 'Inputs/Outputs',
+              labelAr: 'المداخل/المخارج',
+              value: 'XLR 5-pin power, powerCON, DMX In/Out',
+            },
+            {
+              key: 'includedCables',
+              label: 'Included Cables',
+              labelAr: 'الكابلات المرفقة',
+              value: 'Power cable, head cable, XLR 5-pin cable (3 m)',
+            },
           ],
         },
         {
@@ -1212,8 +1568,18 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
           icon: 'ruler',
           priority: 5,
           specs: [
-            { key: 'yoke', label: 'Yoke Type', labelAr: 'نوع الحامل', value: 'Manually-operated yoke (180° tilt)' },
-            { key: 'fixtureMount', label: 'Fixture Mounting', labelAr: 'تثبيت الفيكسشر', value: '1x 5/8" receiver (via yoke)' },
+            {
+              key: 'yoke',
+              label: 'Yoke Type',
+              labelAr: 'نوع الحامل',
+              value: 'Manually-operated yoke (180° tilt)',
+            },
+            {
+              key: 'fixtureMount',
+              label: 'Fixture Mounting',
+              labelAr: 'تثبيت الفيكسشر',
+              value: '1x 5/8" receiver (via yoke)',
+            },
           ],
         },
         {
@@ -1222,18 +1588,42 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
           icon: 'ruler',
           priority: 6,
           specs: [
-            { key: 'dimensions', label: 'Dimensions', labelAr: 'الأبعاد', value: 'Fixture: ~34.5 x 29.8 x 21.6 cm / Ballast: ~27.9 x 12.7 x 9.7 cm' },
-            { key: 'weight', label: 'Weight', labelAr: 'الوزن', value: '~11.4 kg', type: 'range', rangePercent: 40, highlight: true },
+            {
+              key: 'dimensions',
+              label: 'Dimensions',
+              labelAr: 'الأبعاد',
+              value: 'Fixture: ~34.5 x 29.8 x 21.6 cm / Ballast: ~27.9 x 12.7 x 9.7 cm',
+            },
+            {
+              key: 'weight',
+              label: 'Weight',
+              labelAr: 'الوزن',
+              value: '~11.4 kg',
+              type: 'range',
+              rangePercent: 40,
+              highlight: true,
+            },
             { key: 'cooling', label: 'Cooling', labelAr: 'التبريد', value: 'Fan' },
             { key: 'display', label: 'Display', labelAr: 'الشاشة', value: 'LCD' },
-            { key: 'materials', label: 'Materials', labelAr: 'المواد', value: 'Aluminum (housing)' },
-            { key: 'certifications', label: 'Certifications', labelAr: 'الشهادات', value: 'RoHS, CE, FCC, cTUVus, PSE, KC' },
+            {
+              key: 'materials',
+              label: 'Materials',
+              labelAr: 'المواد',
+              value: 'Aluminum (housing)',
+            },
+            {
+              key: 'certifications',
+              label: 'Certifications',
+              labelAr: 'الشهادات',
+              value: 'RoHS, CE, FCC, cTUVus, PSE, KC',
+            },
             { key: 'ip', label: 'Protection Rating', labelAr: 'درجة الحماية', value: '—' },
           ],
         },
       ],
     },
-    boxContents: 'Light head, Power cable, Head cable, Power ballast, Light cone (Hyper Reflector), Cone protector, 2.4GHz remote, Ballast grip, AC power adapter',
+    boxContents:
+      'Light head, Power cable, Head cable, Power ballast, Light cone (Hyper Reflector), Cone protector, 2.4GHz remote, Ballast grip, AC power adapter',
     imageUrl: IMAGES.aputure300D,
   },
   {
@@ -1257,7 +1647,8 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
       cri: 'CRI 95+',
       control: 'Sidus Link, DMX',
     },
-    boxContents: 'LED panel, Power adapter, Power cable, Power ballast, Tilting Stand Mount, Thick diffuser, Thin diffuser, Extension cable, Grid light, Support Bracket, Softbox frame, Carrying Case',
+    boxContents:
+      'LED panel, Power adapter, Power cable, Power ballast, Tilting Stand Mount, Thick diffuser, Thin diffuser, Extension cable, Grid light, Support Bracket, Softbox frame, Carrying Case',
     imageUrl: IMAGES.amaranF22c,
   },
   {
@@ -1274,7 +1665,12 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'E1-06',
     barcode: '60000006',
-    specifications: { type: 'RGBWW LED tube', length: '2ft per tube', cri: 'CRI 95+', battery: 'Built-in rechargeable' },
+    specifications: {
+      type: 'RGBWW LED tube',
+      length: '2ft per tube',
+      cri: 'CRI 95+',
+      battery: 'Built-in rechargeable',
+    },
     boxContents: '4x LED tubes, Carrying bag',
     imageUrl: IMAGES.lightTubes,
   },
@@ -1302,7 +1698,8 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
       wireless: 'CRMX / AsteraApp / DMX',
       cri: 'CRI 96+',
     },
-    boxContents: '8x Astera Titan Tubes, Charging case, Tube Holders, Tube Clamps, Tube safety rings, Safety clamps',
+    boxContents:
+      '8x Astera Titan Tubes, Charging case, Tube Holders, Tube Clamps, Tube safety rings, Safety clamps',
     imageUrl: IMAGES.asteraTitan,
   },
   {
@@ -1328,7 +1725,8 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
       cri: 'CRI 96+ / TLCI 97+',
       control: 'DMX512, sACN, ArtNet, Bluetooth',
     },
-    boxContents: 'Light head, Light power box, Head-to-box power cable, Box AC power cable, Light Cone, NanLux Fresnel attachment',
+    boxContents:
+      'Light head, Light power box, Head-to-box power cable, Box AC power cable, Light Cone, NanLux Fresnel attachment',
     imageUrl: IMAGES.nanlux1200,
   },
   {
@@ -1347,8 +1745,15 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     warehouseLocation: 'E2-01',
     barcode: '60000009',
     budgetTier: BudgetTier.PROFESSIONAL,
-    specifications: { power: '600Ws', cct: '5600K ±200K', flashDuration: '1/220 to 1/10,600s', recycleTime: '0.01-0.9s', battery: '360 full-power flashes' },
-    boxContents: 'Light head with protector, Flash bulb, Battery (WB87), Charger, Power cable, Sony trigger, Canon trigger, Trigger battery',
+    specifications: {
+      power: '600Ws',
+      cct: '5600K ±200K',
+      flashDuration: '1/220 to 1/10,600s',
+      recycleTime: '0.01-0.9s',
+      battery: '360 full-power flashes',
+    },
+    boxContents:
+      'Light head with protector, Flash bulb, Battery (WB87), Charger, Power cable, Sony trigger, Canon trigger, Trigger battery',
     imageUrl: IMAGES.godoxAD600,
   },
   {
@@ -1367,8 +1772,15 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     warehouseLocation: 'E2-02',
     barcode: '60000010',
     budgetTier: BudgetTier.ESSENTIAL,
-    specifications: { power: '400Ws', cct: '5600K ±100K', flashDuration: '1/250 to 1/10,600s', recycleTime: '0.01-1s', battery: '390 full-power flashes' },
-    boxContents: 'Light head with protector, Flash bulb, Battery, Charger, Power cable, Sony trigger, Canon trigger, Trigger battery',
+    specifications: {
+      power: '400Ws',
+      cct: '5600K ±100K',
+      flashDuration: '1/250 to 1/10,600s',
+      recycleTime: '0.01-1s',
+      battery: '390 full-power flashes',
+    },
+    boxContents:
+      'Light head with protector, Flash bulb, Battery, Charger, Power cable, Sony trigger, Canon trigger, Trigger battery',
     imageUrl: IMAGES.godoxAD400,
   },
   {
@@ -1395,7 +1807,8 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
       control: 'DMX, Bluetooth (Sidus Link)',
       weatherResistance: 'IP54',
     },
-    boxContents: '600d Pro Lamp Head, LS 600d Control Box, Hyper Reflector, 5-Pin Head Cable (3m), Power cable, Connector cable, Remote control',
+    boxContents:
+      '600d Pro Lamp Head, LS 600d Control Box, Hyper Reflector, 5-Pin Head Cable (3m), Power cable, Connector cable, Remote control',
     imageUrl: IMAGES.aputure600D,
   },
   {
@@ -1421,7 +1834,8 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
       colorModes: 'CCT, HSI, Gel, Source, X/Y Coordinates',
       control: 'DMX, Bluetooth (Sidus Link)',
     },
-    boxContents: '600c Pro Lamp Head, Control Box, Hyper Reflector, 5-Pin Head Cable (3m), Power cable, Connector cable',
+    boxContents:
+      '600c Pro Lamp Head, Control Box, Hyper Reflector, 5-Pin Head Cable (3m), Power cable, Connector cable',
     imageUrl: IMAGES.aputure600C,
   },
   {
@@ -1440,8 +1854,15 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     warehouseLocation: 'E2-05',
     barcode: '60000013',
     budgetTier: BudgetTier.PREMIUM,
-    specifications: { power: '1200Ws', cct: '5600K', flashDuration: '1/100 to 1/6,700s', recycleTime: '0.01-1.8s', battery: '500 full-power flashes (dual battery)' },
-    boxContents: 'Flash Head, Power Pack, Battery for AD1200Pro, Battery Charger, Power Connection Cord, Reflector, Glass Protection Cover, Carrying Bag',
+    specifications: {
+      power: '1200Ws',
+      cct: '5600K',
+      flashDuration: '1/100 to 1/6,700s',
+      recycleTime: '0.01-1.8s',
+      battery: '500 full-power flashes (dual battery)',
+    },
+    boxContents:
+      'Flash Head, Power Pack, Battery for AD1200Pro, Battery Charger, Power Connection Cord, Reflector, Glass Protection Cover, Carrying Bag',
     imageUrl: IMAGES.godoxAD1200,
   },
 
@@ -1540,7 +1961,10 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'F1-06',
     barcode: '70000006',
-    specifications: { compatibility: 'Aputure Bowens mount', type: 'Overhead space light diffuser' },
+    specifications: {
+      compatibility: 'Aputure Bowens mount',
+      type: 'Overhead space light diffuser',
+    },
     imageUrl: IMAGES.spacelight,
   },
   {
@@ -1655,7 +2079,10 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'F2-01',
     barcode: '70000013',
-    specifications: { compatibility: 'Aputure 300d/600d series', projection: 'Gobo + lens projection' },
+    specifications: {
+      compatibility: 'Aputure 300d/600d series',
+      projection: 'Gobo + lens projection',
+    },
     imageUrl: IMAGES.spotlightMount,
   },
   {
@@ -1689,7 +2116,11 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'F2-03',
     barcode: '70000016',
-    specifications: { compatibility: 'Aputure LS 600d/c Pro', lensSize: '10-inch Fresnel', beamAngle: '15°-45°' },
+    specifications: {
+      compatibility: 'Aputure LS 600d/c Pro',
+      lensSize: '10-inch Fresnel',
+      beamAngle: '15°-45°',
+    },
     imageUrl: IMAGES.fresnelF10,
   },
 
@@ -1799,7 +2230,8 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
       recording: 'ProRes RAW, ProRes, DNx',
       inputs: '12G-SDI (4x), HDMI 2.0',
     },
-    boxContents: 'Atomos NEON 24" Monitor/Recorder, Master Control Unit, Master Caddy II, AC Power Supply, AtomX SDI Expansion Module, 2x Support Feet (with mounting screws)',
+    boxContents:
+      'Atomos NEON 24" Monitor/Recorder, Master Control Unit, Master Caddy II, AC Power Supply, AtomX SDI Expansion Module, 2x Support Feet (with mounting screws)',
     imageUrl: IMAGES.atomosNeon24,
   },
 
@@ -1818,7 +2250,13 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'I1-01',
     barcode: '100000001',
-    specifications: { capacity: '290Wh', mount: 'B-Mount', voltage: '26.4V nominal', outputs: '3x D-Tap, 1x USB-A', display: 'LED capacity indicator' },
+    specifications: {
+      capacity: '290Wh',
+      mount: 'B-Mount',
+      voltage: '26.4V nominal',
+      outputs: '3x D-Tap, 1x USB-A',
+      display: 'LED capacity indicator',
+    },
     imageUrl: IMAGES.blueShapeB290,
   },
   {
@@ -1835,7 +2273,11 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'I1-02',
     barcode: '100000002',
-    specifications: { channels: '4x B-Mount simultaneous charging', power: 'AC 100-240V', display: 'Per-channel LED status' },
+    specifications: {
+      channels: '4x B-Mount simultaneous charging',
+      power: 'AC 100-240V',
+      display: 'Per-channel LED status',
+    },
     boxContents: 'Charger station, AC power cable',
     imageUrl: IMAGES.switCharger,
   },
@@ -1855,7 +2297,11 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'J1-01',
     barcode: '110000001',
-    specifications: { length: '3m / 10ft each', connectors: 'XLR Male to XLR Female', shielding: 'Braided copper' },
+    specifications: {
+      length: '3m / 10ft each',
+      connectors: 'XLR Male to XLR Female',
+      shielding: 'Braided copper',
+    },
     imageUrl: IMAGES.xlrCable,
   },
   {
@@ -1939,7 +2385,8 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
       batteryLife: 'Up to 8 hours (AA)',
       switchable: '20 compatible channels',
     },
-    boxContents: '4x Bodypack transmitter (SK 100 G4), 4x Camera receiver (EK 100 G4), 4x Lavalier microphone (ME 2-II)',
+    boxContents:
+      '4x Bodypack transmitter (SK 100 G4), 4x Camera receiver (EK 100 G4), 4x Lavalier microphone (ME 2-II)',
     imageUrl: IMAGES.sennheiserEW,
   },
   {
@@ -2007,7 +2454,12 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     warehouseLocation: 'J1-08',
     barcode: '110000008',
     budgetTier: BudgetTier.ESSENTIAL,
-    specifications: { type: 'On-camera shotgun', connector: '3.5mm TRS', battery: 'LiPo rechargeable', hpf: '2-stage high-pass filter' },
+    specifications: {
+      type: 'On-camera shotgun',
+      connector: '3.5mm TRS',
+      battery: 'LiPo rechargeable',
+      hpf: '2-stage high-pass filter',
+    },
     imageUrl: IMAGES.rodeMic,
   },
   {
@@ -2024,7 +2476,12 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'J1-09',
     barcode: '110000009',
-    specifications: { channels: '1 TX + 1 RX', frequency: '2.4GHz', range: 'Up to 100m', latency: '<10ms' },
+    specifications: {
+      channels: '1 TX + 1 RX',
+      frequency: '2.4GHz',
+      range: 'Up to 100m',
+      latency: '<10ms',
+    },
     boxContents: 'Transmitter, Receiver',
     imageUrl: IMAGES.saramonicXLR9,
   },
@@ -2068,7 +2525,11 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'J2-01',
     barcode: '11000011',
-    specifications: { type: 'Omnidirectional lavalier', color: 'Gold (skin-tone)', connector: '3.5mm locking' },
+    specifications: {
+      type: 'Omnidirectional lavalier',
+      color: 'Gold (skin-tone)',
+      connector: '3.5mm locking',
+    },
     imageUrl: IMAGES.sennLavGold,
   },
   {
@@ -2085,7 +2546,11 @@ const ALL_EQUIPMENT: EquipmentSeedData[] = [
     isActive: true,
     warehouseLocation: 'J2-02',
     barcode: '110000012',
-    specifications: { type: 'Omnidirectional lavalier', connector: '3.5mm TRS', cableLength: '1.5m' },
+    specifications: {
+      type: 'Omnidirectional lavalier',
+      connector: '3.5mm TRS',
+      cableLength: '1.5m',
+    },
     imageUrl: IMAGES.lavMic,
   },
 
@@ -2333,6 +2798,8 @@ async function main() {
     { name: 'user.view', description: 'View users' },
     { name: 'audit.view', description: 'View audit logs' },
     { name: 'audit.export', description: 'Export audit logs' },
+    { name: 'settings.read', description: 'Read settings (FAQ, policies, banners)' },
+    { name: 'settings.update', description: 'Update settings (FAQ, policies, banners)' },
     { name: 'settings.edit', description: 'Edit settings' },
     { name: 'settings.view', description: 'View settings' },
   ]
@@ -2372,6 +2839,30 @@ async function main() {
     createdCategories[cat.slug] = category
   }
   console.log(`✅ Created ${CATEGORIES.length} categories`)
+
+  // 4b. Create subcategories under Lighting so the equipment page category bar shows a second row
+  const LIGHTING_SUBCATEGORIES = [
+    { name: 'LED Panels', slug: 'led-panels', description: 'LED panels and mat lights' },
+    { name: 'COB Lights', slug: 'cob-lights', description: 'COB and fresnel-style lights' },
+    { name: 'Softboxes & Modifiers', slug: 'lighting-modifiers', description: 'Softboxes, diffusers, and modifiers for lighting' },
+  ]
+  const lightingParent = createdCategories['lighting']
+  if (lightingParent) {
+    for (const sub of LIGHTING_SUBCATEGORIES) {
+      await prisma.category.upsert({
+        where: { slug: sub.slug },
+        update: { name: sub.name, description: sub.description ?? null, parentId: lightingParent.id, updatedBy: admin.id },
+        create: {
+          name: sub.name,
+          slug: sub.slug,
+          description: sub.description ?? null,
+          parentId: lightingParent.id,
+          createdBy: admin.id,
+        },
+      })
+    }
+    console.log(`✅ Created ${LIGHTING_SUBCATEGORIES.length} Lighting subcategories`)
+  }
 
   // 5. Create ALL Brands (39 brands covering all manufacturers in inventory)
   const createdBrands: Record<string, { id: string; name: string; slug: string }> = {}
@@ -2467,9 +2958,7 @@ async function main() {
     ]
 
     if (item.boxContents) {
-      translationFields.push(
-        { field: 'box_contents', language: 'en', value: item.boxContents },
-      )
+      translationFields.push({ field: 'box_contents', language: 'en', value: item.boxContents })
     }
 
     for (const t of translationFields) {
@@ -2494,34 +2983,148 @@ async function main() {
       })
     }
   }
-  console.log(`✅ Created ${createdCount} equipment items (${featuredCount} featured) with media & translations`)
+  console.log(
+    `✅ Created ${createdCount} equipment items (${featuredCount} featured) with media & translations`
+  )
 
   // 7. Shoot Types (Smart Kit Builder)
   const shootTypeDefs = [
-    { name: 'Wedding', slug: 'wedding', description: 'Full-day coverage: ceremony, reception, details.', icon: 'Heart', sortOrder: 0, categorySlugs: ['cameras', 'lenses', 'lighting', 'audio', 'grip'] },
-    { name: 'Commercial / Advertising', slug: 'commercial', description: 'High-end spots and product shots.', icon: 'Tv', sortOrder: 1, categorySlugs: ['cameras', 'lenses', 'lighting', 'audio', 'grip'] },
-    { name: 'Product Photography', slug: 'product', description: 'Stills and motion for e-commerce and catalogs.', icon: 'Package', sortOrder: 2, categorySlugs: ['cameras', 'lenses', 'lighting'] },
-    { name: 'Event Coverage', slug: 'event', description: 'Conferences, galas, and live events.', icon: 'Calendar', sortOrder: 3, categorySlugs: ['cameras', 'lenses', 'lighting', 'audio'] },
-    { name: 'Interview / Talking Head', slug: 'interview', description: 'Single or multi-cam interviews.', icon: 'Mic', sortOrder: 4, categorySlugs: ['cameras', 'lenses', 'lighting', 'audio'] },
-    { name: 'Documentary', slug: 'documentary', description: 'Run-and-gun and sit-down interviews.', icon: 'Film', sortOrder: 5, categorySlugs: ['cameras', 'lenses', 'lighting', 'audio', 'grip'] },
-    { name: 'Music Video', slug: 'music-video', description: 'Performance and narrative music videos.', icon: 'Music', sortOrder: 6, categorySlugs: ['cameras', 'lenses', 'lighting', 'audio', 'grip'] },
-    { name: 'Short Film / Narrative', slug: 'short-film', description: 'Scripted narrative and short films.', icon: 'Clapperboard', sortOrder: 7, categorySlugs: ['cameras', 'lenses', 'lighting', 'audio', 'grip'] },
-    { name: 'Social Media / Content', slug: 'social-media', description: 'Reels, vlogs, and social content.', icon: 'Share2', sortOrder: 8, categorySlugs: ['cameras', 'lenses', 'lighting', 'audio'] },
-    { name: 'Real Estate', slug: 'real-estate', description: 'Property tours and stills.', icon: 'Home', sortOrder: 9, categorySlugs: ['cameras', 'lenses', 'lighting'] },
-    { name: 'Corporate / Training', slug: 'corporate', description: 'Training videos and internal comms.', icon: 'Briefcase', sortOrder: 10, categorySlugs: ['cameras', 'lenses', 'lighting', 'audio'] },
-    { name: 'Live Streaming', slug: 'live-streaming', description: 'Multi-cam live streams and webcasts.', icon: 'Radio', sortOrder: 11, categorySlugs: ['cameras', 'lenses', 'lighting', 'audio'] },
+    {
+      name: 'Wedding',
+      slug: 'wedding',
+      description: 'Full-day coverage: ceremony, reception, details.',
+      icon: 'Heart',
+      sortOrder: 0,
+      categorySlugs: ['cameras', 'lenses', 'lighting', 'audio', 'grip'],
+    },
+    {
+      name: 'Commercial / Advertising',
+      slug: 'commercial',
+      description: 'High-end spots and product shots.',
+      icon: 'Tv',
+      sortOrder: 1,
+      categorySlugs: ['cameras', 'lenses', 'lighting', 'audio', 'grip'],
+    },
+    {
+      name: 'Product Photography',
+      slug: 'product',
+      description: 'Stills and motion for e-commerce and catalogs.',
+      icon: 'Package',
+      sortOrder: 2,
+      categorySlugs: ['cameras', 'lenses', 'lighting'],
+    },
+    {
+      name: 'Event Coverage',
+      slug: 'event',
+      description: 'Conferences, galas, and live events.',
+      icon: 'Calendar',
+      sortOrder: 3,
+      categorySlugs: ['cameras', 'lenses', 'lighting', 'audio'],
+    },
+    {
+      name: 'Interview / Talking Head',
+      slug: 'interview',
+      description: 'Single or multi-cam interviews.',
+      icon: 'Mic',
+      sortOrder: 4,
+      categorySlugs: ['cameras', 'lenses', 'lighting', 'audio'],
+    },
+    {
+      name: 'Documentary',
+      slug: 'documentary',
+      description: 'Run-and-gun and sit-down interviews.',
+      icon: 'Film',
+      sortOrder: 5,
+      categorySlugs: ['cameras', 'lenses', 'lighting', 'audio', 'grip'],
+    },
+    {
+      name: 'Music Video',
+      slug: 'music-video',
+      description: 'Performance and narrative music videos.',
+      icon: 'Music',
+      sortOrder: 6,
+      categorySlugs: ['cameras', 'lenses', 'lighting', 'audio', 'grip'],
+    },
+    {
+      name: 'Short Film / Narrative',
+      slug: 'short-film',
+      description: 'Scripted narrative and short films.',
+      icon: 'Clapperboard',
+      sortOrder: 7,
+      categorySlugs: ['cameras', 'lenses', 'lighting', 'audio', 'grip'],
+    },
+    {
+      name: 'Social Media / Content',
+      slug: 'social-media',
+      description: 'Reels, vlogs, and social content.',
+      icon: 'Share2',
+      sortOrder: 8,
+      categorySlugs: ['cameras', 'lenses', 'lighting', 'audio'],
+    },
+    {
+      name: 'Real Estate',
+      slug: 'real-estate',
+      description: 'Property tours and stills.',
+      icon: 'Home',
+      sortOrder: 9,
+      categorySlugs: ['cameras', 'lenses', 'lighting'],
+    },
+    {
+      name: 'Corporate / Training',
+      slug: 'corporate',
+      description: 'Training videos and internal comms.',
+      icon: 'Briefcase',
+      sortOrder: 10,
+      categorySlugs: ['cameras', 'lenses', 'lighting', 'audio'],
+    },
+    {
+      name: 'Live Streaming',
+      slug: 'live-streaming',
+      description: 'Multi-cam live streams and webcasts.',
+      icon: 'Radio',
+      sortOrder: 11,
+      categorySlugs: ['cameras', 'lenses', 'lighting', 'audio'],
+    },
   ]
 
   const questionnaireSample = [
-    { id: 'environment', question: 'Indoor or Outdoor?', questionAr: 'داخلي أم خارجي؟', type: 'single_choice', options: [{ id: 'indoor', label: 'Indoor', labelAr: 'داخلي', icon: 'building' }, { id: 'outdoor', label: 'Outdoor', labelAr: 'خارجي', icon: 'sun' }, { id: 'both', label: 'Both', labelAr: 'كلاهما', icon: 'layers' }] },
-    { id: 'crew_size', question: 'Crew size?', questionAr: 'حجم الفريق؟', type: 'single_choice', options: [{ id: 'solo', label: 'Solo', labelAr: 'فردي' }, { id: 'small', label: '2-3 people', labelAr: '2-3 أشخاص' }, { id: 'large', label: '4+ people', labelAr: '+4 أشخاص' }] },
+    {
+      id: 'environment',
+      question: 'Indoor or Outdoor?',
+      questionAr: 'داخلي أم خارجي؟',
+      type: 'single_choice',
+      options: [
+        { id: 'indoor', label: 'Indoor', labelAr: 'داخلي', icon: 'building' },
+        { id: 'outdoor', label: 'Outdoor', labelAr: 'خارجي', icon: 'sun' },
+        { id: 'both', label: 'Both', labelAr: 'كلاهما', icon: 'layers' },
+      ],
+    },
+    {
+      id: 'crew_size',
+      question: 'Crew size?',
+      questionAr: 'حجم الفريق؟',
+      type: 'single_choice',
+      options: [
+        { id: 'solo', label: 'Solo', labelAr: 'فردي' },
+        { id: 'small', label: '2-3 people', labelAr: '2-3 أشخاص' },
+        { id: 'large', label: '4+ people', labelAr: '+4 أشخاص' },
+      ],
+    },
   ]
 
   const createdShootTypes: { id: string; slug: string }[] = []
   for (const def of shootTypeDefs) {
     const st = await prisma.shootType.upsert({
       where: { slug: def.slug },
-      update: { name: def.name, description: def.description, icon: def.icon, sortOrder: def.sortOrder, isActive: true, questionnaire: questionnaireSample as object, updatedBy: admin.id },
+      update: {
+        name: def.name,
+        description: def.description,
+        icon: def.icon,
+        sortOrder: def.sortOrder,
+        isActive: true,
+        questionnaire: questionnaireSample as object,
+        updatedBy: admin.id,
+      },
       create: {
         name: def.name,
         slug: def.slug,
@@ -2557,15 +3160,40 @@ async function main() {
 
   // 8. Shoot Type Recommendations (map popular equipment to shoot types)
   const recommendationMap: Record<string, { skus: string[]; tier: BudgetTier }[]> = {
-    'all': [
+    all: [
       { skus: ['CAM-A7S3', 'LENS-SIGMA-2470', 'SND-RODE-MIC'], tier: BudgetTier.ESSENTIAL },
-      { skus: ['CAM-A7S3', 'LENS-SIGMA-2470', 'ACC-NUCLEUS-M', 'LGT-APT-300D', 'SND-SENN-EW4G', 'STAB-RS4-PRO'], tier: BudgetTier.PROFESSIONAL },
-      { skus: ['CAM-A7R5', 'LENS-ARRI-UP', 'ACC-TERADEK-B6', 'LGT-APT-600C', 'LGT-ASTERA-8P', 'SND-ZOOM-F6', 'STAB-EASYRIG', 'MON-ATOMOS-24'], tier: BudgetTier.PREMIUM },
+      {
+        skus: [
+          'CAM-A7S3',
+          'LENS-SIGMA-2470',
+          'ACC-NUCLEUS-M',
+          'LGT-APT-300D',
+          'SND-SENN-EW4G',
+          'STAB-RS4-PRO',
+        ],
+        tier: BudgetTier.PROFESSIONAL,
+      },
+      {
+        skus: [
+          'CAM-A7R5',
+          'LENS-ARRI-UP',
+          'ACC-TERADEK-B6',
+          'LGT-APT-600C',
+          'LGT-ASTERA-8P',
+          'SND-ZOOM-F6',
+          'STAB-EASYRIG',
+          'MON-ATOMOS-24',
+        ],
+        tier: BudgetTier.PREMIUM,
+      },
     ],
   }
 
-  const allEquipmentDb = await prisma.equipment.findMany({ where: { sku: { in: ALL_EQUIPMENT.map(e => e.sku) } }, select: { id: true, sku: true } })
-  const equipBySku = Object.fromEntries(allEquipmentDb.map(e => [e.sku, e]))
+  const allEquipmentDb = await prisma.equipment.findMany({
+    where: { sku: { in: ALL_EQUIPMENT.map((e) => e.sku) } },
+    select: { id: true, sku: true },
+  })
+  const equipBySku = Object.fromEntries(allEquipmentDb.map((e) => [e.sku, e]))
 
   for (const st of createdShootTypes) {
     const recs = recommendationMap['all'] || []
@@ -2574,8 +3202,18 @@ async function main() {
         const eq = equipBySku[rec.skus[idx]]
         if (!eq) continue
         await prisma.shootTypeRecommendation.upsert({
-          where: { shootTypeId_equipmentId_budgetTier: { shootTypeId: st.id, equipmentId: eq.id, budgetTier: rec.tier } },
-          update: { reason: `Recommended for ${st.slug} shoots`, sortOrder: idx, defaultQuantity: 1 },
+          where: {
+            shootTypeId_equipmentId_budgetTier: {
+              shootTypeId: st.id,
+              equipmentId: eq.id,
+              budgetTier: rec.tier,
+            },
+          },
+          update: {
+            reason: `Recommended for ${st.slug} shoots`,
+            sortOrder: idx,
+            defaultQuantity: 1,
+          },
           create: {
             shootTypeId: st.id,
             equipmentId: eq.id,
@@ -2594,35 +3232,192 @@ async function main() {
   // 9. Feature Flags
   const featureFlags = [
     // Integrations & Payments
-    { name: 'enable_booking_checkout', description: 'Enable booking checkout flow', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_payments', description: 'Enable payment processing', enabled: true, scope: FeatureFlagScope.INTEGRATION, requiresApproval: false },
-    { name: 'enable_whatsapp', description: 'Enable WhatsApp notifications', enabled: false, scope: FeatureFlagScope.INTEGRATION, requiresApproval: false },
+    {
+      name: 'enable_booking_checkout',
+      description: 'Enable booking checkout flow',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_payments',
+      description: 'Enable payment processing',
+      enabled: true,
+      scope: FeatureFlagScope.INTEGRATION,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_whatsapp',
+      description: 'Enable WhatsApp notifications',
+      enabled: false,
+      scope: FeatureFlagScope.INTEGRATION,
+      requiresApproval: false,
+    },
     // System
-    { name: 'enable_ai_recommendations', description: 'Enable AI equipment recommendations', enabled: false, scope: FeatureFlagScope.MODULE, requiresApproval: true },
-    { name: 'maintenance_mode', description: 'Maintenance mode - read-only access', enabled: false, scope: FeatureFlagScope.EMERGENCY, requiresApproval: true },
+    {
+      name: 'enable_ai_recommendations',
+      description: 'Enable AI equipment recommendations',
+      enabled: false,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: true,
+    },
+    {
+      name: 'maintenance_mode',
+      description: 'Maintenance mode - read-only access',
+      enabled: false,
+      scope: FeatureFlagScope.EMERGENCY,
+      requiresApproval: true,
+    },
     // Build Your Kit
-    { name: 'smart-kit-builder', description: 'Smart Kit Builder – shoot type, budget tier, dynamic category flow', enabled: true, scope: FeatureFlagScope.UI, requiresApproval: false },
-    { name: 'kit-ai-assistant', description: 'Floating AI chat widget on Build Your Kit', enabled: true, scope: FeatureFlagScope.INTEGRATION, requiresApproval: false },
-    { name: 'kit-prebuilt-comparison', description: 'Pre-built kit comparison at summary step', enabled: true, scope: FeatureFlagScope.UI, requiresApproval: false },
+    {
+      name: 'smart-kit-builder',
+      description: 'Smart Kit Builder – shoot type, budget tier, dynamic category flow',
+      enabled: true,
+      scope: FeatureFlagScope.UI,
+      requiresApproval: false,
+    },
+    {
+      name: 'kit-ai-assistant',
+      description: 'Floating AI chat widget on Build Your Kit',
+      enabled: true,
+      scope: FeatureFlagScope.INTEGRATION,
+      requiresApproval: false,
+    },
+    {
+      name: 'kit-prebuilt-comparison',
+      description: 'Pre-built kit comparison at summary step',
+      enabled: true,
+      scope: FeatureFlagScope.UI,
+      requiresApproval: false,
+    },
     // Public Website
-    { name: 'enable_build_kit', description: 'Show or hide the Build Your Kit page and navigation links', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_equipment_catalog', description: 'Show /equipment page and nav links', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_studios', description: 'Show /studios page and nav links', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_packages', description: 'Show /packages page and nav links', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_how_it_works', description: 'Show /how-it-works page and nav links', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_support', description: 'Show /support page and nav links', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_whatsapp_cta', description: 'Show floating WhatsApp button on public site', enabled: true, scope: FeatureFlagScope.UI, requiresApproval: false },
+    {
+      name: 'enable_build_kit',
+      description: 'Show or hide the Build Your Kit page and navigation links',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_equipment_catalog',
+      description: 'Show /equipment page and nav links',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_studios',
+      description: 'Show /studios page and nav links',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_packages',
+      description: 'Show /packages page and nav links',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_how_it_works',
+      description: 'Show /how-it-works page and nav links',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_support',
+      description: 'Show /support page and nav links',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_whatsapp_cta',
+      description: 'Show floating WhatsApp button on public site',
+      enabled: true,
+      scope: FeatureFlagScope.UI,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_home_kit_teaser',
+      description: 'Show "Build Your Kit" teaser banner on the homepage',
+      enabled: false,
+      scope: FeatureFlagScope.UI,
+      requiresApproval: false,
+    },
     // Control Panel (Admin Sidebar)
-    { name: 'enable_admin_ai', description: 'Show AI Features in admin sidebar', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_admin_kit_builder', description: 'Show Kit Builder in admin sidebar', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_admin_shoot_types', description: 'Show Shoot Types in admin sidebar', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_admin_dynamic_pricing', description: 'Show Dynamic Pricing in admin sidebar', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_admin_ai_recommendations', description: 'Show AI Recommendations in admin sidebar', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_admin_vendors', description: 'Show Vendors section in admin sidebar', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_admin_marketing', description: 'Show Marketing in admin sidebar', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_admin_coupons', description: 'Show Coupons in admin sidebar', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_admin_live_ops', description: 'Show Live Operations in admin sidebar', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
-    { name: 'enable_admin_analytics', description: 'Show Analytics in admin sidebar', enabled: true, scope: FeatureFlagScope.MODULE, requiresApproval: false },
+    {
+      name: 'enable_admin_ai',
+      description: 'Show AI Features in admin sidebar',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_admin_kit_builder',
+      description: 'Show Kit Builder in admin sidebar',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_admin_shoot_types',
+      description: 'Show Shoot Types in admin sidebar',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_admin_dynamic_pricing',
+      description: 'Show Dynamic Pricing in admin sidebar',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_admin_ai_recommendations',
+      description: 'Show AI Recommendations in admin sidebar',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_admin_vendors',
+      description: 'Show Vendors section in admin sidebar',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_admin_marketing',
+      description: 'Show Marketing in admin sidebar',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_admin_coupons',
+      description: 'Show Coupons in admin sidebar',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_admin_live_ops',
+      description: 'Show Live Operations in admin sidebar',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
+    {
+      name: 'enable_admin_analytics',
+      description: 'Show Analytics in admin sidebar',
+      enabled: true,
+      scope: FeatureFlagScope.MODULE,
+      requiresApproval: false,
+    },
   ]
 
   for (const flag of featureFlags) {
@@ -2636,9 +3431,30 @@ async function main() {
 
   // 10. Sample Notifications
   const sampleNotifications = [
-    { id: 'seed-notif-1', type: 'booking.confirmed', title: 'Booking Confirmed', message: 'Booking #BK-001 has been confirmed.', channel: NotificationChannel.IN_APP, userId: admin.id },
-    { id: 'seed-notif-2', type: 'payment.success', title: 'Payment Successful', message: 'Payment of 1,500 SAR has been processed successfully.', channel: NotificationChannel.IN_APP, userId: admin.id },
-    { id: 'seed-notif-3', type: 'contract.signed', title: 'Contract Signed', message: 'Contract for booking #BK-001 has been signed.', channel: NotificationChannel.IN_APP, userId: admin.id },
+    {
+      id: 'seed-notif-1',
+      type: 'booking.confirmed',
+      title: 'Booking Confirmed',
+      message: 'Booking #BK-001 has been confirmed.',
+      channel: NotificationChannel.IN_APP,
+      userId: admin.id,
+    },
+    {
+      id: 'seed-notif-2',
+      type: 'payment.success',
+      title: 'Payment Successful',
+      message: 'Payment of 1,500 SAR has been processed successfully.',
+      channel: NotificationChannel.IN_APP,
+      userId: admin.id,
+    },
+    {
+      id: 'seed-notif-3',
+      type: 'contract.signed',
+      title: 'Contract Signed',
+      message: 'Contract for booking #BK-001 has been signed.',
+      channel: NotificationChannel.IN_APP,
+      userId: admin.id,
+    },
   ]
   for (const n of sampleNotifications) {
     const { id, ...data } = n
@@ -2650,8 +3466,15 @@ async function main() {
   }
   console.log(`✅ Created ${sampleNotifications.length} sample notifications`)
 
-  // 11. Hero Banner (home page carousel)
-  const HERO_IMAGE_URL = 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80'
+  // 11. Hero Banner (home page carousel) – use reliable Unsplash cinema images
+  const HERO_SLIDE_IMAGES = [
+    'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=1920&h=800&fit=crop&q=80', // Film production set
+    'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=1920&h=800&fit=crop&q=80', // Camera and audio equipment
+    'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=1920&h=800&fit=crop&q=80', // Cinema/studio setup
+    'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=1920&h=800&fit=crop&q=80', // Lighting rig on set
+    'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=1920&h=800&fit=crop&q=80', // Recording studio
+    'https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=1920&h=800&fit=crop&q=80', // Drone / aerial filming
+  ]
   const heroBanner = await prisma.heroBanner.upsert({
     where: { pageSlug: 'home' },
     update: {},
@@ -2670,7 +3493,7 @@ async function main() {
   const heroSlidesData = [
     {
       order: 0,
-      imageUrl: HERO_IMAGE_URL,
+      imageUrl: HERO_SLIDE_IMAGES[0],
       titleAr: 'تأجير معدات سينمائية واستوديوهات',
       titleEn: 'Cinematic Equipment & Studio Rental',
       titleZh: '影视设备与工作室租赁',
@@ -2690,7 +3513,7 @@ async function main() {
     },
     {
       order: 1,
-      imageUrl: 'https://images.unsplash.com/photo-1542204165-65bf26472b9b?w=1200&q=80',
+      imageUrl: HERO_SLIDE_IMAGES[1],
       titleAr: 'معدات احترافية للإنتاج السينمائي',
       titleEn: 'Professional Gear for Film Production',
       titleZh: '专业影视制作设备',
@@ -2705,7 +3528,7 @@ async function main() {
     },
     {
       order: 2,
-      imageUrl: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=1200&q=80',
+      imageUrl: HERO_SLIDE_IMAGES[2],
       titleAr: 'ابن مجموعتك المثالية',
       titleEn: 'Build Your Perfect Kit',
       titleZh: '打造您的完美套件',
@@ -2716,6 +3539,56 @@ async function main() {
       ctaTextEn: 'Build Your Kit',
       ctaTextZh: '开始搭配',
       ctaUrl: '/build-your-kit',
+      ctaStyle: 'primary',
+    },
+    {
+      order: 3,
+      imageUrl: HERO_SLIDE_IMAGES[3],
+      titleAr: 'إضاءة احترافية لكل مشهد',
+      titleEn: 'Professional Lighting for Every Scene',
+      titleZh: '每个场景的专业灯光',
+      subtitleAr: 'معدات إضاءة متقدمة من أشهر العلامات التجارية العالمية',
+      subtitleEn: 'Advanced lighting gear from the world\'s most renowned brands',
+      subtitleZh: '来自全球知名品牌的先进灯光设备',
+      ctaTextAr: 'تصفح الإضاءة',
+      ctaTextEn: 'Browse Lighting',
+      ctaTextZh: '浏览灯光',
+      ctaUrl: '/equipment?category=lighting',
+      ctaStyle: 'primary',
+    },
+    {
+      order: 4,
+      imageUrl: HERO_SLIDE_IMAGES[4],
+      titleAr: 'استوديوهات جاهزة للتصوير',
+      titleEn: 'Production-Ready Studios',
+      titleZh: '即用型专业工作室',
+      subtitleAr: 'استوديوهات مجهزة بالكامل للتصوير والتسجيل والبث المباشر',
+      subtitleEn: 'Fully equipped studios for filming, recording and live streaming',
+      subtitleZh: '配备齐全的工作室，适用于拍摄、录制和直播',
+      ctaTextAr: 'احجز استوديو',
+      ctaTextEn: 'Book a Studio',
+      ctaTextZh: '预订工作室',
+      ctaUrl: '/studios',
+      ctaStyle: 'primary',
+      cta2TextAr: 'شاهد الباقات',
+      cta2TextEn: 'View Packages',
+      cta2TextZh: '查看套餐',
+      cta2Url: '/packages',
+      cta2Style: 'outline',
+    },
+    {
+      order: 5,
+      imageUrl: HERO_SLIDE_IMAGES[5],
+      titleAr: 'تصوير جوي بطائرات درون',
+      titleEn: 'Aerial Filming with Drones',
+      titleZh: '无人机航拍服务',
+      subtitleAr: 'طائرات درون سينمائية لتصوير المشاهد الجوية بدقة عالية',
+      subtitleEn: 'Cinema-grade drones for stunning high-resolution aerial shots',
+      subtitleZh: '电影级无人机，拍摄令人惊叹的高清航拍画面',
+      ctaTextAr: 'استكشف الدرونز',
+      ctaTextEn: 'Explore Drones',
+      ctaTextZh: '探索无人机',
+      ctaUrl: '/equipment?category=drones',
       ctaStyle: 'primary',
     },
   ]
@@ -2739,7 +3612,378 @@ async function main() {
     }
     console.log(`✅ Created hero banner "home" with ${heroSlidesData.length} slides`)
   } else {
-    console.log('✅ Hero banner "home" already has slides')
+    // Update existing slides and create new ones
+    const byOrder = new Map(existingSlides.map((s) => [s.order, s]))
+    for (const data of heroSlidesData) {
+      const slide = byOrder.get(data.order)
+      if (slide) {
+        await prisma.heroSlide.update({
+          where: { id: slide.id },
+          data: { imageUrl: data.imageUrl, updatedAt: new Date() },
+        })
+      } else {
+        await prisma.heroSlide.create({
+          data: {
+            bannerId: heroBanner.id,
+            ...data,
+            overlayOpacity: 0.3,
+            textPosition: 'start',
+            isActive: true,
+            createdBy: admin.id,
+            updatedAt: new Date(),
+          },
+        })
+      }
+    }
+    console.log(`✅ Hero banner "home" slides updated/created (${heroSlidesData.length} total)`)
+  }
+
+  // FAQ items (homepage الأسئلة الشائعة) – seed full list (replace any existing)
+  await prisma.faqItem.deleteMany({})
+  const faqItems = [
+    {
+      questionAr: 'كيف يمكنني استئجار المعدات؟',
+      questionEn: 'كيف يمكنني استئجار المعدات؟',
+      questionZh: null,
+      answerAr:
+        'يمكنك استئجار المعدات عن طريق اختيار المنطقة (الرياض)، ثم البحث واختيار المعدات المطلوبة وتحديد مدة الإيجار، ثم تأكيد الحجز ودفع قيمة الفاتورة كاملة.',
+      answerEn:
+        'يمكنك استئجار المعدات عن طريق اختيار المنطقة (الرياض)، ثم البحث واختيار المعدات المطلوبة وتحديد مدة الإيجار، ثم تأكيد الحجز ودفع قيمة الفاتورة كاملة.',
+      answerZh: null,
+      order: 0,
+      isActive: true,
+    },
+    {
+      questionAr: 'ما طرق الدفع المتاحة؟',
+      questionEn: 'ما طرق الدفع المتاحة؟',
+      questionZh: null,
+      answerAr:
+        'الدفع يتم مقدماً بالكامل، ويمكن الدفع عبر: تابي، تمارا، فيزا، ماستر كارد، PayPal، مدى، Apple Pay. أي طلب غير مدفوع يُلغى بعد ساعتين.',
+      answerEn:
+        'الدفع يتم مقدماً بالكامل، ويمكن الدفع عبر: تابي، تمارا، فيزا، ماستر كارد، PayPal، مدى، Apple Pay. أي طلب غير مدفوع يُلغى بعد ساعتين.',
+      answerZh: null,
+      order: 1,
+      isActive: true,
+    },
+    {
+      questionAr: 'هل أحتاج إلى دفع مبلغ تأمين (وديعة) أو تقديم تأمين على المعدات؟',
+      questionEn: 'هل أحتاج إلى دفع مبلغ تأمين (وديعة) أو تقديم تأمين على المعدات؟',
+      questionZh: null,
+      answerAr:
+        'نعم، قد يُطلب منك دفع تأمين نقدي أو توقيع سند لأمر حسب قيمة المعدات المستأجرة لضمان سلامتها.',
+      answerEn:
+        'نعم، قد يُطلب منك دفع تأمين نقدي أو توقيع سند لأمر حسب قيمة المعدات المستأجرة لضمان سلامتها.',
+      answerZh: null,
+      order: 2,
+      isActive: true,
+    },
+    {
+      questionAr: 'ما هي سياسة الإلغاء واسترداد المبلغ؟',
+      questionEn: 'ما هي سياسة الإلغاء واسترداد المبلغ؟',
+      questionZh: null,
+      answerAr:
+        'إذا تم الإلغاء قبل 48 ساعة من موعد الحجز، يُضاف المبلغ إلى المحفظة الإلكترونية (غير نقدي). إذا قبل 48 ساعة فلا يتم استرداد المبلغ.',
+      answerEn:
+        'إذا تم الإلغاء قبل 48 ساعة من موعد الحجز، يُضاف المبلغ إلى المحفظة الإلكترونية (غير نقدي). إذا قبل 48 ساعة فلا يتم استرداد المبلغ.',
+      answerZh: null,
+      order: 3,
+      isActive: true,
+    },
+    {
+      questionAr: 'هل يتوفر دعم فني إذا واجهت مشاكل في استخدام المعدات؟',
+      questionEn: 'هل يتوفر دعم فني إذا واجهت مشاكل في استخدام المعدات؟',
+      questionZh: null,
+      answerAr:
+        'نعم، إذا استلمت معدات معطلة أو بها ضرر، تواصل مع خدمة العملاء وأرسل فيديو يوضح الحالة لاستبدال المعدات أو استرداد المبلغ.',
+      answerEn:
+        'نعم، إذا استلمت معدات معطلة أو بها ضرر، تواصل مع خدمة العملاء وأرسل فيديو يوضح الحالة لاستبدال المعدات أو استرداد المبلغ.',
+      answerZh: null,
+      order: 4,
+      isActive: true,
+    },
+    {
+      questionAr: 'كيف يتم تسليم المعدات واستلامها؟',
+      questionEn: 'كيف يتم تسليم المعدات واستلامها؟',
+      questionZh: null,
+      answerAr:
+        'يتم توصيل المعدات إلى موقعك في الرياض أو استلامها من نقطة محددة حسب الاتفاق.',
+      answerEn:
+        'يتم توصيل المعدات إلى موقعك في الرياض أو استلامها من نقطة محددة حسب الاتفاق.',
+      answerZh: null,
+      order: 5,
+      isActive: true,
+    },
+    {
+      questionAr: 'ماذا لو تعطلت المعدات أو انكسر شيء أثناء فترة الإيجار؟',
+      questionEn: 'ماذا لو تعطلت المعدات أو انكسر شيء أثناء فترة الإيجار؟',
+      questionZh: null,
+      answerAr:
+        'المستأجر مسؤول عن أي ضرر أو كسر أثناء الإيجار. يتم احتساب تكلفة الإصلاح أو الاستبدال. إذا فقدت المعدات يجب دفع قيمتها بالكامل.',
+      answerEn:
+        'المستأجر مسؤول عن أي ضرر أو كسر أثناء الإيجار. يتم احتساب تكلفة الإصلاح أو الاستبدال. إذا فقدت المعدات يجب دفع قيمتها بالكامل.',
+      answerZh: null,
+      order: 6,
+      isActive: true,
+    },
+    {
+      questionAr: 'ما هي إجراءات الأمان والمسؤوليات التي تقع عليّ تجاه المعدات المستأجرة؟',
+      questionEn: 'ما هي إجراءات الأمان والمسؤوليات التي تقع عليّ تجاه المعدات المستأجرة؟',
+      questionZh: null,
+      answerAr:
+        'يجب استخدام المعدات بشكل صحيح والحفاظ على نظافتها. المسؤولية تقع على المستأجر، وقد تُفرض رسوم تنظيف إضافية (100–500 ريال).',
+      answerEn:
+        'يجب استخدام المعدات بشكل صحيح والحفاظ على نظافتها. المسؤولية تقع على المستأجر، وقد تُفرض رسوم تنظيف إضافية (100–500 ريال).',
+      answerZh: null,
+      order: 7,
+      isActive: true,
+    },
+    {
+      questionAr:
+        'هل يمكنني استخدام المعدات للمناسبات الخاصة مثل حفلات الزفاف أو الفعاليات العامة؟',
+      questionEn:
+        'هل يمكنني استخدام المعدات للمناسبات الخاصة مثل حفلات الزفاف أو الفعاليات العامة؟',
+      questionZh: null,
+      answerAr:
+        'نعم، يمكن استئجار المعدات لأي مناسبة في الرياض مع الالتزام بشروط الاستخدام.',
+      answerEn:
+        'نعم، يمكن استئجار المعدات لأي مناسبة في الرياض مع الالتزام بشروط الاستخدام.',
+      answerZh: null,
+      order: 8,
+      isActive: true,
+    },
+    {
+      questionAr: 'وش يميز فاينل عن باقي المتاجر؟',
+      questionEn: 'وش يميز فاينل عن باقي المتاجر؟',
+      questionZh: null,
+      answerAr:
+        'تنوع كبير في المعدات، سهولة الحجز، توصيل سريع داخل الرياض، دعم فني وخدمة عملاء مميزة.',
+      answerEn:
+        'تنوع كبير في المعدات، سهولة الحجز، توصيل سريع داخل الرياض، دعم فني وخدمة عملاء مميزة.',
+      answerZh: null,
+      order: 9,
+      isActive: true,
+    },
+    {
+      questionAr: 'هل ممكن فاينل يساعدني أختار المعدات المناسبة لمشروعي؟',
+      questionEn: 'هل ممكن فاينل يساعدني أختار المعدات المناسبة لمشروعي؟',
+      questionZh: null,
+      answerAr:
+        'نعم، فريق خدمة العملاء والفنيين يساعدك في اختيار المعدات الأنسب حسب نوع التصوير وميزانيتك.',
+      answerEn:
+        'نعم، فريق خدمة العملاء والفنيين يساعدك في اختيار المعدات الأنسب حسب نوع التصوير وميزانيتك.',
+      answerZh: null,
+      order: 10,
+      isActive: true,
+    },
+    {
+      questionAr: 'كيف يسهّل فاينل تجربة العميل مقارنة بالآخرين؟',
+      questionEn: 'كيف يسهّل فاينل تجربة العميل مقارنة بالآخرين؟',
+      questionZh: null,
+      answerAr:
+        'بواجهة موقع سهلة، خيارات دفع متعددة، سرعة توصيل داخل الرياض، وشفافية في الأسعار والسياسات.',
+      answerEn:
+        'بواجهة موقع سهلة، خيارات دفع متعددة، سرعة توصيل داخل الرياض، وشفافية في الأسعار والسياسات.',
+      answerZh: null,
+      order: 11,
+      isActive: true,
+    },
+    {
+      questionAr: 'ما هي مدة الإيجار الأدنى؟',
+      questionEn: 'ما هي مدة الإيجار الأدنى؟',
+      questionZh: null,
+      answerAr: 'أقل مدة للإيجار هي 24 ساعة.',
+      answerEn: 'أقل مدة للإيجار هي 24 ساعة.',
+      answerZh: null,
+      order: 12,
+      isActive: true,
+    },
+    {
+      questionAr: 'كيف يتم الاستلام والتسليم؟',
+      questionEn: 'كيف يتم الاستلام والتسليم؟',
+      questionZh: null,
+      answerAr:
+        'استلام مباشر من الفرع في الرياض أو توصيل عبر مندوب للعنوان المحدد داخل الرياض.',
+      answerEn:
+        'استلام مباشر من الفرع في الرياض أو توصيل عبر مندوب للعنوان المحدد داخل الرياض.',
+      answerZh: null,
+      order: 13,
+      isActive: true,
+    },
+    {
+      questionAr: 'هل المعدات تشمل ضمان؟',
+      questionEn: 'هل المعدات تشمل ضمان؟',
+      questionZh: null,
+      answerAr:
+        'جميع المعدات تُفحص وتُصان قبل التأجير. العميل مسؤول عن سلامتها أثناء الاستخدام، وفحص الحالة يتم بعد الاسترجاع.',
+      answerEn:
+        'جميع المعدات تُفحص وتُصان قبل التأجير. العميل مسؤول عن سلامتها أثناء الاستخدام، وفحص الحالة يتم بعد الاسترجاع.',
+      answerZh: null,
+      order: 14,
+      isActive: true,
+    },
+    {
+      questionAr: 'هل يمكن إلغاء الحجز بعد تأكيده؟',
+      questionEn: 'هل يمكن إلغاء الحجز بعد تأكيده؟',
+      questionZh: null,
+      answerAr:
+        'نعم، يمكن الإلغاء وفق سياسة الإلغاء الخاصة، ويفضل التواصل مع خدمة العملاء مباشرة.',
+      answerEn:
+        'نعم، يمكن الإلغاء وفق سياسة الإلغاء الخاصة، ويفضل التواصل مع خدمة العملاء مباشرة.',
+      answerZh: null,
+      order: 15,
+      isActive: true,
+    },
+    {
+      questionAr: 'ماذا لو تعطل الجهاز أثناء فترة الإيجار؟',
+      questionEn: 'ماذا لو تعطل الجهاز أثناء فترة الإيجار؟',
+      questionZh: null,
+      answerAr:
+        'يرجى التواصل فورًا مع خدمة العملاء وسيتم إيجاد الحل المناسب حسب الحالة.',
+      answerEn:
+        'يرجى التواصل فورًا مع خدمة العملاء وسيتم إيجاد الحل المناسب حسب الحالة.',
+      answerZh: null,
+      order: 16,
+      isActive: true,
+    },
+    {
+      questionAr: 'هل أحتاج إلى هوية أو ضمان للاستئجار؟',
+      questionEn: 'هل أحتاج إلى هوية أو ضمان للاستئجار؟',
+      questionZh: null,
+      answerAr:
+        'نعم، يشترط تقديم صورة الهوية الوطنية أو الإقامة، وقد يُطلب ضمان (سند تأميني) لبعض المعدات.',
+      answerEn:
+        'نعم، يشترط تقديم صورة الهوية الوطنية أو الإقامة، وقد يُطلب ضمان (سند تأميني) لبعض المعدات.',
+      answerZh: null,
+      order: 17,
+      isActive: true,
+    },
+    {
+      questionAr: 'هل يمكن تمديد مدة الإيجار بعد بدايتها؟',
+      questionEn: 'هل يمكن تمديد مدة الإيجار بعد بدايتها؟',
+      questionZh: null,
+      answerAr:
+        'نعم، يمكن التمديد بشرط التواصل قبل انتهاء الفترة الحالية وتأكيد توفر المعدات.',
+      answerEn:
+        'نعم، يمكن التمديد بشرط التواصل قبل انتهاء الفترة الحالية وتأكيد توفر المعدات.',
+      answerZh: null,
+      order: 18,
+      isActive: true,
+    },
+  ]
+  for (const item of faqItems) {
+    await prisma.faqItem.create({
+      data: {
+        ...item,
+        createdBy: admin.id,
+        updatedBy: admin.id,
+      },
+    })
+  }
+  console.log(`✅ FAQ items seeded (${faqItems.length} items)`)
+
+  // Policy items (rental policies page) – add default 6 if not already present
+  const defaultPolicyItems = [
+    {
+      titleAr: 'التأمين',
+      titleEn: 'Insurance',
+      titleZh: null as string | null,
+      bodyAr:
+        'المعدات مغطاة بتأمين التأجير القياسي خلال فترة التأجير. قد يتوفر تنازل عن الأضرار أو تغطية أعلى عند الدفع. تنطبق استثناءات؛ راجع الشروط للتفاصيل.',
+      bodyEn:
+        'Equipment is covered by our standard rental insurance during the rental period. Optional damage waiver or higher coverage may be available at checkout. Exclusions apply; see terms for details.',
+      bodyZh: null as string | null,
+      order: 0,
+      isActive: true,
+    },
+    {
+      titleAr: 'الوديعة',
+      titleEn: 'Deposit',
+      titleZh: null as string | null,
+      bodyAr:
+        'وديعة قابلة للاسترداد (عادة 30٪ من قيمة المعدات، حد أدنى 1000 ريال، حد أقصى 50000 ريال) مطلوبة. تُطلق بعد إرجاع المعدات وفحصها. قد تُخصم مبالغ عن الأضرار أو التأخير.',
+      bodyEn:
+        'A refundable deposit (typically 30% of equipment value, min 1,000 SAR, max 50,000 SAR) is required. It is released after equipment is returned and inspected. Deductions may apply for damage or late return.',
+      bodyZh: null as string | null,
+      order: 1,
+      isActive: true,
+    },
+    {
+      titleAr: 'متطلبات الهوية',
+      titleEn: 'ID Requirements',
+      titleZh: null as string | null,
+      bodyAr:
+        'قد يُطلب بطاقة هوية حكومية سارية (الهوية الوطنية أو جواز السفر)، وللشركات السجل التجاري. قد نتحقق من الهوية قبل تسليم المعدات.',
+      bodyEn:
+        'Valid government-issued ID (national ID or passport) and, for companies, commercial registration may be required. We may verify identity before releasing equipment.',
+      bodyZh: null as string | null,
+      order: 2,
+      isActive: true,
+    },
+    {
+      titleAr: 'رسوم التأخير',
+      titleEn: 'Late Fees',
+      titleZh: null as string | null,
+      bodyAr:
+        'الإرجاع المتأخر يُحتسب بمقدار 1.5× معدل اليوم عن كل يوم أو جزء من يوم بعد تاريخ الإرجاع المتفق عليه، ما لم يتم الموافقة على تمديد مسبقاً.',
+      bodyEn:
+        'Late returns are charged at 1.5× the daily rate for each day or part day after the agreed return date, unless an extension was approved in advance.',
+      bodyZh: null as string | null,
+      order: 3,
+      isActive: true,
+    },
+    {
+      titleAr: 'الأضرار والضياع',
+      titleEn: 'Damage & Loss',
+      titleZh: null as string | null,
+      bodyAr:
+        'أنت مسؤول عن المعدات من الاستلام حتى الإرجاع. يجب الإبلاغ عن أي ضرر أو ضياع فوراً. قد تُخصم تكاليف الإصلاح أو الاستبدال من الوديعة أو تُفوتر.',
+      bodyEn:
+        'You are responsible for equipment from pickup until return. Damage or loss must be reported immediately. Repair or replacement costs may be deducted from the deposit or invoiced.',
+      bodyZh: null as string | null,
+      order: 4,
+      isActive: true,
+    },
+    {
+      titleAr: 'الإلغاء',
+      titleEn: 'Cancellation',
+      titleZh: null as string | null,
+      bodyAr:
+        'الإلغاء قبل أكثر من 48 ساعة من الاستلام: استرداد كامل مخصوماً رسوم المعالجة. خلال 48 ساعة: قد تُحجز الوديعة. الغياب يفقد الوديعة. راجع الشروط لسياسة الإلغاء الكاملة.',
+      bodyEn:
+        'Cancellations more than 48 hours before pickup: full refund minus a processing fee. Within 48 hours: deposit may be retained. No-shows forfeit the deposit. See terms for full cancellation policy.',
+      bodyZh: null as string | null,
+      order: 5,
+      isActive: true,
+    },
+  ]
+  defaultPolicyItems.push({
+    titleAr: TERMS_TITLE_AR,
+    titleEn: TERMS_TITLE_EN,
+    titleZh: null as string | null,
+    bodyAr: TERMS_BODY_AR,
+    bodyEn: TERMS_BODY_EN,
+    bodyZh: null as string | null,
+    order: 6,
+    isActive: true,
+  })
+  let policyAdded = 0
+  for (const item of defaultPolicyItems) {
+    const existing = await prisma.policyItem.findFirst({
+      where: { titleEn: item.titleEn, deletedAt: null },
+    })
+    if (!existing) {
+      await prisma.policyItem.create({
+        data: {
+          ...item,
+          createdBy: admin.id,
+          updatedBy: admin.id,
+        },
+      })
+      policyAdded++
+    }
+  }
+  if (policyAdded > 0) {
+    console.log(`✅ Policy items added (${policyAdded} of ${defaultPolicyItems.length} defaults)`)
   }
 
   // Summary

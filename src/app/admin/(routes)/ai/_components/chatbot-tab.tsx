@@ -83,14 +83,16 @@ export function ChatbotTab() {
       <Card>
         <CardHeader>
           <CardTitle>AI Chatbot</CardTitle>
-          <CardDescription>Interact with AI assistant for equipment search, pricing, and support</CardDescription>
+          <CardDescription>
+            Interact with AI assistant for equipment search, pricing, and support
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <div className="h-96 overflow-y-auto border rounded-lg p-4 space-y-4">
+            <div className="h-96 space-y-4 overflow-y-auto rounded-lg border p-4">
               {messages.length === 0 && (
-                <div className="text-center text-muted-foreground py-8">
-                  <Bot className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <div className="py-8 text-center text-muted-foreground">
+                  <Bot className="mx-auto mb-4 h-12 w-12 opacity-50" />
                   <p>Start a conversation with the AI assistant</p>
                 </div>
               )}
@@ -124,9 +126,9 @@ export function ChatbotTab() {
                 </div>
               ))}
               {loading && (
-                <div className="flex gap-3 justify-start">
+                <div className="flex justify-start gap-3">
                   <Bot className="h-6 w-6 text-primary" />
-                  <div className="bg-muted rounded-lg p-3">
+                  <div className="rounded-lg bg-muted p-3">
                     <p className="text-sm">Thinking...</p>
                   </div>
                 </div>

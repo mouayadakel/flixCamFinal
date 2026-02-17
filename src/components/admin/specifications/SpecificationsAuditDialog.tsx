@@ -68,19 +68,14 @@ interface AuditResponse {
 
 type TabValue = 'flat' | 'empty' | 'invalid' | 'all'
 
-function filterByTab(
-  equipment: EquipmentAuditItem[],
-  tab: TabValue
-): EquipmentAuditItem[] {
+function filterByTab(equipment: EquipmentAuditItem[], tab: TabValue): EquipmentAuditItem[] {
   switch (tab) {
     case 'flat':
       return equipment.filter((i) => i.specsFormat === 'flat')
     case 'empty':
       return equipment.filter((i) => i.specsFormat === 'empty')
     case 'invalid':
-      return equipment.filter(
-        (i) => i.status === 'invalid' && i.specsFormat !== 'empty'
-      )
+      return equipment.filter((i) => i.status === 'invalid' && i.specsFormat !== 'empty')
     default:
       return equipment
   }
@@ -128,9 +123,7 @@ export function SpecificationsAuditDialog() {
   }, [open, fetchAudit])
 
   const flatItems = audit?.equipment?.filter((i) => i.specsFormat === 'flat') ?? []
-  const allSelected =
-    flatItems.length > 0 &&
-    flatItems.every((i) => selectedIds.has(i.id))
+  const allSelected = flatItems.length > 0 && flatItems.every((i) => selectedIds.has(i.id))
   const someSelected = flatItems.some((i) => selectedIds.has(i.id))
 
   const handleSelectAll = (checked: boolean) => {
@@ -227,7 +220,7 @@ export function SpecificationsAuditDialog() {
           </Button>
         </DialogTrigger>
         <DialogContent
-          className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+          className="flex max-h-[90vh] max-w-4xl flex-col overflow-hidden"
           dir="rtl"
           aria-label="تقرير فحص المواصفات"
         >
@@ -240,11 +233,9 @@ export function SpecificationsAuditDialog() {
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
           ) : !audit ? (
-            <div className="py-6 text-center text-muted-foreground">
-              لم يتم تحميل التقرير بعد.
-            </div>
+            <div className="py-6 text-center text-muted-foreground">لم يتم تحميل التقرير بعد.</div>
           ) : (
-            <div className="flex flex-col gap-4 overflow-hidden min-h-0">
+            <div className="flex min-h-0 flex-col gap-4 overflow-hidden">
               {/* Summary cards */}
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
                 <Card>
@@ -272,9 +263,7 @@ export function SpecificationsAuditDialog() {
                 <Card>
                   <CardContent className="pt-4">
                     <p className="text-xs text-muted-foreground">بدون مواصفات</p>
-                    <p className="text-2xl font-semibold">
-                      {audit.summary.missingSpecs}
-                    </p>
+                    <p className="text-2xl font-semibold">{audit.summary.missingSpecs}</p>
                   </CardContent>
                 </Card>
                 <Card>
@@ -288,9 +277,7 @@ export function SpecificationsAuditDialog() {
                 <Card>
                   <CardContent className="pt-4">
                     <p className="text-xs text-muted-foreground">بدون صور</p>
-                    <p className="text-2xl font-semibold">
-                      {audit.summary.missingImages}
-                    </p>
+                    <p className="text-2xl font-semibold">{audit.summary.missingImages}</p>
                   </CardContent>
                 </Card>
               </div>
@@ -299,8 +286,8 @@ export function SpecificationsAuditDialog() {
               </p>
 
               {/* Tabs */}
-              <Tabs defaultValue="flat" className="flex flex-col min-h-0 overflow-hidden">
-                <div className="flex items-center justify-between gap-2 flex-wrap">
+              <Tabs defaultValue="flat" className="flex min-h-0 flex-col overflow-hidden">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <TabsList>
                     <TabsTrigger value="flat">تحتاج تحويل</TabsTrigger>
                     <TabsTrigger value="empty">ناقصة</TabsTrigger>
@@ -327,9 +314,7 @@ export function SpecificationsAuditDialog() {
                         disabled={convertLoading || selectedIds.size === 0}
                         aria-label="تحويل المحددة"
                       >
-                        {convertLoading ? (
-                          <Loader2 className="ml-1 h-4 w-4 animate-spin" />
-                        ) : null}
+                        {convertLoading ? <Loader2 className="ml-1 h-4 w-4 animate-spin" /> : null}
                         تحويل المحددة ({selectedIds.size})
                       </Button>
                     )}
@@ -342,7 +327,7 @@ export function SpecificationsAuditDialog() {
                     <TabsContent
                       key={tab}
                       value={tab}
-                      className="mt-3 overflow-auto flex-1 min-h-0 data-[state=inactive]:hidden"
+                      className="mt-3 min-h-0 flex-1 overflow-auto data-[state=inactive]:hidden"
                     >
                       <Table>
                         <TableHeader>
@@ -351,11 +336,7 @@ export function SpecificationsAuditDialog() {
                               <TableHead className="w-10">
                                 <Checkbox
                                   checked={
-                                    allSelected
-                                      ? true
-                                      : someSelected
-                                        ? 'indeterminate'
-                                        : false
+                                    allSelected ? true : someSelected ? 'indeterminate' : false
                                   }
                                   onCheckedChange={handleSelectAll}
                                   aria-label="تحديد الكل"
@@ -387,22 +368,17 @@ export function SpecificationsAuditDialog() {
                                     <Checkbox
                                       checked={selectedIds.has(item.id)}
                                       onCheckedChange={(checked) =>
-                                        handleSelectOne(
-                                          item.id,
-                                          checked === true
-                                        )
+                                        handleSelectOne(item.id, checked === true)
                                       }
                                       aria-label={`تحديد ${item.sku}`}
                                     />
                                   </TableCell>
                                 )}
-                                <TableCell className="font-mono text-sm">
-                                  {item.sku}
-                                </TableCell>
+                                <TableCell className="font-mono text-sm">{item.sku}</TableCell>
                                 <TableCell>{item.model}</TableCell>
                                 <TableCell>{item.category}</TableCell>
                                 <TableCell className="max-w-[200px]">
-                                  <ul className="list-disc list-inside text-xs text-muted-foreground">
+                                  <ul className="list-inside list-disc text-xs text-muted-foreground">
                                     {item.issues.slice(0, 3).map((issue, idx) => (
                                       <li key={idx}>{issue}</li>
                                     ))}
@@ -437,22 +413,16 @@ export function SpecificationsAuditDialog() {
             <AlertDialogDescription>
               {dryRunSummary != null && (
                 <>
-                  محاكاة التحويل: سيتم تحويل {dryRunSummary.converted} معدّة،
-                  تخطي {dryRunSummary.skipped}، فشل {dryRunSummary.failed}.
-                  هل تريد تنفيذ التحويل فعلياً؟
+                  محاكاة التحويل: سيتم تحويل {dryRunSummary.converted} معدّة، تخطي{' '}
+                  {dryRunSummary.skipped}، فشل {dryRunSummary.failed}. هل تريد تنفيذ التحويل فعلياً؟
                 </>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>إلغاء</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmConvert}
-              disabled={convertLoading}
-            >
-              {convertLoading ? (
-                <Loader2 className="ml-1 h-4 w-4 animate-spin" />
-              ) : null}
+            <AlertDialogAction onClick={handleConfirmConvert} disabled={convertLoading}>
+              {convertLoading ? <Loader2 className="ml-1 h-4 w-4 animate-spin" /> : null}
               تأكيد التحويل
             </AlertDialogAction>
           </AlertDialogFooter>

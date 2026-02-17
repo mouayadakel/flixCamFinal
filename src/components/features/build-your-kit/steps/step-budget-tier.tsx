@@ -10,8 +10,18 @@ import { cn } from '@/lib/utils'
 import { Zap, Star, Crown } from 'lucide-react'
 
 const TIERS: { id: BudgetTier; labelKey: string; descKey: string; Icon: typeof Zap }[] = [
-  { id: 'ESSENTIAL', labelKey: 'kit.budgetEssential', descKey: 'kit.budgetEssentialDesc', Icon: Zap },
-  { id: 'PROFESSIONAL', labelKey: 'kit.budgetProfessional', descKey: 'kit.budgetProfessionalDesc', Icon: Star },
+  {
+    id: 'ESSENTIAL',
+    labelKey: 'kit.budgetEssential',
+    descKey: 'kit.budgetEssentialDesc',
+    Icon: Zap,
+  },
+  {
+    id: 'PROFESSIONAL',
+    labelKey: 'kit.budgetProfessional',
+    descKey: 'kit.budgetProfessionalDesc',
+    Icon: Star,
+  },
   { id: 'PREMIUM', labelKey: 'kit.budgetPremium', descKey: 'kit.budgetPremiumDesc', Icon: Crown },
 ]
 
@@ -22,12 +32,8 @@ export function StepBudgetTier() {
 
   return (
     <div className="animate-fade-in">
-      <h2 className="text-section-title text-text-heading mb-1">
-        {t('kit.chooseBudget')}
-      </h2>
-      <p className="text-body-main text-text-muted mb-6">
-        {t('kit.chooseBudgetDesc')}
-      </p>
+      <h2 className="mb-1 text-section-title text-text-heading">{t('kit.chooseBudget')}</h2>
+      <p className="mb-6 text-body-main text-text-muted">{t('kit.chooseBudgetDesc')}</p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {TIERS.map(({ id, labelKey, descKey, Icon }) => (
           <button
@@ -49,7 +55,9 @@ export function StepBudgetTier() {
             <div
               className={cn(
                 'mb-3 flex h-12 w-12 items-center justify-center rounded-xl',
-                budgetTier === id ? 'bg-brand-primary text-white' : 'bg-surface-light text-text-muted'
+                budgetTier === id
+                  ? 'bg-brand-primary text-white'
+                  : 'bg-surface-light text-text-muted'
               )}
             >
               <Icon className="h-6 w-6" />
@@ -59,9 +67,7 @@ export function StepBudgetTier() {
           </button>
         ))}
       </div>
-      <p className="mt-4 text-center text-sm text-text-muted">
-        {t('kit.chooseBudgetHint')}
-      </p>
+      <p className="mt-4 text-center text-sm text-text-muted">{t('kit.chooseBudgetHint')}</p>
     </div>
   )
 }

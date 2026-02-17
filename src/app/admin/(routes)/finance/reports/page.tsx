@@ -25,9 +25,7 @@ export default function FinancialReportsPage() {
   const [dateFrom, setDateFrom] = useState<string>(
     new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]
   )
-  const [dateTo, setDateTo] = useState<string>(
-    new Date().toISOString().split('T')[0]
-  )
+  const [dateTo, setDateTo] = useState<string>(new Date().toISOString().split('T')[0])
   const [reportData, setReportData] = useState<any>(null)
 
   const reportTypes: Array<{ value: ReportType; label: { ar: string; en: string } }> = [
@@ -97,9 +95,10 @@ export default function FinancialReportsPage() {
       }
       const blob = await res.blob()
       const ext = exportFormat === 'xlsx' ? 'xlsx' : 'pdf'
-      const contentType = exportFormat === 'xlsx'
-        ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        : 'application/pdf'
+      const contentType =
+        exportFormat === 'xlsx'
+          ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          : 'application/pdf'
       const url = URL.createObjectURL(new Blob([blob], { type: contentType }))
       const a = document.createElement('a')
       a.href = url
@@ -123,9 +122,7 @@ export default function FinancialReportsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">التقارير المالية</h1>
-          <p className="text-muted-foreground mt-2">
-            تقارير وإحصائيات شاملة للأداء المالي
-          </p>
+          <p className="mt-2 text-muted-foreground">تقارير وإحصائيات شاملة للأداء المالي</p>
         </div>
         {reportData && (
           <div className="flex items-center gap-2">
@@ -138,7 +135,7 @@ export default function FinancialReportsPage() {
               <option value="pdf">PDF</option>
             </select>
             <Button onClick={handleExport} disabled={exporting}>
-              <Download className="h-4 w-4 ml-2" />
+              <Download className="ml-2 h-4 w-4" />
               {exporting ? 'جاري التصدير...' : 'تصدير التقرير'}
             </Button>
           </div>
@@ -151,13 +148,13 @@ export default function FinancialReportsPage() {
           <CardTitle>إعدادات التقرير</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">نوع التقرير</label>
+              <label className="mb-2 block text-sm font-medium">نوع التقرير</label>
               <select
                 value={reportType}
                 onChange={(e) => setReportType(e.target.value as ReportType)}
-                className="w-full px-4 py-2 border rounded-lg"
+                className="w-full rounded-lg border px-4 py-2"
               >
                 {reportTypes.map((type) => (
                   <option key={type.value} value={type.value}>
@@ -167,26 +164,26 @@ export default function FinancialReportsPage() {
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium mb-2 block">من تاريخ</label>
+              <label className="mb-2 block text-sm font-medium">من تاريخ</label>
               <input
                 type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg"
+                className="w-full rounded-lg border px-4 py-2"
               />
             </div>
             <div>
-              <label className="text-sm font-medium mb-2 block">إلى تاريخ</label>
+              <label className="mb-2 block text-sm font-medium">إلى تاريخ</label>
               <input
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg"
+                className="w-full rounded-lg border px-4 py-2"
               />
             </div>
             <div className="flex items-end">
               <Button onClick={generateReport} className="w-full" disabled={loading}>
-                <BarChart3 className="h-4 w-4 ml-2" />
+                <BarChart3 className="ml-2 h-4 w-4" />
                 {loading ? 'جاري الإنشاء...' : 'إنشاء التقرير'}
               </Button>
             </div>
@@ -205,15 +202,17 @@ export default function FinancialReportsPage() {
         <div className="space-y-4">
           {/* Summary Cards */}
           {reportType === 'revenue' && (
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">إجمالي الإيرادات</CardTitle>
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{formatCurrency(reportData.totalRevenue)}</div>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <div className="text-2xl font-bold">
+                    {formatCurrency(reportData.totalRevenue)}
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
                     {reportData.totalBookings} حجز
                   </p>
                 </CardContent>
@@ -224,7 +223,9 @@ export default function FinancialReportsPage() {
                   <BarChart3 className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{formatCurrency(reportData.averageBookingValue)}</div>
+                  <div className="text-2xl font-bold">
+                    {formatCurrency(reportData.averageBookingValue)}
+                  </div>
                 </CardContent>
               </Card>
               <Card>
@@ -254,7 +255,7 @@ export default function FinancialReportsPage() {
               <CardTitle>تفاصيل التقرير</CardTitle>
             </CardHeader>
             <CardContent>
-              <pre className="bg-muted p-4 rounded-lg overflow-auto text-sm">
+              <pre className="overflow-auto rounded-lg bg-muted p-4 text-sm">
                 {JSON.stringify(reportData, null, 2)}
               </pre>
             </CardContent>

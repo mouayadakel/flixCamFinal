@@ -27,22 +27,11 @@ const FIELD_PERMISSIONS: Record<string, Record<string, FieldPermissionConfig>> =
       requiredPermission: 'equipment.update_metadata',
     },
     pricing: {
-      fields: [
-        'dailyRate',
-        'weeklyRate',
-        'monthlyRate',
-        'replacementCost',
-        'purchasePrice',
-      ],
+      fields: ['dailyRate', 'weeklyRate', 'monthlyRate', 'replacementCost', 'purchasePrice'],
       requiredPermission: 'equipment.update_pricing',
     },
     operations: {
-      fields: [
-        'isAvailable',
-        'currentLocation',
-        'condition',
-        'maintenanceStatus',
-      ],
+      fields: ['isAvailable', 'currentLocation', 'condition', 'maintenanceStatus'],
       requiredPermission: 'warehouse.manage',
     },
   },
@@ -87,9 +76,7 @@ export async function filterFieldsForUser(
   }
 
   // Fields not in any group - allow if user has equipment.read at least
-  const allGroupFields = new Set(
-    Object.values(config).flatMap((c) => c.fields)
-  )
+  const allGroupFields = new Set(Object.values(config).flatMap((c) => c.fields))
   for (const key of Object.keys(data)) {
     if (!allGroupFields.has(key) && !allowed.includes(key) && !denied.includes(key)) {
       allowed.push(key)
@@ -102,10 +89,7 @@ export async function filterFieldsForUser(
 /**
  * Get allowed field names for a resource (for form field hiding)
  */
-export async function getAllowedFields(
-  userId: string,
-  resource: string
-): Promise<string[]> {
+export async function getAllowedFields(userId: string, resource: string): Promise<string[]> {
   const config = FIELD_PERMISSIONS[resource]
   if (!config) return []
 

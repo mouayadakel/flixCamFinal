@@ -115,11 +115,14 @@ export default function AuditLogPage() {
     const headers = ['الوقت', 'المستخدم', 'الإجراء', 'نوع المورد', 'معرف المورد', 'البيانات']
     const rows = logs.map((log) => {
       const time = format(new Date(log.timestamp), 'yyyy-MM-dd HH:mm:ss')
-      const actor = log.user ? (log.user.name || log.user.email) : (log.userId ?? '—')
+      const actor = log.user ? log.user.name || log.user.email : (log.userId ?? '—')
       const meta = log.metadata ? JSON.stringify(log.metadata) : ''
       return [time, actor, log.action, log.resourceType ?? '', log.resourceId ?? '', meta]
     })
-    const csv = [headers.join(','), ...rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(','))].join('\n')
+    const csv = [
+      headers.join(','),
+      ...rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')),
+    ].join('\n')
     const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -133,7 +136,7 @@ export default function AuditLogPage() {
     <div className="space-y-6" dir="rtl">
       <div>
         <h1 className="text-3xl font-bold">سجل التدقيق</h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="mt-1 text-muted-foreground">
           تتبع الإجراءات والموافقات والاستردادات وتغييرات الحالة
         </p>
       </div>
@@ -141,10 +144,12 @@ export default function AuditLogPage() {
       <Card>
         <CardHeader>
           <CardTitle>الفلاتر</CardTitle>
-          <CardDescription>نطاق التاريخ، المستخدم، نوع المورد، الإجراء، معرف المورد</CardDescription>
+          <CardDescription>
+            نطاق التاريخ، المستخدم، نوع المورد، الإجراء، معرف المورد
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div>
               <Label>من تاريخ</Label>
               <Input
@@ -209,11 +214,15 @@ export default function AuditLogPage() {
           </div>
           <div className="flex gap-2">
             <Button onClick={fetchLogs} disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : <RefreshCw className="h-4 w-4 ml-2" />}
+              {loading ? (
+                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="ml-2 h-4 w-4" />
+              )}
               تطبيق
             </Button>
             <Button variant="outline" onClick={exportCsv} disabled={logs.length === 0}>
-              <Download className="h-4 w-4 ml-2" />
+              <Download className="ml-2 h-4 w-4" />
               تصدير CSV
             </Button>
           </div>
@@ -221,8 +230,8 @@ export default function AuditLogPage() {
       </Card>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 flex items-center gap-2">
-          <AlertCircle className="h-5 w-5 text-red-600 shrink-0" />
+        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
+          <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />
           <p className="text-red-800">{error}</p>
           <Button variant="outline" size="sm" onClick={fetchLogs}>
             إعادة المحاولة
@@ -251,14 +260,14 @@ export default function AuditLogPage() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12">
-                      <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground mt-2">جاري التحميل...</p>
+                    <TableCell colSpan={6} className="py-12 text-center">
+                      <Loader2 className="mx-auto h-8 w-8 animate-spin text-muted-foreground" />
+                      <p className="mt-2 text-sm text-muted-foreground">جاري التحميل...</p>
                     </TableCell>
                   </TableRow>
                 ) : logs.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                    <TableCell colSpan={6} className="py-12 text-center text-muted-foreground">
                       لا توجد سجلات
                     </TableCell>
                   </TableRow>
@@ -276,31 +285,38 @@ export default function AuditLogPage() {
                               className="h-8 w-8"
                               onClick={() => setExpandedId(isExpanded ? null : log.id)}
                             >
-                              {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                              {isExpanded ? (
+                                <ChevronUp className="h-4 w-4" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4" />
+                              )}
                             </Button>
                           </TableCell>
                           <TableCell className="whitespace-nowrap text-sm">
                             {format(new Date(log.timestamp), 'yyyy-MM-dd HH:mm')}
                           </TableCell>
                           <TableCell className="text-sm">
-                            {log.user ? (log.user.name || log.user.email) : (log.userId ?? '—')}
+                            {log.user ? log.user.name || log.user.email : (log.userId ?? '—')}
                           </TableCell>
                           <TableCell className="font-mono text-sm">{log.action}</TableCell>
                           <TableCell>{log.resourceType ?? '—'}</TableCell>
                           <TableCell>
                             {link && log.resourceId ? (
-                              <Link href={link} className="text-primary hover:underline font-mono text-sm">
+                              <Link
+                                href={link}
+                                className="font-mono text-sm text-primary hover:underline"
+                              >
                                 {log.resourceId}
                               </Link>
                             ) : (
-                              log.resourceId ?? '—'
+                              (log.resourceId ?? '—')
                             )}
                           </TableCell>
                         </TableRow>
                         {isExpanded && log.metadata && Object.keys(log.metadata).length > 0 && (
                           <TableRow>
                             <TableCell colSpan={6} className="bg-muted/50 p-4">
-                              <pre className="text-xs font-mono overflow-x-auto whitespace-pre-wrap">
+                              <pre className="overflow-x-auto whitespace-pre-wrap font-mono text-xs">
                                 {JSON.stringify(log.metadata, null, 2)}
                               </pre>
                             </TableCell>

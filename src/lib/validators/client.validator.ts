@@ -9,12 +9,9 @@
 import { z } from 'zod'
 import { UserRole } from '@prisma/client'
 
-export const clientStatusSchema = z.enum(
-  ['active', 'suspended', 'inactive'],
-  {
-    errorMap: () => ({ message: 'حالة العميل غير صالحة' }),
-  }
-)
+export const clientStatusSchema = z.enum(['active', 'suspended', 'inactive'], {
+  errorMap: () => ({ message: 'حالة العميل غير صالحة' }),
+})
 
 export const createClientSchema = z.object({
   email: z.string().email('البريد الإلكتروني غير صالح'),

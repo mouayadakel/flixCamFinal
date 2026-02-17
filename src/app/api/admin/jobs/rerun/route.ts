@@ -13,22 +13,16 @@ import { rateLimitAPI } from '@/lib/utils/rate-limit'
 
 export async function POST(request: Request) {
   const rateLimit = rateLimitAPI(request)
-  
+
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: 'Too many requests' },
-      { status: 429 }
-    )
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }
 
   try {
     const session = await auth()
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     if (!(await hasPermission(session.user.id, PERMISSIONS.SYSTEM_CLEAR_CACHE))) {
@@ -42,10 +36,7 @@ export async function POST(request: Request) {
     const { jobId, jobType } = body
 
     if (!jobId) {
-      return NextResponse.json(
-        { error: 'Job ID is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Job ID is required' }, { status: 400 })
     }
 
     // Implement job rerun based on job type
@@ -108,9 +99,6 @@ export async function POST(request: Request) {
       jobId,
     })
   } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Failed to rerun job' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Failed to rerun job' }, { status: 500 })
   }
 }

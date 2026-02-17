@@ -72,10 +72,7 @@ export class TranslationService {
         entityId,
         deletedAt: null,
       },
-      orderBy: [
-        { language: 'asc' },
-        { field: 'asc' },
-      ],
+      orderBy: [{ language: 'asc' }, { field: 'asc' }],
     })
 
     // Group by language and field
@@ -97,14 +94,17 @@ export class TranslationService {
     const translations = await this.getTranslations(entityType, entityId)
 
     const locales = ['ar', 'en', 'zh']
-    const result: Record<string, {
-      name?: string
-      description?: string
-      shortDescription?: string
-      seoTitle?: string
-      seoDescription?: string
-      seoKeywords?: string
-    }> = {}
+    const result: Record<
+      string,
+      {
+        name?: string
+        description?: string
+        shortDescription?: string
+        seoTitle?: string
+        seoDescription?: string
+        seoKeywords?: string
+      }
+    > = {}
 
     locales.forEach((locale) => {
       if (translations[locale]) {

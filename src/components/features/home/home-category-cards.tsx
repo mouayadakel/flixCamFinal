@@ -49,31 +49,29 @@ export function HomeCategoryCards({ categories }: HomeCategoryCardsProps) {
   if (!categories.length) return null
 
   return (
-    <section className="bg-white py-16 md:py-20 lg:py-24">
+    <section className="bg-white py-10 md:py-12">
       <PublicContainer>
         <div className="mb-10 text-center">
-          <h2 className="text-section-title text-text-heading">
-            {t('home.categoriesTitle')}
-          </h2>
+          <h2 className="text-section-title text-text-heading">{t('home.categoriesTitle')}</h2>
           <p className="mx-auto mt-3 max-w-lg text-body-main text-text-body">
-            {t('home.heroSubtitle')}
+            {t('home.categoriesSubtitle')}
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 md:gap-5">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-5 lg:grid-cols-5">
           {categories.map((cat, index) => {
             const Icon = getIcon(cat.slug)
             return (
               <Link
                 key={cat.id}
                 href={`/equipment?categoryId=${cat.id}`}
-                className="group flex flex-col items-center gap-4 rounded-2xl border border-border-light/80 bg-white p-6 text-center shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover hover:border-brand-primary/20 opacity-0 animate-fade-in-up"
+                className="group flex animate-fade-in-up flex-col items-center gap-4 rounded-2xl border border-border-light/80 bg-white p-6 text-center opacity-0 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-brand-primary/20 hover:shadow-card-hover"
                 style={{ animationDelay: `${0.05 * index}s` }}
               >
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-primary/10 to-brand-primary/5 text-brand-primary transition-all duration-300 group-hover:bg-brand-primary group-hover:text-white group-hover:shadow-lg group-hover:shadow-brand-primary/20 group-hover:scale-110">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-primary/10 to-brand-primary/5 text-brand-primary transition-all duration-300 group-hover:scale-110 group-hover:bg-brand-primary group-hover:text-white group-hover:shadow-lg group-hover:shadow-brand-primary/20">
                   <Icon className="h-7 w-7" />
                 </div>
                 <div>
-                  <span className="font-semibold text-text-heading group-hover:text-brand-primary transition-colors">
+                  <span className="font-semibold text-text-heading transition-colors group-hover:text-brand-primary">
                     {cat.name}
                   </span>
                   <span className="mt-1 block text-sm text-text-muted">

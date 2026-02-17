@@ -23,6 +23,7 @@ npm run db:seed
 If you have PostgreSQL installed locally:
 
 1. Create the database:
+
 ```bash
 createdb flixcam_rent
 # Or using psql:
@@ -30,16 +31,19 @@ psql -U postgres -c "CREATE DATABASE flixcam_rent;"
 ```
 
 2. Update `.env` with your connection string:
+
 ```
 DATABASE_URL="postgresql://your_user:your_password@localhost:5432/flixcam_rent?schema=public"
 ```
 
 3. Run migrations:
+
 ```bash
 npm run db:migrate
 ```
 
 4. Seed the database:
+
 ```bash
 npm run db:seed
 ```
@@ -66,6 +70,7 @@ npm run db:studio
 ## Default Admin Credentials
 
 After seeding:
+
 - Email: `admin@flixcam.rent`
 - Password: `admin123`
 

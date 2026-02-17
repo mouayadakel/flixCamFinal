@@ -77,6 +77,7 @@
 ## Files Created/Modified
 
 ### Created:
+
 1. `src/lib/types/booking.types.ts` - Booking TypeScript types
 2. `src/lib/validators/booking.validator.ts` - Zod validation schemas
 3. `src/lib/booking/state-machine.ts` - State machine utility with all 8 states
@@ -89,11 +90,13 @@
 10. `src/app/admin/(routes)/bookings/new/page.tsx` - Create booking page
 
 ### Modified:
+
 1. `src/app/admin/(routes)/bookings/page.tsx` - Updated to use real API data
 
 ## State Machine Implementation
 
 ### States (8 total):
+
 1. **DRAFT** (مسودة) - Initial state
 2. **RISK_CHECK** (فحص المخاطر) - Automated risk assessment
 3. **PAYMENT_PENDING** (انتظار الدفع) - Waiting for deposit
@@ -104,6 +107,7 @@
 8. **CANCELLED** (ملغي) - Booking cancelled
 
 ### Transitions Implemented:
+
 - ✅ DRAFT → RISK_CHECK (submit)
 - ✅ RISK_CHECK → PAYMENT_PENDING (auto, if risk acceptable)
 - ✅ RISK_CHECK → CANCELLED (auto, if high risk)
@@ -116,6 +120,7 @@
 ## Features Implemented
 
 ### Booking List Page
+
 - ✅ Real-time data from database
 - ✅ Search by booking number, customer name/email
 - ✅ Filter by status
@@ -126,6 +131,7 @@
 - ✅ Link to detail page
 
 ### Booking Detail Page
+
 - ✅ Visual state machine with progress indicator
 - ✅ Current state highlighted
 - ✅ Allowed transitions shown as buttons
@@ -138,6 +144,7 @@
 - ✅ State transition functionality
 
 ### Create Booking Page
+
 - ✅ Customer selection (dropdown)
 - ✅ Date/time pickers
 - ✅ Equipment multi-select with visual selection
@@ -148,6 +155,7 @@
 - ✅ Success redirect
 
 ### API Endpoints
+
 - ✅ `GET /api/bookings` - List with filters (status, customer, date range, search)
 - ✅ `POST /api/bookings` - Create new booking
 - ✅ `GET /api/bookings/[id]` - Get booking details
@@ -158,20 +166,24 @@
 ## Integration Points
 
 ### State Machine Utility
+
 - Used by: Booking detail page (UI visualization)
 - Functions: `getAllowedTransitions()`, `isValidTransition()`, `BOOKING_STATES`
 
 ### Booking Service
+
 - Used by: API routes
 - Methods: `create()`, `getById()`, `list()`, `transitionState()`, `performRiskCheck()`, `cancel()`
 
 ### Booking Policy
+
 - Used by: Booking service (authorization checks)
 - Methods: `canCreate()`, `canView()`, `canUpdate()`, `canDelete()`, `canTransitionState()`
 
 ## Database Integration
 
 All operations use Prisma with:
+
 - ✅ Proper soft delete filtering (`deletedAt: null`)
 - ✅ Relations (customer, equipment, payments, contracts)
 - ✅ Transaction safety for state transitions
@@ -191,6 +203,7 @@ All operations use Prisma with:
 ## Testing Checklist
 
 ### Booking List
+
 - [ ] Page loads and displays bookings from database
 - [ ] Search filters results correctly
 - [ ] Status filter works
@@ -199,6 +212,7 @@ All operations use Prisma with:
 - [ ] Empty state displays when no bookings
 
 ### Booking Detail
+
 - [ ] Page loads with booking data
 - [ ] State machine visualizes current state correctly
 - [ ] Allowed transitions shown as buttons
@@ -209,6 +223,7 @@ All operations use Prisma with:
 - [ ] Payments list shows payment history
 
 ### Create Booking
+
 - [ ] Form validates required fields
 - [ ] Customer dropdown loads users
 - [ ] Equipment selection works (multi-select)
@@ -218,6 +233,7 @@ All operations use Prisma with:
 - [ ] Error messages display correctly
 
 ### API Endpoints
+
 - [ ] GET /api/bookings returns list with filters
 - [ ] POST /api/bookings creates booking
 - [ ] GET /api/bookings/[id] returns booking
@@ -226,6 +242,7 @@ All operations use Prisma with:
 - [ ] POST /api/bookings/[id]/transition transitions state
 
 ### State Machine
+
 - [ ] DRAFT → RISK_CHECK transition works
 - [ ] RISK_CHECK → PAYMENT_PENDING (auto) works
 - [ ] PAYMENT_PENDING → CONFIRMED (after payment) works
@@ -240,6 +257,7 @@ All operations use Prisma with:
 **Phase 5: Integrations** is ready to begin.
 
 ### Required Before Phase 5:
+
 1. Test all booking management features
 2. Verify state machine transitions work correctly
 3. Test with real database data
@@ -253,7 +271,6 @@ All operations use Prisma with:
   - `lib/booking/state-machine.ts` - UI utility for visualization and allowed transitions
   - `lib/services/booking.service.ts` - Business logic for actual state transitions
   - Both are used together: UI uses utility, API uses service
-  
 - The booking service already had comprehensive CRUD operations - we integrated the state machine utility for UI purposes
 
 - All pages are Arabic-first with RTL layout

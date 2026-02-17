@@ -8,11 +8,11 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { 
-  Package, 
-  Plus, 
-  Edit, 
-  Trash2, 
+import {
+  Package,
+  Plus,
+  Edit,
+  Trash2,
   Copy,
   Search,
   Filter,
@@ -25,7 +25,7 @@ import {
   Lightbulb,
   Mic,
   AlertTriangle,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -106,7 +106,7 @@ export default function KitBuilderPage() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
-  
+
   // Dialog state
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingKit, setEditingKit] = useState<Kit | null>(null)
@@ -242,8 +242,8 @@ export default function KitBuilderPage() {
   }
 
   const handleAddItem = (eq: AvailableEquipment) => {
-    const existingIndex = formData.items.findIndex(i => i.equipmentId === eq.id)
-    
+    const existingIndex = formData.items.findIndex((i) => i.equipmentId === eq.id)
+
     if (existingIndex >= 0) {
       // Increment quantity
       const newItems = [...formData.items]
@@ -270,7 +270,7 @@ export default function KitBuilderPage() {
   const handleRemoveItem = (equipmentId: string) => {
     setFormData({
       ...formData,
-      items: formData.items.filter(i => i.equipmentId !== equipmentId),
+      items: formData.items.filter((i) => i.equipmentId !== equipmentId),
     })
   }
 
@@ -278,14 +278,15 @@ export default function KitBuilderPage() {
     if (quantity < 1) return
     setFormData({
       ...formData,
-      items: formData.items.map(i => 
-        i.equipmentId === equipmentId ? { ...i, quantity } : i
-      ),
+      items: formData.items.map((i) => (i.equipmentId === equipmentId ? { ...i, quantity } : i)),
     })
   }
 
   const calculateTotals = () => {
-    const totalDailyRate = formData.items.reduce((sum, item) => sum + (item.dailyRate * item.quantity), 0)
+    const totalDailyRate = formData.items.reduce(
+      (sum, item) => sum + item.dailyRate * item.quantity,
+      0
+    )
     const discount = totalDailyRate * (formData.discountPercent / 100)
     const finalDailyRate = totalDailyRate - discount
     return { totalDailyRate, discount, finalDailyRate }
@@ -365,9 +366,9 @@ export default function KitBuilderPage() {
     }
   }
 
-  const filteredKits = kits.filter(kit => {
-    const matchesSearch = kit.name.toLowerCase().includes(search.toLowerCase()) ||
-                         kit.nameAr.includes(search)
+  const filteredKits = kits.filter((kit) => {
+    const matchesSearch =
+      kit.name.toLowerCase().includes(search.toLowerCase()) || kit.nameAr.includes(search)
     const matchesCategory = categoryFilter === 'all' || kit.category === categoryFilter
     return matchesSearch && matchesCategory
   })
@@ -379,16 +380,14 @@ export default function KitBuilderPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
+          <h1 className="flex items-center gap-2 text-3xl font-bold">
             <Package className="h-8 w-8 text-primary" />
             منشئ الأطقم
           </h1>
-          <p className="text-muted-foreground mt-1">
-            إنشاء وإدارة حزم المعدات المجمعة
-          </p>
+          <p className="mt-1 text-muted-foreground">إنشاء وإدارة حزم المعدات المجمعة</p>
         </div>
         <Button onClick={handleCreateKit}>
-          <Plus className="h-4 w-4 ml-2" />
+          <Plus className="ml-2 h-4 w-4" />
           طقم جديد
         </Button>
       </div>
@@ -396,9 +395,9 @@ export default function KitBuilderPage() {
       {/* Filters */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex gap-4 items-center">
+          <div className="flex items-center gap-4">
             <div className="relative flex-1">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="بحث بالاسم..."
                 value={search}
@@ -413,7 +412,9 @@ export default function KitBuilderPage() {
               <SelectContent>
                 <SelectItem value="all">جميع الفئات</SelectItem>
                 {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
-                  <SelectItem key={key} value={key}>{config.label}</SelectItem>
+                  <SelectItem key={key} value={key}>
+                    {config.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -423,19 +424,19 @@ export default function KitBuilderPage() {
 
       {/* Kits Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1, 2, 3].map(i => (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-64" />
           ))}
         </div>
       ) : loadError ? (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
-            <AlertTriangle className="h-12 w-12 mx-auto mb-4 text-destructive" />
+            <AlertTriangle className="mx-auto mb-4 h-12 w-12 text-destructive" />
             <p className="text-lg font-medium">فشل تحميل البيانات</p>
-            <p className="text-sm mb-4">{loadError}</p>
+            <p className="mb-4 text-sm">{loadError}</p>
             <Button variant="outline" onClick={() => loadData()}>
-              <RefreshCw className="h-4 w-4 ml-2" />
+              <RefreshCw className="ml-2 h-4 w-4" />
               إعادة المحاولة
             </Button>
           </CardContent>
@@ -443,27 +444,27 @@ export default function KitBuilderPage() {
       ) : filteredKits.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-muted-foreground">
-            <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <Package className="mx-auto mb-4 h-12 w-12 opacity-50" />
             <p className="text-lg font-medium">لا توجد أطقم</p>
             <p className="text-sm">ابدأ بإنشاء طقم جديد</p>
             <Button className="mt-4" onClick={handleCreateKit}>
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="ml-2 h-4 w-4" />
               إنشاء طقم
             </Button>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredKits.map((kit) => {
             const categoryConfig = CATEGORY_CONFIG[kit.category]
             const CategoryIcon = categoryConfig.icon
-            
+
             return (
               <Card key={kit.id} className={!kit.isActive ? 'opacity-60' : ''}>
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
-                      <div className={`p-2 rounded-lg ${categoryConfig.bgColor}`}>
+                      <div className={`rounded-lg p-2 ${categoryConfig.bgColor}`}>
                         <CategoryIcon className={`h-5 w-5 ${categoryConfig.color}`} />
                       </div>
                       <div>
@@ -477,16 +478,18 @@ export default function KitBuilderPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">{kit.description}</p>
-                  
-                  <div className="space-y-2 mb-4">
+                  <p className="mb-4 text-sm text-muted-foreground">{kit.description}</p>
+
+                  <div className="mb-4 space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>عدد المعدات:</span>
                       <span className="font-medium">{kit.items.length} قطعة</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>السعر الأصلي:</span>
-                      <span className="line-through text-muted-foreground">{formatCurrency(kit.totalDailyRate)}</span>
+                      <span className="text-muted-foreground line-through">
+                        {formatCurrency(kit.totalDailyRate)}
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>الخصم:</span>
@@ -498,19 +501,29 @@ export default function KitBuilderPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
+                  <div className="mb-4 flex items-center justify-between text-xs text-muted-foreground">
                     <span>استخدم {kit.usageCount} مرة</span>
                   </div>
 
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="flex-1" onClick={() => handleEditKit(kit)}>
-                      <Edit className="h-4 w-4 ml-1" />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => handleEditKit(kit)}
+                    >
+                      <Edit className="ml-1 h-4 w-4" />
                       تعديل
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => handleDuplicateKit(kit)}>
                       <Copy className="h-4 w-4" />
                     </Button>
-                    <Button size="sm" variant="ghost" className="text-destructive" onClick={() => handleDeleteKit(kit.id)}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-destructive"
+                      onClick={() => handleDeleteKit(kit.id)}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -523,14 +536,10 @@ export default function KitBuilderPage() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" dir="rtl">
+        <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto" dir="rtl">
           <DialogHeader>
-            <DialogTitle>
-              {editingKit ? 'تعديل الطقم' : 'إنشاء طقم جديد'}
-            </DialogTitle>
-            <DialogDescription>
-              قم بتجميع المعدات في حزمة واحدة مع خصم
-            </DialogDescription>
+            <DialogTitle>{editingKit ? 'تعديل الطقم' : 'إنشاء طقم جديد'}</DialogTitle>
+            <DialogDescription>قم بتجميع المعدات في حزمة واحدة مع خصم</DialogDescription>
           </DialogHeader>
 
           <div className="grid grid-cols-2 gap-6">
@@ -544,7 +553,7 @@ export default function KitBuilderPage() {
                   placeholder="طقم التصوير الاحترافي"
                 />
               </div>
-              
+
               <div>
                 <label className="text-sm font-medium">الاسم (إنجليزي) *</label>
                 <Input
@@ -566,21 +575,25 @@ export default function KitBuilderPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium">الفئة</label>
-                  <Select 
-                    value={formData.category} 
-                    onValueChange={(v) => setFormData({ ...formData, category: v as Kit['category'] })}
+                  <Select
+                    value={formData.category}
+                    onValueChange={(v) =>
+                      setFormData({ ...formData, category: v as Kit['category'] })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
-                        <SelectItem key={key} value={key}>{config.label}</SelectItem>
+                        <SelectItem key={key} value={key}>
+                          {config.label}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div>
                   <label className="text-sm font-medium">نسبة الخصم %</label>
                   <Input
@@ -588,22 +601,26 @@ export default function KitBuilderPage() {
                     min="0"
                     max="50"
                     value={formData.discountPercent}
-                    onChange={(e) => setFormData({ ...formData, discountPercent: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, discountPercent: Number(e.target.value) })
+                    }
                   />
                 </div>
               </div>
 
               {/* Kit Items */}
               <div>
-                <label className="text-sm font-medium mb-2 block">المعدات المضافة ({formData.items.length})</label>
+                <label className="mb-2 block text-sm font-medium">
+                  المعدات المضافة ({formData.items.length})
+                </label>
                 {formData.items.length === 0 ? (
-                  <div className="border rounded-lg p-4 text-center text-muted-foreground">
+                  <div className="rounded-lg border p-4 text-center text-muted-foreground">
                     اختر معدات من القائمة على اليسار
                   </div>
                 ) : (
-                  <div className="border rounded-lg divide-y max-h-48 overflow-y-auto">
+                  <div className="max-h-48 divide-y overflow-y-auto rounded-lg border">
                     {formData.items.map((item) => (
-                      <div key={item.equipmentId} className="p-2 flex items-center justify-between">
+                      <div key={item.equipmentId} className="flex items-center justify-between p-2">
                         <div className="flex items-center gap-2">
                           <GripVertical className="h-4 w-4 text-muted-foreground" />
                           <div>
@@ -616,10 +633,12 @@ export default function KitBuilderPage() {
                             type="number"
                             min="1"
                             value={item.quantity}
-                            onChange={(e) => handleUpdateItemQuantity(item.equipmentId, Number(e.target.value))}
-                            className="w-16 h-8 text-center"
+                            onChange={(e) =>
+                              handleUpdateItemQuantity(item.equipmentId, Number(e.target.value))
+                            }
+                            className="h-8 w-16 text-center"
                           />
-                          <span className="text-sm text-muted-foreground w-20">
+                          <span className="w-20 text-sm text-muted-foreground">
                             {formatCurrency(item.dailyRate * item.quantity)}
                           </span>
                           <Button
@@ -637,7 +656,7 @@ export default function KitBuilderPage() {
               </div>
 
               {/* Totals */}
-              <div className="bg-muted rounded-lg p-4 space-y-2">
+              <div className="space-y-2 rounded-lg bg-muted p-4">
                 <div className="flex justify-between">
                   <span>المجموع:</span>
                   <span>{formatCurrency(totalDailyRate)}</span>
@@ -646,7 +665,7 @@ export default function KitBuilderPage() {
                   <span>الخصم ({formData.discountPercent}%):</span>
                   <span>-{formatCurrency(discount)}</span>
                 </div>
-                <div className="flex justify-between font-bold text-lg border-t pt-2">
+                <div className="flex justify-between border-t pt-2 text-lg font-bold">
                   <span>السعر النهائي:</span>
                   <span className="text-primary">{formatCurrency(finalDailyRate)}/يوم</span>
                 </div>
@@ -655,28 +674,30 @@ export default function KitBuilderPage() {
 
             {/* Right: Equipment Selection */}
             <div>
-              <label className="text-sm font-medium mb-2 block">اختر المعدات</label>
-              <div className="border rounded-lg max-h-[500px] overflow-y-auto">
+              <label className="mb-2 block text-sm font-medium">اختر المعدات</label>
+              <div className="max-h-[500px] overflow-y-auto rounded-lg border">
                 {equipment.length === 0 ? (
-                  <div className="p-4 text-center text-muted-foreground">
-                    لا توجد معدات متاحة
-                  </div>
+                  <div className="p-4 text-center text-muted-foreground">لا توجد معدات متاحة</div>
                 ) : (
                   <div className="divide-y">
                     {equipment.map((eq) => {
-                      const isAdded = formData.items.some(i => i.equipmentId === eq.id)
+                      const isAdded = formData.items.some((i) => i.equipmentId === eq.id)
                       return (
                         <div
                           key={eq.id}
-                          className={`p-3 flex items-center justify-between hover:bg-muted/50 cursor-pointer ${isAdded ? 'bg-primary/5' : ''}`}
+                          className={`flex cursor-pointer items-center justify-between p-3 hover:bg-muted/50 ${isAdded ? 'bg-primary/5' : ''}`}
                           onClick={() => handleAddItem(eq)}
                         >
                           <div>
                             <p className="font-medium">{eq.model || eq.sku}</p>
-                            <p className="text-xs text-muted-foreground">{eq.sku} • {eq.category?.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {eq.sku} • {eq.category?.name}
+                            </p>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-sm">{formatCurrency(Number(eq.dailyPrice))}/يوم</span>
+                            <span className="text-sm">
+                              {formatCurrency(Number(eq.dailyPrice))}/يوم
+                            </span>
                             <Button size="sm" variant={isAdded ? 'secondary' : 'outline'}>
                               <Plus className="h-4 w-4" />
                             </Button>
@@ -695,7 +716,7 @@ export default function KitBuilderPage() {
               إلغاء
             </Button>
             <Button onClick={handleSaveKit} disabled={saving}>
-              <Save className="h-4 w-4 ml-2" />
+              <Save className="ml-2 h-4 w-4" />
               {saving ? 'جاري الحفظ...' : 'حفظ الطقم'}
             </Button>
           </DialogFooter>

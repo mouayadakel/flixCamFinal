@@ -67,11 +67,11 @@ export class TapClient {
     this.apiKey = apiKey
     this.webhookSecret = webhookSecret
     this.baseUrl = process.env.TAP_API_URL || 'https://api.tap.company/v2'
-    
+
     this.client = axios.create({
       baseURL: this.baseUrl,
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
     })
@@ -99,9 +99,7 @@ export class TapClient {
       return response.data
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
-        throw new Error(
-          `Tap API error: ${error.response?.data?.message || error.message}`
-        )
+        throw new Error(`Tap API error: ${error.response?.data?.message || error.message}`)
       }
       throw error
     }
@@ -121,10 +119,7 @@ export class TapClient {
     try {
       const hmac = crypto.createHmac('sha256', this.webhookSecret)
       const digest = hmac.update(payload).digest('hex')
-      return crypto.timingSafeEqual(
-        Buffer.from(signature),
-        Buffer.from(digest)
-      )
+      return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest))
     } catch (error) {
       return false
     }
@@ -154,9 +149,7 @@ export class TapClient {
       return response.data
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
-        throw new Error(
-          `Tap API error: ${error.response?.data?.message || error.message}`
-        )
+        throw new Error(`Tap API error: ${error.response?.data?.message || error.message}`)
       }
       throw error
     }
@@ -176,9 +169,7 @@ export class TapClient {
       return response.data
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
-        throw new Error(
-          `Tap API error: ${error.response?.data?.message || error.message}`
-        )
+        throw new Error(`Tap API error: ${error.response?.data?.message || error.message}`)
       }
       throw error
     }

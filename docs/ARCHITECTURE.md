@@ -3,6 +3,7 @@
 ## Architecture Overview
 
 ### Frontend
+
 - **Next.js 14** (App Router)
 - **React** with TypeScript
 - **Tailwind CSS** for styling
@@ -10,12 +11,14 @@
 - Server Components by default, Client Components when needed
 
 ### Backend
+
 - **Node.js** with TypeScript
 - **Prisma ORM** (single source of truth)
 - **PostgreSQL** database
 - **NextAuth.js v5** for authentication
 
 ### Infrastructure
+
 - **Local Docker** for PostgreSQL (development)
 - **Cloud database** for production (TBD: Supabase/Neon/Railway)
 - **GitHub Actions** for CI/CD
@@ -24,24 +27,28 @@
 ## Architecture Principles
 
 ### 1. API-First Design
+
 - All business logic in API routes
 - Thin controllers, fat services
 - RESTful API design
 - Proper HTTP status codes
 
 ### 2. Event-Driven Architecture
+
 - Critical actions emit events
 - Decoupled event handlers
 - Async processing
 - Event storage in database
 
 ### 3. Service-Based Modules
+
 - Domain-based organization
 - Services over controllers
 - Clear separation of concerns
 - Reusable business logic
 
 ### 4. Policy-Based Authorization
+
 - No admin bypass
 - Every model has a policy
 - Permission checks in services

@@ -40,7 +40,11 @@ interface RefundItem {
 export default function FinanceRefundsPage() {
   const { toast } = useToast()
   const [data, setData] = useState<RefundItem[]>([])
-  const [summary, setSummary] = useState<{ totalRefunded: number; pendingRefundRequests: number; thisMonthRefunded: number } | null>(null)
+  const [summary, setSummary] = useState<{
+    totalRefunded: number
+    pendingRefundRequests: number
+    thisMonthRefunded: number
+  } | null>(null)
   const [loading, setLoading] = useState(true)
 
   const load = async () => {
@@ -69,20 +73,20 @@ export default function FinanceRefundsPage() {
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/admin/finance">
-              <ArrowLeft className="h-4 w-4 ml-1" />
+              <ArrowLeft className="ml-1 h-4 w-4" />
               المالية
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
+            <h1 className="flex items-center gap-2 text-3xl font-bold">
               <RotateCcw className="h-8 w-8" />
               الاستردادات
             </h1>
-            <p className="text-muted-foreground mt-1">تتبع المدفوعات المستردة</p>
+            <p className="mt-1 text-muted-foreground">تتبع المدفوعات المستردة</p>
           </div>
         </div>
         <Button variant="outline" onClick={load} disabled={loading}>
-          <RefreshCw className={`h-4 w-4 ml-2 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           تحديث
         </Button>
       </div>
@@ -102,7 +106,9 @@ export default function FinanceRefundsPage() {
               <CardTitle className="text-sm font-medium">طلبات استرداد قيد الانتظار</CardTitle>
             </CardHeader>
             <CardContent>
-              <span className="text-2xl font-bold text-amber-600">{summary.pendingRefundRequests}</span>
+              <span className="text-2xl font-bold text-amber-600">
+                {summary.pendingRefundRequests}
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -110,7 +116,9 @@ export default function FinanceRefundsPage() {
               <CardTitle className="text-sm font-medium">استردادات هذا الشهر</CardTitle>
             </CardHeader>
             <CardContent>
-              <span className="text-2xl font-bold text-green-600">{formatCurrency(summary.thisMonthRefunded)}</span>
+              <span className="text-2xl font-bold text-green-600">
+                {formatCurrency(summary.thisMonthRefunded)}
+              </span>
             </CardContent>
           </Card>
         </div>
@@ -140,7 +148,7 @@ export default function FinanceRefundsPage() {
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">
+                <TableCell colSpan={9} className="py-12 text-center text-muted-foreground">
                   لا توجد استردادات
                 </TableCell>
               </TableRow>
@@ -149,28 +157,37 @@ export default function FinanceRefundsPage() {
                 <TableRow key={row.id}>
                   <TableCell className="font-mono text-sm">{row.id.slice(0, 8)}…</TableCell>
                   <TableCell>
-                    <Link href={`/admin/bookings/${row.bookingId}`} className="text-primary hover:underline">
+                    <Link
+                      href={`/admin/bookings/${row.bookingId}`}
+                      className="text-primary hover:underline"
+                    >
                       #{row.bookingNumber ?? row.bookingId.slice(0, 8)}
                     </Link>
                   </TableCell>
                   <TableCell>{row.customer?.name || row.customer?.email || '—'}</TableCell>
                   <TableCell>{formatCurrency(row.amount)}</TableCell>
-                  <TableCell className="text-destructive font-medium">
+                  <TableCell className="font-medium text-destructive">
                     {row.refundAmount != null ? formatCurrency(row.refundAmount) : '—'}
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground max-w-[160px] truncate">
+                  <TableCell className="max-w-[160px] truncate text-sm text-muted-foreground">
                     {row.refundReason || '—'}
                   </TableCell>
                   <TableCell>
                     <Badge variant={row.status === 'REFUNDED' ? 'destructive' : 'secondary'}>
-                      {row.status === 'REFUNDED' ? 'مسترد' : row.status === 'PARTIALLY_REFUNDED' ? 'مسترد جزئياً' : row.status}
+                      {row.status === 'REFUNDED'
+                        ? 'مسترد'
+                        : row.status === 'PARTIALLY_REFUNDED'
+                          ? 'مسترد جزئياً'
+                          : row.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{formatDate(row.updatedAt)}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {formatDate(row.updatedAt)}
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="sm" asChild>
                       <Link href={`/admin/payments/${row.id}`}>
-                        <Eye className="h-4 w-4 ml-1" />
+                        <Eye className="ml-1 h-4 w-4" />
                         عرض
                       </Link>
                     </Button>

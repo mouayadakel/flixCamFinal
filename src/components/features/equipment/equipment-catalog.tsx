@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useLocale } from '@/hooks/use-locale'
+import { EquipmentCategoryBar } from './equipment-category-bar'
 import { FilterPanel } from './filter-panel'
 import { EquipmentGrid } from './equipment-grid'
 import { Button } from '@/components/ui/button'
@@ -22,7 +23,9 @@ export function EquipmentCatalog() {
   const { t } = useLocale()
   const [equipment, setEquipment] = useState<EquipmentCardItem[]>([])
   const [total, setTotal] = useState(0)
-  const [categories, setCategories] = useState<{ id: string; name: string; slug: string }[]>([])
+  const [categories, setCategories] = useState<
+    { id: string; name: string; slug: string; parentId?: string | null }[]
+  >([])
   const [brands, setBrands] = useState<{ id: string; name: string; slug: string }[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -73,14 +76,22 @@ export function EquipmentCatalog() {
   const hasNext = skip + PAGE_SIZE < total
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8">
-      <div className="w-full lg:w-72 shrink-0">
-        <FilterPanel
-          categories={categories}
-          brands={brands}
-          total={total}
+    <div className="flex flex-col gap-6">
+      {categories.length > 0 && (
+        <EquipmentCategoryBar
+          categories={categories.map((c) => ({
+            id: c.id,
+            name: c.name,
+            slug: c.slug,
+            parentId: c.parentId ?? null,
+          }))}
+          currentCategoryId={categoryId}
         />
-      </div>
+      )}
+      <div className="flex flex-col gap-8 lg:flex-row">
+        <div className="w-full shrink-0 lg:w-72">
+          <FilterPanel categories={categories} brands={brands} total={total} />
+        </div>
       <div className="min-w-0 flex-1 space-y-6">
         {q && (
           <p className="text-body-main text-text-muted">
@@ -89,9 +100,13 @@ export function EquipmentCatalog() {
         )}
 
         {error && (
-          <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5 text-destructive text-sm">
+          <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5 text-sm text-destructive">
             {error}
-            <Button variant="link" className="ms-2 text-destructive" onClick={() => window.location.reload()}>
+            <Button
+              variant="link"
+              className="ms-2 text-destructive"
+              onClick={() => window.location.reload()}
+            >
               {t('common.retry')}
             </Button>
           </div>
@@ -102,7 +117,7 @@ export function EquipmentCatalog() {
             <EquipmentGrid items={equipment} isLoading={isLoading} />
 
             {!isLoading && equipment.length === 0 && (
-              <div className="text-center py-16 text-muted-foreground">
+              <div className="py-16 text-center text-muted-foreground">
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-light">
                   <span className="text-3xl">🔍</span>
                 </div>
@@ -119,17 +134,9 @@ export function EquipmentCatalog() {
             )}
 
             {totalPages > 1 && !isLoading && (
-              <nav
-                className="flex items-center justify-center gap-2 pt-6"
-                aria-label="Pagination"
-              >
+              <nav className="flex items-center justify-center gap-2 pt-6" aria-label="Pagination">
                 {hasPrev && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    asChild
-                    className="rounded-xl"
-                  >
+                  <Button variant="outline" size="sm" asChild className="rounded-xl">
                     <Link
                       href={`/equipment?${new URLSearchParams({
                         ...Object.fromEntries(searchParams?.entries() ?? []),
@@ -145,12 +152,7 @@ export function EquipmentCatalog() {
                   {currentPage} / {totalPages}
                 </span>
                 {hasNext && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    asChild
-                    className="rounded-xl"
-                  >
+                  <Button variant="outline" size="sm" asChild className="rounded-xl">
                     <Link
                       href={`/equipment?${new URLSearchParams({
                         ...Object.fromEntries(searchParams?.entries() ?? []),
@@ -166,6 +168,7 @@ export function EquipmentCatalog() {
             )}
           </>
         )}
+      </div>
       </div>
     </div>
   )

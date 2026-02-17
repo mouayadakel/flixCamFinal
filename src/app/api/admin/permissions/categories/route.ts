@@ -26,7 +26,10 @@ export async function GET(request: NextRequest) {
     }
     const canManage = await hasPermission(session.user.id, PERMISSIONS.SETTINGS_MANAGE_ROLES)
     if (!canManage) {
-      return NextResponse.json({ error: 'Forbidden - Missing settings.manage_roles permission' }, { status: 403 })
+      return NextResponse.json(
+        { error: 'Forbidden - Missing settings.manage_roles permission' },
+        { status: 403 }
+      )
     }
 
     const categories = await prisma.permissionCategory.findMany({

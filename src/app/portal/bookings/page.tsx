@@ -42,9 +42,7 @@ export default async function PortalBookingsPage({
   }
 
   if (searchQuery) {
-    where.OR = [
-      { bookingNumber: { contains: searchQuery, mode: 'insensitive' } },
-    ]
+    where.OR = [{ bookingNumber: { contains: searchQuery, mode: 'insensitive' } }]
   }
 
   const bookings = await prisma.booking.findMany({
@@ -67,7 +65,10 @@ export default async function PortalBookingsPage({
   })
 
   function getStatusBadge(status: BookingStatus) {
-    const statusConfig: Record<BookingStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+    const statusConfig: Record<
+      BookingStatus,
+      { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+    > = {
       DRAFT: { label: 'مسودة', variant: 'outline' },
       RISK_CHECK: { label: 'فحص المخاطر', variant: 'outline' },
       PAYMENT_PENDING: { label: 'انتظار الدفع', variant: 'secondary' },
@@ -87,9 +88,7 @@ export default async function PortalBookingsPage({
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">حجوزاتي</h1>
-        <p className="text-muted-foreground mt-2">
-          عرض وإدارة جميع حجوزاتك
-        </p>
+        <p className="mt-2 text-muted-foreground">عرض وإدارة جميع حجوزاتك</p>
       </div>
 
       {/* Filters */}
@@ -99,19 +98,19 @@ export default async function PortalBookingsPage({
         </CardHeader>
         <CardContent>
           <form method="get" className="flex flex-wrap items-center gap-4">
-            <div className="relative flex-1 min-w-[200px]">
+            <div className="relative min-w-[200px] flex-1">
               <input
                 type="text"
                 name="search"
                 placeholder="البحث برقم الحجز..."
                 defaultValue={searchQuery || ''}
-                className="w-full px-4 py-2 border rounded-lg"
+                className="w-full rounded-lg border px-4 py-2"
               />
             </div>
             <select
               name="status"
               defaultValue={statusFilter || 'all'}
-              className="px-4 py-2 border rounded-lg"
+              className="rounded-lg border px-4 py-2"
             >
               <option value="all">جميع الحالات</option>
               <option value="DRAFT">مسودة</option>
@@ -133,7 +132,7 @@ export default async function PortalBookingsPage({
         </CardHeader>
         <CardContent>
           {bookings.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="py-12 text-center">
               <p className="text-muted-foreground">لا توجد حجوزات</p>
             </div>
           ) : (
@@ -141,28 +140,25 @@ export default async function PortalBookingsPage({
               {bookings.map((booking) => (
                 <div
                   key={booking.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-neutral-50 transition-colors"
+                  className="flex items-center justify-between rounded-lg border p-4 transition-colors hover:bg-neutral-50"
                 >
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-medium text-lg">
-                        حجز #{booking.bookingNumber}
-                      </span>
+                    <div className="mb-2 flex items-center gap-3">
+                      <span className="text-lg font-medium">حجز #{booking.bookingNumber}</span>
                       {getStatusBadge(booking.status)}
                     </div>
-                    <div className="text-sm text-muted-foreground space-y-1">
+                    <div className="space-y-1 text-sm text-muted-foreground">
                       <div>
                         <span className="font-medium">التواريخ:</span> من{' '}
-                        {formatDate(booking.startDate)} إلى{' '}
-                        {formatDate(booking.endDate)}
+                        {formatDate(booking.startDate)} إلى {formatDate(booking.endDate)}
                       </div>
                       <div>
                         <span className="font-medium">المبلغ:</span>{' '}
                         {formatCurrency(booking.totalAmount.toNumber())}
                       </div>
                       <div>
-                        <span className="font-medium">المعدات:</span>{' '}
-                        {booking.equipment.length} عنصر
+                        <span className="font-medium">المعدات:</span> {booking.equipment.length}{' '}
+                        عنصر
                       </div>
                     </div>
                   </div>

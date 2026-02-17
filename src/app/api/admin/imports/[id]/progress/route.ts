@@ -15,10 +15,7 @@ export const dynamic = 'force-dynamic'
  * GET /api/admin/imports/[id]/progress
  * Return detailed progress breakdown
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   // Skip rate limiting for polling endpoints
   // const rateLimit = rateLimitAPI(request)
   // if (!rateLimit.allowed) {
@@ -107,9 +104,6 @@ export async function GET(
     })
   } catch (error: any) {
     console.error('Failed to get progress:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to get progress' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Failed to get progress' }, { status: 500 })
   }
 }

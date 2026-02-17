@@ -99,11 +99,21 @@ export function CheckoutStepDates({ onSuccess }: CheckoutStepDatesProps) {
           <div className="grid gap-4 rounded-md border bg-muted/30 p-4">
             <div>
               <Label htmlFor="deliveryCity">{t('checkout.deliveryCity')}</Label>
-              <Input id="deliveryCity" value={city} onChange={(e) => setCity(e.target.value)} className="mt-1" />
+              <Input
+                id="deliveryCity"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="mt-1"
+              />
             </div>
             <div>
               <Label htmlFor="deliveryStreet">{t('checkout.deliveryStreet')}</Label>
-              <Input id="deliveryStreet" value={street} onChange={(e) => setStreet(e.target.value)} className="mt-1" />
+              <Input
+                id="deliveryStreet"
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+                className="mt-1"
+              />
             </div>
           </div>
         )}

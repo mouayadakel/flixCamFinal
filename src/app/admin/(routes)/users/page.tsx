@@ -35,7 +35,10 @@ interface UserRow {
   updatedAt: string
 }
 
-const STATUS_LABELS: Record<string, { ar: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_LABELS: Record<
+  string,
+  { ar: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   active: { ar: 'نشط', variant: 'default' },
   suspended: { ar: 'معلق', variant: 'destructive' },
   inactive: { ar: 'غير نشط', variant: 'secondary' },
@@ -88,17 +91,17 @@ export default function UsersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">المستخدمون</h1>
-          <p className="text-muted-foreground mt-1">إدارة الحسابات والأدوار</p>
+          <p className="mt-1 text-muted-foreground">إدارة الحسابات والأدوار</p>
         </div>
         <div className="flex gap-2">
           <Button asChild>
             <Link href="/admin/users/new">
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="ml-2 h-4 w-4" />
               مستخدم جديد
             </Link>
           </Button>
           <Button variant="outline" onClick={fetchUsers} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 ml-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
         </div>
@@ -112,8 +115,8 @@ export default function UsersPage() {
       />
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 flex items-center gap-2">
-          <AlertCircle className="h-5 w-5 text-red-600 shrink-0" />
+        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
+          <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />
           <p className="text-red-800">{error}</p>
           <Button variant="outline" size="sm" onClick={fetchUsers}>
             إعادة المحاولة
@@ -138,14 +141,14 @@ export default function UsersPage() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground mt-2">جاري التحميل...</p>
+                <TableCell colSpan={8} className="py-12 text-center">
+                  <Loader2 className="mx-auto h-8 w-8 animate-spin text-muted-foreground" />
+                  <p className="mt-2 text-sm text-muted-foreground">جاري التحميل...</p>
                 </TableCell>
               </TableRow>
             ) : data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
+                <TableCell colSpan={8} className="py-12 text-center text-muted-foreground">
                   لا يوجد مستخدمون
                 </TableCell>
               </TableRow>

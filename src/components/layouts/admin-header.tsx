@@ -59,13 +59,9 @@ export function AdminHeader() {
       </Button>
 
       {/* Search */}
-      <div className="relative flex-1 max-w-md">
+      <div className="relative max-w-md flex-1">
         <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-        <Input
-          placeholder="بحث..."
-          className="pr-10"
-          dir="rtl"
-        />
+        <Input placeholder="بحث..." className="pr-10" dir="rtl" />
       </div>
 
       {/* Right Side - Notifications & User Menu */}
@@ -77,7 +73,7 @@ export function AdminHeader() {
             {notificationsCount > 0 && (
               <Badge
                 variant="destructive"
-                className="absolute -top-1 -left-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
+                className="absolute -left-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs"
               >
                 {notificationsCount > 9 ? '9+' : notificationsCount}
               </Badge>
@@ -92,7 +88,7 @@ export function AdminHeader() {
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-primary-700">
                 <User className="h-4 w-4" />
               </div>
-              <span className="hidden md:inline text-sm font-medium">
+              <span className="hidden text-sm font-medium md:inline">
                 {session?.user?.name || session?.user?.email || 'المستخدم'}
               </span>
             </Button>

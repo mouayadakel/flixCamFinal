@@ -17,20 +17,22 @@ export const dynamic = 'force-dynamic'
 
 const updateUserSchema = z.object({
   name: z.string().min(1).max(255).optional(),
-  role: z.enum([
-    'ADMIN',
-    'SALES_MANAGER',
-    'ACCOUNTANT',
-    'WAREHOUSE_MANAGER',
-    'TECHNICIAN',
-    'CUSTOMER_SERVICE',
-    'MARKETING_MANAGER',
-    'RISK_MANAGER',
-    'APPROVAL_AGENT',
-    'AUDITOR',
-    'AI_OPERATOR',
-    'DATA_ENTRY',
-  ]).optional(),
+  role: z
+    .enum([
+      'ADMIN',
+      'SALES_MANAGER',
+      'ACCOUNTANT',
+      'WAREHOUSE_MANAGER',
+      'TECHNICIAN',
+      'CUSTOMER_SERVICE',
+      'MARKETING_MANAGER',
+      'RISK_MANAGER',
+      'APPROVAL_AGENT',
+      'AUDITOR',
+      'AI_OPERATOR',
+      'DATA_ENTRY',
+    ])
+    .optional(),
   phone: z.string().optional(),
   twoFactorEnabled: z.boolean().optional(),
 })
@@ -39,25 +41,16 @@ const updateUserSchema = z.object({
  * GET /api/admin/users/[id]
  * Get user details
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const rateLimit = rateLimitAPI(request)
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        { error: 'Too many requests' },
-        { status: 429 }
-      )
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
     }
 
     const session = await auth()
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check permission
@@ -90,10 +83,7 @@ export async function GET(
     })
 
     if (!user || user.deletedAt) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
     // Get custom permissions separately
@@ -133,25 +123,16 @@ export async function GET(
  * PATCH /api/admin/users/[id]
  * Update user details
  */
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const rateLimit = rateLimitAPI(request)
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        { error: 'Too many requests' },
-        { status: 429 }
-      )
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
     }
 
     const session = await auth()
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check permission
@@ -173,10 +154,7 @@ export async function PATCH(
     })
 
     if (!existingUser || existingUser.deletedAt) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
     // If changing role, check role assignment permission
@@ -244,25 +222,16 @@ export async function PATCH(
  * DELETE /api/admin/users/[id]
  * Delete (soft delete) a user
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const rateLimit = rateLimitAPI(request)
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        { error: 'Too many requests' },
-        { status: 429 }
-      )
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
     }
 
     const session = await auth()
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check permission
@@ -278,10 +247,7 @@ export async function DELETE(
 
     // Prevent self-deletion
     if (userId === session.user.id) {
-      return NextResponse.json(
-        { error: 'Cannot delete your own account' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Cannot delete your own account' }, { status: 400 })
     }
 
     // Check if user exists
@@ -290,10 +256,7 @@ export async function DELETE(
     })
 
     if (!existingUser || existingUser.deletedAt) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
     // Soft delete user

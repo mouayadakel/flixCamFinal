@@ -96,6 +96,13 @@ export const FEATURE_FLAG_META: Record<string, Omit<FeatureFlagMeta, 'name'>> = 
     group: 'public_website',
     sortOrder: 7,
   },
+  enable_home_kit_teaser: {
+    label: 'Homepage Kit Teaser',
+    labelAr: 'إعلان كيت الصفحة الرئيسية',
+    description: 'Show "Build Your Kit" teaser banner on the homepage',
+    group: 'public_website',
+    sortOrder: 8,
+  },
 
   // ─── Control Panel (Admin Sidebar) ───────────────────────────
   enable_admin_ai: {

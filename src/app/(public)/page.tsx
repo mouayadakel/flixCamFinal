@@ -1,48 +1,55 @@
 /**
- * Public homepage: Hero (with search), Category cards, Featured Equipment,
- * Trust signals, Top Brands, How It Works (5 steps), Testimonials, FAQ, CTA.
+ * Public homepage: Hero (with search), Categories, Featured Equipment (8),
+ * New Arrivals (8), Kit Teaser, Trust Signals + How It Works, Top Brands,
+ * Testimonials, FAQ, CTA.
  */
 
 import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/db/prisma'
 import { HeroBannerService } from '@/lib/services/hero-banner.service'
+import { FeatureFlagService } from '@/lib/services/feature-flag.service'
 import { HomeHero } from '@/components/features/home/home-hero'
 import { HomeCategoryCards } from '@/components/features/home/home-category-cards'
 import { HomeFeaturedEquipment } from '@/components/features/home/home-featured-equipment'
+import { HomeNewArrivals } from '@/components/features/home/home-new-arrivals'
+import { HomeKitTeaser } from '@/components/features/home/home-kit-teaser'
 import { HomeTrustSignals } from '@/components/features/home/home-trust-signals'
-import { HomeHowItWorks } from '@/components/features/home/home-how-it-works'
 import { HomeTopBrands } from '@/components/features/home/home-top-brands'
 import { HomeTestimonials } from '@/components/features/home/home-testimonials'
 import { HomeFaq } from '@/components/features/home/home-faq'
 import { HomeCta } from '@/components/features/home/home-cta'
 
+function shuffleArray<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
 async function getFeaturedEquipment() {
-  return unstable_cache(
-    async () => {
-      const data = await prisma.equipment.findMany({
-        where: { deletedAt: null, isActive: true, featured: true },
-        take: 8,
-        select: {
-          id: true,
-          sku: true,
-          model: true,
-          dailyPrice: true,
-          quantityAvailable: true,
-          category: { select: { id: true, name: true, slug: true } },
-          brand: { select: { id: true, name: true, slug: true } },
-          media: { take: 1, select: { id: true, url: true, type: true } },
-        },
-        orderBy: { createdAt: 'desc' },
-      })
-      return data.map((e) => ({
-        ...e,
-        dailyPrice: e.dailyPrice ? Number(e.dailyPrice) : 0,
-        quantityAvailable: e.quantityAvailable ?? 0,
-      }))
+  const data = await prisma.equipment.findMany({
+    where: { deletedAt: null, isActive: true, featured: true },
+    take: 200,
+    select: {
+      id: true,
+      sku: true,
+      model: true,
+      dailyPrice: true,
+      quantityAvailable: true,
+      category: { select: { id: true, name: true, slug: true } },
+      brand: { select: { id: true, name: true, slug: true } },
+      media: { take: 1, select: { id: true, url: true, type: true } },
     },
-    ['public-home-featured-equipment'],
-    { revalidate: 300 }
-  )()
+  })
+  const mapped = data.map((e) => ({
+    ...e,
+    dailyPrice: e.dailyPrice ? Number(e.dailyPrice) : 0,
+    quantityAvailable: e.quantityAvailable ?? 0,
+  }))
+  const shuffled = shuffleArray(mapped)
+  return shuffled.slice(0, 8)
 }
 
 async function getCategoriesForHome() {
@@ -85,6 +92,35 @@ async function getHomeStats() {
   )()
 }
 
+async function getNewArrivals() {
+  return unstable_cache(
+    async () => {
+      const data = await prisma.equipment.findMany({
+        where: { deletedAt: null, isActive: true },
+        orderBy: { createdAt: 'desc' },
+        take: 8,
+        select: {
+          id: true,
+          sku: true,
+          model: true,
+          dailyPrice: true,
+          quantityAvailable: true,
+          category: { select: { id: true, name: true, slug: true } },
+          brand: { select: { id: true, name: true, slug: true } },
+          media: { take: 1, select: { id: true, url: true, type: true } },
+        },
+      })
+      return data.map((e) => ({
+        ...e,
+        dailyPrice: e.dailyPrice ? Number(e.dailyPrice) : 0,
+        quantityAvailable: e.quantityAvailable ?? 0,
+      }))
+    },
+    ['public-home-new-arrivals'],
+    { revalidate: 300 }
+  )()
+}
+
 async function getHeroBanner() {
   try {
     return await unstable_cache(
@@ -99,6 +135,7 @@ async function getHeroBanner() {
 
 export default async function PublicHomePage() {
   let featured: Awaited<ReturnType<typeof getFeaturedEquipment>> = []
+  let newArrivals: Awaited<ReturnType<typeof getNewArrivals>> = []
   let categories: Awaited<ReturnType<typeof getCategoriesForHome>> = []
   let stats: Awaited<ReturnType<typeof getHomeStats>> = {
     equipmentCount: 0,
@@ -107,12 +144,15 @@ export default async function PublicHomePage() {
   }
   let heroBanner: Awaited<ReturnType<typeof getHeroBanner>> = null
 
+  let showKitTeaser = false
   try {
-    ;[featured, categories, stats, heroBanner] = await Promise.all([
+    ;[featured, newArrivals, categories, stats, heroBanner, showKitTeaser] = await Promise.all([
       getFeaturedEquipment(),
+      getNewArrivals(),
       getCategoriesForHome(),
       getHomeStats(),
       getHeroBanner(),
+      FeatureFlagService.isEnabled('enable_home_kit_teaser'),
     ])
   } catch (e) {
     console.error('[PublicHomePage] data fetch failed:', e)
@@ -123,13 +163,14 @@ export default async function PublicHomePage() {
       <HomeHero banner={heroBanner ?? undefined} />
       <HomeCategoryCards categories={categories} />
       <HomeFeaturedEquipment items={featured} />
+      <HomeNewArrivals items={newArrivals} />
+      {showKitTeaser && <HomeKitTeaser />}
       <HomeTrustSignals
         equipmentCount={stats.equipmentCount}
         rentalsCount={stats.rentalsCount}
         yearFounded={stats.yearFounded}
       />
       <HomeTopBrands />
-      <HomeHowItWorks />
       <HomeTestimonials />
       <HomeFaq />
       <HomeCta />

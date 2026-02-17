@@ -9,27 +9,18 @@ import { auth } from '@/lib/auth'
 import { IntegrationConfigService } from '@/lib/services/integration-config.service'
 import { rateLimitAPI } from '@/lib/utils/rate-limit'
 
-export async function PATCH(
-  request: Request,
-  { params }: { params: { type: string } }
-) {
+export async function PATCH(request: Request, { params }: { params: { type: string } }) {
   const rateLimit = rateLimitAPI(request)
-  
+
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: 'Too many requests' },
-      { status: 429 }
-    )
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }
 
   try {
     const session = await auth()
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const body = await request.json()

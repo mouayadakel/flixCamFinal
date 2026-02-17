@@ -9,15 +9,15 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { 
-  ArrowRight, 
-  Package, 
-  CheckCircle, 
+import {
+  ArrowRight,
+  Package,
+  CheckCircle,
   AlertCircle,
   Search,
   Camera,
   User,
-  Calendar
+  Calendar,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -75,7 +75,7 @@ export default function CheckOutPage() {
 
   useEffect(() => {
     if (bookingIdFromUrl && bookings.length > 0) {
-      const booking = bookings.find(b => b.id === bookingIdFromUrl)
+      const booking = bookings.find((b) => b.id === bookingIdFromUrl)
       if (booking) {
         setSelectedBooking(booking)
       }
@@ -120,7 +120,7 @@ export default function CheckOutPage() {
 
   const handleSelectAll = () => {
     if (!selectedBooking) return
-    const allItems = selectedBooking.equipment.filter(e => !e.checkedOut).map(e => e.id)
+    const allItems = selectedBooking.equipment.filter((e) => !e.checkedOut).map((e) => e.id)
     if (checkedItems.size === allItems.length) {
       setCheckedItems(new Set())
     } else {
@@ -168,37 +168,38 @@ export default function CheckOutPage() {
     }
   }
 
-  const filteredBookings = bookings.filter(b => 
-    b.bookingNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    b.customer.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    b.customer.email.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredBookings = bookings.filter(
+    (b) =>
+      b.bookingNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.customer.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.customer.email.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <Package className="h-8 w-8" />
             إخراج المعدات
           </h1>
-          </div>
+        </div>
         <Button variant="outline" asChild>
           <Link href="/admin/ops/warehouse">
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="ml-2 h-4 w-4" />
             العودة
           </Link>
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Bookings List */}
-        <div className="lg:col-span-1 space-y-4">
+        <div className="space-y-4 lg:col-span-1">
           <Card>
             <CardHeader>
               <CardTitle>الحجوزات الجاهزة للإخراج</CardTitle>
               <div className="relative mt-2">
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="بحث..."
                   value={searchQuery}
@@ -215,8 +216,8 @@ export default function CheckOutPage() {
                   <Skeleton className="h-20 w-full" />
                 </div>
               ) : filteredBookings.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <div className="py-8 text-center text-muted-foreground">
+                  <Package className="mx-auto mb-4 h-12 w-12 opacity-50" />
                   <p>لا توجد حجوزات جاهزة للإخراج</p>
                 </div>
               ) : (
@@ -225,13 +226,13 @@ export default function CheckOutPage() {
                     <div
                       key={booking.id}
                       onClick={() => handleSelectBooking(booking)}
-                      className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                      className={`cursor-pointer rounded-lg border p-4 transition-colors ${
                         selectedBooking?.id === booking.id
                           ? 'border-primary bg-primary/5'
                           : 'hover:bg-muted/50'
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="mb-2 flex items-center justify-between">
                         <Badge variant="outline">{booking.bookingNumber}</Badge>
                         <span className="text-sm text-muted-foreground">
                           {booking.equipment.length} معدات
@@ -252,12 +253,12 @@ export default function CheckOutPage() {
         </div>
 
         {/* Check-out Form */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="space-y-4 lg:col-span-2">
           {!selectedBooking ? (
             <Card>
               <CardContent className="py-12">
                 <div className="text-center text-muted-foreground">
-                  <Package className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                  <Package className="mx-auto mb-4 h-16 w-16 opacity-50" />
                   <p className="text-lg">اختر حجزاً من القائمة لبدء عملية الإخراج</p>
                 </div>
               </CardContent>
@@ -288,7 +289,8 @@ export default function CheckOutPage() {
                       <div>
                         <p className="text-sm text-muted-foreground">فترة الإيجار</p>
                         <p className="font-medium">
-                          {formatDate(selectedBooking.startDate)} - {formatDate(selectedBooking.endDate)}
+                          {formatDate(selectedBooking.startDate)} -{' '}
+                          {formatDate(selectedBooking.endDate)}
                         </p>
                       </div>
                     </div>
@@ -302,7 +304,8 @@ export default function CheckOutPage() {
                   <div className="flex items-center justify-between">
                     <CardTitle>المعدات</CardTitle>
                     <Button variant="outline" size="sm" onClick={handleSelectAll}>
-                      {checkedItems.size === selectedBooking.equipment.filter(e => !e.checkedOut).length
+                      {checkedItems.size ===
+                      selectedBooking.equipment.filter((e) => !e.checkedOut).length
                         ? 'إلغاء تحديد الكل'
                         : 'تحديد الكل'}
                     </Button>
@@ -313,8 +316,8 @@ export default function CheckOutPage() {
                     {selectedBooking.equipment.map((item) => (
                       <div
                         key={item.id}
-                        className={`flex items-center gap-4 p-4 border rounded-lg ${
-                          item.checkedOut ? 'bg-green-50 border-green-200' : ''
+                        className={`flex items-center gap-4 rounded-lg border p-4 ${
+                          item.checkedOut ? 'border-green-200 bg-green-50' : ''
                         }`}
                       >
                         {item.checkedOut ? (
@@ -331,7 +334,7 @@ export default function CheckOutPage() {
                             <p className="text-sm text-muted-foreground">{item.equipment.model}</p>
                           )}
                           {item.equipment.serialNumber && (
-                            <p className="text-xs text-muted-foreground font-mono">
+                            <p className="font-mono text-xs text-muted-foreground">
                               S/N: {item.equipment.serialNumber}
                             </p>
                           )}
@@ -362,7 +365,8 @@ export default function CheckOutPage() {
                   />
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-muted-foreground">
-                      تم تحديد {checkedItems.size} من {selectedBooking.equipment.filter(e => !e.checkedOut).length} معدات
+                      تم تحديد {checkedItems.size} من{' '}
+                      {selectedBooking.equipment.filter((e) => !e.checkedOut).length} معدات
                     </p>
                     <Button
                       onClick={handleCheckOut}

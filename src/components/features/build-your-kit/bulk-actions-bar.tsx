@@ -39,7 +39,8 @@ export function BulkActionsBar() {
     <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border-light bg-surface-light p-4">
       <div>
         <p className="text-sm font-medium text-text-heading">
-          {totalUnits} {t('kit.items')} selected · {formatSar(totalWithVat)} ({durationDays} {t('kit.days')})
+          {totalUnits} {t('kit.items')} selected · {formatSar(totalWithVat)} ({durationDays}{' '}
+          {t('kit.days')})
         </p>
         <p className="text-xs text-text-muted">
           {selectedCount} {selectedCount === 1 ? 'item' : 'items'} in your kit

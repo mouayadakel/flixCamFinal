@@ -18,6 +18,7 @@
 ## Files Created/Modified
 
 ### Created:
+
 1. `src/app/portal/layout.tsx` - Client portal layout with navigation
 2. `src/app/portal/dashboard/page.tsx` - Client dashboard with KPIs and booking overview
 3. `src/app/portal/bookings/page.tsx` - My Bookings list page with filters
@@ -33,6 +34,7 @@
 ## Features Implemented
 
 ### Client Dashboard ✅
+
 - **KPI Cards**:
   - Total bookings count
   - Total spent amount
@@ -42,28 +44,33 @@
 - **Quick Actions**: Links to bookings, contracts, invoices
 
 ### My Bookings Page ✅
+
 - **List View**: All client bookings with status badges
 - **Filters**: Status filter and search by booking number
 - **Booking Cards**: Shows booking number, dates, amount, equipment count
 - **Actions**: View booking details
 
 ### Booking Detail Page ✅
+
 - **Booking Information**: Dates, amounts, deposit
 - **Equipment List**: All equipment items with details
 - **Payment History**: List of all payments
 - **Quick Actions**: View contract, pay invoice, view invoices
 
 ### My Contracts Page ✅
+
 - **Contract List**: All contracts with status badges
 - **Status Indicators**: Signed, Pending, etc.
 - **Actions**: Sign contract (if pending), view contract
 
 ### Contract Viewing Page ✅
+
 - **Contract Information**: Contract ID, dates, status
 - **Contract Content**: Full contract text (HTML)
 - **Actions**: Sign contract, download PDF, view booking
 
 ### Contract E-Signature Page ✅
+
 - **Contract Preview**: Displays full contract content
 - **Signature Canvas**: Interactive signature drawing
 - **Clear Signature**: Button to clear and redraw
@@ -71,12 +78,14 @@
 - **Submit**: Saves signature to database and updates contract status
 
 ### My Invoices Page ✅
+
 - **Invoice List**: All invoices with payment status
 - **Status Badges**: Paid, Partially Paid, Unpaid
 - **Payment Information**: Shows paid amount vs total
 - **Actions**: View details, download PDF
 
 ### Invoice Detail Page ✅
+
 - **Invoice Information**: Invoice number, dates, amounts
 - **Payment History**: List of all payments
 - **Invoice Items**: Line items breakdown
@@ -85,12 +94,14 @@
 ## API Routes
 
 ### Contract APIs ✅
+
 - `GET /api/contracts/[id]` - Get contract details
 - `POST /api/contracts/[id]/sign` - Sign contract with e-signature
 
 ## Database Integration
 
 All operations use Prisma with:
+
 - ✅ Proper soft delete filtering (`deletedAt: null`)
 - ✅ User authorization (only client's own data)
 - ✅ Relations (booking, equipment, payments, contracts)
@@ -117,12 +128,14 @@ All operations use Prisma with:
 ## Testing Checklist
 
 ### Dashboard
+
 - [ ] Dashboard loads with correct KPIs
 - [ ] Active bookings display correctly
 - [ ] Upcoming bookings display correctly
 - [ ] Quick actions navigate correctly
 
 ### Bookings
+
 - [ ] Bookings list loads correctly
 - [ ] Filters work (status, search)
 - [ ] Booking detail page shows all information
@@ -130,6 +143,7 @@ All operations use Prisma with:
 - [ ] Payment history displays correctly
 
 ### Contracts
+
 - [ ] Contracts list loads correctly
 - [ ] Contract viewing page displays content
 - [ ] Contract signing page loads
@@ -139,6 +153,7 @@ All operations use Prisma with:
 - [ ] Terms acceptance required
 
 ### Invoices
+
 - [ ] Invoices list loads correctly
 - [ ] Payment status displays correctly
 - [ ] Invoice detail page shows all information
@@ -150,6 +165,7 @@ All operations use Prisma with:
 **Phase 7: Warehouse Operations** is ready to begin.
 
 ### Required Before Phase 7:
+
 1. Test all client portal features
 2. Verify contract signing works end-to-end
 3. Test invoice viewing and downloading

@@ -34,30 +34,22 @@ export default async function VendorEquipmentNewPage() {
       <div>
         <Link
           href="/vendor/equipment"
-          className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1 mb-2"
+          className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowRight className="h-4 w-4" />
           العودة للمعدات
         </Link>
         <h1 className="text-3xl font-bold">إضافة معدات جديدة</h1>
-        <p className="text-muted-foreground mt-1">
-          سيتم مراجعة الإدراج من قبل الإدارة قبل النشر
-        </p>
+        <p className="mt-1 text-muted-foreground">سيتم مراجعة الإدراج من قبل الإدارة قبل النشر</p>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>تفاصيل المعدات</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            الإدارة ستحدد السعر بعد الموافقة
-          </p>
+          <p className="text-sm text-muted-foreground">الإدارة ستحدد السعر بعد الموافقة</p>
         </CardHeader>
         <CardContent>
-          <VendorEquipmentForm
-            categories={categories}
-            brands={brands}
-            vendorId={vendor.id}
-          />
+          <VendorEquipmentForm categories={categories} brands={brands} vendorId={vendor.id} />
         </CardContent>
       </Card>
     </div>

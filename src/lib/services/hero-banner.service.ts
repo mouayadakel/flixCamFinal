@@ -239,7 +239,10 @@ export class HeroBannerService {
     }
   }
 
-  static async createBanner(data: CreateBannerInput, userId?: string): Promise<HeroBannerWithSlides> {
+  static async createBanner(
+    data: CreateBannerInput,
+    userId?: string
+  ): Promise<HeroBannerWithSlides> {
     const existing = await prisma.heroBanner.findFirst({
       where: { pageSlug: data.pageSlug, deletedAt: null },
     })

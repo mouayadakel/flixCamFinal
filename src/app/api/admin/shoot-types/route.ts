@@ -32,7 +32,10 @@ export async function GET(request: NextRequest) {
     const list = await ShootTypeService.getAll(includeInactive)
     return NextResponse.json({ data: list })
   } catch (error) {
-    const status = error && typeof error === 'object' && 'statusCode' in error ? (error as { statusCode: number }).statusCode : 500
+    const status =
+      error && typeof error === 'object' && 'statusCode' in error
+        ? (error as { statusCode: number }).statusCode
+        : 500
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal Server Error' },
       { status }
@@ -64,9 +67,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message, fields: error.fields }, { status: 400 })
     }
     if (error instanceof Error && 'issues' in error) {
-      return NextResponse.json({ error: 'Validation failed', details: (error as { issues: unknown }).issues }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Validation failed', details: (error as { issues: unknown }).issues },
+        { status: 400 }
+      )
     }
-    const status = error && typeof error === 'object' && 'statusCode' in error ? (error as { statusCode: number }).statusCode : 500
+    const status =
+      error && typeof error === 'object' && 'statusCode' in error
+        ? (error as { statusCode: number }).statusCode
+        : 500
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal Server Error' },
       { status }

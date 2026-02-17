@@ -6,13 +6,13 @@
 
 ## 📊 الوضع الحالي vs المطلوب
 
-| المؤشر | الحالي | المطلوب | الفجوة |
-|--------|--------|---------|--------|
-| صفحات Live | 25 | 75+ | 50 صفحة |
-| صفحات Mock | 15 | 0 | -15 صفحة |
-| صفحات Missing | 35 | 0+ | 35 صفحة |
-| APIs مكتملة | ~40% | 100% | +60% |
-| Features كاملة | 33% | 100% | +67% |
+| المؤشر         | الحالي | المطلوب | الفجوة   |
+| -------------- | ------ | ------- | -------- |
+| صفحات Live     | 25     | 75+     | 50 صفحة  |
+| صفحات Mock     | 15     | 0       | -15 صفحة |
+| صفحات Missing  | 35     | 0+      | 35 صفحة  |
+| APIs مكتملة    | ~40%   | 100%    | +60%     |
+| Features كاملة | 33%    | 100%    | +67%     |
 
 ---
 
@@ -21,6 +21,7 @@
 ## 1.1 `/admin/dashboard` (تحسينات حرجة)
 
 ### **الوضع الحالي:**
+
 - ✅ KPIs أساسية موجودة
 - ⚠️ المقارنات hardcoded (+12%, -5%)
 - ❌ لا يوجد date range selector
@@ -52,6 +53,7 @@ DateRangeSelector {
 ```
 
 **UI Elements:**
+
 - DatePicker component مع Presets
 - زر "Compare to" مع Dropdown
 - Badge يظهر الفترة المختارة
@@ -60,6 +62,7 @@ DateRangeSelector {
 #### 2. KPI Cards - تحسينات
 
 **Revenue Card:**
+
 ```typescript
 RevenueKPI {
   current: number // من DB فعلي
@@ -84,6 +87,7 @@ RevenueKPI {
 ```
 
 **UI Elements:**
+
 - رقم أكبر للقيمة الحالية
 - Arrow icon (up/down) مع اللون المناسب
 - Tooltip عند hover يظهر breakdown
@@ -91,6 +95,7 @@ RevenueKPI {
 - زر "View Details" يفتح modal أو ينقل لصفحة Revenue
 
 **Bookings Card:**
+
 ```typescript
 BookingsKPI {
   total: number
@@ -111,6 +116,7 @@ BookingsKPI {
 ```
 
 **Occupancy Card:**
+
 ```typescript
 OccupancyKPI {
   equipment: {
@@ -129,6 +135,7 @@ OccupancyKPI {
 ```
 
 **New Clients Card:**
+
 ```typescript
 NewClientsKPI {
   thisMonth: number
@@ -147,6 +154,7 @@ NewClientsKPI {
 #### 3. Charts - تحسينات
 
 **Revenue Chart:**
+
 ```typescript
 RevenueChart {
   type: "line" | "bar" | "area"
@@ -177,6 +185,7 @@ RevenueChart {
 ```
 
 **UI Elements:**
+
 - Tabs للتبديل بين Line/Bar/Area
 - Dropdown لاختيار Granularity
 - Legend مع checkboxes للإظهار/الإخفاء
@@ -185,6 +194,7 @@ RevenueChart {
 - Tooltip يظهر التفاصيل
 
 **Booking Status Chart:**
+
 ```typescript
 BookingStatusChart {
   type: "donut" | "pie" | "bar"
@@ -366,6 +376,7 @@ RevenueForecast {
 ## 1.2 `/admin/dashboard/overview` (تحويل من Placeholder)
 
 ### **المطلوب:**
+
 صفحة Overview شاملة مع widgets قابلة للتخصيص
 
 ```typescript
@@ -418,6 +429,7 @@ DashboardOverview {
 ```
 
 **UI Elements:**
+
 - زر "Customize Dashboard"
 - Drag & Drop لإعادة ترتيب الـ Widgets
 - زر "+" لإضافة widget جديد
@@ -431,6 +443,7 @@ DashboardOverview {
 ## 1.3 `/admin/dashboard/revenue` (تحويل من Placeholder)
 
 ### **المطلوب:**
+
 صفحة تحليلات إيرادات متقدمة
 
 ```typescript
@@ -441,7 +454,7 @@ RevenueDashboard {
     groupBy: "day" | "week" | "month" | "quarter"
     revenueType: "all" | "equipment" | "studio" | "packages"
   }
-  
+
   metrics: {
     totalRevenue: {
       current: number
@@ -465,7 +478,7 @@ RevenueDashboard {
       rate: number
     }
   }
-  
+
   charts: {
     revenueOverTime: {
       type: "line" | "bar" | "area"
@@ -486,7 +499,7 @@ RevenueDashboard {
       data: SourceData[]
     }
   }
-  
+
   tables: {
     topEquipment: {
       columns: ["Equipment", "Rentals", "Revenue", "Growth"]
@@ -503,7 +516,7 @@ RevenueDashboard {
       data: MonthlyRevenueData[]
     }
   }
-  
+
   insights: {
     aiPowered: true
     items: [
@@ -523,7 +536,7 @@ RevenueDashboard {
       }
     ]
   }
-  
+
   export: {
     formats: ["PDF", "Excel", "CSV"]
     templates: ["Summary", "Detailed", "Executive"]
@@ -537,6 +550,7 @@ RevenueDashboard {
 ```
 
 **UI Elements:**
+
 - Filter bar في الأعلى
 - Grid من KPI cards
 - Section للـ Charts (2-3 charts)
@@ -551,6 +565,7 @@ RevenueDashboard {
 ## 1.4 `/admin/dashboard/activity` (تحويل من Placeholder)
 
 ### **المطلوب:**
+
 Activity Feed للنظام
 
 ```typescript
@@ -561,12 +576,12 @@ ActivityDashboard {
     user: string // filter by user
     entity: string // filter by booking/equipment/etc
   }
-  
+
   feed: {
     items: ActivityItem[]
     grouping: "none" | "by-hour" | "by-day"
     realtime: boolean // live updates
-    
+
     ActivityItem: {
       id: string
       timestamp: Date
@@ -589,14 +604,14 @@ ActivityDashboard {
       color: string
     }
   }
-  
+
   stats: {
     totalActivities: number
     byType: { type: string, count: number }[]
     byUser: { user: string, count: number }[]
     busyHours: { hour: number, count: number }[]
   }
-  
+
   realTimeIndicator: {
     enabled: true
     lastUpdate: Date
@@ -606,6 +621,7 @@ ActivityDashboard {
 ```
 
 **أمثلة على Activities:**
+
 ```typescript
 [
   {
@@ -649,6 +665,7 @@ ActivityDashboard {
 ```
 
 **UI Elements:**
+
 - Live indicator badge (🟢 Live)
 - Filter dropdown
 - Timeline-style feed
@@ -663,6 +680,7 @@ ActivityDashboard {
 ## 1.5 `/admin/dashboard/recent-bookings` (تحويل من Placeholder)
 
 ### **المطلوب:**
+
 قائمة متقدمة للحجوزات الأخيرة
 
 ```typescript
@@ -674,14 +692,14 @@ RecentBookingsDashboard {
     sortBy: "created" | "start_date" | "amount"
     sortOrder: "asc" | "desc"
   }
-  
+
   summary: {
     total: number
     totalValue: number
     byStatus: { status: string, count: number, value: number }[]
     byType: { type: string, count: number, value: number }[]
   }
-  
+
   table: {
     columns: [
       {
@@ -749,7 +767,7 @@ RecentBookingsDashboard {
       "Send Messages"
     ]
   }
-  
+
   quickStats: {
     todayBookings: number
     activeNow: number
@@ -760,6 +778,7 @@ RecentBookingsDashboard {
 ```
 
 **UI Elements:**
+
 - Summary cards في الأعلى
 - Filter bar
 - Table مع checkboxes للـ bulk actions
@@ -774,6 +793,7 @@ RecentBookingsDashboard {
 ## 1.6 `/admin/dashboard/quick-actions` (تحويل من Placeholder)
 
 ### **المطلوب:**
+
 Command Center للإجراءات السريعة
 
 ```typescript
@@ -902,18 +922,18 @@ QuickActionsDashboard {
       ]
     }
   ]
-  
+
   recentActions: {
     enabled: true
     items: Action[] // last 10 actions by user
   }
-  
+
   favoriteActions: {
     enabled: true
     customizable: true
     items: Action[] // user favorites
   }
-  
+
   commandPalette: {
     enabled: true
     shortcut: "Ctrl+K"
@@ -924,6 +944,7 @@ QuickActionsDashboard {
 ```
 
 **UI Elements:**
+
 - Grid layout للـ sections
 - Cards للـ actions مع icons كبيرة
 - Badge indicators للـ counts
@@ -942,6 +963,7 @@ QuickActionsDashboard {
 ## 2.1 `/admin/action-center` (جديد - حرج جداً)
 
 ### **الهدف:**
+
 مركز القيادة للمهام العاجلة والتنبيهات
 
 ```typescript
@@ -952,7 +974,7 @@ ActionCenter {
     normal: number
     overdue: number
   }
-  
+
   filters: {
     priority: "all" | "urgent" | "high" | "normal"
     type: "all" | "approval" | "alert" | "task"
@@ -960,9 +982,9 @@ ActionCenter {
     assignedTo: "me" | "unassigned" | "all"
     dateRange: DateRange
   }
-  
+
   actions: ActionItem[]
-  
+
   ActionItem: {
     id: string
     type: "approval" | "alert" | "task"
@@ -970,24 +992,24 @@ ActionCenter {
     title: string
     description: string
     status: "pending" | "in_progress" | "completed"
-    
+
     relatedEntity: {
       type: "booking" | "payment" | "equipment" | "maintenance" | "client"
       id: string
       name: string
       link: string
     }
-    
+
     assignedTo?: {
       id: string
       name: string
       avatar?: string
     }
-    
+
     createdAt: Date
     dueDate?: Date
     completedAt?: Date
-    
+
     actions: {
       primary?: {
         label: string
@@ -1003,7 +1025,7 @@ ActionCenter {
         requiresReason: boolean
       }
     }
-    
+
     metadata: Record<string, any>
   }
 }
@@ -1012,51 +1034,53 @@ ActionCenter {
 ### **أنواع Actions:**
 
 #### 1. Failed Payments (Urgent)
+
 ```typescript
 {
-  type: "alert"
-  priority: "urgent"
-  title: "Payment Failed"
-  description: "Booking #BK-1234 payment failed - SAR 2,500"
+  type: 'alert'
+  priority: 'urgent'
+  title: 'Payment Failed'
+  description: 'Booking #BK-1234 payment failed - SAR 2,500'
   relatedEntity: {
-    type: "booking"
-    id: "BK-1234"
-    link: "/admin/bookings/BK-1234"
+    type: 'booking'
+    id: 'BK-1234'
+    link: '/admin/bookings/BK-1234'
   }
   actions: {
     primary: {
-      label: "Retry Payment"
+      label: 'Retry Payment'
       action: () => retryPayment()
     }
     secondary: {
-      label: "Contact Client"
+      label: 'Contact Client'
       action: () => openWhatsApp()
     }
   }
   metadata: {
-    paymentId: "PAY-5678"
+    paymentId: 'PAY-5678'
     amount: 2500
-    failureReason: "Insufficient funds"
+    failureReason: 'Insufficient funds'
     attempts: 1
   }
 }
 ```
 
 #### 2. Low Stock Alert (High)
+
 ```typescript
 {
-  type: "alert"
-  priority: "high"
-  title: "Low Stock Alert"
-  description: "Sony A7S III: 1 unit left (minimum: 2)"
+  type: 'alert'
+  priority: 'high'
+  title: 'Low Stock Alert'
+  description: 'Sony A7S III: 1 unit left (minimum: 2)'
   relatedEntity: {
-    type: "equipment"
-    id: "EQ-123"
-    link: "/admin/inventory/equipment/EQ-123"
+    type: 'equipment'
+    id: 'EQ-123'
+    link: '/admin/inventory/equipment/EQ-123'
   }
   actions: {
     primary: {
-      label: "Order More"
+      label: 'Order More'
       action: () => createPurchaseOrder()
     }
     dismiss: {
@@ -1073,6 +1097,7 @@ ActionCenter {
 ```
 
 #### 3. Maintenance Due (High)
+
 ```typescript
 {
   type: "task"
@@ -1097,99 +1122,103 @@ ActionCenter {
 ```
 
 #### 4. Late Returns (Urgent)
+
 ```typescript
 {
-  type: "alert"
-  priority: "urgent"
-  title: "Late Return"
-  description: "Booking #BK-1233 - Equipment not returned (2 days overdue)"
+  type: 'alert'
+  priority: 'urgent'
+  title: 'Late Return'
+  description: 'Booking #BK-1233 - Equipment not returned (2 days overdue)'
   relatedEntity: {
-    type: "booking"
-    id: "BK-1233"
-    link: "/admin/bookings/BK-1233"
+    type: 'booking'
+    id: 'BK-1233'
+    link: '/admin/bookings/BK-1233'
   }
   actions: {
     primary: {
-      label: "Contact Client"
+      label: 'Contact Client'
       action: () => openWhatsApp()
     }
     secondary: {
-      label: "Apply Late Fee"
+      label: 'Apply Late Fee'
       action: () => applyLateFee()
     }
   }
   metadata: {
-    returnDate: "2024-01-26"
+    returnDate: '2024-01-26'
     daysOverdue: 2
-    equipment: ["Camera", "Lens"]
-    clientPhone: "+966..."
+    equipment: ['Camera', 'Lens']
+    clientPhone: '+966...'
   }
 }
 ```
 
 #### 5. Overbooking Risk (High)
+
 ```typescript
 {
-  type: "alert"
-  priority: "high"
-  title: "Potential Overbooking"
-  description: "Sony A7S III: 3 overlapping bookings detected"
+  type: 'alert'
+  priority: 'high'
+  title: 'Potential Overbooking'
+  description: 'Sony A7S III: 3 overlapping bookings detected'
   relatedEntity: {
-    type: "equipment"
-    id: "EQ-123"
-    link: "/admin/inventory/equipment/EQ-123"
+    type: 'equipment'
+    id: 'EQ-123'
+    link: '/admin/inventory/equipment/EQ-123'
   }
   actions: {
     primary: {
-      label: "Resolve Conflicts"
+      label: 'Resolve Conflicts'
       action: () => openConflictResolver()
     }
   }
   metadata: {
-    conflictingBookings: ["BK-1234", "BK-1235", "BK-1236"]
-    date: "2024-02-01"
+    conflictingBookings: ['BK-1234', 'BK-1235', 'BK-1236']
+    date: '2024-02-01'
   }
 }
 ```
 
 #### 6. Discount Approval Required (Normal)
+
 ```typescript
 {
-  type: "approval"
-  priority: "normal"
-  title: "Discount Approval Required"
-  description: "Quote #QT-5678 - 25% discount requested (over 20% limit)"
+  type: 'approval'
+  priority: 'normal'
+  title: 'Discount Approval Required'
+  description: 'Quote #QT-5678 - 25% discount requested (over 20% limit)'
   relatedEntity: {
-    type: "quote"
-    id: "QT-5678"
-    link: "/admin/quotes/QT-5678"
+    type: 'quote'
+    id: 'QT-5678'
+    link: '/admin/quotes/QT-5678'
   }
   assignedTo: {
-    id: "user-123"
-    name: "Manager"
+    id: 'user-123'
+    name: 'Manager'
   }
   actions: {
     primary: {
-      label: "Approve"
+      label: 'Approve'
       action: () => approveDiscount()
       confirmRequired: true
     }
     secondary: {
-      label: "Reject"
+      label: 'Reject'
       action: () => rejectDiscount()
     }
   }
   metadata: {
-    requestedBy: "Ahmed Ali"
+    requestedBy: 'Ahmed Ali'
     discount: 25
     limit: 20
     amount: 5000
-    reason: "Large order - repeat client"
+    reason: 'Large order - repeat client'
   }
 }
 ```
 
 ### **UI Layout:**
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │ Action Center                                       │
@@ -1220,6 +1249,7 @@ ActionCenter {
 ```
 
 ### **Additional Features:**
+
 - Real-time updates (WebSocket/Polling)
 - Desktop notifications
 - Email/WhatsApp digests
@@ -1234,6 +1264,7 @@ ActionCenter {
 ## 2.2 `/admin/approvals` (جديد - حرج)
 
 ### **الهدف:**
+
 نظام مركزي لجميع الموافقات
 
 ```typescript
@@ -1245,7 +1276,7 @@ ApprovalsSystem {
     assignedTo: "me" | "team" | "all"
     dateRange: DateRange
   }
-  
+
   summary: {
     pending: number
     approved: number
@@ -1253,45 +1284,45 @@ ApprovalsSystem {
     avgApprovalTime: number // in hours
     byType: { type: string, count: number }[]
   }
-  
+
   approvals: Approval[]
-  
+
   Approval: {
     id: string
     type: ApprovalType
     status: "pending" | "approved" | "rejected"
     priority: "urgent" | "high" | "normal"
-    
+
     requestor: {
       id: string
       name: string
       role: string
     }
-    
+
     approver?: {
       id: string
       name: string
     }
-    
+
     subject: string
     description: string
-    
+
     relatedEntity: {
       type: string
       id: string
       name: string
       link: string
     }
-    
+
     requestDetails: Record<string, any>
-    
+
     financialImpact?: {
       amount: number
       type: "cost" | "revenue_loss" | "discount"
     }
-    
+
     businessJustification?: string
-    
+
     actions: {
       approve: {
         requiresComment: boolean
@@ -1307,14 +1338,14 @@ ApprovalsSystem {
         action: (message: string) => Promise<void>
       }
     }
-    
+
     history: {
       timestamp: Date
       action: string
       user: string
       comment?: string
     }[]
-    
+
     createdAt: Date
     dueDate?: Date
     decidedAt?: Date
@@ -1330,83 +1361,86 @@ ApprovalsSystem {
 ### **أنواع Approvals:**
 
 #### 1. Discount Approval
+
 ```typescript
 {
-  type: "discount"
-  priority: "normal"
-  subject: "25% Discount Request"
-  description: "Quote #QT-5678 - Client requesting 25% discount"
-  
+  type: 'discount'
+  priority: 'normal'
+  subject: '25% Discount Request'
+  description: 'Quote #QT-5678 - Client requesting 25% discount'
+
   requestDetails: {
     originalAmount: 5000
     discountPercentage: 25
     discountedAmount: 3750
     threshold: 20 // auto-approve under 20%
-    reason: "Repeat client with 10+ previous bookings"
+    reason: 'Repeat client with 10+ previous bookings'
     clientHistory: {
       totalBookings: 15
       totalRevenue: 45000
       averageOrderValue: 3000
     }
   }
-  
-  businessJustification: "Client has excellent history and this is a large order"
-  
+
+  businessJustification: 'Client has excellent history and this is a large order'
+
   financialImpact: {
     amount: 1250
-    type: "revenue_loss"
+    type: 'revenue_loss'
   }
 }
 ```
 
 #### 2. Refund Approval
+
 ```typescript
 {
-  type: "refund"
-  priority: "high"
-  subject: "Full Refund Request"
-  description: "Booking #BK-1234 - Client requesting full refund"
-  
+  type: 'refund'
+  priority: 'high'
+  subject: 'Full Refund Request'
+  description: 'Booking #BK-1234 - Client requesting full refund'
+
   requestDetails: {
-    bookingId: "BK-1234"
+    bookingId: 'BK-1234'
     originalAmount: 2500
     refundAmount: 2500
-    refundType: "full"
-    reason: "Equipment malfunction"
+    refundType: 'full'
+    reason: 'Equipment malfunction'
     policy: {
       allows: false // outside policy window
-      window: "48 hours before start"
-      timeToStart: "12 hours"
+      window: '48 hours before start'
+      timeToStart: '12 hours'
     }
     clientRequest: "Camera had issues, couldn't complete shoot"
   }
-  
-  businessJustification: "Equipment issue confirmed, maintain client satisfaction"
-  
+
+  businessJustification: 'Equipment issue confirmed, maintain client satisfaction'
+
   financialImpact: {
     amount: 2500
-    type: "revenue_loss"
+    type: 'revenue_loss'
   }
 }
 ```
 
 #### 3. Change Request Approval
+
 ```typescript
 {
-  type: "change_request"
-  priority: "normal"
-  subject: "Booking Date Change"
-  description: "Booking #BK-1235 - Client requesting date change"
-  
+  type: 'change_request'
+  priority: 'normal'
+  subject: 'Booking Date Change'
+  description: 'Booking #BK-1235 - Client requesting date change'
+
   requestDetails: {
-    bookingId: "BK-1235"
+    bookingId: 'BK-1235'
     originalDates: {
-      start: "2024-02-01"
-      end: "2024-02-03"
+      start: '2024-02-01'
+      end: '2024-02-03'
     }
     requestedDates: {
-      start: "2024-02-10"
-      end: "2024-02-12"
+      start: '2024-02-10'
+      end: '2024-02-12'
     }
     availability: {
       available: true
@@ -1418,71 +1452,74 @@ ApprovalsSystem {
       fee: 0 // no fee for this change
     }
   }
-  
-  businessJustification: "No conflicts, maintain client satisfaction"
+
+  businessJustification: 'No conflicts, maintain client satisfaction'
 }
 ```
 
 #### 4. Overbooking Approval
+
 ```typescript
 {
-  type: "overbooking"
-  priority: "urgent"
-  subject: "Overbooking Request"
-  description: "Staff requesting to overbook Sony A7S III"
-  
+  type: 'overbooking'
+  priority: 'urgent'
+  subject: 'Overbooking Request'
+  description: 'Staff requesting to overbook Sony A7S III'
+
   requestDetails: {
-    equipmentId: "EQ-123"
-    equipmentName: "Sony A7S III"
+    equipmentId: 'EQ-123'
+    equipmentName: 'Sony A7S III'
     currentBookings: 3
     availableUnits: 2
-    requestedBooking: "BK-1236"
-    conflictDate: "2024-02-05"
+    requestedBooking: 'BK-1236'
+    conflictDate: '2024-02-05'
     mitigation: {
-      plan: "Can source from partner"
+      plan: 'Can source from partner'
       cost: 500
-      confidence: "high"
+      confidence: 'high'
     }
-    clientImportance: "VIP - repeat client"
+    clientImportance: 'VIP - repeat client'
   }
-  
-  businessJustification: "VIP client, can source alternative, high-margin booking"
-  
+
+  businessJustification: 'VIP client, can source alternative, high-margin booking'
+
   financialImpact: {
     amount: 500 // extra cost
-    type: "cost"
+    type: 'cost'
   }
 }
 ```
 
 #### 5. Manual Booking Approval
+
 ```typescript
 {
-  type: "manual_booking"
-  priority: "high"
-  subject: "Out-of-Policy Booking"
-  description: "Booking with special terms requires approval"
-  
+  type: 'manual_booking'
+  priority: 'high'
+  subject: 'Out-of-Policy Booking'
+  description: 'Booking with special terms requires approval'
+
   requestDetails: {
     deviations: [
-      "Below minimum rental duration",
-      "Custom pricing (30% below standard)",
-      "Deferred payment terms"
+      'Below minimum rental duration',
+      'Custom pricing (30% below standard)',
+      'Deferred payment terms',
     ]
-    clientType: "Corporate - Large Account"
+    clientType: 'Corporate - Large Account'
     contractValue: 50000 // annual
     proposedTerms: {
-      duration: "1 day" // minimum is 2
+      duration: '1 day' // minimum is 2
       price: 1750 // standard is 2500
-      payment: "Net 30" // standard is immediate
+      payment: 'Net 30' // standard is immediate
     }
   }
-  
-  businessJustification: "Strategic client, potential for large contract"
+
+  businessJustification: 'Strategic client, potential for large contract'
 }
 ```
 
 ### **UI Layout:**
+
 ```
 ┌──────────────────────────────────────────────────────┐
 │ Approvals                                            │
@@ -1517,6 +1554,7 @@ ApprovalsSystem {
 ```
 
 ### **Additional Features:**
+
 - Approval workflows (multi-level)
 - Delegation rules
 - Auto-approval thresholds
@@ -1533,6 +1571,7 @@ ApprovalsSystem {
 ## 2.3 `/admin/live-ops` (جديد - مهم)
 
 ### **الهدف:**
+
 Dashboard للعمليات الحية في الوقت الفعلي
 
 ```typescript
@@ -1542,7 +1581,7 @@ LiveOperations {
     updateInterval: 30000 // 30 seconds
     lastUpdate: Date
   }
-  
+
   overview: {
     activeBookings: {
       count: number
@@ -1550,62 +1589,62 @@ LiveOperations {
       studioSessions: number
       totalValue: number
     }
-    
+
     todayDeliveries: {
       completed: number
       pending: number
       inProgress: number
       delayed: number
     }
-    
+
     checkOutQueue: {
       pending: number
       avgWaitTime: number // minutes
     }
-    
+
     checkInQueue: {
       pending: number
       overdueReturns: number
     }
-    
+
     staffStatus: {
       active: number
       busy: number
       available: number
     }
   }
-  
+
   timeline: {
     type: "gantt" | "list"
     view: "today" | "week" | "month"
-    
+
     events: LiveEvent[]
-    
+
     LiveEvent: {
       id: string
       type: "booking_start" | "booking_end" | "delivery" | "pickup" | "maintenance"
       time: Date
       duration?: number
       status: "upcoming" | "active" | "completed" | "delayed"
-      
+
       booking?: {
         id: string
         client: string
         items: string[]
       }
-      
+
       delivery?: {
         id: string
         driver: string
         location: string
         eta?: Date
       }
-      
+
       color: string
       priority: "normal" | "high" | "urgent"
     }
   }
-  
+
   map: {
     enabled: boolean // if GPS tracking available
     markers: {
@@ -1620,7 +1659,7 @@ LiveOperations {
       studios: Location[]
     }
   }
-  
+
   alerts: {
     items: Alert[]
     Alert: {
@@ -1630,7 +1669,7 @@ LiveOperations {
       action?: { label: string, onClick: () => void }
     }
   }
-  
+
   quickActions: {
     updateDeliveryStatus: (id: string, status: string) => void
     markCheckOut: (bookingId: string) => void
@@ -1644,11 +1683,13 @@ LiveOperations {
 ### **UI Sections:**
 
 #### 1. Overview Cards
+
 ```
 [Active Bookings: 15]  [Deliveries Today: 8]  [Check-Out Queue: 3]  [Staff Active: 5]
 ```
 
 #### 2. Timeline View
+
 ```
 08:00 ━━ 10:00 Studio A - Client A (Active)
       ├─ 09:00 📦 Delivery to Client B (In Transit)
@@ -1658,6 +1699,7 @@ LiveOperations {
 ```
 
 #### 3. Deliveries Map (if GPS enabled)
+
 ```
 [Map with markers for:]
 - 🏢 Warehouse location
@@ -1667,6 +1709,7 @@ LiveOperations {
 ```
 
 #### 4. Check-Out Queue
+
 ```
 ┌────────────────────────────────────┐
 │ Pending Check-Outs (3)             │
@@ -1683,6 +1726,7 @@ LiveOperations {
 ```
 
 #### 5. Active Alerts
+
 ```
 ⚠️ Delivery delayed: #DEL-123 - ETA pushed by 30 minutes
 🔴 Late return: #BK-1233 - Equipment overdue by 2 days
@@ -1690,6 +1734,7 @@ LiveOperations {
 ```
 
 ### **Additional Features:**
+
 - Real-time notifications
 - Live chat with staff/drivers
 - Weather alerts (for deliveries)
@@ -1709,6 +1754,7 @@ LiveOperations {
 ## 3.1 `/admin/quotes` (تحسينات ضرورية)
 
 ### **الوضع الحالي:**
+
 - ✅ List موجود
 - ✅ Detail موجود
 - ❌ Create مفقود
@@ -1733,7 +1779,7 @@ QuoteCreation {
     canSkip: boolean
     saveAsDraft: boolean
   }
-  
+
   clientSelection: {
     existing: {
       search: {
@@ -1746,7 +1792,7 @@ QuoteCreation {
       }
       quickSelect: Client[] // recent clients
     }
-    
+
     new: {
       quickCreate: {
         name: string
@@ -1756,13 +1802,13 @@ QuoteCreation {
       }
       fullForm: boolean
     }
-    
+
     guest: {
       allow: boolean
       fields: ["name", "email", "phone"]
     }
   }
-  
+
   itemsSelection: {
     equipment: {
       search: {
@@ -1774,7 +1820,7 @@ QuoteCreation {
         }
         results: Equipment[]
       }
-      
+
       selected: {
         equipmentId: string
         quantity: number
@@ -1789,14 +1835,14 @@ QuoteCreation {
         }
         alternatives: Equipment[] // if not available
       }[]
-      
+
       recommendations: {
         enabled: boolean
         items: Equipment[]
         source: "ai" | "rules" | "manual"
       }
     }
-    
+
     studio: {
       studioId: string
       date: Date
@@ -1814,17 +1860,17 @@ QuoteCreation {
         quantity: number
       }[]
     }
-    
+
     packages: {
       available: Package[]
       selected?: Package
       customize: boolean // allow removing items
     }
   }
-  
+
   pricing: {
     subtotal: number
-    
+
     discounts: {
       automatic: {
         bundle: number
@@ -1838,7 +1884,7 @@ QuoteCreation {
         requiresApproval: boolean
       }
     }
-    
+
     addons: {
       delivery: {
         included: boolean
@@ -1853,18 +1899,18 @@ QuoteCreation {
         fee: number
       }
     }
-    
+
     taxes: {
       vat: {
         rate: number
         amount: number
       }
     }
-    
+
     total: number
     deposit: number
   }
-  
+
   terms: {
     duration: {
       start: Date
@@ -1872,14 +1918,14 @@ QuoteCreation {
       flexible: boolean
       buffer: number // days
     }
-    
+
     delivery: {
       method: "pickup" | "delivery"
       address?: string
       date?: Date
       time?: string
     }
-    
+
     payment: {
       deposit: {
         required: boolean
@@ -1891,7 +1937,7 @@ QuoteCreation {
         method: "before_delivery" | "on_delivery" | "after_return"
       }
     }
-    
+
     cancellation: {
       policy: "standard" | "flexible" | "strict"
       cutoff: number // hours before
@@ -1903,14 +1949,14 @@ QuoteCreation {
         }[]
       }
     }
-    
+
     additional: {
       notes: string
       specialRequests: string
       internalNotes: string
     }
   }
-  
+
   review: {
     summary: {
       client: ClientInfo
@@ -1918,14 +1964,14 @@ QuoteCreation {
       pricing: PricingSummary
       terms: TermsSummary
     }
-    
+
     actions: {
       saveDraft: boolean
       sendToClient: boolean
       sendMethod: "email" | "whatsapp" | "both"
       createBooking: boolean // skip quote, create booking directly
     }
-    
+
     preview: {
       pdf: boolean
       template: "standard" | "premium"
@@ -1940,18 +1986,18 @@ QuoteCreation {
 ```typescript
 QuoteDetailEnhancements {
   // Add to existing detail page
-  
+
   actions: {
     edit: {
       label: "Edit Quote"
       link: `/admin/quotes/${id}/edit`
     }
-    
+
     duplicate: {
       label: "Duplicate"
       action: () => duplicateQuote()
     }
-    
+
     convertToBooking: {
       label: "Convert to Booking"
       requirements: {
@@ -1960,13 +2006,13 @@ QuoteDetailEnhancements {
       }
       action: () => convertToBooking()
     }
-    
+
     sendToClient: {
       label: "Send/Resend"
       methods: ["email", "whatsapp", "sms"]
       templates: QuoteTemplate[]
     }
-    
+
     pdf: {
       generate: () => generatePDF()
       download: boolean
@@ -1977,14 +2023,14 @@ QuoteDetailEnhancements {
         includeTerms: boolean
       }
     }
-    
+
     revise: {
       label: "Create Revision"
       action: () => createRevision()
       preserveHistory: true
     }
   }
-  
+
   versionHistory: {
     versions: {
       version: number
@@ -1993,26 +2039,26 @@ QuoteDetailEnhancements {
       changes: string[]
       reason: string
     }[]
-    
+
     compare: {
       enabled: boolean
       versions: [number, number]
       diff: QuoteDiff
     }
-    
+
     restore: {
       enabled: boolean
       toVersion: number
     }
   }
-  
+
   clientInteractions: {
     views: {
       timestamp: Date
       ipAddress: string
       device: string
     }[]
-    
+
     communications: {
       type: "email" | "whatsapp" | "call"
       timestamp: Date
@@ -2020,14 +2066,14 @@ QuoteDetailEnhancements {
       content: string
       status: "sent" | "delivered" | "read" | "replied"
     }[]
-    
+
     feedback: {
       clientResponse: string
       concerns: string[]
       modifications: string[]
     }
   }
-  
+
   analytics: {
     timeToConversion: number // hours
     revisionsCount: number
@@ -2042,6 +2088,7 @@ QuoteDetailEnhancements {
 ## 3.2 `/admin/bookings` (تحسينات كبيرة)
 
 ### **الوضع الحالي:**
+
 - ✅ List موجود
 - ✅ Detail موجود مع State Machine
 - ✅ Create موجود
@@ -2057,39 +2104,39 @@ QuoteDetailEnhancements {
 ConflictDetection {
   automatic: {
     checkOn: ["create", "update", "date_change"]
-    
+
     types: {
       equipment: {
         quantityCheck: boolean
         considerBuffer: boolean
         checkMaintenanceSchedule: boolean
       }
-      
+
       studio: {
         timeOverlap: boolean
         considerBuffer: boolean
         considerSetup: boolean
       }
-      
+
       staff: {
         availability: boolean
         maxConcurrent: number
       }
     }
-    
+
     severity: {
       critical: {
         description: "Booking impossible - no units available"
         block: true
         notify: ["manager", "ops"]
       }
-      
+
       high: {
         description: "Potential conflict - overlapping bookings"
         warn: true
         requiresReview: boolean
       }
-      
+
       medium: {
         description: "Buffer time violation"
         warn: true
@@ -2097,20 +2144,20 @@ ConflictDetection {
       }
     }
   }
-  
+
   resolution: {
     suggestions: {
       alternativeDates: Date[]
       alternativeEquipment: Equipment[]
       alternativeStudio: Studio[]
-      
+
       sourceFromPartner: {
         possible: boolean
         cost: number
         partner: string
       }
     }
-    
+
     actions: {
       adjustBuffer: boolean
       createWaitlist: boolean
@@ -2118,14 +2165,14 @@ ConflictDetection {
       createCounterOffer: boolean
     }
   }
-  
+
   monitoring: {
     realTime: boolean
     alerts: {
       channels: ["dashboard", "email", "whatsapp"]
       recipients: string[]
     }
-    
+
     dashboard: {
       upcomingConflicts: Conflict[]
       resolvedConflicts: Conflict[]
@@ -2142,13 +2189,13 @@ LateReturnManagement {
   detection: {
     automatic: boolean
     checkFrequency: "hourly" | "every_6_hours" | "daily"
-    
+
     grace: Period {
       hours: number
       noFeeWindow: number
     }
   }
-  
+
   notifications: {
     beforeDue: {
       enabled: boolean
@@ -2156,7 +2203,7 @@ LateReturnManagement {
       channels: ["email", "whatsapp", "sms"]
       message: string
     }
-    
+
     afterDue: {
       enabled: boolean
       timing: number[] // hours after: [1, 6, 24]
@@ -2167,22 +2214,22 @@ LateReturnManagement {
       }
     }
   }
-  
+
   fees: {
     calculation: {
       type: "fixed_per_day" | "percentage_of_rental" | "tiered"
-      
+
       fixed: {
         amount: number
         perDay: boolean
         perHour: boolean
       }
-      
+
       percentage: {
         rate: number
         basedOn: "daily_rate" | "total_rental"
       }
-      
+
       tiered: {
         tiers: {
           hoursLate: number
@@ -2190,13 +2237,13 @@ LateReturnManagement {
         }[]
       }
     }
-    
+
     application: {
       automatic: boolean
       requiresApproval: boolean
       notifyClient: boolean
     }
-    
+
     waiver: {
       allowed: boolean
       requiresApproval: boolean
@@ -2204,13 +2251,13 @@ LateReturnManagement {
       documentation: boolean
     }
   }
-  
+
   enforcement: {
     blocked: Actions {
       createNewBooking: boolean
       requireClearance: boolean
     }
-    
+
     legal: {
       escalationThreshold: number // days
       process: string
@@ -2225,6 +2272,7 @@ LateReturnManagement {
 ## 3.3 `/admin/calendar` (تحويل من Mock - حرج جداً)
 
 ### **المطلوب:**
+
 تقويم تفاعلي كامل - هذا قلب نظام التأجير!
 
 ```typescript
@@ -2233,38 +2281,38 @@ CalendarSystem {
     day: {
       hourSlots: HourSlot[]
       resources: Resource[]
-      
+
       HourSlot: {
         hour: number
         events: Event[]
         availability: "available" | "partial" | "full"
       }
-      
+
       layout: "vertical" | "horizontal"
       hourHeight: number
     }
-    
+
     week: {
       days: DayColumn[]
-      
+
       DayColumn: {
         date: Date
         events: Event[]
         utilization: number
       }
-      
+
       showWeekend: boolean
       startHour: number
       endHour: number
     }
-    
+
     month: {
       weeks: Week[]
-      
+
       Week: {
         days: DayCell[]
       }
-      
+
       DayCell: {
         date: Date
         events: Event[]
@@ -2272,30 +2320,30 @@ CalendarSystem {
         revenue: number
         hasConflicts: boolean
       }
-      
+
       showEventDetails: "tooltip" | "inline" | "modal"
     }
-    
+
     agenda: {
       groupBy: "date" | "resource" | "client"
-      
+
       items: AgendaItem[]
-      
+
       AgendaItem: {
         date: Date
         events: Event[]
         totalRevenue: number
         conflicts: number
       }
-      
+
       sorting: "chronological" | "revenue" | "priority"
     }
-    
+
     timeline: {
       // Gantt-style view
       resources: Resource[]
       scale: "hour" | "day" | "week"
-      
+
       bars: {
         event: Event
         start: number
@@ -2304,7 +2352,7 @@ CalendarSystem {
       }[]
     }
   }
-  
+
   eventTypes: {
     booking: {
       display: {
@@ -2313,7 +2361,7 @@ CalendarSystem {
         color: string
         icon: "Calendar"
       }
-      
+
       tooltip: {
         bookingId: string
         client: string
@@ -2323,7 +2371,7 @@ CalendarSystem {
         status: string
         paymentStatus: string
       }
-      
+
       actions: [
         "View Details",
         "Edit Booking",
@@ -2331,7 +2379,7 @@ CalendarSystem {
         "Check Availability"
       ]
     }
-    
+
     maintenance: {
       display: {
         title: string // "Maintenance: Equipment Name"
@@ -2339,7 +2387,7 @@ CalendarSystem {
         icon: "Wrench"
         pattern: "diagonal-stripes"
       }
-      
+
       tooltip: {
         equipment: string
         type: string
@@ -2347,14 +2395,14 @@ CalendarSystem {
         estimatedDuration: number
       }
     }
-    
+
     blocked: {
       display: {
         title: string // "Blocked: Reason"
         color: "#ef4444"
         icon: "Ban"
       }
-      
+
       tooltip: {
         reason: string
         blockedBy: string
@@ -2362,11 +2410,11 @@ CalendarSystem {
       }
     }
   }
-  
+
   interactions: {
     create: {
       method: "click" | "drag"
-      
+
       click: {
         // Click empty slot
         action: "open_booking_form"
@@ -2375,27 +2423,27 @@ CalendarSystem {
           resource: Resource
         }
       }
-      
+
       drag: {
         // Drag to create
         selectTimeRange: boolean
         selectMultipleResources: boolean
       }
     }
-    
+
     edit: {
       drag: {
         enabled: boolean
         resizeEnabled: boolean
         changeResource: boolean
       }
-      
+
       click: {
         singleClick: "open_details"
         doubleClick: "edit_event"
       }
     }
-    
+
     contextMenu: {
       enabled: boolean
       actions: [
@@ -2408,7 +2456,7 @@ CalendarSystem {
       ]
     }
   }
-  
+
   filters: {
     resources: {
       equipment: {
@@ -2416,20 +2464,20 @@ CalendarSystem {
         specific: string[]
         availability: "all" | "available" | "booked"
       }
-      
+
       studios: {
         specific: string[]
         availability: "all" | "available" | "booked"
       }
     }
-    
+
     bookings: {
       status: BookingStatus[]
       clients: string[]
       dateRange: DateRange
       valueRange: [number, number]
     }
-    
+
     display: {
       showMaintenance: boolean
       showBlocked: boolean
@@ -2437,39 +2485,39 @@ CalendarSystem {
       showCancelled: boolean
     }
   }
-  
+
   search: {
     query: string
     searchIn: ["client", "booking_id", "equipment", "notes"]
-    
+
     results: SearchResult[]
-    
+
     actions: {
       jumpToDate: (result: SearchResult) => void
       highlight: (result: SearchResult) => void
     }
   }
-  
+
   sync: {
     realTime: boolean
     updateInterval: number
-    
+
     conflicts: {
       detectOnUpdate: boolean
       highlightConflicts: boolean
       autoResolve: boolean
     }
-    
+
     notifications: {
       newBooking: boolean
       modification: boolean
       cancellation: boolean
     }
   }
-  
+
   export: {
     formats: ["PDF", "Excel", "iCal", "Google Calendar"]
-    
+
     options: {
       dateRange: DateRange
       resources: string[]
@@ -2477,14 +2525,14 @@ CalendarSystem {
       includeFinancials: boolean
     }
   }
-  
+
   customization: {
     colors: {
       byStatus: Record<string, string>
       byResourceType: Record<string, string>
       byPriority: Record<string, string>
     }
-    
+
     views: {
       defaultView: ViewType
       startDay: "sunday" | "monday"
@@ -2492,7 +2540,7 @@ CalendarSystem {
       endHour: number
       slotDuration: number
     }
-    
+
     labels: {
       showClientNames: boolean
       showEquipmentNames: boolean
@@ -2504,6 +2552,7 @@ CalendarSystem {
 ```
 
 **UI - Week View:**
+
 ```
 ┌───────────────────────────────────────────────────────────────────┐
 │ Calendar                    Jan 28 - Feb 3, 2026        [Week ▼]  │
@@ -2535,6 +2584,7 @@ CalendarSystem {
 ## 4.1 `/admin/ai/recommendations` (جديد - مهم للإيرادات)
 
 ### **الهدف:**
+
 نظام التوصيات الذكية لزيادة القيمة والمبيعات
 
 ```typescript
@@ -2545,7 +2595,7 @@ RecommendationsEngine {
       description: string
       type: "complete_kit" | "accessory" | "upgrade" | "bundle"
       priority: number
-      
+
       trigger: {
         items: string[] // equipment IDs
         condition: "any" | "all"
@@ -2555,29 +2605,29 @@ RecommendationsEngine {
           orderValue: { min?: number, max?: number }
         }
       }
-      
+
       recommendations: {
         items: {
           equipmentId: string
           priority: number
           reason: string // "Compatible with", "Often rented together"
-          
+
           discount: {
             enabled: boolean
             type: "percentage" | "fixed"
             value: number
           }
         }[]
-        
+
         maxShow: number // how many to show at once
-        
+
         presentation: {
           title: string
           description: string
           position: "product_page" | "cart" | "checkout"
         }
       }
-      
+
       performance: {
         impressions: number
         clicks: number
@@ -2587,7 +2637,7 @@ RecommendationsEngine {
       }
     }
   }
-  
+
   aiPowered: {
     enabled: boolean
     models: {
@@ -2595,12 +2645,12 @@ RecommendationsEngine {
         enabled: boolean
         basedOn: "booking_history" | "client_behavior"
       }
-      
+
       contentBased: {
         enabled: boolean
         features: ["category", "brand", "specifications"]
       }
-      
+
       hybrid: {
         enabled: boolean
         weights: {
@@ -2610,14 +2660,14 @@ RecommendationsEngine {
         }
       }
     }
-    
+
     learning: {
       autoOptimize: boolean
       updateFrequency: "daily" | "weekly"
       minDataPoints: number
     }
   }
-  
+
   testing: {
     abTesting: {
       enabled: boolean
@@ -2634,7 +2684,7 @@ RecommendationsEngine {
       }[]
     }
   }
-  
+
   analytics: {
     overview: {
       totalImpressions: number
@@ -2645,9 +2695,9 @@ RecommendationsEngine {
       avgConversionRate: number
       avgOrderIncrease: number
     }
-    
+
     topRules: RecommendationRule[]
-    
+
     insights: {
       bestPerformingCategories: string[]
       optimalDiscountRange: [number, number]
@@ -2662,79 +2712,81 @@ RecommendationsEngine {
 ## 4.2 `/admin/dynamic-pricing` (تفعيل - مهم جداً للإيرادات)
 
 ### **الوضع الحالي:**
+
 - ❌ Placeholder في sidebar
 - ❌ غير مفعل نهائياً
 
 ### **المطلوب:**
+
 نظام تسعير ديناميكي يعتمد على الطلب
 
 ```typescript
 DynamicPricing {
   strategy: {
     type: "demand_based" | "time_based" | "utilization_based" | "hybrid"
-    
+
     demandBased: {
       factors: {
         currentBookings: {
           weight: number
           threshold: number // % utilization
         }
-        
+
         upcomingBookings: {
           weight: number
           lookahead: number // days
         }
-        
+
         seasonality: {
           weight: number
           patterns: SeasonalPattern[]
         }
-        
+
         dayOfWeek: {
           weight: number
           premiumDays: string[]
         }
       }
-      
+
       adjustments: {
         min: number // -20%
         max: number // +50%
         increments: number // 5%
       }
     }
-    
+
     timeBased: {
       leadTime: {
         lastMinute: {
           threshold: number // hours
           adjustment: number // % discount
         }
-        
+
         advanceBooking: {
           threshold: number // days
           adjustment: number // % discount
         }
       }
-      
+
       duration: {
         longTerm: {
           threshold: number // days
           adjustment: number // % discount
         }
-        
+
         weekend: {
           adjustment: number
         }
       }
     }
-    
+
     utilizationBased: {
       targets: {
         optimal: number // 75%
         high: number // 90%
         low: number // 50%
       }
-      
+
       actions: {
         belowOptimal: "decrease_price"
         aboveOptimal: "increase_price"
@@ -2742,7 +2794,7 @@ DynamicPricing {
       }
     }
   }
-  
+
   rules: {
     equipment: {
       byCategory: {
@@ -2751,14 +2803,14 @@ DynamicPricing {
         strategy: PricingStrategy
         limits: { min: number, max: number }
       }[]
-      
+
       byItem: {
         equipmentId: string
         override: boolean
         customStrategy: PricingStrategy
       }[]
     }
-    
+
     studio: {
       byStudio: {
         studioId: string
@@ -2768,10 +2820,10 @@ DynamicPricing {
       }[]
     }
   }
-  
+
   ai: {
     enabled: boolean
-    
+
     learning: {
       dataPoints: [
         "historical_bookings",
@@ -2780,28 +2832,28 @@ DynamicPricing {
         "market_trends",
         "conversion_rates"
       ]
-      
+
       updateFrequency: "realtime" | "daily" | "weekly"
-      
+
       minDataRequired: number
     }
-    
+
     optimization: {
       goal: "maximize_revenue" | "maximize_utilization" | "balanced"
-      
+
       constraints: {
         maintainMargin: number // %
         avoidDramaticChanges: boolean
         maxPriceChange: number // % per day
       }
     }
-    
+
     predictions: {
       demandForecast: {
         horizon: number // days
         confidence: number
       }
-      
+
       optimalPricing: {
         byItem: { id: string, price: number, confidence: number }[]
         expectedRevenue: number
@@ -2809,33 +2861,33 @@ DynamicPricing {
       }
     }
   }
-  
+
   monitoring: {
     realtime: {
       currentPrices: { id: string, basePrice: number, dynamicPrice: number }[]
       adjustments: PriceAdjustment[]
       performance: PerformanceMetrics
     }
-    
+
     alerts: {
       priceChanges: boolean
       demandSpikes: boolean
       competitorPricing: boolean
     }
   }
-  
+
   testing: {
     abTests: {
       active: ABTest[]
       results: TestResult[]
     }
-    
+
     simulation: {
       runScenario: (params: ScenarioParams) => Simulation
       compareStrategies: (strategies: Strategy[]) => Comparison
     }
   }
-  
+
   reporting: {
     performance: {
       revenueImpact: number
@@ -2843,7 +2895,7 @@ DynamicPricing {
       avgPriceAdjustment: number
       conversionRateChange: number
     }
-    
+
     insights: {
       bestPerformingRules: Rule[]
       optimalPricingWindows: TimeWindow[]
@@ -2856,4 +2908,3 @@ DynamicPricing {
 ---
 
 بسبب طول المحتوى، سأكمل باقي الأقسام في الجزء التالي...
-

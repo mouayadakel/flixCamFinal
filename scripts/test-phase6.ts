@@ -150,9 +150,7 @@ test('Contract GET route exists', () => {
 })
 
 test('Contract sign route exists', () => {
-  return existsSync(
-    join(process.cwd(), 'src/app/api/contracts/[id]/sign/route.ts')
-  )
+  return existsSync(join(process.cwd(), 'src/app/api/contracts/[id]/sign/route.ts'))
 })
 
 // Summary

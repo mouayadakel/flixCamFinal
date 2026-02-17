@@ -8,10 +8,10 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
+import {
+  CheckCircle,
+  XCircle,
+  Clock,
   Eye,
   Calendar,
   DollarSign,
@@ -20,7 +20,7 @@ import {
   User,
   FileText,
   Filter,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -77,7 +77,10 @@ const TYPE_CONFIG: Record<ApprovalType, { label: string; icon: any; color: strin
   extension: { label: 'تمديد', icon: Clock, color: 'text-orange-600' },
 }
 
-const STATUS_CONFIG: Record<ApprovalStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_CONFIG: Record<
+  ApprovalStatus,
+  { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   pending: { label: 'معلق', variant: 'secondary' },
   approved: { label: 'موافق', variant: 'default' },
   rejected: { label: 'مرفوض', variant: 'destructive' },
@@ -194,16 +197,11 @@ export default function ApprovalsPage() {
         throw new Error(data.error || res.statusText || 'فشل تنفيذ الإجراء')
       }
 
-      setApprovals(prev =>
-        prev.filter(a => a.id !== selectedApproval.id)
-      )
+      setApprovals((prev) => prev.filter((a) => a.id !== selectedApproval.id))
 
       toast({
         title: actionType === 'approve' ? 'تمت الموافقة' : 'تم الرفض',
-        description:
-          actionType === 'approve'
-            ? 'تمت الموافقة على الطلب بنجاح'
-            : 'تم رفض الطلب',
+        description: actionType === 'approve' ? 'تمت الموافقة على الطلب بنجاح' : 'تم رفض الطلب',
       })
 
       setSelectedApproval(null)
@@ -221,18 +219,17 @@ export default function ApprovalsPage() {
     }
   }
 
-  const pendingApprovals = approvals.filter(a => a.status === 'pending')
-  const filteredApprovals = activeTab === 'all' 
-    ? pendingApprovals 
-    : pendingApprovals.filter(a => a.type === activeTab)
+  const pendingApprovals = approvals.filter((a) => a.status === 'pending')
+  const filteredApprovals =
+    activeTab === 'all' ? pendingApprovals : pendingApprovals.filter((a) => a.type === activeTab)
 
   const stats = {
     total: pendingApprovals.length,
-    booking: pendingApprovals.filter(a => a.type === 'booking').length,
-    refund: pendingApprovals.filter(a => a.type === 'refund').length,
-    discount: pendingApprovals.filter(a => a.type === 'discount').length,
-    credit: pendingApprovals.filter(a => a.type === 'credit').length,
-    extension: pendingApprovals.filter(a => a.type === 'extension').length,
+    booking: pendingApprovals.filter((a) => a.type === 'booking').length,
+    refund: pendingApprovals.filter((a) => a.type === 'refund').length,
+    discount: pendingApprovals.filter((a) => a.type === 'discount').length,
+    credit: pendingApprovals.filter((a) => a.type === 'credit').length,
+    extension: pendingApprovals.filter((a) => a.type === 'extension').length,
   }
 
   return (
@@ -241,18 +238,16 @@ export default function ApprovalsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">الموافقات</h1>
-          <p className="text-muted-foreground mt-1">
-            إدارة طلبات الموافقة المعلقة
-          </p>
+          <p className="mt-1 text-muted-foreground">إدارة طلبات الموافقة المعلقة</p>
         </div>
         <Button variant="outline" onClick={loadApprovals} disabled={loading}>
-          <RefreshCw className={`h-4 w-4 ml-2 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           تحديث
         </Button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
         <Card>
           <CardContent className="pt-4">
             <div className="text-center">
@@ -267,7 +262,7 @@ export default function ApprovalsPage() {
             <Card key={type}>
               <CardContent className="pt-4">
                 <div className="text-center">
-                  <Icon className={`h-5 w-5 mx-auto mb-1 ${config.color}`} />
+                  <Icon className={`mx-auto mb-1 h-5 w-5 ${config.color}`} />
                   <p className="text-xl font-bold">{stats[type as ApprovalType]}</p>
                   <p className="text-xs text-muted-foreground">{config.label}</p>
                 </div>
@@ -281,9 +276,7 @@ export default function ApprovalsPage() {
       <Card>
         <CardHeader>
           <CardTitle>طلبات الموافقة المعلقة</CardTitle>
-          <CardDescription>
-            راجع وقرر بشأن الطلبات المعلقة
-          </CardDescription>
+          <CardDescription>راجع وقرر بشأن الطلبات المعلقة</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ApprovalType | 'all')}>
@@ -298,13 +291,13 @@ export default function ApprovalsPage() {
             <TabsContent value={activeTab} className="mt-0">
               {loading ? (
                 <div className="space-y-3">
-                  {[1, 2, 3].map(i => (
+                  {[1, 2, 3].map((i) => (
                     <Skeleton key={i} className="h-16 w-full" />
                   ))}
                 </div>
               ) : filteredApprovals.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-500" />
+                <div className="py-12 text-center text-muted-foreground">
+                  <CheckCircle className="mx-auto mb-4 h-12 w-12 text-green-500" />
                   <p className="text-lg font-medium">لا توجد طلبات معلقة</p>
                   <p className="text-sm">جميع الطلبات تمت معالجتها</p>
                 </div>
@@ -324,7 +317,7 @@ export default function ApprovalsPage() {
                     {filteredApprovals.map((approval) => {
                       const typeConfig = TYPE_CONFIG[approval.type]
                       const TypeIcon = typeConfig.icon
-                      
+
                       return (
                         <TableRow key={approval.id}>
                           <TableCell>
@@ -336,7 +329,7 @@ export default function ApprovalsPage() {
                           <TableCell>
                             <div>
                               <p className="font-medium">{approval.subject}</p>
-                              <p className="text-sm text-muted-foreground truncate max-w-xs">
+                              <p className="max-w-xs truncate text-sm text-muted-foreground">
                                 {approval.description}
                               </p>
                             </div>
@@ -357,13 +350,17 @@ export default function ApprovalsPage() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              {approval.relatedId && approval.relatedType && RELATED_TYPE_TO_ROUTE[approval.relatedType] && (
-                                <Link href={`/admin/${RELATED_TYPE_TO_ROUTE[approval.relatedType]}/${approval.relatedId}`}>
-                                  <Button variant="ghost" size="sm">
-                                    <Eye className="h-4 w-4" />
-                                  </Button>
-                                </Link>
-                              )}
+                              {approval.relatedId &&
+                                approval.relatedType &&
+                                RELATED_TYPE_TO_ROUTE[approval.relatedType] && (
+                                  <Link
+                                    href={`/admin/${RELATED_TYPE_TO_ROUTE[approval.relatedType]}/${approval.relatedId}`}
+                                  >
+                                    <Button variant="ghost" size="sm">
+                                      <Eye className="h-4 w-4" />
+                                    </Button>
+                                  </Link>
+                                )}
                               <Button
                                 size="sm"
                                 variant="default"
@@ -372,7 +369,7 @@ export default function ApprovalsPage() {
                                   setActionType('approve')
                                 }}
                               >
-                                <CheckCircle className="h-4 w-4 ml-1" />
+                                <CheckCircle className="ml-1 h-4 w-4" />
                                 موافقة
                               </Button>
                               <Button
@@ -383,7 +380,7 @@ export default function ApprovalsPage() {
                                   setActionType('reject')
                                 }}
                               >
-                                <XCircle className="h-4 w-4 ml-1" />
+                                <XCircle className="ml-1 h-4 w-4" />
                                 رفض
                               </Button>
                             </div>
@@ -400,29 +397,28 @@ export default function ApprovalsPage() {
       </Card>
 
       {/* Confirmation Dialog */}
-      <Dialog open={!!selectedApproval && !!actionType} onOpenChange={() => {
-        setSelectedApproval(null)
-        setActionType(null)
-        setNotes('')
-      }}>
+      <Dialog
+        open={!!selectedApproval && !!actionType}
+        onOpenChange={() => {
+          setSelectedApproval(null)
+          setActionType(null)
+          setNotes('')
+        }}
+      >
         <DialogContent dir="rtl">
           <DialogHeader>
-            <DialogTitle>
-              {actionType === 'approve' ? 'تأكيد الموافقة' : 'تأكيد الرفض'}
-            </DialogTitle>
-            <DialogDescription>
-              {selectedApproval?.subject}
-            </DialogDescription>
+            <DialogTitle>{actionType === 'approve' ? 'تأكيد الموافقة' : 'تأكيد الرفض'}</DialogTitle>
+            <DialogDescription>{selectedApproval?.subject}</DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
-            <div className="p-4 bg-muted rounded-lg">
+            <div className="rounded-lg bg-muted p-4">
               <p className="text-sm">{selectedApproval?.description}</p>
               {selectedApproval?.amount && (
-                <p className="text-lg font-bold mt-2">{formatCurrency(selectedApproval.amount)}</p>
+                <p className="mt-2 text-lg font-bold">{formatCurrency(selectedApproval.amount)}</p>
               )}
             </div>
-            
+
             <div>
               <label className="text-sm font-medium">ملاحظات (اختياري)</label>
               <Textarea

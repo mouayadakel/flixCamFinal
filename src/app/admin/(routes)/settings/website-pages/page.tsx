@@ -49,7 +49,7 @@ export default function WebsitePagesPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">صفحات الموقع العام</h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="mt-2 text-muted-foreground">
           إدارة صفحات الموقع العام (الرئيسية، عن، سياسات، إلخ)
         </p>
       </div>
@@ -70,7 +70,7 @@ export default function WebsitePagesPage() {
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
           ) : pages.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
+            <div className="py-12 text-center text-muted-foreground">
               لا توجد صفحات مسجلة. يمكن إضافتها عبر البذور أو واجهة التحرير لاحقاً.
             </div>
           ) : (
@@ -78,7 +78,7 @@ export default function WebsitePagesPage() {
               {pages.map((p) => (
                 <div
                   key={p.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
+                  className="flex items-center justify-between rounded-lg border p-4 hover:bg-muted/50"
                 >
                   <div className="flex items-center gap-3">
                     <FileText className="h-5 w-5 text-muted-foreground" />

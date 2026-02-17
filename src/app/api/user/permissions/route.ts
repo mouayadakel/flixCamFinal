@@ -50,10 +50,7 @@ export async function GET(request: Request) {
   try {
     const rateLimit = rateLimitAPI(request)
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        { error: 'Too many requests' },
-        { status: 429 }
-      )
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
     }
 
     const session = await auth()
@@ -65,7 +62,10 @@ export async function GET(request: Request) {
       )
     }
 
-    const superAdmin = await isSuperAdminUser(session.user.id, session.user.role as string | undefined)
+    const superAdmin = await isSuperAdminUser(
+      session.user.id,
+      session.user.role as string | undefined
+    )
     const basePermissions = await getUserPermissions(session.user.id)
     const permissions = superAdmin ? ['*'] : basePermissions
     const isSuperAdmin = superAdmin || basePermissions.includes('*')

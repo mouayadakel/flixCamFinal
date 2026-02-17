@@ -19,7 +19,7 @@ export function CartSummary({ subtotal, discountAmount, total, itemCount }: Cart
   const { t } = useLocale()
 
   return (
-    <div className="rounded-lg border bg-card p-4 space-y-2">
+    <div className="space-y-2 rounded-lg border bg-card p-4">
       <div className="flex justify-between text-sm">
         <span>{t('cart.subtotal')}</span>
         <span>{subtotal.toLocaleString()} SAR</span>
@@ -30,11 +30,11 @@ export function CartSummary({ subtotal, discountAmount, total, itemCount }: Cart
           <span>-{discountAmount.toLocaleString()} SAR</span>
         </div>
       )}
-      <div className="flex justify-between font-semibold pt-2 border-t">
+      <div className="flex justify-between border-t pt-2 font-semibold">
         <span>{t('cart.total')}</span>
         <span>{total.toLocaleString()} SAR</span>
       </div>
-      <Button asChild className="w-full mt-4" size="lg" disabled={itemCount === 0}>
+      <Button asChild className="mt-4 w-full" size="lg" disabled={itemCount === 0}>
         <Link href="/checkout">{t('cart.checkout')}</Link>
       </Button>
     </div>

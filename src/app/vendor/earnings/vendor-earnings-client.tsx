@@ -20,13 +20,13 @@ export function VendorEarningsClient({ monthlyData }: { monthlyData: MonthlyItem
         return (
           <div key={d.month} className="flex items-center gap-3">
             <span className="w-16 text-sm text-muted-foreground">{label}</span>
-            <div className="flex-1 h-6 bg-muted rounded overflow-hidden">
+            <div className="h-6 flex-1 overflow-hidden rounded bg-muted">
               <div
-                className="h-full bg-brand-primary rounded transition-all"
+                className="h-full rounded bg-brand-primary transition-all"
                 style={{ width: `${Math.max(pct, 2)}%` }}
               />
             </div>
-            <span className="w-24 text-sm font-medium text-right">
+            <span className="w-24 text-right text-sm font-medium">
               {new Intl.NumberFormat('ar-SA', {
                 style: 'currency',
                 currency: 'SAR',

@@ -8,16 +8,16 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { 
-  ArrowRight, 
-  Package, 
+import {
+  ArrowRight,
+  Package,
   Search,
   Filter,
   CheckCircle,
   Clock,
   AlertTriangle,
   Wrench,
-  Eye
+  Eye,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -134,37 +134,38 @@ export default function WarehouseInventoryPage() {
     }
   }
 
-  const filteredEquipment = equipment.filter(e => 
-    e.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    e.model?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    e.serialNumber?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredEquipment = equipment.filter(
+    (e) =>
+      e.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      e.model?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      e.serialNumber?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <Package className="h-8 w-8" />
             مخزون المستودع
           </h1>
-          </div>
+        </div>
         <Button variant="outline" asChild>
           <Link href="/admin/ops/warehouse">
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="ml-2 h-4 w-4" />
             العودة
           </Link>
         </Button>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
         <Card>
           <CardContent className="pt-4">
             <div className="text-center">
               <p className="text-sm text-muted-foreground">الإجمالي</p>
               {loading ? (
-                <Skeleton className="h-8 w-16 mx-auto mt-1" />
+                <Skeleton className="mx-auto mt-1 h-8 w-16" />
               ) : (
                 <p className="text-2xl font-bold">{stats?.total || 0}</p>
               )}
@@ -176,7 +177,7 @@ export default function WarehouseInventoryPage() {
             <div className="text-center">
               <p className="text-sm text-green-600">متاح</p>
               {loading ? (
-                <Skeleton className="h-8 w-16 mx-auto mt-1" />
+                <Skeleton className="mx-auto mt-1 h-8 w-16" />
               ) : (
                 <p className="text-2xl font-bold text-green-600">{stats?.available || 0}</p>
               )}
@@ -188,7 +189,7 @@ export default function WarehouseInventoryPage() {
             <div className="text-center">
               <p className="text-sm text-blue-600">مؤجر</p>
               {loading ? (
-                <Skeleton className="h-8 w-16 mx-auto mt-1" />
+                <Skeleton className="mx-auto mt-1 h-8 w-16" />
               ) : (
                 <p className="text-2xl font-bold text-blue-600">{stats?.rented || 0}</p>
               )}
@@ -200,7 +201,7 @@ export default function WarehouseInventoryPage() {
             <div className="text-center">
               <p className="text-sm text-yellow-600">صيانة</p>
               {loading ? (
-                <Skeleton className="h-8 w-16 mx-auto mt-1" />
+                <Skeleton className="mx-auto mt-1 h-8 w-16" />
               ) : (
                 <p className="text-2xl font-bold text-yellow-600">{stats?.maintenance || 0}</p>
               )}
@@ -212,7 +213,7 @@ export default function WarehouseInventoryPage() {
             <div className="text-center">
               <p className="text-sm text-purple-600">محجوز</p>
               {loading ? (
-                <Skeleton className="h-8 w-16 mx-auto mt-1" />
+                <Skeleton className="mx-auto mt-1 h-8 w-16" />
               ) : (
                 <p className="text-2xl font-bold text-purple-600">{stats?.reserved || 0}</p>
               )}
@@ -224,9 +225,9 @@ export default function WarehouseInventoryPage() {
       {/* Filters */}
       <Card>
         <CardContent className="py-4">
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="relative min-w-[200px] flex-1">
+              <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="بحث بالرمز أو الموديل..."
                 value={searchQuery}
@@ -253,7 +254,9 @@ export default function WarehouseInventoryPage() {
               <SelectContent>
                 <SelectItem value="all">جميع الفئات</SelectItem>
                 {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                  <SelectItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -294,7 +297,7 @@ export default function WarehouseInventoryPage() {
                   </TableRow>
                 ) : filteredEquipment.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
                       لا توجد معدات
                     </TableCell>
                   </TableRow>
@@ -311,7 +314,7 @@ export default function WarehouseInventoryPage() {
                         <TableCell>{item.category?.name || '-'}</TableCell>
                         <TableCell>
                           <Badge className={statusConf.color}>
-                            <StatusIcon className="h-3 w-3 ml-1" />
+                            <StatusIcon className="ml-1 h-3 w-3" />
                             {statusConf.label}
                           </Badge>
                         </TableCell>
@@ -321,9 +324,9 @@ export default function WarehouseInventoryPage() {
                         <TableCell>{item.location || '-'}</TableCell>
                         <TableCell>
                           {item.currentBooking ? (
-                            <Link 
+                            <Link
                               href={`/admin/bookings/${item.currentBooking.id}`}
-                              className="text-primary hover:underline text-sm"
+                              className="text-sm text-primary hover:underline"
                             >
                               {item.currentBooking.bookingNumber}
                             </Link>
@@ -334,7 +337,7 @@ export default function WarehouseInventoryPage() {
                         <TableCell>
                           <Link href={`/admin/inventory/equipment/${item.id}`}>
                             <Button size="sm" variant="ghost">
-                              <Eye className="h-4 w-4 ml-1" />
+                              <Eye className="ml-1 h-4 w-4" />
                               عرض
                             </Button>
                           </Link>

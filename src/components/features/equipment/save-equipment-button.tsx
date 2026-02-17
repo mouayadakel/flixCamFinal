@@ -16,7 +16,11 @@ interface SaveEquipmentButtonProps {
   className?: string
 }
 
-export function SaveEquipmentButton({ equipmentId, initialSaved = false, className }: SaveEquipmentButtonProps) {
+export function SaveEquipmentButton({
+  equipmentId,
+  initialSaved = false,
+  className,
+}: SaveEquipmentButtonProps) {
   const { data: session, status } = useSession()
   const [saved, setSaved] = useState(initialSaved)
   const [loading, setLoading] = useState(false)
@@ -41,9 +45,12 @@ export function SaveEquipmentButton({ equipmentId, initialSaved = false, classNa
     setLoading(true)
     try {
       if (saved) {
-        const res = await fetch(`/api/user/saved-gear?equipmentId=${encodeURIComponent(equipmentId)}`, {
-          method: 'DELETE',
-        })
+        const res = await fetch(
+          `/api/user/saved-gear?equipmentId=${encodeURIComponent(equipmentId)}`,
+          {
+            method: 'DELETE',
+          }
+        )
         if (res.ok) setSaved(false)
       } else {
         const res = await fetch('/api/user/saved-gear', {
@@ -68,16 +75,14 @@ export function SaveEquipmentButton({ equipmentId, initialSaved = false, classNa
         'group/heart flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm backdrop-blur-sm transition-all duration-200',
         'hover:bg-white hover:shadow-md active:scale-90',
         saved && 'bg-red-50 hover:bg-red-50',
-        loading && 'opacity-60 cursor-not-allowed',
+        loading && 'cursor-not-allowed opacity-60',
         className
       )}
     >
       <Heart
         className={cn(
           'h-[18px] w-[18px] transition-all duration-200',
-          saved
-            ? 'fill-red-500 text-red-500'
-            : 'text-neutral-400 group-hover/heart:text-red-400',
+          saved ? 'fill-red-500 text-red-500' : 'text-neutral-400 group-hover/heart:text-red-400',
           animating && 'animate-badge-bounce'
         )}
       />

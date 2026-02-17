@@ -12,10 +12,7 @@ import { handleApiError } from '@/lib/utils/api-helpers'
 import { UnauthorizedError, NotFoundError } from '@/lib/errors'
 import type { Prisma } from '@prisma/client'
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()
@@ -44,10 +41,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user) throw new UnauthorizedError()
@@ -67,7 +61,8 @@ export async function PATCH(
     if (parsed.subject !== undefined) updateData.subject = parsed.subject
     if (parsed.bodyText !== undefined) updateData.bodyText = parsed.bodyText
     if (parsed.bodyHtml !== undefined) updateData.bodyHtml = parsed.bodyHtml
-    if (parsed.variables !== undefined) updateData.variables = (parsed.variables ?? null) as Prisma.InputJsonValue
+    if (parsed.variables !== undefined)
+      updateData.variables = (parsed.variables ?? null) as Prisma.InputJsonValue
     if (parsed.isActive !== undefined) updateData.isActive = parsed.isActive
     if (parsed.language !== undefined) updateData.language = parsed.language
     if (parsed.variant !== undefined) updateData.variant = parsed.variant

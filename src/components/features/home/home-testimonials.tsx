@@ -27,23 +27,21 @@ export function HomeTestimonials() {
   const testimonials = (home?.testimonials as TestimonialEntry[] | undefined) ?? []
 
   return (
-    <section className="py-16 md:py-20 lg:py-24 bg-white border-t border-border-light/50">
+    <section className="border-t border-border-light/50 bg-white py-10 md:py-14">
       <PublicContainer>
         <div className="mb-12 text-center">
-          <h2 className="text-section-title text-text-heading">
-            {t('home.testimonialsTitle')}
-          </h2>
+          <h2 className="text-section-title text-text-heading">{t('home.testimonialsTitle')}</h2>
           <p className="mx-auto mt-3 max-w-md text-body-main text-text-body">
-            {t('home.heroSubtitle')}
+            {t('home.testimonialsSubtitle')}
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
-          {testimonials.slice(0, 3).map((item, index) => (
-            <div
-              key={index}
-              className="group relative flex flex-col rounded-2xl border border-border-light/60 bg-surface-light/30 p-6 transition-all duration-300 hover:bg-white hover:shadow-card-hover hover:border-brand-primary/10 opacity-0 animate-fade-in-up md:p-8"
-              style={{ animationDelay: `${0.1 * index}s` }}
-            >
+        <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0 md:overflow-visible">
+          <div className="flex gap-6 pb-2 sm:grid sm:grid-cols-3 md:gap-8 md:pb-0">
+            {testimonials.slice(0, 3).map((item, index) => (
+              <div
+                key={index}
+                className="group relative flex min-w-[280px] flex-1 flex-col rounded-2xl border border-border-light/60 bg-surface-light/30 p-6 transition-all duration-300 hover:border-brand-primary/10 hover:bg-white hover:shadow-card-hover sm:min-w-0 md:p-8"
+              >
               {/* Quotation mark */}
               <Quote className="mb-4 h-8 w-8 text-brand-primary/20 transition-colors group-hover:text-brand-primary/40" />
 
@@ -58,9 +56,7 @@ export function HomeTestimonials() {
                   <span
                     key={i}
                     className={`text-lg ${
-                      i < (item.rating ?? 5)
-                        ? 'text-warning-500'
-                        : 'text-border-light'
+                      i < (item.rating ?? 5) ? 'text-warning-500' : 'text-border-light'
                     }`}
                   >
                     ★
@@ -79,12 +75,11 @@ export function HomeTestimonials() {
                     sizes="40px"
                   />
                 </div>
-                <span className="text-sm font-semibold text-text-heading">
-                  {item.authorName}
-                </span>
+                <span className="text-sm font-semibold text-text-heading">{item.authorName}</span>
               </div>
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
       </PublicContainer>
     </section>

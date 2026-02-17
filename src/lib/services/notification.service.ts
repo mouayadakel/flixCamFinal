@@ -105,10 +105,7 @@ export class NotificationService {
   /**
    * Get notification template
    */
-  static getTemplate(
-    type: string,
-    data: Record<string, any>
-  ): NotificationTemplate {
+  static getTemplate(type: string, data: Record<string, any>): NotificationTemplate {
     const templates: Record<string, NotificationTemplate> = {
       'booking.confirmed': {
         type: 'booking.confirmed',
@@ -142,12 +139,14 @@ export class NotificationService {
       },
     }
 
-    return templates[type] || {
-      type,
-      title: 'Notification',
-      message: data.message || 'You have a new notification',
-      channels: [NotificationChannel.IN_APP],
-    }
+    return (
+      templates[type] || {
+        type,
+        title: 'Notification',
+        message: data.message || 'You have a new notification',
+        channels: [NotificationChannel.IN_APP],
+      }
+    )
   }
 
   /**
@@ -167,7 +166,7 @@ export class NotificationService {
     // TODO: Implement WhatsApp sending via Cloud API
     // This should use the configured WhatsApp API key
     const whatsappApiKey = process.env.WHATSAPP_API_KEY
-    
+
     if (!whatsappApiKey) {
       // WhatsApp API key not configured - silently skip
       return

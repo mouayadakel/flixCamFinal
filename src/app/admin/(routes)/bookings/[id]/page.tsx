@@ -9,7 +9,15 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowRight, Calendar, DollarSign, User, Package, FileText, AlertTriangle } from 'lucide-react'
+import {
+  ArrowRight,
+  Calendar,
+  DollarSign,
+  User,
+  Package,
+  FileText,
+  AlertTriangle,
+} from 'lucide-react'
 import { BookingStateMachine } from '@/components/features/bookings/booking-state-machine'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -68,17 +76,28 @@ function ContractSection({
             {contracts.map((contract) => (
               <div
                 key={contract.id}
-                className="flex items-center justify-between p-4 border rounded-lg"
+                className="flex items-center justify-between rounded-lg border p-4"
               >
                 <div>
                   <div className="font-medium">عقد #{contract.id.slice(0, 8)}</div>
-                  <Badge variant={contract.status === 'SIGNED' ? 'default' : 'secondary'} className="mt-1">
-                    {contract.status === 'SIGNED' ? 'موقع' : contract.status === 'PENDING_SIGNATURE' ? 'في انتظار التوقيع' : contract.status}
+                  <Badge
+                    variant={contract.status === 'SIGNED' ? 'default' : 'secondary'}
+                    className="mt-1"
+                  >
+                    {contract.status === 'SIGNED'
+                      ? 'موقع'
+                      : contract.status === 'PENDING_SIGNATURE'
+                        ? 'في انتظار التوقيع'
+                        : contract.status}
                   </Badge>
                 </div>
                 <Button size="sm" asChild>
-                  <a href={`/api/contracts/${contract.id}/pdf`} target="_blank" rel="noopener noreferrer">
-                    <FileText className="h-4 w-4 ml-1" />
+                  <a
+                    href={`/api/contracts/${contract.id}/pdf`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <FileText className="ml-1 h-4 w-4" />
                     تحميل عقد PDF
                   </a>
                 </Button>
@@ -88,12 +107,7 @@ function ContractSection({
         ) : (
           <p className="text-muted-foreground">لا توجد عقود لهذا الحجز.</p>
         )}
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleGenerate}
-          disabled={generating}
-        >
+        <Button type="button" variant="outline" onClick={handleGenerate} disabled={generating}>
           {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : 'إنشاء عقد'}
         </Button>
       </CardContent>
@@ -159,7 +173,15 @@ export default function BookingDetailPage() {
   const [booking, setBooking] = useState<Booking | null>(null)
   const [loading, setLoading] = useState(true)
   const [transitioning, setTransitioning] = useState(false)
-  const [damageClaims, setDamageClaims] = useState<Array<{ id: string; status: string; damageType: string; severity: string; estimatedCost: string }>>([])
+  const [damageClaims, setDamageClaims] = useState<
+    Array<{
+      id: string
+      status: string
+      damageType: string
+      severity: string
+      estimatedCost: string
+    }>
+  >([])
 
   useEffect(() => {
     loadBooking()
@@ -168,7 +190,7 @@ export default function BookingDetailPage() {
   useEffect(() => {
     if (booking?.id) {
       fetch(`/api/bookings/${booking.id}/damage-claims`)
-        .then((r) => r.ok ? r.json() : { claims: [] })
+        .then((r) => (r.ok ? r.json() : { claims: [] }))
         .then((d) => setDamageClaims(d.claims ?? []))
         .catch(() => setDamageClaims([]))
     }
@@ -252,7 +274,7 @@ export default function BookingDetailPage() {
 
   if (!booking) {
     return (
-      <div className="text-center py-12">
+      <div className="py-12 text-center">
         <p className="text-muted-foreground">الحجز غير موجود</p>
         <Button asChild className="mt-4">
           <Link href="/admin/bookings">العودة إلى الحجوزات</Link>
@@ -269,7 +291,7 @@ export default function BookingDetailPage() {
         </div>
         <Button variant="outline" asChild>
           <Link href="/admin/bookings">
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="ml-2 h-4 w-4" />
             العودة
           </Link>
         </Button>
@@ -307,7 +329,7 @@ export default function BookingDetailPage() {
 
         {/* Summary Tab */}
         <TabsContent value="summary" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -367,13 +389,17 @@ export default function BookingDetailPage() {
               <CardContent className="space-y-3">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">الإجمالي الفرعي</span>
-                  <span>{formatAmount(Number(booking.totalAmount ?? 0) - Number(booking.vatAmount ?? 0))}</span>
+                  <span>
+                    {formatAmount(
+                      Number(booking.totalAmount ?? 0) - Number(booking.vatAmount ?? 0)
+                    )}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">ضريبة القيمة المضافة</span>
                   <span>{formatAmount(booking.vatAmount)}</span>
                 </div>
-                <div className="border-t pt-2 flex justify-between font-medium">
+                <div className="flex justify-between border-t pt-2 font-medium">
                   <span>الإجمالي النهائي</span>
                   <span className="text-lg">{formatAmount(booking.totalAmount)}</span>
                 </div>
@@ -415,7 +441,7 @@ export default function BookingDetailPage() {
                   {booking.equipment.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between p-4 border rounded-lg"
+                      className="flex items-center justify-between rounded-lg border p-4"
                     >
                       <div>
                         <div className="font-medium">{item.equipment.sku}</div>
@@ -453,7 +479,7 @@ export default function BookingDetailPage() {
                   {booking.payments.map((payment) => (
                     <div
                       key={payment.id}
-                      className="flex items-center justify-between p-4 border rounded-lg"
+                      className="flex items-center justify-between rounded-lg border p-4"
                     >
                       <div>
                         <div className="font-medium">{formatAmount(payment.amount)}</div>
@@ -474,7 +500,11 @@ export default function BookingDetailPage() {
 
         {/* Contracts Tab */}
         <TabsContent value="contracts">
-          <ContractSection bookingId={booking.id} contracts={booking.contracts ?? []} onGenerated={loadBooking} />
+          <ContractSection
+            bookingId={booking.id}
+            contracts={booking.contracts ?? []}
+            onGenerated={loadBooking}
+          />
         </TabsContent>
 
         {/* Damage Claims Tab */}
@@ -489,9 +519,7 @@ export default function BookingDetailPage() {
                 <CardDescription>الإبلاغ عن أضرار للمعدات أو الاستوديو ومراجعتها</CardDescription>
               </div>
               <Button asChild>
-                <Link href={`/admin/damage-claims/new?bookingId=${booking.id}`}>
-                  إبلاغ عن ضرر
-                </Link>
+                <Link href={`/admin/damage-claims/new?bookingId=${booking.id}`}>إبلاغ عن ضرر</Link>
               </Button>
             </CardHeader>
             <CardContent>
@@ -500,7 +528,7 @@ export default function BookingDetailPage() {
                   {damageClaims.map((c) => (
                     <div
                       key={c.id}
-                      className="flex items-center justify-between p-4 border rounded-lg"
+                      className="flex items-center justify-between rounded-lg border p-4"
                     >
                       <div>
                         <div className="font-medium">{c.damageType.replace(/_/g, ' ')}</div>
@@ -518,7 +546,9 @@ export default function BookingDetailPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-muted-foreground">لا توجد مطالبات أضرار. انقر &quot;إبلاغ عن ضرر&quot; للإضافة.</p>
+                <p className="text-muted-foreground">
+                  لا توجد مطالبات أضرار. انقر &quot;إبلاغ عن ضرر&quot; للإضافة.
+                </p>
               )}
             </CardContent>
           </Card>
@@ -532,7 +562,7 @@ export default function BookingDetailPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center justify-between rounded-lg border p-3">
                   <div>
                     <div className="font-medium">تاريخ البداية</div>
                     <div className="text-sm text-muted-foreground">
@@ -541,7 +571,7 @@ export default function BookingDetailPage() {
                   </div>
                   <Badge variant="outline">بداية</Badge>
                 </div>
-                <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center justify-between rounded-lg border p-3">
                   <div>
                     <div className="font-medium">تاريخ النهاية</div>
                     <div className="text-sm text-muted-foreground">
@@ -551,7 +581,7 @@ export default function BookingDetailPage() {
                   <Badge variant="outline">نهاية</Badge>
                 </div>
                 {booking.studioId && (
-                  <div className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center justify-between rounded-lg border p-3">
                     <div>
                       <div className="font-medium">استوديو</div>
                       <div className="text-sm text-muted-foreground">
@@ -572,7 +602,9 @@ export default function BookingDetailPage() {
             <CardHeader>
               <CardTitle>التوصيل</CardTitle>
               <CardDescription>
-                {booking.delivery_required ? 'هذا الحجز يتطلب توصيلاً' : 'التوصيل غير مطلوب لهذا الحجز'}
+                {booking.delivery_required
+                  ? 'هذا الحجز يتطلب توصيلاً'
+                  : 'التوصيل غير مطلوب لهذا الحجز'}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -599,7 +631,7 @@ export default function BookingDetailPage() {
             <CardContent>
               {booking.status === 'RETURNED' || booking.status === 'CLOSED' ? (
                 <div className="space-y-2">
-                  <div className="p-3 border rounded-lg">
+                  <div className="rounded-lg border p-3">
                     <div className="font-medium">تاريخ الإرجاع</div>
                     <div className="text-sm text-muted-foreground">
                       {formatDate(booking.endDate)}
@@ -610,9 +642,7 @@ export default function BookingDetailPage() {
                   </p>
                 </div>
               ) : (
-                <p className="text-muted-foreground">
-                  لم يتم إرجاع المعدات بعد
-                </p>
+                <p className="text-muted-foreground">لم يتم إرجاع المعدات بعد</p>
               )}
             </CardContent>
           </Card>
@@ -626,7 +656,7 @@ export default function BookingDetailPage() {
             </CardHeader>
             <CardContent>
               {booking.notes ? (
-                <div className="p-4 border rounded-lg">
+                <div className="rounded-lg border p-4">
                   <p className="whitespace-pre-wrap">{booking.notes}</p>
                 </div>
               ) : (
@@ -644,21 +674,21 @@ export default function BookingDetailPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="p-3 border rounded-lg">
+                <div className="rounded-lg border p-3">
                   <div className="font-medium">تم الإنشاء</div>
                   <div className="text-sm text-muted-foreground">
                     {formatDate(booking.createdAt)}
                   </div>
                 </div>
                 {booking.updatedAt && booking.updatedAt !== booking.createdAt && (
-                  <div className="p-3 border rounded-lg">
+                  <div className="rounded-lg border p-3">
                     <div className="font-medium">آخر تحديث</div>
                     <div className="text-sm text-muted-foreground">
                       {formatDate(booking.updatedAt)}
                     </div>
                   </div>
                 )}
-                <p className="text-sm text-muted-foreground mt-4">
+                <p className="mt-4 text-sm text-muted-foreground">
                   سجل التغييرات التفصيلي سيتم إضافته قريباً
                 </p>
               </div>

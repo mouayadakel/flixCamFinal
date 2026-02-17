@@ -6,20 +6,21 @@
 
 ### الإحصائيات الرئيسية
 
-| المؤشر | الحالي | المطلوب | الفجوة |
-|--------|--------|---------|--------|
-| **صفحات Live** | 25 | 75+ | **+50 صفحة** |
-| **صفحات Mock** | 15 | 0 | **-15 صفحة** |
-| **صفحات Missing** | 35 | 0 | **+35 صفحة** |
-| **APIs مكتملة** | ~40% | 100% | **+60%** |
-| **Features كاملة** | 33% | 100% | **+67%** |
-| **الوقت المقدر** | - | 4.5-6 أشهر | **~6 أشهر** |
+| المؤشر             | الحالي | المطلوب    | الفجوة       |
+| ------------------ | ------ | ---------- | ------------ |
+| **صفحات Live**     | 25     | 75+        | **+50 صفحة** |
+| **صفحات Mock**     | 15     | 0          | **-15 صفحة** |
+| **صفحات Missing**  | 35     | 0          | **+35 صفحة** |
+| **APIs مكتملة**    | ~40%   | 100%       | **+60%**     |
+| **Features كاملة** | 33%    | 100%       | **+67%**     |
+| **الوقت المقدر**   | -      | 4.5-6 أشهر | **~6 أشهر**  |
 
 ---
 
 ## 📑 جدول المحتويات
 
 ### القسم الأول: Dashboard & Analytics
+
 1. **Dashboard الرئيسي** - تحسينات حرجة (P0)
    - Date Range Selector
    - KPI Cards Enhancement
@@ -327,7 +328,9 @@
 ### المرحلة الأولى: الأساسيات الحرجة (P0) - 6-8 أسابيع
 
 #### Sprint 1-2 (أسبوعان)
+
 **الأولوية القصوى - المهام الحرجة:**
+
 1. **Action Center** (`/admin/action-center`)
    - Dashboard للمهام العاجلة
    - Failed Payments alerts
@@ -347,7 +350,9 @@
    - Click to View Details
 
 #### Sprint 3-4 (أسبوعان)
+
 **Booking Engine الحرج:**
+
 1. **Quote Creation** (`/admin/quotes/new`)
    - Creation Wizard
    - PDF Generation
@@ -364,7 +369,9 @@
    - Interactive Features
 
 #### Sprint 5-6 (أسبوعان)
+
 **Inventory & Studios:**
+
 1. **Studios System - تحويل من Mock**
    - Studio Creation
    - Operating Hours
@@ -380,7 +387,9 @@
    - CRUD Operations
 
 #### Sprint 7-8 (أسبوعان)
+
 **Packages & Finance:**
+
 1. **Packages Management** (`/admin/packages`)
    - Package Creation Wizard
    - Pricing Strategies
@@ -400,7 +409,9 @@
 ### المرحلة الثانية: التحسينات المهمة (P1) - 8-10 أسابيع
 
 #### Sprint 9-10 (أسبوعان)
+
 **Operations & Warehouse:**
+
 1. **Warehouse Operations**
    - Check-out Process
    - Check-in Process
@@ -417,7 +428,9 @@
    - Blocking System
 
 #### Sprint 11-12 (أسبوعان)
+
 **CRM & Clients:**
+
 1. **Clients Management - Complete CRUD**
    - Client Creation
    - Client Details Page
@@ -433,7 +446,9 @@
    - Approval Workflow
 
 #### Sprint 13-14 (أسبوعان)
+
 **AI & Recommendations:**
+
 1. **Recommendations Engine** (`/admin/recommendations`)
    - Rules Creation
    - AI Integration
@@ -450,7 +465,9 @@
    - Pricing Calculation
 
 #### Sprint 15-16 (أسبوعان)
+
 **Delivery & Maintenance:**
+
 1. **Delivery Management** (`/admin/ops/delivery`)
    - Scheduling System
    - Route Planning
@@ -467,7 +484,9 @@
    - Refund Processing
 
 #### Sprint 17-18 (أسبوعان)
+
 **Studio Add-ons & Reports:**
+
 1. **Studio Add-ons** (`/admin/studios/add-ons`)
    - Add-on Creation
    - Pricing Management
@@ -488,7 +507,9 @@
 ### المرحلة الثالثة: التحسينات المتقدمة (P2) - 4-6 أسابيع
 
 #### Sprint 19-20 (أسبوعان)
+
 **Marketing & Segmentation:**
+
 1. **Marketing Campaigns** (`/admin/marketing`)
    - Campaign Creation
    - Email Integration
@@ -504,7 +525,9 @@
    - Conversion Tools
 
 #### Sprint 21-22 (أسبوعان)
+
 **Advanced Features:**
+
 1. **Dashboard Customization**
    - Widget System
    - Drag & Drop Layout
@@ -525,7 +548,9 @@
 ## 📊 ملخص الأولويات
 
 ### P0 - Critical (Must Have) - 8 أسابيع
+
 **الصفحات الحرجة التي تمنع الإطلاق:**
+
 - Action Center
 - Approvals System
 - Calendar (تفاعلي كامل)
@@ -543,7 +568,9 @@
 ---
 
 ### P1 - High Priority - 10 أسابيع
+
 **الصفحات المهمة للتشغيل الكامل:**
+
 - Live Operations
 - Recommendations Engine
 - Dynamic Pricing
@@ -567,7 +594,9 @@
 ---
 
 ### P2 - Medium Priority - 6 أسابيع
+
 **التحسينات والميزات المتقدمة:**
+
 - Marketing Campaigns
 - Customer Segmentation
 - Guest Management Enhancements
@@ -592,26 +621,31 @@
 ### الفوائد الرئيسية
 
 ✅ **تحسين الكفاءة التشغيلية**
+
 - Automated Workflows
 - Real-time Monitoring
 - Conflict Prevention
 
 ✅ **زيادة الإيرادات**
+
 - Dynamic Pricing
 - Upselling & Cross-selling
 - Package Deals
 
 ✅ **تحسين تجربة العملاء**
+
 - Faster Response Times
 - Better Availability Management
 - Smoother Booking Process
 
 ✅ **تقليل الأخطاء**
+
 - Automated Conflict Detection
 - Validation Rules
 - Alert System
 
 ✅ **تحسين اتخاذ القرارات**
+
 - Advanced Analytics
 - AI-powered Insights
 - Forecasting
@@ -705,16 +739,19 @@
 هذه الخطة الشاملة تحول لوحة التحكم من **33% مكتملة** إلى **نظام production-ready 100%** في غضون **4.5-6 أشهر**.
 
 **الأولويات الحرجة (P0):**
+
 - 11 صفحة رئيسية
 - 8 أسابيع
 - **يجب تنفيذها فوراً لإمكانية الإطلاق**
 
 **الأولويات العالية (P1):**
+
 - 17 صفحة رئيسية
 - 10 أسابيع
 - **ضرورية للتشغيل الكامل**
 
 **التحسينات المتقدمة (P2):**
+
 - 6 صفحات رئيسية
 - 6 أسابيع
 - **تحسين التجربة والأداء**
@@ -737,4 +774,3 @@
 **الحالة:** جاهز للتنفيذ
 
 ---
-

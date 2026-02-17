@@ -38,8 +38,7 @@ type MenuItemRow = {
  */
 export async function getUserMenu(userId: string): Promise<MenuItemNode[]> {
   const permissions = await getEffectivePermissions(userId)
-  const hasPerm = (required: string) =>
-    permissions.some((p) => matchesPermission(p, required))
+  const hasPerm = (required: string) => permissions.some((p) => matchesPermission(p, required))
 
   const allItems = await prisma.menuItem.findMany({
     where: { isActive: true },
@@ -58,7 +57,9 @@ export async function getUserMenu(userId: string): Promise<MenuItemNode[]> {
 
   function filterItem(item: MenuItemRow): MenuItemNode | null {
     const reqPerms = item.menuItemPermissions.map((mp) => mp.permission.name)
-    const children = (byParent.get(item.id) ?? []).map((c) => filterItem(c)).filter((c): c is MenuItemNode => c !== null)
+    const children = (byParent.get(item.id) ?? [])
+      .map((c) => filterItem(c))
+      .filter((c): c is MenuItemNode => c !== null)
 
     if (reqPerms.length === 0) {
       if (children.length === 0) return null

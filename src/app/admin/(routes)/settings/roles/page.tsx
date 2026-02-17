@@ -106,19 +106,19 @@ export default function RolesPage() {
     <div className="space-y-6" dir="rtl">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <Shield className="h-8 w-8" />
             الأدوار والصلاحيات
           </h1>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={loadRoles}>
-            <RefreshCw className="h-4 w-4 ml-2" />
+            <RefreshCw className="ml-2 h-4 w-4" />
             تحديث
           </Button>
           <Button asChild>
             <Link href="/admin/settings/roles/new">
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="ml-2 h-4 w-4" />
               دور جديد
             </Link>
           </Button>
@@ -149,7 +149,7 @@ export default function RolesPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <Card>
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
@@ -216,7 +216,7 @@ export default function RolesPage() {
                   </TableRow>
                 ) : filteredRoles.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
                       لا توجد أدوار
                     </TableCell>
                   </TableRow>
@@ -246,7 +246,7 @@ export default function RolesPage() {
                               href={`/admin/settings/roles/${role.id}/users`}
                               title="ربط مستخدم"
                             >
-                              <UserPlus className="h-4 w-4 ml-1" />
+                              <UserPlus className="ml-1 h-4 w-4" />
                               ربط مستخدم
                             </Link>
                           </Button>
@@ -303,13 +303,18 @@ export default function RolesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>حذف الدور</AlertDialogTitle>
             <AlertDialogDescription>
-              هل أنت متأكد من حذف الدور &quot;{deleteTarget?.displayNameAr || deleteTarget?.displayName}&quot;؟
-              لا يمكن التراجع عن هذا الإجراء.
+              هل أنت متأكد من حذف الدور &quot;
+              {deleteTarget?.displayNameAr || deleteTarget?.displayName}&quot;؟ لا يمكن التراجع عن
+              هذا الإجراء.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>إلغاء</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} disabled={deleting} className="bg-destructive text-destructive-foreground">
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground"
+            >
               {deleting ? 'جاري الحذف...' : 'حذف'}
             </AlertDialogAction>
           </AlertDialogFooter>

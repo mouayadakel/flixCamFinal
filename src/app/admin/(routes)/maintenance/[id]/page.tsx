@@ -9,9 +9,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { 
-  ArrowRight, 
-  Wrench, 
+import {
+  ArrowRight,
+  Wrench,
   Calendar,
   User,
   CheckCircle,
@@ -21,7 +21,7 @@ import {
   FileText,
   Play,
   Pause,
-  XCircle
+  XCircle,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -170,8 +170,8 @@ export default function MaintenanceDetailPage() {
 
   if (!maintenance) {
     return (
-      <div className="text-center py-12" dir="rtl">
-        <AlertCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+      <div className="py-12 text-center" dir="rtl">
+        <AlertCircle className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
         <p className="text-lg font-medium">طلب الصيانة غير موجود</p>
         <Button asChild className="mt-4">
           <Link href="/admin/maintenance">العودة إلى الصيانة</Link>
@@ -190,13 +190,13 @@ export default function MaintenanceDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <Wrench className="h-8 w-8" />
             طلب صيانة #{maintenance.maintenanceNumber}
           </h1>
-          <div className="flex items-center gap-2 mt-2">
+          <div className="mt-2 flex items-center gap-2">
             <Badge className={statusConfig.color}>
-              <StatusIcon className="h-3 w-3 ml-1" />
+              <StatusIcon className="ml-1 h-3 w-3" />
               {statusConfig.label}
             </Badge>
             <Badge className={priorityConfig.color}>{priorityConfig.label}</Badge>
@@ -205,15 +205,15 @@ export default function MaintenanceDetailPage() {
         </div>
         <Button variant="outline" asChild>
           <Link href="/admin/maintenance">
-            <ArrowRight className="h-4 w-4 ml-2" />
+            <ArrowRight className="ml-2 h-4 w-4" />
             العودة
           </Link>
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           {/* Equipment Info */}
           <Card>
             <CardHeader>
@@ -226,7 +226,7 @@ export default function MaintenanceDetailPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">رمز المعدات</p>
-                  <Link 
+                  <Link
                     href={`/admin/inventory/equipment/${maintenance.equipment.id}`}
                     className="font-medium text-primary hover:underline"
                   >
@@ -242,7 +242,7 @@ export default function MaintenanceDetailPage() {
                 {maintenance.equipment.serialNumber && (
                   <div>
                     <p className="text-sm text-muted-foreground">الرقم التسلسلي</p>
-                    <p className="font-medium font-mono">{maintenance.equipment.serialNumber}</p>
+                    <p className="font-mono font-medium">{maintenance.equipment.serialNumber}</p>
                   </div>
                 )}
               </div>
@@ -276,11 +276,11 @@ export default function MaintenanceDetailPage() {
                     rows={4}
                   />
                 </div>
-                <Button 
+                <Button
                   onClick={() => handleStatusChange('completed', completionNotes)}
                   disabled={updating}
                 >
-                  <CheckCircle className="h-4 w-4 ml-2" />
+                  <CheckCircle className="ml-2 h-4 w-4" />
                   {updating ? 'جاري التحديث...' : 'تحديد كمكتمل'}
                 </Button>
               </CardContent>
@@ -294,7 +294,7 @@ export default function MaintenanceDetailPage() {
                 <CardTitle>ملاحظات</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="whitespace-pre-wrap bg-muted p-4 rounded-lg">{maintenance.notes}</p>
+                <p className="whitespace-pre-wrap rounded-lg bg-muted p-4">{maintenance.notes}</p>
               </CardContent>
             </Card>
           )}
@@ -309,44 +309,44 @@ export default function MaintenanceDetailPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               {maintenance.status === 'scheduled' && (
-                <Button 
-                  className="w-full" 
+                <Button
+                  className="w-full"
                   onClick={() => handleStatusChange('in_progress')}
                   disabled={updating}
                 >
-                  <Play className="h-4 w-4 ml-2" />
+                  <Play className="ml-2 h-4 w-4" />
                   بدء العمل
                 </Button>
               )}
               {maintenance.status === 'in_progress' && (
                 <>
-                  <Button 
-                    className="w-full" 
+                  <Button
+                    className="w-full"
                     onClick={() => handleStatusChange('completed')}
                     disabled={updating}
                   >
-                    <CheckCircle className="h-4 w-4 ml-2" />
+                    <CheckCircle className="ml-2 h-4 w-4" />
                     تحديد كمكتمل
                   </Button>
-                  <Button 
-                    className="w-full" 
+                  <Button
+                    className="w-full"
                     variant="outline"
                     onClick={() => handleStatusChange('scheduled')}
                     disabled={updating}
                   >
-                    <Pause className="h-4 w-4 ml-2" />
+                    <Pause className="ml-2 h-4 w-4" />
                     إيقاف مؤقت
                   </Button>
                 </>
               )}
               {maintenance.status !== 'cancelled' && maintenance.status !== 'completed' && (
-                <Button 
-                  className="w-full" 
+                <Button
+                  className="w-full"
                   variant="outline"
                   onClick={() => handleStatusChange('cancelled')}
                   disabled={updating}
                 >
-                  <XCircle className="h-4 w-4 ml-2" />
+                  <XCircle className="ml-2 h-4 w-4" />
                   إلغاء
                 </Button>
               )}

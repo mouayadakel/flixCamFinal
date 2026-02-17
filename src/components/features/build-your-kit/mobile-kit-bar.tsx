@@ -12,13 +12,7 @@ import {
   getKitWizardTotalAmount,
   getKitWizardSelectedCount,
 } from '@/lib/stores/kit-wizard.store'
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { ChevronUp } from 'lucide-react'
 
@@ -60,12 +54,12 @@ export function MobileKitBar() {
   }
 
   return (
-    <div className="fixed bottom-0 start-0 end-0 z-40 lg:hidden">
+    <div className="fixed bottom-0 end-0 start-0 z-40 lg:hidden">
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
           <button
             type="button"
-            className="flex w-full items-center justify-between gap-4 border-t border-border-light bg-white/95 p-4 shadow-card-elevated backdrop-blur-sm safe-area-pb"
+            className="safe-area-pb flex w-full items-center justify-between gap-4 border-t border-border-light bg-white/95 p-4 shadow-card-elevated backdrop-blur-sm"
             aria-expanded={open}
             aria-label={t('kit.reviewKit')}
           >
@@ -74,29 +68,22 @@ export function MobileKitBar() {
                 {totalUnits} {t('kit.items')} · {formatSar(totalWithVat)}
               </p>
               <p className="text-xs text-text-muted">
-                {t('kit.duration')}: {durationDays} {durationDays === 1 ? t('kit.day') : t('kit.days')}
+                {t('kit.duration')}: {durationDays}{' '}
+                {durationDays === 1 ? t('kit.day') : t('kit.days')}
               </p>
             </div>
             <ChevronUp className="h-5 w-5 shrink-0 text-text-muted" />
           </button>
         </SheetTrigger>
-        <SheetContent
-          side="bottom"
-          className="max-h-[85vh] rounded-t-2xl border-t"
-        >
+        <SheetContent side="bottom" className="max-h-[85vh] rounded-t-2xl border-t">
           <SheetHeader>
             <SheetTitle>{t('kit.summaryTitle')}</SheetTitle>
           </SheetHeader>
-          <div className="flex flex-col gap-4 overflow-y-auto pb-safe">
+          <div className="pb-safe flex flex-col gap-4 overflow-y-auto">
             <ul className="space-y-2">
               {Object.entries(selectedEquipment).map(([id, item]) => (
-                <li
-                  key={id}
-                  className="flex items-center justify-between gap-2 text-sm"
-                >
-                  <span className="min-w-0 truncate text-text-heading">
-                    {item.model ?? id}
-                  </span>
+                <li key={id} className="flex items-center justify-between gap-2 text-sm">
+                  <span className="min-w-0 truncate text-text-heading">{item.model ?? id}</span>
                   <span className="shrink-0 text-text-muted">
                     {item.qty} × {formatSar(item.dailyPrice)}/day
                   </span>

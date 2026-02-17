@@ -47,20 +47,20 @@ export function SEOSection({
 
   const handleAutoGenerate = () => {
     const newValue: typeof value = {}
-    
+
     if (name && !value.seoTitle) {
       newValue.seoTitle = `Rent ${name} in Riyadh | FlixCam.rent`
     }
-    
+
     if (shortDescription && !value.seoDescription) {
       newValue.seoDescription = shortDescription.substring(0, 155)
     }
-    
+
     if (name && !value.seoKeywords) {
       const keywords = [name, 'rental', 'Riyadh', 'cinema equipment']
       newValue.seoKeywords = keywords.join(', ')
     }
-    
+
     if (Object.keys(newValue).length > 0) {
       onChange({ ...value, ...newValue })
     }
@@ -68,21 +68,14 @@ export function SEOSection({
 
   return (
     <Card className={cn('overflow-hidden', className)} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-      <CardHeader
-        className="cursor-pointer"
-        onClick={() => setExpanded(!expanded)}
-      >
+      <CardHeader className="cursor-pointer" onClick={() => setExpanded(!expanded)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Search className="h-5 w-5 text-neutral-400" />
             <h3 className="font-semibold">SEO - {localeLabels[locale]}</h3>
           </div>
           <Button type="button" variant="ghost" size="sm">
-            {expanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
+            {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
         </div>
       </CardHeader>
@@ -105,9 +98,7 @@ export function SEOSection({
               maxLength={200}
               dir={locale === 'ar' ? 'rtl' : 'ltr'}
             />
-            <p className="text-xs text-neutral-500">
-              {value.seoTitle?.length || 0} / 200 حرف
-            </p>
+            <p className="text-xs text-neutral-500">{value.seoTitle?.length || 0} / 200 حرف</p>
           </div>
 
           <div className="space-y-2">
@@ -135,9 +126,7 @@ export function SEOSection({
               maxLength={500}
               dir={locale === 'ar' ? 'rtl' : 'ltr'}
             />
-            <p className="text-xs text-neutral-500">
-              {value.seoKeywords?.length || 0} / 500 حرف
-            </p>
+            <p className="text-xs text-neutral-500">{value.seoKeywords?.length || 0} / 500 حرف</p>
           </div>
         </CardContent>
       )}

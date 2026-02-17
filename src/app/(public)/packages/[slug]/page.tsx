@@ -38,10 +38,7 @@ async function getPackage(slug: string) {
     },
   }))
 
-  const subtotal = items.reduce(
-    (sum, i) => sum + i.equipment.dailyPrice * i.quantity,
-    0
-  )
+  const subtotal = items.reduce((sum, i) => sum + i.equipment.dailyPrice * i.quantity, 0)
   const discountPercent = kit.discountPercent ? Number(kit.discountPercent) : 0
   const total = discountPercent > 0 ? subtotal * (1 - discountPercent / 100) : subtotal
 
@@ -57,11 +54,7 @@ async function getPackage(slug: string) {
   }
 }
 
-export default async function PackageDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
+export default async function PackageDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const enabled = await FeatureFlagService.isEnabled('enable_packages')
   if (!enabled) redirect('/')
   const { slug } = await params
@@ -69,7 +62,7 @@ export default async function PackageDetailPage({
   if (!pkg) notFound()
 
   return (
-    <main className="container py-8 px-4">
+    <main className="container px-4 py-8">
       <PackageDetail pkg={pkg} />
     </main>
   )

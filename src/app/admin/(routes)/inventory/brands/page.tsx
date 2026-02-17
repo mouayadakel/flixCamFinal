@@ -8,15 +8,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Search,
-  Tag,
-  RefreshCw,
-  ExternalLink
-} from 'lucide-react'
+import { Plus, Edit, Trash2, Search, Tag, RefreshCw, ExternalLink } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -225,29 +217,35 @@ export default function BrandsPage() {
     setSelectedBrand(null)
   }
 
-  const filteredBrands = brands.filter(b =>
-    b.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    b.slug.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredBrands = brands.filter(
+    (b) =>
+      b.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.slug.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   return (
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="flex items-center gap-3 text-3xl font-bold">
             <Tag className="h-8 w-8" />
             العلامات التجارية
           </h1>
-          </div>
+        </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={loadBrands}>
-            <RefreshCw className="h-4 w-4 ml-2" />
+            <RefreshCw className="ml-2 h-4 w-4" />
             تحديث
           </Button>
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
-              <Button onClick={() => { resetForm(); setIsCreateOpen(true); }}>
-                <Plus className="h-4 w-4 ml-2" />
+              <Button
+                onClick={() => {
+                  resetForm()
+                  setIsCreateOpen(true)
+                }}
+              >
+                <Plus className="ml-2 h-4 w-4" />
                 علامة جديدة
               </Button>
             </DialogTrigger>
@@ -299,7 +297,9 @@ export default function BrandsPage() {
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsCreateOpen(false)}>إلغاء</Button>
+                <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
+                  إلغاء
+                </Button>
                 <Button onClick={handleCreate} disabled={submitting}>
                   {submitting ? 'جاري الإنشاء...' : 'إنشاء'}
                 </Button>
@@ -313,7 +313,7 @@ export default function BrandsPage() {
       <Card>
         <CardContent className="py-4">
           <div className="relative max-w-md">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="بحث بالاسم..."
               value={searchQuery}
@@ -355,7 +355,7 @@ export default function BrandsPage() {
                   </TableRow>
                 ) : filteredBrands.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
                       لا توجد علامات تجارية
                     </TableCell>
                   </TableRow>
@@ -364,9 +364,13 @@ export default function BrandsPage() {
                     <TableRow key={brand.id}>
                       <TableCell>
                         {brand.logoUrl ? (
-                          <img src={brand.logoUrl} alt={brand.name} className="h-8 w-8 object-contain" />
+                          <img
+                            src={brand.logoUrl}
+                            alt={brand.name}
+                            className="h-8 w-8 object-contain"
+                          />
                         ) : (
-                          <div className="h-8 w-8 bg-muted rounded flex items-center justify-center">
+                          <div className="flex h-8 w-8 items-center justify-center rounded bg-muted">
                             <Tag className="h-4 w-4 text-muted-foreground" />
                           </div>
                         )}
@@ -375,7 +379,13 @@ export default function BrandsPage() {
                       <TableCell className="font-mono text-sm">{brand.slug}</TableCell>
                       <TableCell>{brand._count?.products || 0}</TableCell>
                       <TableCell>
-                        <Badge className={brand.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
+                        <Badge
+                          className={
+                            brand.isActive
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }
+                        >
                           {brand.isActive ? 'نشط' : 'غير نشط'}
                         </Badge>
                       </TableCell>
@@ -449,7 +459,9 @@ export default function BrandsPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditOpen(false)}>إلغاء</Button>
+            <Button variant="outline" onClick={() => setIsEditOpen(false)}>
+              إلغاء
+            </Button>
             <Button onClick={handleEdit} disabled={submitting}>
               {submitting ? 'جاري الحفظ...' : 'حفظ'}
             </Button>
@@ -465,7 +477,7 @@ export default function BrandsPage() {
             <AlertDialogDescription>
               هل أنت متأكد من حذف العلامة التجارية &quot;{selectedBrand?.name}&quot;؟
               {(selectedBrand?._count?.products || 0) > 0 && (
-                <span className="block mt-2 text-destructive">
+                <span className="mt-2 block text-destructive">
                   تحذير: هذه العلامة مرتبطة بـ {selectedBrand?._count?.products} منتج
                 </span>
               )}

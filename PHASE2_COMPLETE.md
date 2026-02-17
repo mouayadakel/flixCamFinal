@@ -43,6 +43,7 @@
 ## Files Created/Modified
 
 ### Created:
+
 1. `src/components/dashboard/kpi-card.tsx` - KPI card component
 2. `src/components/dashboard/revenue-chart.tsx` - Revenue line chart (30 days)
 3. `src/components/dashboard/booking-state-chart.tsx` - Booking state pie chart
@@ -50,6 +51,7 @@
 5. `src/components/layouts/admin-breadcrumbs.tsx` - Breadcrumb navigation
 
 ### Modified:
+
 1. `src/components/layouts/admin-sidebar.tsx` - Complete rewrite with:
    - 8 main sections matching Enterprise Sitemap
    - Arabic-first labels
@@ -133,16 +135,19 @@ The sidebar includes all 8 sections from the Enterprise Sitemap:
 ## Dashboard Features
 
 ### KPI Cards
+
 - **Revenue (This Month)**: Calculated from successful payments
 - **Bookings (This Month)**: Count of bookings created this month
 - **Utilization Rate**: Percentage of equipment currently rented
 - **New Clients (This Month)**: Count of new client users
 
 ### Charts
+
 - **Revenue Chart**: Line chart showing daily revenue for last 30 days
 - **Booking State Chart**: Pie chart showing distribution of booking states
 
 ### Recent Bookings Table
+
 - Shows last 10 bookings
 - Displays: Booking number, Client name, Start/End dates, Total, State, Actions
 - Links to booking detail page
@@ -158,6 +163,7 @@ The sidebar includes all 8 sections from the Enterprise Sitemap:
 ## Testing Checklist
 
 ### Layout
+
 - [ ] Sidebar displays all 8 sections
 - [ ] Sections expand/collapse correctly
 - [ ] Active route highlighting works
@@ -170,6 +176,7 @@ The sidebar includes all 8 sections from the Enterprise Sitemap:
 - [ ] User menu dropdown works
 
 ### Dashboard
+
 - [ ] KPI cards show real data from database
 - [ ] Revenue chart renders with real data
 - [ ] Booking state chart shows correct distribution
@@ -184,6 +191,7 @@ The sidebar includes all 8 sections from the Enterprise Sitemap:
 **Phase 3: Equipment Management** is ready to begin.
 
 ### Required Before Phase 3:
+
 1. Test dashboard with real data
 2. Verify all sidebar links work
 3. Test mobile responsiveness

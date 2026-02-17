@@ -27,8 +27,7 @@ export async function POST(request: NextRequest) {
   const parsed = deferredRegisterSchema.safeParse(body)
   if (!parsed.success) {
     const err = parsed.error.flatten()
-    const msg =
-      err.fieldErrors?.email?.[0] ?? err.fieldErrors?.password?.[0] ?? 'Invalid input'
+    const msg = err.fieldErrors?.email?.[0] ?? err.fieldErrors?.password?.[0] ?? 'Invalid input'
     return NextResponse.json({ error: msg }, { status: 400 })
   }
 

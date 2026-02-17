@@ -40,4 +40,6 @@ export const LOCALE_INIT_SCRIPT = `
     document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
   }
 })();
-`.replace(/\s+/g, ' ').trim()
+`
+  .replace(/\s+/g, ' ')
+  .trim()

@@ -85,7 +85,7 @@ export default function BookingConfirmationPage() {
 
   if (loading) {
     return (
-      <main className="container mx-auto max-w-lg py-16 px-4 text-center">
+      <main className="container mx-auto max-w-lg px-4 py-16 text-center">
         <p className="text-muted-foreground">{t('common.loading')}</p>
       </main>
     )
@@ -93,13 +93,13 @@ export default function BookingConfirmationPage() {
 
   if (error || !booking) {
     return (
-      <main className="container mx-auto max-w-lg py-16 px-4 text-center">
-        <h1 className="text-2xl font-bold mb-4">تم تأكيد الحجز</h1>
-        <p className="text-muted-foreground mb-2">رقم الحجز: {id}</p>
-        <p className="text-sm text-muted-foreground mb-6">
+      <main className="container mx-auto max-w-lg px-4 py-16 text-center">
+        <h1 className="mb-4 text-2xl font-bold">تم تأكيد الحجز</h1>
+        <p className="mb-2 text-muted-foreground">رقم الحجز: {id}</p>
+        <p className="mb-6 text-sm text-muted-foreground">
           سجّل الدخول لعرض التفاصيل أو تواصل مع الدعم.
         </p>
-        <div className="flex gap-4 justify-center flex-wrap">
+        <div className="flex flex-wrap justify-center gap-4">
           <Button asChild>
             <Link href="/login">تسجيل الدخول</Link>
           </Button>
@@ -112,22 +112,30 @@ export default function BookingConfirmationPage() {
   }
 
   return (
-    <main className="container mx-auto max-w-lg py-12 px-4">
-      <div className="text-center mb-8">
-        <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
-        <h1 className="text-2xl font-bold mb-2">تم تأكيد الحجز</h1>
+    <main className="container mx-auto max-w-lg px-4 py-12">
+      <div className="mb-8 text-center">
+        <CheckCircle className="mx-auto mb-4 h-16 w-16 text-green-600" />
+        <h1 className="mb-2 text-2xl font-bold">تم تأكيد الحجز</h1>
         <p className="text-muted-foreground">رقم الحجز: {booking.bookingNumber}</p>
       </div>
 
-      <div className="rounded-lg border bg-card p-6 space-y-4 mb-6">
-        <p><strong>التواريخ:</strong> {new Date(booking.startDate).toLocaleDateString('ar-SA')} – {new Date(booking.endDate).toLocaleDateString('ar-SA')}</p>
-        <p><strong>الإجمالي:</strong> {Number(booking.totalAmount).toLocaleString()} SAR</p>
+      <div className="mb-6 space-y-4 rounded-lg border bg-card p-6">
+        <p>
+          <strong>التواريخ:</strong> {new Date(booking.startDate).toLocaleDateString('ar-SA')} –{' '}
+          {new Date(booking.endDate).toLocaleDateString('ar-SA')}
+        </p>
+        <p>
+          <strong>الإجمالي:</strong> {Number(booking.totalAmount).toLocaleString()} SAR
+        </p>
         {booking.equipment?.length ? (
-          <p><strong>المعدات:</strong> {booking.equipment.map((e) => `${e.equipment?.name ?? ''} × ${e.quantity}`).join('، ')}</p>
+          <p>
+            <strong>المعدات:</strong>{' '}
+            {booking.equipment.map((e) => `${e.equipment?.name ?? ''} × ${e.quantity}`).join('، ')}
+          </p>
         ) : null}
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+      <div className="flex flex-col justify-center gap-3 sm:flex-row">
         <Button variant="outline" onClick={addToCalendar} className="gap-2">
           <Calendar className="h-4 w-4" />
           إضافة للتقويم

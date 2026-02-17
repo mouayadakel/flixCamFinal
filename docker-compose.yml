@@ -10,11 +10,11 @@ services:
       POSTGRES_PASSWORD: flixcam_dev_password
       POSTGRES_DB: flixcam_rent
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U flixcam"]
+      test: ['CMD-SHELL', 'pg_isready -U flixcam']
       interval: 10s
       timeout: 5s
       retries: 5

@@ -109,9 +109,7 @@ export async function POST(request: NextRequest) {
     const parsed = createStudioSchema.parse(body)
 
     const slug =
-      parsed.slug && parsed.slug.trim() !== ''
-        ? slugify(parsed.slug.trim())
-        : slugify(parsed.name)
+      parsed.slug && parsed.slug.trim() !== '' ? slugify(parsed.slug.trim()) : slugify(parsed.name)
 
     const existing = await prisma.studio.findFirst({
       where: {

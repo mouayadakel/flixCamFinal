@@ -16,11 +16,11 @@ interface PermissionGateProps {
   showFallback?: boolean
 }
 
-export function PermissionGate({ 
-  permission, 
-  children, 
+export function PermissionGate({
+  permission,
+  children,
   fallback = null,
-  showFallback = false 
+  showFallback = false,
 }: PermissionGateProps) {
   const [hasAccess, setHasAccess] = useState<boolean | null>(null)
 

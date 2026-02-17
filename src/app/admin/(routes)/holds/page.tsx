@@ -50,7 +50,11 @@ function timeRemaining(expiresAt: string | null): string {
 export default function HoldsPage() {
   const { toast } = useToast()
   const [holds, setHolds] = useState<HoldItem[]>([])
-  const [summary, setSummary] = useState<{ activeHoldsCount: number; expiringSoonCount: number; totalLockedEquipment: number } | null>(null)
+  const [summary, setSummary] = useState<{
+    activeHoldsCount: number
+    expiringSoonCount: number
+    totalLockedEquipment: number
+  } | null>(null)
   const [loading, setLoading] = useState(true)
   const [releasingId, setReleasingId] = useState<string | null>(null)
 
@@ -113,16 +117,16 @@ export default function HoldsPage() {
     <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
+          <h1 className="flex items-center gap-2 text-3xl font-bold">
             <Clock className="h-8 w-8 text-primary" />
             الحجوزات المؤقتة (الاحتياط)
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             حجوزات بمؤقت ولم تكتمل الدفع – انتهاء الاحتياط يحرر المعدة
           </p>
         </div>
         <Button variant="outline" onClick={loadHolds} disabled={loading}>
-          <RefreshCw className={`h-4 w-4 ml-2 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           تحديث
         </Button>
       </div>
@@ -178,7 +182,7 @@ export default function HoldsPage() {
               </TableRow>
             ) : holds.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+                <TableCell colSpan={7} className="py-12 text-center text-muted-foreground">
                   لا توجد احتياطات نشطة
                 </TableCell>
               </TableRow>
@@ -199,7 +203,10 @@ export default function HoldsPage() {
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
                       {h.equipment.map((e) => (
-                        <span key={e.equipmentId} className="inline-flex items-center gap-1 text-sm">
+                        <span
+                          key={e.equipmentId}
+                          className="inline-flex items-center gap-1 text-sm"
+                        >
                           <Package className="h-3 w-3" />
                           {e.sku}
                           {e.quantity > 1 && ` ×${e.quantity}`}
@@ -211,7 +218,14 @@ export default function HoldsPage() {
                     {h.softLockExpiresAt ? formatDate(h.softLockExpiresAt) : '—'}
                   </TableCell>
                   <TableCell>
-                    <span className={h.softLockExpiresAt && new Date(h.softLockExpiresAt).getTime() - Date.now() < 5 * 60 * 1000 ? 'text-destructive font-medium' : ''}>
+                    <span
+                      className={
+                        h.softLockExpiresAt &&
+                        new Date(h.softLockExpiresAt).getTime() - Date.now() < 5 * 60 * 1000
+                          ? 'font-medium text-destructive'
+                          : ''
+                      }
+                    >
                       {timeRemaining(h.softLockExpiresAt)}
                     </span>
                   </TableCell>
@@ -219,14 +233,14 @@ export default function HoldsPage() {
                     <Badge variant="outline">{h.status}</Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex gap-2 justify-end">
+                    <div className="flex justify-end gap-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleExtend(h.id)}
                         disabled={releasingId === h.id}
                       >
-                        <Plus className="h-4 w-4 ml-1" />
+                        <Plus className="ml-1 h-4 w-4" />
                         تمديد
                       </Button>
                       <Button
@@ -236,7 +250,7 @@ export default function HoldsPage() {
                         disabled={releasingId === h.id}
                         className="text-destructive hover:text-destructive"
                       >
-                        <Unlock className="h-4 w-4 ml-1" />
+                        <Unlock className="ml-1 h-4 w-4" />
                         إلغاء الاحتياط
                       </Button>
                       <Button variant="ghost" size="sm" asChild>

@@ -19,10 +19,7 @@ import { ValidationError, ForbiddenError } from '@/lib/errors'
  * Body: { ...filter, format: 'pdf' | 'xlsx' }
  * Returns PDF or Excel file.
  */
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { type: string } }
-) {
+export async function POST(req: NextRequest, { params }: { params: { type: string } }) {
   try {
     const session = await auth()
 
@@ -34,10 +31,7 @@ export async function POST(
     const reportType = reportTypeSchema.parse(params.type)
     const policy = await ReportsPolicy.canView(userId, reportType)
     if (!policy.allowed) {
-      return NextResponse.json(
-        { error: policy.reason || 'Forbidden' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: policy.reason || 'Forbidden' }, { status: 403 })
     }
 
     const body = await req.json()
@@ -66,10 +60,7 @@ export async function POST(
         report = await ReportsService.generateInventoryReport(filter, userId)
         break
       default:
-        return NextResponse.json(
-          { error: 'نوع التقرير غير مدعوم' },
-          { status: 400 }
-        )
+        return NextResponse.json({ error: 'نوع التقرير غير مدعوم' }, { status: 400 })
     }
 
     let columns = report.columns ?? []
@@ -84,13 +75,18 @@ export async function POST(
           { key: 'revenue', label: 'Revenue' },
           { key: 'bookings', label: 'Bookings' },
         ]
-        rows = report.revenueByPeriod.map((r: { period: string; revenue: number; bookings: number }) => ({
-          period: r.period,
-          revenue: r.revenue,
-          bookings: r.bookings,
-        }))
+        rows = report.revenueByPeriod.map(
+          (r: { period: string; revenue: number; bookings: number }) => ({
+            period: r.period,
+            revenue: r.revenue,
+            bookings: r.bookings,
+          })
+        )
       } else {
-        columns = [{ key: 'metric', label: 'Metric' }, { key: 'value', label: 'Value' }]
+        columns = [
+          { key: 'metric', label: 'Metric' },
+          { key: 'value', label: 'Value' },
+        ]
         rows = [
           { metric: 'Total Revenue', value: report.totalRevenue ?? 0 },
           { metric: 'Total Bookings', value: report.totalBookings ?? 0 },
@@ -104,7 +100,10 @@ export async function POST(
     if (format === 'xlsx') {
       const buffer = PdfService.generateReportExcelBuffer(
         title,
-        columns.map((c: any) => ({ key: typeof c === 'string' ? c : c.key ?? c.id, label: typeof c === 'string' ? c : c.label ?? c.key ?? c.id })),
+        columns.map((c: any) => ({
+          key: typeof c === 'string' ? c : (c.key ?? c.id),
+          label: typeof c === 'string' ? c : (c.label ?? c.key ?? c.id),
+        })),
         Array.isArray(rows) ? rows : []
       )
       const filename = `report-${reportType}-${Date.now()}.xlsx`
@@ -119,7 +118,9 @@ export async function POST(
     }
 
     const normalizedColumns = columns.map((c: any) =>
-      typeof c === 'string' ? { key: c, label: c } : { key: c.key ?? c.id, label: c.label ?? c.key ?? c.id }
+      typeof c === 'string'
+        ? { key: c, label: c }
+        : { key: c.key ?? c.id, label: c.label ?? c.key ?? c.id }
     )
     const normalizedRows = Array.isArray(rows) ? rows : []
     const buffer = PdfService.generateReportPdfBuffer({
@@ -139,21 +140,12 @@ export async function POST(
     })
   } catch (error: any) {
     if (error instanceof ValidationError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
     if (error instanceof ForbiddenError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 403 })
     }
     console.error('Report export error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

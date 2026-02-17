@@ -21,11 +21,7 @@ import { BookingActions } from '@/components/features/portal/booking-actions'
 
 const CANCELLATION_HOURS_BEFORE_START = 48
 
-export default async function PortalBookingDetailPage({
-  params,
-}: {
-  params: { id: string }
-}) {
+export default async function PortalBookingDetailPage({ params }: { params: { id: string } }) {
   const session = await auth()
 
   if (!session?.user?.id) {
@@ -86,7 +82,10 @@ export default async function PortalBookingDetailPage({
       : undefined
 
   function getStatusBadge(status: BookingStatus) {
-    const statusConfig: Record<BookingStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+    const statusConfig: Record<
+      BookingStatus,
+      { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+    > = {
       DRAFT: { label: 'مسودة', variant: 'outline' },
       RISK_CHECK: { label: 'فحص المخاطر', variant: 'outline' },
       PAYMENT_PENDING: { label: 'انتظار الدفع', variant: 'secondary' },
@@ -108,20 +107,18 @@ export default async function PortalBookingDetailPage({
         <div>
           <Link
             href="/portal/bookings"
-            className="text-sm text-muted-foreground hover:text-foreground mb-2 inline-flex items-center gap-1"
+            className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowRight className="h-4 w-4" />
             العودة إلى الحجوزات
           </Link>
-          <h1 className="text-3xl font-bold">
-            حجز #{booking.bookingNumber}
-          </h1>
+          <h1 className="text-3xl font-bold">حجز #{booking.bookingNumber}</h1>
         </div>
         {getStatusBadge(booking.status)}
       </div>
 
       {/* Booking Information */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -140,7 +137,7 @@ export default async function PortalBookingDetailPage({
             </div>
             <div>
               <div className="text-sm text-muted-foreground">المبلغ الإجمالي</div>
-              <div className="font-medium text-lg">
+              <div className="text-lg font-medium">
                 {formatCurrency(booking.totalAmount.toNumber())}
               </div>
             </div>
@@ -158,14 +155,16 @@ export default async function PortalBookingDetailPage({
                 <div className="font-medium">{formatDate(booking.actualReturnDate)}</div>
               </div>
             )}
-            {'lateFeeAmount' in booking && booking.lateFeeAmount && Number(booking.lateFeeAmount) > 0 && (
-              <div>
-                <div className="text-sm text-muted-foreground">رسوم التأخير (150%)</div>
-                <div className="font-medium text-amber-600">
-                  {formatCurrency(Number(booking.lateFeeAmount))}
+            {'lateFeeAmount' in booking &&
+              booking.lateFeeAmount &&
+              Number(booking.lateFeeAmount) > 0 && (
+                <div>
+                  <div className="text-sm text-muted-foreground">رسوم التأخير (150%)</div>
+                  <div className="font-medium text-amber-600">
+                    {formatCurrency(Number(booking.lateFeeAmount))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </CardContent>
         </Card>
 
@@ -184,16 +183,12 @@ export default async function PortalBookingDetailPage({
                 {booking.equipment.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between p-3 border rounded-lg"
+                    className="flex items-center justify-between rounded-lg border p-3"
                   >
                     <div>
-                      <div className="font-medium">
-                        {item.equipment.sku}
-                      </div>
+                      <div className="font-medium">{item.equipment.sku}</div>
                       {item.equipment.model && (
-                        <div className="text-sm text-muted-foreground">
-                          {item.equipment.model}
-                        </div>
+                        <div className="text-sm text-muted-foreground">{item.equipment.model}</div>
                       )}
                       {item.equipment.category && (
                         <div className="text-sm text-muted-foreground">
@@ -231,24 +226,24 @@ export default async function PortalBookingDetailPage({
               }))}
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t">
+          <div className="grid grid-cols-1 gap-4 border-t pt-2 md:grid-cols-3">
             {booking.contracts.length > 0 && (
               <Link href={`/portal/contracts/${booking.contracts[0].id}`}>
                 <Button variant="outline" className="w-full justify-start">
-                  <FileText className="h-4 w-4 ml-2" />
+                  <FileText className="ml-2 h-4 w-4" />
                   عرض العقد
                 </Button>
               </Link>
             )}
             {booking.status === 'PAYMENT_PENDING' && (
               <Button variant="default" className="w-full justify-start">
-                <Receipt className="h-4 w-4 ml-2" />
+                <Receipt className="ml-2 h-4 w-4" />
                 دفع الآن
               </Button>
             )}
             <Link href="/portal/invoices">
               <Button variant="outline" className="w-full justify-start">
-                <Receipt className="h-4 w-4 ml-2" />
+                <Receipt className="ml-2 h-4 w-4" />
                 الفواتير
               </Button>
             </Link>
@@ -267,32 +262,26 @@ export default async function PortalBookingDetailPage({
               {booking.payments.map((payment) => (
                 <div
                   key={payment.id}
-                  className="flex items-center justify-between p-3 border rounded-lg"
+                  className="flex items-center justify-between rounded-lg border p-3"
                 >
                   <div>
-                    <div className="font-medium">
-                      {formatCurrency(payment.amount.toNumber())}
-                    </div>
+                    <div className="font-medium">{formatCurrency(payment.amount.toNumber())}</div>
                     <div className="text-sm text-muted-foreground">
                       {formatDate(payment.createdAt)}
                     </div>
                   </div>
-                  <Badge
-                    variant={
-                      payment.status === 'SUCCESS' ? 'default' : 'secondary'
-                    }
-                  >
-                    {payment.status === 'SUCCESS' 
-                      ? 'مدفوع' 
+                  <Badge variant={payment.status === 'SUCCESS' ? 'default' : 'secondary'}>
+                    {payment.status === 'SUCCESS'
+                      ? 'مدفوع'
                       : payment.status === 'PENDING'
-                      ? 'قيد الانتظار'
-                      : payment.status === 'PROCESSING'
-                      ? 'قيد المعالجة'
-                      : payment.status === 'FAILED'
-                      ? 'فشل'
-                      : payment.status === 'REFUNDED'
-                      ? 'مسترد'
-                      : payment.status}
+                        ? 'قيد الانتظار'
+                        : payment.status === 'PROCESSING'
+                          ? 'قيد المعالجة'
+                          : payment.status === 'FAILED'
+                            ? 'فشل'
+                            : payment.status === 'REFUNDED'
+                              ? 'مسترد'
+                              : payment.status}
                   </Badge>
                 </div>
               ))}

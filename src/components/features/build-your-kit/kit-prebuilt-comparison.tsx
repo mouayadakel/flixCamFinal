@@ -58,8 +58,8 @@ export function KitPrebuiltComparison({
 
   return (
     <div className="rounded-xl border border-border-light bg-surface-light p-4">
-      <h3 className="font-semibold text-text-heading mb-2">{t('kit.prebuiltMatch')}</h3>
-      <p className="text-sm text-text-muted mb-3">{t('kit.prebuiltSavings')}</p>
+      <h3 className="mb-2 font-semibold text-text-heading">{t('kit.prebuiltMatch')}</h3>
+      <p className="mb-3 text-sm text-text-muted">{t('kit.prebuiltSavings')}</p>
       <ul className="space-y-3">
         {matchingKits.slice(0, 2).map((kit) => {
           const kitPerDay = kit.totalWithDiscount
@@ -70,7 +70,7 @@ export function KitPrebuiltComparison({
           return (
             <li
               key={kit.id}
-              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-3 border-b border-border-light last:border-0"
+              className="flex flex-col gap-3 border-b border-border-light py-3 last:border-0 sm:flex-row sm:items-center sm:justify-between"
             >
               <div>
                 <p className="font-medium text-text-heading">{kit.name}</p>
@@ -80,7 +80,7 @@ export function KitPrebuiltComparison({
                     ` · ${t('kit.youSave').replace('{percent}', String(kit.savingsPercent))}`}
                 </p>
                 {savingsAmount > 0 && (
-                  <p className="text-xs text-brand-primary mt-0.5">
+                  <p className="mt-0.5 text-xs text-brand-primary">
                     {t('kit.saveAmount').replace('{amount}', formatSar(savingsAmount))}
                   </p>
                 )}

@@ -136,7 +136,13 @@ export class IntegrationService {
    * Get all integrations
    */
   static async getAll(): Promise<IntegrationConfig[]> {
-    const types: IntegrationConfig['type'][] = ['payments', 'email', 'whatsapp', 'analytics', 'webhooks']
+    const types: IntegrationConfig['type'][] = [
+      'payments',
+      'email',
+      'whatsapp',
+      'analytics',
+      'webhooks',
+    ]
     return Promise.all(types.map((type) => this.getConfig(type)))
   }
 }

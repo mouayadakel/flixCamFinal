@@ -22,10 +22,7 @@ const CANCELLATION_HOURS_BEFORE_START = 48
  * - Status is DRAFT, RISK_CHECK, PAYMENT_PENDING, or CONFIRMED
  * - If CONFIRMED: start date must be more than 48h in the future
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.id) {
@@ -78,9 +75,7 @@ export async function POST(
     }
 
     const ipAddress =
-      request.headers.get('x-forwarded-for') ||
-      request.headers.get('x-real-ip') ||
-      'unknown'
+      request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'
 
     await BookingService.transitionState(
@@ -96,10 +91,7 @@ export async function POST(
     })
   } catch (error) {
     if (error && typeof error === 'object' && 'name' in error && error.name === 'ZodError') {
-      return NextResponse.json(
-        { error: 'بيانات غير صالحة', details: error },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'بيانات غير صالحة', details: error }, { status: 400 })
     }
     console.error('Portal cancel error:', error)
     return NextResponse.json(

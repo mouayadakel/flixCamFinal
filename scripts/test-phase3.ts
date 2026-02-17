@@ -162,7 +162,9 @@ async function testPhase3() {
       if (booking) {
         try {
           const inspections = await InspectionService.listByBooking(booking.id, userId)
-          console.log(`  ✅ InspectionService.listByBooking() - Found ${inspections.length} inspections`)
+          console.log(
+            `  ✅ InspectionService.listByBooking() - Found ${inspections.length} inspections`
+          )
           passed++
         } catch (error: any) {
           console.log(`  ⚠️  InspectionService - No inspections found (expected)`)

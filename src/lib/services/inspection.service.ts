@@ -6,11 +6,7 @@
 
 import { prisma } from '@/lib/db/prisma'
 import { AuditService } from './audit.service'
-import {
-  NotFoundError,
-  ValidationError,
-  ForbiddenError,
-} from '@/lib/errors'
+import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission } from '@/lib/auth/permissions'
 
 export type InspectionType = 'check_in' | 'check_out'

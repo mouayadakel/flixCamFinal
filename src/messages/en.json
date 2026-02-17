@@ -15,6 +15,7 @@
     "account": "My Account",
     "howItWorks": "How It Works",
     "support": "Support",
+    "faq": "FAQ",
     "policies": "Terms & Privacy"
   },
   "common": {
@@ -31,6 +32,7 @@
     "apply": "Apply",
     "clear": "Clear",
     "viewAll": "View all",
+    "viewDetails": "View Details",
     "noResults": "No results found",
     "resultsFor": "Results for: {query}",
     "productsCount": "Products",
@@ -75,13 +77,16 @@
     "specShowAll": "Show all specifications",
     "specShowLess": "Show less",
     "includedPlaceholder": "Standard rental includes the unit as described.",
-    "addonsPlaceholder": "Insurance and optional accessories can be added at checkout."
+    "addonsPlaceholder": "Insurance and optional accessories can be added at checkout.",
+    "noSubcategories": "No subcategories",
+    "selectCategoryForSubcategories": "Select a category above to see subcategories"
   },
   "home": {
     "heroTitle": "Cinematic Equipment & Studio Rental",
     "heroSubtitle": "Book the right equipment and studios for your project in Riyadh",
     "featuredEquipment": "Featured Equipment",
     "topBrandsTitle": "Top Brands",
+    "topBrandsSubtitle": "Rent from the brands you trust",
     "exploreStudios": "Explore Studios",
     "howItWorksTitle": "How It Works",
     "howItWorksStep1": "Choose",
@@ -93,9 +98,21 @@
     "ctaButton": "Book now",
     "testimonialsTitle": "What People Are Saying",
     "testimonials": [
-      { "quote": "Great equipment and smooth booking. Highly recommend for film projects.", "authorName": "Sarah M.", "rating": 5 },
-      { "quote": "Professional service and well-maintained gear. Will rent again.", "authorName": "Ahmed K.", "rating": 5 },
-      { "quote": "Easy process from booking to return. The team was very helpful.", "authorName": "Lisa T.", "rating": 5 }
+      {
+        "quote": "Great equipment and smooth booking. Highly recommend for film projects.",
+        "authorName": "Sarah M.",
+        "rating": 5
+      },
+      {
+        "quote": "Professional service and well-maintained gear. Will rent again.",
+        "authorName": "Ahmed K.",
+        "rating": 5
+      },
+      {
+        "quote": "Easy process from booking to return. The team was very helpful.",
+        "authorName": "Lisa T.",
+        "rating": 5
+      }
     ],
     "heroSearchPlaceholder": "Search equipment...",
     "categoriesTitle": "Browse by Category",
@@ -104,7 +121,18 @@
     "trustRentalsCount": "{count}+ completed rentals",
     "trustYears": "Since {year}",
     "trustInsured": "Fully insured",
-    "trustSupport": "24/7 support"
+    "trustSupport": "24/7 support",
+    "categoriesSubtitle": "Find gear by type — from cameras to lighting",
+    "featuredSubtitle": "Handpicked by our team for your next shoot",
+    "howItWorksSubtitle": "Rent in 5 simple steps",
+    "testimonialsSubtitle": "Hear from filmmakers who trust us",
+    "faqSubtitle": "Common questions about renting with us",
+    "ctaSubtitle": "Browse our full catalog and start your next project",
+    "newArrivalsTitle": "New Arrivals",
+    "newArrivalsSubtitle": "Latest equipment added to our catalog",
+    "kitTeaserTitle": "Build Your Perfect Kit",
+    "kitTeaserSubtitle": "Mix and match equipment for your shoot. Get AI suggestions and save with bundles.",
+    "kitTeaserButton": "Build Your Kit"
   },
   "footer": {
     "links": "Quick links",

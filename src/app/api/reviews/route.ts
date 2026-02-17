@@ -47,11 +47,19 @@ export async function GET(request: NextRequest) {
     })
 
     const shape = reviews.map((r) => {
-      const b = r.booking as { id: string; bookingNumber: string; status: string; startDate: Date; endDate: Date; equipment?: Array<{ equipment: { sku: string; model: string | null } }> } | null
-      const equipmentNames = b?.equipment
-        ?.map((be) => be.equipment?.sku ?? '')
-        .filter(Boolean)
-        .join(', ') ?? null
+      const b = r.booking as {
+        id: string
+        bookingNumber: string
+        status: string
+        startDate: Date
+        endDate: Date
+        equipment?: Array<{ equipment: { sku: string; model: string | null } }>
+      } | null
+      const equipmentNames =
+        b?.equipment
+          ?.map((be) => be.equipment?.sku ?? '')
+          .filter(Boolean)
+          .join(', ') ?? null
       return {
         id: r.id,
         bookingId: r.bookingId,
@@ -98,10 +106,7 @@ export async function POST(request: NextRequest) {
       where: { bookingId: parsed.bookingId },
     })
     if (existing) {
-      return NextResponse.json(
-        { error: 'This booking already has a review' },
-        { status: 409 }
-      )
+      return NextResponse.json({ error: 'This booking already has a review' }, { status: 409 })
     }
 
     const review = await prisma.review.create({

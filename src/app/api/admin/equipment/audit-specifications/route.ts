@@ -8,10 +8,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
 import { prisma } from '@/lib/db/prisma'
-import {
-  isStructuredSpecifications,
-  isFlatSpecifications,
-} from '@/lib/types/specifications.types'
+import { isStructuredSpecifications, isFlatSpecifications } from '@/lib/types/specifications.types'
 
 // ============================================================================
 // Types
@@ -76,7 +73,11 @@ function analyzeSpecifications(specs: unknown): {
   }
 
   if (isStructuredSpecifications(specs)) {
-    const s = specs as { groups?: Array<{ specs?: Array<{ value?: string }> }>; highlights?: unknown[]; quickSpecs?: unknown[] }
+    const s = specs as {
+      groups?: Array<{ specs?: Array<{ value?: string }> }>
+      highlights?: unknown[]
+      quickSpecs?: unknown[]
+    }
     if (!s.groups || s.groups.length === 0) {
       issues.push('Structured format but no specification groups')
       return {
@@ -86,10 +87,7 @@ function analyzeSpecifications(specs: unknown): {
       }
     }
 
-    const totalSpecs = s.groups.reduce(
-      (sum, group) => sum + (group.specs?.length || 0),
-      0
-    )
+    const totalSpecs = s.groups.reduce((sum, group) => sum + (group.specs?.length || 0), 0)
     if (totalSpecs === 0) {
       issues.push('Groups exist but contain no specifications')
       return {
@@ -156,10 +154,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     if (!(await hasPermission(session.user.id, PERMISSIONS.EQUIPMENT_READ))) {
-      return NextResponse.json(
-        { error: 'Forbidden - equipment.read required' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'Forbidden - equipment.read required' }, { status: 403 })
     }
 
     const equipment = await prisma.equipment.findMany({
@@ -205,14 +200,11 @@ export async function GET(request: NextRequest) {
       complete: completeCount,
       needsConversion: auditItems.filter((i) => i.specsFormat === 'flat').length,
       missingSpecs: auditItems.filter((i) => i.specsFormat === 'empty').length,
-      invalidSpecs: auditItems.filter(
-        (i) => i.status === 'invalid' && i.specsFormat !== 'empty'
-      ).length,
+      invalidSpecs: auditItems.filter((i) => i.status === 'invalid' && i.specsFormat !== 'empty')
+        .length,
       missingImages: auditItems.filter((i) => !i.hasImages).length,
       percentComplete:
-        auditItems.length > 0
-          ? Math.round((completeCount / auditItems.length) * 100)
-          : 0,
+        auditItems.length > 0 ? Math.round((completeCount / auditItems.length) * 100) : 0,
     }
 
     const response: AuditResponse = {

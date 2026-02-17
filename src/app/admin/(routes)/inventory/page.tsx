@@ -14,7 +14,7 @@ export default function InventoryPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Inventory</h1>
-        </div>
+      </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
@@ -27,9 +27,7 @@ export default function InventoryPage() {
           </CardHeader>
           <CardContent>
             <Button asChild className="w-full">
-              <Link href="/admin/inventory/equipment">
-                View Equipment
-              </Link>
+              <Link href="/admin/inventory/equipment">View Equipment</Link>
             </Button>
           </CardContent>
         </Card>
@@ -44,9 +42,7 @@ export default function InventoryPage() {
           </CardHeader>
           <CardContent>
             <Button asChild variant="outline" className="w-full">
-              <Link href="/admin/inventory/categories">
-                View Categories
-              </Link>
+              <Link href="/admin/inventory/categories">View Categories</Link>
             </Button>
           </CardContent>
         </Card>
@@ -61,9 +57,7 @@ export default function InventoryPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             <Button asChild variant="outline" className="w-full">
-              <Link href="/admin/inventory/equipment/new">
-                Add Equipment
-              </Link>
+              <Link href="/admin/inventory/equipment/new">Add Equipment</Link>
             </Button>
           </CardContent>
         </Card>

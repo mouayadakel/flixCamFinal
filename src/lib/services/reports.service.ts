@@ -7,11 +7,7 @@
  */
 
 import { prisma } from '@/lib/db/prisma'
-import {
-  NotFoundError,
-  ValidationError,
-  ForbiddenError,
-} from '@/lib/errors'
+import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission } from '@/lib/auth/permissions'
 import type {
   ReportType,
@@ -30,10 +26,7 @@ export class ReportsService {
   /**
    * Generate revenue report
    */
-  static async generateRevenueReport(
-    filter: ReportFilter,
-    userId: string
-  ): Promise<RevenueReport> {
+  static async generateRevenueReport(filter: ReportFilter, userId: string): Promise<RevenueReport> {
     // Check permission
     const canView = await hasPermission(userId, 'reports.read' as any)
     if (!canView) {
@@ -86,19 +79,34 @@ export class ReportsService {
 
     // Revenue by status
     const revenueByStatus = {
-      confirmed: bookings.filter((b) => b.status === 'CONFIRMED').reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
-      active: bookings.filter((b) => b.status === 'ACTIVE').reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
-      completed: bookings.filter((b) => b.status === 'CLOSED').reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
-      cancelled: bookings.filter((b) => b.status === 'CANCELLED').reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
+      confirmed: bookings
+        .filter((b) => b.status === 'CONFIRMED')
+        .reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
+      active: bookings
+        .filter((b) => b.status === 'ACTIVE')
+        .reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
+      completed: bookings
+        .filter((b) => b.status === 'CLOSED')
+        .reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
+      cancelled: bookings
+        .filter((b) => b.status === 'CANCELLED')
+        .reduce((sum, b) => sum + Number(b.totalAmount || 0), 0),
     }
 
     // Revenue by equipment
-    const equipmentRevenueMap = new Map<string, { name: string; revenue: number; bookings: number }>()
+    const equipmentRevenueMap = new Map<
+      string,
+      { name: string; revenue: number; bookings: number }
+    >()
     bookings.forEach((booking) => {
       booking.equipment.forEach((be) => {
         const equipmentId = be.equipmentId
         const equipmentName = be.equipment.sku || be.equipment.model || equipmentId
-        const existing = equipmentRevenueMap.get(equipmentId) || { name: equipmentName, revenue: 0, bookings: 0 }
+        const existing = equipmentRevenueMap.get(equipmentId) || {
+          name: equipmentName,
+          revenue: 0,
+          bookings: 0,
+        }
         existing.revenue += Number(booking.totalAmount || 0) / booking.equipment.length
         existing.bookings += 1
         equipmentRevenueMap.set(equipmentId, existing)
@@ -113,11 +121,18 @@ export class ReportsService {
     }))
 
     // Revenue by customer
-    const customerRevenueMap = new Map<string, { name: string; revenue: number; bookings: number }>()
+    const customerRevenueMap = new Map<
+      string,
+      { name: string; revenue: number; bookings: number }
+    >()
     bookings.forEach((booking) => {
       const customerId = booking.customerId
       const customerName = booking.customer.name || booking.customer.email
-      const existing = customerRevenueMap.get(customerId) || { name: customerName, revenue: 0, bookings: 0 }
+      const existing = customerRevenueMap.get(customerId) || {
+        name: customerName,
+        revenue: 0,
+        bookings: 0,
+      }
       existing.revenue += Number(booking.totalAmount || 0)
       existing.bookings += 1
       customerRevenueMap.set(customerId, existing)
@@ -169,10 +184,7 @@ export class ReportsService {
   /**
    * Generate booking report
    */
-  static async generateBookingReport(
-    filter: ReportFilter,
-    userId: string
-  ): Promise<BookingReport> {
+  static async generateBookingReport(filter: ReportFilter, userId: string): Promise<BookingReport> {
     // Check permission
     const canView = await hasPermission(userId, 'reports.read' as any)
     if (!canView) {
@@ -253,9 +265,8 @@ export class ReportsService {
         const end = new Date(b.endDate)
         return (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
       })
-    const averageBookingDuration = durations.length > 0
-      ? durations.reduce((sum, d) => sum + d, 0) / durations.length
-      : 0
+    const averageBookingDuration =
+      durations.length > 0 ? durations.reduce((sum, d) => sum + d, 0) / durations.length : 0
 
     // Cancellation rate
     const cancelledCount = bookings.filter((b) => b.status === 'CANCELLED').length
@@ -266,7 +277,11 @@ export class ReportsService {
     bookings.forEach((booking) => {
       const customerId = booking.customerId
       const customerName = booking.customer.name || booking.customer.email
-      const existing = customerMap.get(customerId) || { name: customerName, bookings: 0, revenue: 0 }
+      const existing = customerMap.get(customerId) || {
+        name: customerName,
+        bookings: 0,
+        revenue: 0,
+      }
       existing.bookings += 1
       existing.revenue += Number(booking.totalAmount || 0)
       customerMap.set(customerId, existing)
@@ -362,29 +377,33 @@ export class ReportsService {
     })
 
     const totalEquipment = equipment.length
-    const availableEquipment = equipment.filter((e) => 
-      e.condition !== 'MAINTENANCE' && 
-      e.quantityAvailable > 0
+    const availableEquipment = equipment.filter(
+      (e) => e.condition !== 'MAINTENANCE' && e.quantityAvailable > 0
     ).length
     const rentedEquipment = equipment.filter((e) => e.quantityAvailable < e.quantityTotal).length
     const maintenanceEquipment = equipment.filter((e) => e.condition === 'MAINTENANCE').length
     const damagedItems = 0 // EquipmentCondition enum doesn't have DAMAGED (it's in InventoryItemStatus)
 
     // Calculate utilization
-    const totalDays = Math.ceil((filter.dateTo.getTime() - filter.dateFrom.getTime()) / (1000 * 60 * 60 * 24))
+    const totalDays = Math.ceil(
+      (filter.dateTo.getTime() - filter.dateFrom.getTime()) / (1000 * 60 * 60 * 24)
+    )
     const totalAvailableDays = totalEquipment * totalDays
     const totalRentedDays = equipment.reduce((sum, e) => {
       const equipmentBookings = equipmentBookingsMap.get(e.id) || []
       const rentedDays = equipmentBookings.reduce((bookingSum: number, b: any) => {
         const bookingStart = new Date(b.startDate)
         const bookingEnd = new Date(b.endDate)
-        const bookingDays = Math.ceil((bookingEnd.getTime() - bookingStart.getTime()) / (1000 * 60 * 60 * 24))
+        const bookingDays = Math.ceil(
+          (bookingEnd.getTime() - bookingStart.getTime()) / (1000 * 60 * 60 * 24)
+        )
         return bookingSum + bookingDays
       }, 0)
       return sum + rentedDays
     }, 0)
 
-    const utilizationRate = totalAvailableDays > 0 ? (totalRentedDays / totalAvailableDays) * 100 : 0
+    const utilizationRate =
+      totalAvailableDays > 0 ? (totalRentedDays / totalAvailableDays) * 100 : 0
 
     // Equipment utilization details
     const equipmentUtilization = equipment.map((e) => {
@@ -392,11 +411,16 @@ export class ReportsService {
       const rentedDays = equipmentBookings.reduce((sum: number, b: any) => {
         const bookingStart = new Date(b.startDate)
         const bookingEnd = new Date(b.endDate)
-        const bookingDays = Math.ceil((bookingEnd.getTime() - bookingStart.getTime()) / (1000 * 60 * 60 * 24))
+        const bookingDays = Math.ceil(
+          (bookingEnd.getTime() - bookingStart.getTime()) / (1000 * 60 * 60 * 24)
+        )
         return sum + bookingDays
       }, 0)
       const utilizationRate = totalDays > 0 ? (rentedDays / totalDays) * 100 : 0
-      const revenue = equipmentBookings.reduce((sum: number, b: any) => sum + Number(b.totalAmount || 0), 0)
+      const revenue = equipmentBookings.reduce(
+        (sum: number, b: any) => sum + Number(b.totalAmount || 0),
+        0
+      )
 
       return {
         equipmentId: e.id,
@@ -482,7 +506,9 @@ export class ReportsService {
     })
 
     const totalCustomers = customers.length
-    const activeCustomers = customers.filter((c) => (customerBookingsMap.get(c.id) || []).length > 0).length
+    const activeCustomers = customers.filter(
+      (c) => (customerBookingsMap.get(c.id) || []).length > 0
+    ).length
     const newCustomers = customers.filter((c) => new Date(c.createdAt) >= filter.dateFrom).length
 
     // Customers by period
@@ -512,11 +538,18 @@ export class ReportsService {
     const topCustomers = customers
       .map((c) => {
         const bookings = customerBookingsMap.get(c.id) || []
-        const revenue = bookings.reduce((sum: number, b: any) => sum + Number(b.totalAmount || 0), 0)
+        const revenue = bookings.reduce(
+          (sum: number, b: any) => sum + Number(b.totalAmount || 0),
+          0
+        )
         const averageBookingValue = bookings.length > 0 ? revenue / bookings.length : 0
-        const lastBooking = bookings.length > 0
-          ? bookings.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
-          : null
+        const lastBooking =
+          bookings.length > 0
+            ? bookings.sort(
+                (a: any, b: any) =>
+                  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+              )[0]
+            : null
 
         return {
           customerId: c.id,
@@ -532,7 +565,9 @@ export class ReportsService {
       .slice(0, 10)
 
     // Customer retention
-    const returningCustomers = customers.filter((c) => (customerBookingsMap.get(c.id) || []).length > 1).length
+    const returningCustomers = customers.filter(
+      (c) => (customerBookingsMap.get(c.id) || []).length > 1
+    ).length
     const retentionRate = totalCustomers > 0 ? (returningCustomers / totalCustomers) * 100 : 0
 
     return {
@@ -619,7 +654,8 @@ export class ReportsService {
     const invoices = {
       total: bookings.length,
       paid: bookings.filter((b) => b.status === 'CLOSED' || b.status === 'ACTIVE').length,
-      pending: bookings.filter((b) => b.status === 'PAYMENT_PENDING' || b.status === 'CONFIRMED').length,
+      pending: bookings.filter((b) => b.status === 'PAYMENT_PENDING' || b.status === 'CONFIRMED')
+        .length,
       overdue: 0,
       totalAmount: totalRevenue,
     }
@@ -683,7 +719,9 @@ export class ReportsService {
     const totalItems = equipment.reduce((sum, e) => sum + e.quantityTotal, 0)
     const availableItems = equipment.reduce((sum, e) => sum + e.quantityAvailable, 0)
     const rentedItems = totalItems - availableItems
-    const maintenanceItems = equipment.filter((e) => e.condition === 'MAINTENANCE').reduce((sum, e) => sum + e.quantityTotal, 0)
+    const maintenanceItems = equipment
+      .filter((e) => e.condition === 'MAINTENANCE')
+      .reduce((sum, e) => sum + e.quantityTotal, 0)
     const damagedItems = 0 // EquipmentCondition enum doesn't have DAMAGED
 
     // Inventory value (placeholder - would need purchase price)
@@ -710,11 +748,21 @@ export class ReportsService {
 
     // By condition
     const byCondition = {
-      excellent: equipment.filter((e) => e.condition === 'EXCELLENT').reduce((sum, e) => sum + e.quantityTotal, 0),
-      good: equipment.filter((e) => e.condition === 'GOOD').reduce((sum, e) => sum + e.quantityTotal, 0),
-      fair: equipment.filter((e) => e.condition === 'FAIR').reduce((sum, e) => sum + e.quantityTotal, 0),
-      poor: equipment.filter((e) => e.condition === 'POOR').reduce((sum, e) => sum + e.quantityTotal, 0),
-      maintenance: equipment.filter((e) => e.condition === 'MAINTENANCE').reduce((sum, e) => sum + e.quantityTotal, 0),
+      excellent: equipment
+        .filter((e) => e.condition === 'EXCELLENT')
+        .reduce((sum, e) => sum + e.quantityTotal, 0),
+      good: equipment
+        .filter((e) => e.condition === 'GOOD')
+        .reduce((sum, e) => sum + e.quantityTotal, 0),
+      fair: equipment
+        .filter((e) => e.condition === 'FAIR')
+        .reduce((sum, e) => sum + e.quantityTotal, 0),
+      poor: equipment
+        .filter((e) => e.condition === 'POOR')
+        .reduce((sum, e) => sum + e.quantityTotal, 0),
+      maintenance: equipment
+        .filter((e) => e.condition === 'MAINTENANCE')
+        .reduce((sum, e) => sum + e.quantityTotal, 0),
       damaged: damagedItems, // EquipmentCondition enum doesn't have DAMAGED (it's in InventoryItemStatus)
     }
 
@@ -762,47 +810,100 @@ export class ReportsService {
     const lastYear = new Date(now.getFullYear() - 1, 0, 1)
 
     // Revenue stats
-    const [todayBookings, thisWeekBookings, thisMonthBookings, thisYearBookings, lastMonthBookings] = await Promise.all([
-      prisma.booking.findMany({ where: { deletedAt: null, createdAt: { gte: today }, status: { not: 'CANCELLED' } } }),
-      prisma.booking.findMany({ where: { deletedAt: null, createdAt: { gte: thisWeek }, status: { not: 'CANCELLED' } } }),
-      prisma.booking.findMany({ where: { deletedAt: null, createdAt: { gte: thisMonth }, status: { not: 'CANCELLED' } } }),
-      prisma.booking.findMany({ where: { deletedAt: null, createdAt: { gte: thisYear }, status: { not: 'CANCELLED' } } }),
-      prisma.booking.findMany({ where: { deletedAt: null, createdAt: { gte: lastMonth, lt: thisMonth }, status: { not: 'CANCELLED' } } }),
+    const [
+      todayBookings,
+      thisWeekBookings,
+      thisMonthBookings,
+      thisYearBookings,
+      lastMonthBookings,
+    ] = await Promise.all([
+      prisma.booking.findMany({
+        where: { deletedAt: null, createdAt: { gte: today }, status: { not: 'CANCELLED' } },
+      }),
+      prisma.booking.findMany({
+        where: { deletedAt: null, createdAt: { gte: thisWeek }, status: { not: 'CANCELLED' } },
+      }),
+      prisma.booking.findMany({
+        where: { deletedAt: null, createdAt: { gte: thisMonth }, status: { not: 'CANCELLED' } },
+      }),
+      prisma.booking.findMany({
+        where: { deletedAt: null, createdAt: { gte: thisYear }, status: { not: 'CANCELLED' } },
+      }),
+      prisma.booking.findMany({
+        where: {
+          deletedAt: null,
+          createdAt: { gte: lastMonth, lt: thisMonth },
+          status: { not: 'CANCELLED' },
+        },
+      }),
     ])
 
     const revenueToday = todayBookings.reduce((sum, b) => sum + Number(b.totalAmount || 0), 0)
     const revenueThisWeek = thisWeekBookings.reduce((sum, b) => sum + Number(b.totalAmount || 0), 0)
-    const revenueThisMonth = thisMonthBookings.reduce((sum, b) => sum + Number(b.totalAmount || 0), 0)
+    const revenueThisMonth = thisMonthBookings.reduce(
+      (sum, b) => sum + Number(b.totalAmount || 0),
+      0
+    )
     const revenueThisYear = thisYearBookings.reduce((sum, b) => sum + Number(b.totalAmount || 0), 0)
-    const revenueLastMonth = lastMonthBookings.reduce((sum, b) => sum + Number(b.totalAmount || 0), 0)
-    const revenueGrowth = revenueLastMonth > 0 ? ((revenueThisMonth - revenueLastMonth) / revenueLastMonth) * 100 : 0
+    const revenueLastMonth = lastMonthBookings.reduce(
+      (sum, b) => sum + Number(b.totalAmount || 0),
+      0
+    )
+    const revenueGrowth =
+      revenueLastMonth > 0 ? ((revenueThisMonth - revenueLastMonth) / revenueLastMonth) * 100 : 0
 
     // Booking stats
     const [pendingBookings, activeBookings] = await Promise.all([
-      prisma.booking.count({ where: { deletedAt: null, status: { in: ['DRAFT', 'RISK_CHECK', 'PAYMENT_PENDING'] } } }),
+      prisma.booking.count({
+        where: { deletedAt: null, status: { in: ['DRAFT', 'RISK_CHECK', 'PAYMENT_PENDING'] } },
+      }),
       prisma.booking.count({ where: { deletedAt: null, status: 'ACTIVE' } }),
     ])
 
     const bookingsLastMonth = lastMonthBookings.length
-    const bookingsGrowth = bookingsLastMonth > 0 ? ((thisMonthBookings.length - bookingsLastMonth) / bookingsLastMonth) * 100 : 0
+    const bookingsGrowth =
+      bookingsLastMonth > 0
+        ? ((thisMonthBookings.length - bookingsLastMonth) / bookingsLastMonth) * 100
+        : 0
 
     // Equipment stats (rented = rows where quantityAvailable < quantityTotal; Prisma cannot compare two columns in one count)
-    const [equipmentList, totalEquipment, availableEquipment, maintenanceEquipment] = await Promise.all([
-      prisma.equipment.findMany({ where: { deletedAt: null }, select: { quantityAvailable: true, quantityTotal: true, condition: true } }),
-      prisma.equipment.count({ where: { deletedAt: null } }),
-      prisma.equipment.count({ where: { deletedAt: null, quantityAvailable: { gt: 0 }, condition: { not: 'MAINTENANCE' } } }),
-      prisma.equipment.count({ where: { deletedAt: null, condition: 'MAINTENANCE' } }),
-    ])
-    const rentedEquipment = equipmentList.filter((e) => e.quantityAvailable < e.quantityTotal).length
+    const [equipmentList, totalEquipment, availableEquipment, maintenanceEquipment] =
+      await Promise.all([
+        prisma.equipment.findMany({
+          where: { deletedAt: null },
+          select: { quantityAvailable: true, quantityTotal: true, condition: true },
+        }),
+        prisma.equipment.count({ where: { deletedAt: null } }),
+        prisma.equipment.count({
+          where: {
+            deletedAt: null,
+            quantityAvailable: { gt: 0 },
+            condition: { not: 'MAINTENANCE' },
+          },
+        }),
+        prisma.equipment.count({ where: { deletedAt: null, condition: 'MAINTENANCE' } }),
+      ])
+    const rentedEquipment = equipmentList.filter(
+      (e) => e.quantityAvailable < e.quantityTotal
+    ).length
 
-    const utilization = totalEquipment > 0 ? ((totalEquipment - availableEquipment) / totalEquipment) * 100 : 0
+    const utilization =
+      totalEquipment > 0 ? ((totalEquipment - availableEquipment) / totalEquipment) * 100 : 0
 
     // Customer stats
     // Get customer stats (using DATA_ENTRY as placeholder for client role)
     const [totalCustomers, newCustomersThisMonth, newCustomersLastMonth] = await Promise.all([
       prisma.user.count({ where: { role: 'DATA_ENTRY', deletedAt: null } }),
-      prisma.user.count({ where: { role: 'DATA_ENTRY', deletedAt: null, createdAt: { gte: thisMonth } } }),
-      prisma.user.count({ where: { role: 'DATA_ENTRY', deletedAt: null, createdAt: { gte: lastMonth, lt: thisMonth } } }),
+      prisma.user.count({
+        where: { role: 'DATA_ENTRY', deletedAt: null, createdAt: { gte: thisMonth } },
+      }),
+      prisma.user.count({
+        where: {
+          role: 'DATA_ENTRY',
+          deletedAt: null,
+          createdAt: { gte: lastMonth, lt: thisMonth },
+        },
+      }),
     ])
 
     // Get active customers (customers with bookings this month)
@@ -818,10 +919,18 @@ export class ReportsService {
     })
     const activeCustomers = activeCustomersBookings.length
 
-    const customersGrowth = newCustomersLastMonth > 0 ? ((newCustomersThisMonth - newCustomersLastMonth) / newCustomersLastMonth) * 100 : 0
+    const customersGrowth =
+      newCustomersLastMonth > 0
+        ? ((newCustomersThisMonth - newCustomersLastMonth) / newCustomersLastMonth) * 100
+        : 0
 
     // Recent activity (placeholder)
-    const recentActivity: Array<{ id: string; type: string; description: string; timestamp: Date }> = []
+    const recentActivity: Array<{
+      id: string
+      type: string
+      description: string
+      timestamp: Date
+    }> = []
 
     return {
       revenue: {

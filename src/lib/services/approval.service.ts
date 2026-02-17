@@ -6,11 +6,7 @@
 
 import { prisma } from '@/lib/db/prisma'
 import { AuditService } from './audit.service'
-import {
-  NotFoundError,
-  ValidationError,
-  ForbiddenError,
-} from '@/lib/errors'
+import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission } from '@/lib/auth/permissions'
 import { UserRole, NotificationChannel } from '@prisma/client'
 
@@ -128,7 +124,7 @@ export class ApprovalService {
         status: 'approved',
         approvedBy: input.approvedBy,
         metadata: {
-          ...(approval.metadata as Record<string, any> || {}),
+          ...((approval.metadata as Record<string, any>) || {}),
           approvedNotes: input.notes,
           approvedAt: new Date().toISOString(),
         },
@@ -193,7 +189,7 @@ export class ApprovalService {
         status: 'rejected',
         approvedBy: input.rejectedBy, // Using approvedBy field for rejector
         metadata: {
-          ...(approval.metadata as Record<string, any> || {}),
+          ...((approval.metadata as Record<string, any>) || {}),
           rejectionReason: input.reason,
           rejectedAt: new Date().toISOString(),
         },
@@ -275,10 +271,7 @@ export class ApprovalService {
   /**
    * Get approvals for a resource
    */
-  static async getByResource(
-    resourceType: string,
-    resourceId: string
-  ) {
+  static async getByResource(resourceType: string, resourceId: string) {
     return prisma.approvalRequest.findMany({
       where: {
         resourceType,

@@ -6,10 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useLocale } from '@/hooks/use-locale'
-import {
-  useKitWizardStore,
-  type EquipmentRecommendationItem,
-} from '@/lib/stores/kit-wizard.store'
+import { useKitWizardStore, type EquipmentRecommendationItem } from '@/lib/stores/kit-wizard.store'
 import { useCartStore } from '@/lib/stores/cart.store'
 import {
   Dialog,
@@ -66,15 +63,25 @@ export function KitAiAssistant() {
       })
       if (!res.ok) return
       const data = await res.json()
-      const list = (data.suggestions ?? []).map((s: { equipmentId: string; equipmentName: string; sku: string; quantity: number; dailyPrice: number; role: string; reason: string }) => ({
-        equipmentId: s.equipmentId,
-        equipmentName: s.equipmentName,
-        sku: s.sku,
-        quantity: s.quantity,
-        dailyPrice: s.dailyPrice,
-        role: s.role,
-        reason: s.reason,
-      }))
+      const list = (data.suggestions ?? []).map(
+        (s: {
+          equipmentId: string
+          equipmentName: string
+          sku: string
+          quantity: number
+          dailyPrice: number
+          role: string
+          reason: string
+        }) => ({
+          equipmentId: s.equipmentId,
+          equipmentName: s.equipmentName,
+          sku: s.sku,
+          quantity: s.quantity,
+          dailyPrice: s.dailyPrice,
+          role: s.role,
+          reason: s.reason,
+        })
+      )
       setSuggestions(list)
       setAiSuggestions(list)
     } finally {
@@ -122,7 +129,7 @@ export function KitAiAssistant() {
           <span className="hidden sm:inline">{t('kit.askExpert')}</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-full sm:max-w-md max-h-[85vh] flex flex-col">
+      <DialogContent className="flex max-h-[85vh] w-full flex-col sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-brand-primary" />
@@ -145,8 +152,8 @@ export function KitAiAssistant() {
                   )}
                 >
                   <p className="font-medium text-text-heading">{s.equipmentName}</p>
-                  <p className="text-sm text-text-muted mb-2">{s.reason}</p>
-                  <p className="text-sm text-text-muted mb-2">
+                  <p className="mb-2 text-sm text-text-muted">{s.reason}</p>
+                  <p className="mb-2 text-sm text-text-muted">
                     {formatSar(s.dailyPrice)}/day · Qty {s.quantity}
                   </p>
                   <Button
@@ -155,9 +162,7 @@ export function KitAiAssistant() {
                     disabled={!!selectedEquipment[s.equipmentId]}
                     onClick={() => handleAddSuggestion(s)}
                   >
-                    {selectedEquipment[s.equipmentId]
-                      ? t('kit.selected')
-                      : t('kit.addSuggestion')}
+                    {selectedEquipment[s.equipmentId] ? t('kit.selected') : t('kit.addSuggestion')}
                   </Button>
                 </li>
               ))}

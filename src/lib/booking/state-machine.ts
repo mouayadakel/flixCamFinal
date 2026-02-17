@@ -12,14 +12,17 @@ import { BookingStatus } from '@prisma/client'
 /**
  * State configurations from USER_FLOWS.json
  */
-export const BOOKING_STATES: Record<BookingState, {
-  label: { ar: string; en: string }
-  description: string
-  color: string
-  autoTransition?: boolean
-  duration?: string
-  final?: boolean
-}> = {
+export const BOOKING_STATES: Record<
+  BookingState,
+  {
+    label: { ar: string; en: string }
+    description: string
+    color: string
+    autoTransition?: boolean
+    duration?: string
+    final?: boolean
+  }
+> = {
   DRAFT: {
     label: { ar: 'مسودة', en: 'Draft' },
     description: 'Initial state when booking is created',
@@ -144,9 +147,7 @@ export function isValidTransition(
   userRole?: string
 ): boolean {
   const transition = TRANSITIONS.find((t) => {
-    const fromMatches = Array.isArray(t.from)
-      ? t.from.includes(from)
-      : t.from === from
+    const fromMatches = Array.isArray(t.from) ? t.from.includes(from) : t.from === from
     return fromMatches && t.to === to
   })
 
@@ -169,22 +170,20 @@ export function getAllowedTransitions(
   currentState: BookingState,
   userRole?: string
 ): BookingState[] {
-  return TRANSITIONS
-    .filter((t) => {
-      const fromMatches = Array.isArray(t.from)
-        ? t.from.includes(currentState)
-        : t.from === currentState
+  return TRANSITIONS.filter((t) => {
+    const fromMatches = Array.isArray(t.from)
+      ? t.from.includes(currentState)
+      : t.from === currentState
 
-      if (!fromMatches) return false
+    if (!fromMatches) return false
 
-      // Check permissions
-      if (t.permissions && userRole) {
-        return t.permissions.includes(userRole)
-      }
+    // Check permissions
+    if (t.permissions && userRole) {
+      return t.permissions.includes(userRole)
+    }
 
-      return true
-    })
-    .map((t) => t.to)
+    return true
+  }).map((t) => t.to)
 }
 
 /**
@@ -307,10 +306,7 @@ async function checkConditions(
 /**
  * Execute transition actions
  */
-async function executeActions(
-  bookingId: string,
-  actions: string[]
-): Promise<void> {
+async function executeActions(bookingId: string, actions: string[]): Promise<void> {
   // TODO: Implement action execution
   // This will be implemented in the booking service
   // Actions like: generate_contract, send_confirmation, etc.

@@ -3,6 +3,7 @@
 ## ✅ Prerequisites Check
 
 1. **Redis is Running** ✅
+
    ```bash
    redis-cli ping
    # Should return: PONG
@@ -19,19 +20,23 @@
 ## 🚀 Starting the System
 
 ### Step 1: Start Redis (if not already running)
+
 ```bash
 brew services start redis
 # Or check status: brew services list | grep redis
 ```
 
 ### Step 2: Start Background Workers
+
 Open a **new terminal window** and run:
+
 ```bash
 cd "/Users/mohammedalakel/Desktop/Website Final/FlixCam.rent"
 npm run worker:all
 ```
 
 You should see:
+
 ```
 Starting background workers...
 ✓ Import worker started
@@ -44,7 +49,9 @@ All workers are running. Press Ctrl+C to stop.
 **Keep this terminal open** - workers need to run continuously.
 
 ### Step 3: Start Development Server
+
 In your **main terminal**, run:
+
 ```bash
 cd "/Users/mohammedalakel/Desktop/Website Final/FlixCam.rent"
 npm run dev
@@ -70,11 +77,13 @@ npm run dev
 ## 🔧 Troubleshooting
 
 ### "Cannot find module" errors
+
 ```bash
 npm install
 ```
 
 ### Redis connection errors
+
 ```bash
 # Check Redis is running
 redis-cli ping
@@ -84,11 +93,13 @@ brew services start redis
 ```
 
 ### Workers not processing jobs
+
 - Make sure workers are running (`npm run worker:all`)
 - Check Redis connection: `redis-cli ping`
 - Verify `.env` has `REDIS_URL=redis://localhost:6379`
 
 ### Import works but AI/images don't process
+
 - Check AI provider credentials in `.env`
 - Check Cloudinary credentials in `.env`
 - Workers will log errors if credentials are missing

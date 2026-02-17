@@ -88,33 +88,19 @@ export function PortalProfileForm() {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="profile-name">الاسم</Label>
-        <Input
-          id="profile-name"
-          {...form.register('name')}
-          placeholder="الاسم الكامل"
-        />
+        <Input id="profile-name" {...form.register('name')} placeholder="الاسم الكامل" />
         {form.formState.errors.name && (
           <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
         )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="profile-email">البريد الإلكتروني</Label>
-        <Input
-          id="profile-email"
-          type="email"
-          value={email}
-          disabled
-          className="bg-muted"
-        />
+        <Input id="profile-email" type="email" value={email} disabled className="bg-muted" />
         <p className="text-xs text-muted-foreground">لا يمكن تغيير البريد من هنا</p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="profile-phone">رقم الهاتف</Label>
-        <Input
-          id="profile-phone"
-          {...form.register('phone')}
-          placeholder="+966..."
-        />
+        <Input id="profile-phone" {...form.register('phone')} placeholder="+966..." />
         {form.formState.errors.phone && (
           <p className="text-sm text-destructive">{form.formState.errors.phone.message}</p>
         )}
@@ -122,7 +108,7 @@ export function PortalProfileForm() {
       <Button type="submit" disabled={form.formState.isSubmitting}>
         {form.formState.isSubmitting ? (
           <>
-            <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+            <Loader2 className="ml-2 h-4 w-4 animate-spin" />
             جاري الحفظ...
           </>
         ) : (

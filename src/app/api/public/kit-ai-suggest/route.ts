@@ -30,10 +30,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const parsed = bodySchema.parse(body)
 
-    const matchingPrebuiltKits = await ShootTypeService.findMatchingPrebuiltKits(parsed.currentSelections)
+    const matchingPrebuiltKits = await ShootTypeService.findMatchingPrebuiltKits(
+      parsed.currentSelections
+    )
 
     const projectType = parsed.shootTypeSlug ?? parsed.shootTypeId ?? 'custom'
-    const budget = parsed.budgetTier === 'PREMIUM' ? 15000 : parsed.budgetTier === 'PROFESSIONAL' ? 8000 : 3000
+    const budget =
+      parsed.budgetTier === 'PREMIUM' ? 15000 : parsed.budgetTier === 'PROFESSIONAL' ? 8000 : 3000
     const kits = await AIService.buildKit({
       projectType,
       duration: parsed.duration,
@@ -60,7 +63,10 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     if (error instanceof Error && 'issues' in error) {
-      return NextResponse.json({ error: 'Validation failed', details: (error as { issues: unknown }).issues }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Validation failed', details: (error as { issues: unknown }).issues },
+        { status: 400 }
+      )
     }
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal Server Error' },

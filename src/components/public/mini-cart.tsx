@@ -38,13 +38,13 @@ export function MiniCart() {
       size="icon"
       asChild
       aria-label={t('nav.cart')}
-      className="relative hover:bg-brand-primary/5 hover:text-brand-primary rounded-full transition-colors"
+      className="relative rounded-full transition-colors hover:bg-brand-primary/5 hover:text-brand-primary"
     >
       <Link href="/cart">
         <ShoppingCart className="h-5 w-5" />
         {count > 0 && (
           <span
-            className={`absolute -top-0.5 -end-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-primary px-1 text-[10px] font-bold text-white shadow-sm ${
+            className={`absolute -end-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand-primary px-1 text-[10px] font-bold text-white shadow-sm ${
               bouncing ? 'animate-badge-bounce' : ''
             }`}
             aria-hidden

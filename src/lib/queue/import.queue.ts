@@ -42,13 +42,17 @@ export async function addImportJob(
     selectedRows?: number[] | Record<string, number[]>
   }
 ) {
-  return await importQueue.add('process-import', {
-    jobId,
-    ...data,
-  }, {
-    jobId, // Use import job ID as BullMQ job ID for easy lookup
-    priority: 1,
-  })
+  return await importQueue.add(
+    'process-import',
+    {
+      jobId,
+      ...data,
+    },
+    {
+      jobId, // Use import job ID as BullMQ job ID for easy lookup
+      priority: 1,
+    }
+  )
 }
 
 /**

@@ -13,8 +13,10 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ## 🚨 CRITICAL GAPS (Must Fix Before Production)
 
 ### 1. **Job Queue Infrastructure** ❌ **CRITICAL**
+
 **Current**: Using `setImmediate()` - fire-and-forget pattern
-**Problem**: 
+**Problem**:
+
 - No job persistence (server restart = lost jobs)
 - No retry mechanism
 - No job prioritization
@@ -23,7 +25,8 @@ Based on the user story requirements and enterprise-grade best practices, here's
 
 **Impact**: Jobs can be lost, no way to recover from failures, can't scale
 
-**Recommendation**: 
+**Recommendation**:
+
 - Implement **BullMQ** or **Bull** with Redis
 - Job persistence and retry logic
 - Configurable concurrency (10 concurrent as per spec)
@@ -35,8 +38,10 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 2. **Multi-Sheet Mapping UI** ❌ **CRITICAL**
+
 **Current**: One sheet at a time, sequential workflow
-**Problem**: 
+**Problem**:
+
 - User story explicitly requires mapping ALL sheets before import
 - Current UI forces users to import sheet-by-sheet
 - No way to see all mappings at once
@@ -45,6 +50,7 @@ Based on the user story requirements and enterprise-grade best practices, here's
 **Impact**: Poor UX, doesn't match requirements, inefficient workflow
 
 **Recommendation**:
+
 - Table-based UI showing all sheets with category mappings
 - Preview first 10 rows per sheet inline
 - "Map All Sheets" step before import
@@ -55,8 +61,10 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 3. **Translation Service Integration** ❌ **CRITICAL**
+
 **Current**: Only English translations created
-**Problem**: 
+**Problem**:
+
 - User story requires Arabic (primary) and Chinese support
 - No translation API integration
 - No SEO field generation
@@ -65,6 +73,7 @@ Based on the user story requirements and enterprise-grade best practices, here's
 **Impact**: Products won't be available in Arabic/Chinese, breaking core functionality
 
 **Recommendation**:
+
 - Integrate translation API (Google Translate, DeepL, or custom)
 - Batch translation (100 products/call as specified)
 - Fallback strategy (continue if translation fails)
@@ -76,8 +85,10 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 4. **Image Processing Pipeline** ❌ **CRITICAL**
+
 **Current**: Only stores URL as string
-**Problem**: 
+**Problem**:
+
 - No image download/upload to CDN
 - External URLs can break (404, domain changes)
 - No image optimization
@@ -87,6 +98,7 @@ Based on the user story requirements and enterprise-grade best practices, here's
 **Impact**: Broken images, security vulnerabilities, poor performance
 
 **Recommendation**:
+
 - Download images with 10s timeout
 - Upload to CDN (Cloudinary, AWS S3, or similar)
 - Image optimization (resize, compress, format conversion)
@@ -99,8 +111,10 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 5. **Dry Run Validation** ❌ **CRITICAL**
+
 **Current**: No validation before import
-**Problem**: 
+**Problem**:
+
 - Users can't preview what will be created
 - No duplicate SKU detection before import
 - No data quality checks
@@ -109,6 +123,7 @@ Based on the user story requirements and enterprise-grade best practices, here's
 **Impact**: Wasted time, data quality issues, user frustration
 
 **Recommendation**:
+
 - `POST /api/admin/imports/validate` endpoint
 - Validate all rows without creating products
 - Check: SKU duplicates, required fields, data types, image URLs
@@ -122,14 +137,17 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ## ⚠️ HIGH PRIORITY GAPS (Fix Soon)
 
 ### 6. **Error Reporting & Recovery** ⚠️ **HIGH**
+
 **Current**: Basic error tracking, no recovery options
 **Missing**:
+
 - Downloadable CSV error report
 - Retry failed rows functionality
 - Rollback entire import
 - Error categorization and filtering
 
 **Recommendation**:
+
 - `GET /api/admin/imports/:id/errors.csv` endpoint
 - `POST /api/admin/imports/:id/retry` - retry failed rows
 - `DELETE /api/admin/imports/:id/rollback` - rollback import
@@ -141,8 +159,10 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 7. **Security Hardening** ⚠️ **HIGH**
+
 **Current**: Basic MIME validation only
 **Missing**:
+
 - Virus scanning (ClamAV)
 - SSRF protection on image URLs
 - XSS prevention (input sanitization)
@@ -150,6 +170,7 @@ Based on the user story requirements and enterprise-grade best practices, here's
 - File size validation (50MB limit)
 
 **Recommendation**:
+
 - Integrate ClamAV for virus scanning
 - URL allowlist validation (SSRF protection)
 - HTML sanitization for product descriptions
@@ -161,14 +182,17 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 8. **Performance Optimizations** ⚠️ **HIGH**
+
 **Current**: Basic batch processing
 **Missing**:
+
 - Redis caching for SKUs/brands
 - Separate image processing queue
 - Database query optimization
 - Connection pooling
 
 **Recommendation**:
+
 - Pre-load existing SKUs and brands into Redis
 - Separate queue for image processing
 - Optimize database queries (avoid N+1)
@@ -180,13 +204,16 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 9. **Column Auto-Detection** ⚠️ **HIGH**
+
 **Current**: Supports multiple column name variations but no UI
-**Problem**: 
+**Problem**:
+
 - Users must guess column names
 - No visual mapping interface
 - No validation of column mappings
 
 **Recommendation**:
+
 - Auto-detect column mappings (fuzzy matching)
 - Visual column mapping UI
 - Show detected vs. actual mappings
@@ -200,7 +227,9 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ## 💡 RECOMMENDED IMPROVEMENTS (Beyond Requirements)
 
 ### 10. **Import Templates & Presets** 💡
+
 **Idea**: Save and reuse import configurations
+
 - Save column mappings as templates
 - Preset category mappings
 - Import history with reuse option
@@ -211,7 +240,9 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 11. **Incremental Updates** 💡
+
 **Idea**: Update existing products instead of only creating new ones
+
 - Detect existing products by SKU
 - Option to update vs. skip duplicates
 - Merge strategy (update all fields vs. only missing)
@@ -222,7 +253,9 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 12. **Import Scheduling** 💡
+
 **Idea**: Schedule imports for off-peak hours
+
 - Schedule imports for specific times
 - Recurring imports (daily, weekly)
 - Email notifications on completion
@@ -233,7 +266,9 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 13. **Data Transformation Rules** 💡
+
 **Idea**: Apply transformations during import
+
 - Price adjustments (multiply by factor)
 - Text transformations (uppercase, trim, replace)
 - Date format conversions
@@ -245,7 +280,9 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 14. **Import Analytics & Reporting** 💡
+
 **Idea**: Track import performance and quality
+
 - Import success rate over time
 - Common error patterns
 - Average import time
@@ -257,7 +294,9 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 15. **Webhook Integration** 💡
+
 **Idea**: Notify external systems on import completion
+
 - Webhook on import completion
 - Webhook on import failure
 - Custom webhook payloads
@@ -268,7 +307,9 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 16. **Import Preview with Diff** 💡
+
 **Idea**: Show what will change before import
+
 - Preview all products that will be created
 - Show diff for updates (if incremental)
 - Side-by-side comparison
@@ -279,7 +320,9 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 17. **Multi-User Import Coordination** 💡
+
 **Idea**: Prevent conflicts when multiple users import
+
 - Lock products during import
 - Show who's importing what
 - Conflict resolution
@@ -290,7 +333,9 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 18. **Import Validation Rules Engine** 💡
+
 **Idea**: Customizable validation rules
+
 - Define custom validation rules
 - Business rule validation (e.g., price ranges)
 - Conditional validation (if field X, then validate Y)
@@ -301,7 +346,9 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 19. **Import Rollback with Granularity** 💡
+
 **Idea**: More flexible rollback options
+
 - Rollback by sheet
 - Rollback by date range
 - Rollback specific products
@@ -312,7 +359,9 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 20. **Import Testing Environment** 💡
+
 **Idea**: Test imports before production
+
 - Test mode (doesn't create products)
 - Compare test vs. production results
 - Import simulation
@@ -325,8 +374,10 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ## 🏗️ ARCHITECTURAL IMPROVEMENTS
 
 ### 21. **Service Layer Separation** 🏗️
+
 **Current**: Logic mixed in worker
 **Recommendation**:
+
 - Separate services: `ImportValidationService`, `ImportTranslationService`, `ImportImageService`
 - Single responsibility principle
 - Easier testing and maintenance
@@ -335,7 +386,9 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 22. **Event-Driven Architecture** 🏗️
+
 **Idea**: Use events for import workflow
+
 - `ImportStarted`, `ImportProgressed`, `ImportCompleted`, `ImportFailed` events
 - Event handlers for notifications, analytics, webhooks
 - Decoupled architecture
@@ -344,7 +397,9 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 23. **Import State Machine** 🏗️
+
 **Idea**: Formal state management
+
 - Clear import states (pending, validating, processing, completed, failed)
 - State transitions with validation
 - State history/audit trail
@@ -353,8 +408,10 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 24. **Database Transaction Strategy** 🏗️
+
 **Current**: Processes row-by-row
 **Recommendation**:
+
 - Batch transactions (100 products as specified)
 - Savepoint for partial rollback
 - Transaction retry with exponential backoff
@@ -365,8 +422,10 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ## 📊 MONITORING & OBSERVABILITY
 
 ### 25. **Import Metrics & Monitoring** 📊
+
 **Missing**: No metrics or monitoring
 **Recommendation**:
+
 - Import duration metrics
 - Success/failure rates
 - Error rate by type
@@ -377,8 +436,10 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 26. **Logging & Debugging** 📊
+
 **Current**: Basic console.log
 **Recommendation**:
+
 - Structured logging (JSON)
 - Log levels (debug, info, warn, error)
 - Request ID tracking
@@ -390,8 +451,10 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ## 🎨 USER EXPERIENCE IMPROVEMENTS
 
 ### 27. **Progress Visualization** 🎨
+
 **Current**: Basic progress bar
 **Recommendation**:
+
 - Real-time progress with ETA
 - Visual breakdown (success/error counts)
 - Current row being processed
@@ -401,8 +464,10 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 28. **Error UI Improvements** 🎨
+
 **Current**: Basic error list
 **Recommendation**:
+
 - Grouped errors by type
 - Expandable error details
 - Inline error fixes
@@ -412,7 +477,9 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 29. **Import Wizard** 🎨
+
 **Idea**: Step-by-step guided import
+
 - Multi-step wizard UI
 - Progress indicator
 - Validation at each step
@@ -424,8 +491,10 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ## 🔒 SECURITY ENHANCEMENTS
 
 ### 30. **Audit Trail** 🔒
+
 **Missing**: No comprehensive audit trail
 **Recommendation**:
+
 - Log all import actions
 - Track who imported what
 - Import history with filters
@@ -435,8 +504,10 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 31. **Import Permissions** 🔒
+
 **Current**: Basic role check
 **Recommendation**:
+
 - Granular permissions (import, validate, rollback)
 - Permission per category
 - Import approval workflow
@@ -447,8 +518,10 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ## 📈 SCALABILITY CONSIDERATIONS
 
 ### 32. **Horizontal Scaling** 📈
+
 **Current**: Single server processing
 **Recommendation**:
+
 - Distributed job processing
 - Worker pool scaling
 - Load balancing
@@ -457,7 +530,9 @@ Based on the user story requirements and enterprise-grade best practices, here's
 ---
 
 ### 33. **Database Optimization** 📈
+
 **Recommendation**:
+
 - Index optimization
 - Query optimization
 - Connection pooling
@@ -468,26 +543,27 @@ Based on the user story requirements and enterprise-grade best practices, here's
 
 ## 🎯 PRIORITY MATRIX
 
-| Priority | Feature | Impact | Effort | Timeline |
-|----------|---------|--------|--------|----------|
-| P0 | Job Queue Infrastructure | Critical | High | Week 1 |
-| P0 | Multi-Sheet Mapping UI | Critical | Medium | Week 1 |
-| P0 | Translation Service | Critical | High | Week 1-2 |
-| P0 | Image Processing | Critical | High | Week 1-2 |
-| P0 | Dry Run Validation | Critical | Medium | Week 1 |
-| P1 | Error Reporting | High | Medium | Week 2 |
-| P1 | Security Hardening | High | High | Week 2-3 |
-| P1 | Performance Optimization | High | Medium | Week 3 |
-| P1 | Column Auto-Detection | High | Medium | Week 2 |
-| P2 | Import Templates | Medium | Low | Week 4 |
-| P2 | Incremental Updates | Medium | High | Week 4+ |
-| P2 | Import Analytics | Medium | Medium | Week 4+ |
+| Priority | Feature                  | Impact   | Effort | Timeline |
+| -------- | ------------------------ | -------- | ------ | -------- |
+| P0       | Job Queue Infrastructure | Critical | High   | Week 1   |
+| P0       | Multi-Sheet Mapping UI   | Critical | Medium | Week 1   |
+| P0       | Translation Service      | Critical | High   | Week 1-2 |
+| P0       | Image Processing         | Critical | High   | Week 1-2 |
+| P0       | Dry Run Validation       | Critical | Medium | Week 1   |
+| P1       | Error Reporting          | High     | Medium | Week 2   |
+| P1       | Security Hardening       | High     | High   | Week 2-3 |
+| P1       | Performance Optimization | High     | Medium | Week 3   |
+| P1       | Column Auto-Detection    | High     | Medium | Week 2   |
+| P2       | Import Templates         | Medium   | Low    | Week 4   |
+| P2       | Incremental Updates      | Medium   | High   | Week 4+  |
+| P2       | Import Analytics         | Medium   | Medium | Week 4+  |
 
 ---
 
 ## 🚀 RECOMMENDED IMPLEMENTATION ROADMAP
 
 ### **Phase 1: Critical Foundation (Weeks 1-2)**
+
 1. ✅ Set up BullMQ job queue with Redis
 2. ✅ Implement multi-sheet mapping UI
 3. ✅ Add dry-run validation endpoint
@@ -495,12 +571,14 @@ Based on the user story requirements and enterprise-grade best practices, here's
 5. ✅ Implement image processing pipeline
 
 ### **Phase 2: Production Readiness (Week 3)**
+
 6. ✅ Error reporting and recovery
 7. ✅ Security hardening
 8. ✅ Performance optimizations
 9. ✅ Column auto-detection
 
 ### **Phase 3: Enhancement (Week 4+)**
+
 10. Import templates
 11. Incremental updates
 12. Import analytics

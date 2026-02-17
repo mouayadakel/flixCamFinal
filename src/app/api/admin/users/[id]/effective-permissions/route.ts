@@ -29,7 +29,10 @@ export async function GET(
     }
     const canView = await hasPermission(session.user.id, PERMISSIONS.USER_READ)
     if (!canView) {
-      return NextResponse.json({ error: 'Forbidden - Missing user.read permission' }, { status: 403 })
+      return NextResponse.json(
+        { error: 'Forbidden - Missing user.read permission' },
+        { status: 403 }
+      )
     }
 
     const p = await Promise.resolve(params)

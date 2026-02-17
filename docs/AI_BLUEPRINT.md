@@ -16,12 +16,14 @@ All AI decisions must be explainable and logged. AI is a decision support system
 ## AI Responsibilities
 
 ### 1. Risk Scoring
+
 - Analyze booking risk factors
 - Generate risk score (0-100)
 - Recommend approval workflow
 - Explain risk factors
 
 ### 2. Deposit Suggestion
+
 - Calculate recommended deposit based on:
   - Equipment value
   - Customer history
@@ -30,24 +32,28 @@ All AI decisions must be explainable and logged. AI is a decision support system
 - Provide reasoning
 
 ### 3. Equipment Alternatives
+
 - Suggest alternative equipment when unavailable
 - Consider compatibility
 - Match specifications
 - Explain recommendations
 
 ### 4. Smart Bundles
+
 - Recommend equipment bundles
 - Studio + Equipment combinations
 - Based on project type
 - Optimize pricing
 
 ### 5. Assistant Requirement
+
 - Determine if assistant is needed
 - Based on equipment complexity
 - Customer experience level
 - Project requirements
 
 ### 6. Demand Prediction
+
 - Predict equipment demand
 - Optimize inventory levels
 - Suggest purchase decisions
@@ -56,16 +62,19 @@ All AI decisions must be explainable and logged. AI is a decision support system
 ## AI Integration (Phase 2)
 
 ### LLM Provider
+
 - **Primary**: OpenAI (GPT-4)
 - **Alternative**: Google Gemini
 - **Configurable**: Via feature flags
 
 ### RAG (Retrieval-Augmented Generation)
+
 - Equipment database as knowledge base
 - Booking history for context
 - Customer data for personalization
 
 ### Vector Database (Optional)
+
 - Equipment embeddings
 - Semantic search
 - Similarity matching
@@ -73,12 +82,14 @@ All AI decisions must be explainable and logged. AI is a decision support system
 ## AI Features Timeline
 
 ### Phase 2 (AI Integration)
+
 - Risk scoring engine
 - Equipment recommendations
 - Smart bundles
 - Demand prediction
 
 ### Phase 3 (Advanced AI)
+
 - Predictive maintenance
 - Automated workflows
 - Advanced analytics
@@ -94,26 +105,26 @@ All AI decisions must be explainable and logged. AI is a decision support system
 ## AI Implementation
 
 ### Service Structure
+
 ```typescript
 // lib/services/ai.service.ts
 export class AIService {
   static async assessRisk(booking: Booking): Promise<RiskAssessment> {
     // AI risk assessment
   }
-  
+
   static async suggestDeposit(booking: Booking): Promise<DepositSuggestion> {
     // AI deposit calculation
   }
-  
-  static async recommendAlternatives(
-    unavailableEquipment: Equipment
-  ): Promise<Equipment[]> {
+
+  static async recommendAlternatives(unavailableEquipment: Equipment): Promise<Equipment[]> {
     // AI equipment recommendations
   }
 }
 ```
 
 ### Event Integration
+
 - `ai.risk_assessed` - Risk assessment complete
 - `ai.deposit_suggested` - Deposit suggestion generated
 - `ai.alternatives_recommended` - Equipment alternatives suggested

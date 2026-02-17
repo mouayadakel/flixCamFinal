@@ -23,11 +23,7 @@ interface TableSkeletonProps {
   headers?: string[]
 }
 
-export function TableSkeleton({
-  rowCount = 5,
-  colCount,
-  headers,
-}: TableSkeletonProps) {
+export function TableSkeleton({ rowCount = 5, colCount, headers }: TableSkeletonProps) {
   const cols = headers?.length ?? colCount ?? 6
 
   return (
