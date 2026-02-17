@@ -94,7 +94,7 @@ export default function NewEquipmentPage() {
 
       if (brandsRes.ok) {
         const brandsData = await brandsRes.json()
-        setBrands(brandsData)
+        setBrands(brandsData.brands ?? brandsData)
       }
     } catch (error) {
       console.error('Failed to load lookups:', error)

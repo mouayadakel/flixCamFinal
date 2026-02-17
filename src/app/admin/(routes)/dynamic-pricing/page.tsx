@@ -23,7 +23,19 @@ import {
   Save,
   X,
   AlertCircle,
+  BarChart3,
+  LineChart as LineChartIcon,
+  Download,
 } from 'lucide-react'
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -60,6 +72,18 @@ import { formatDate } from '@/lib/utils/format.utils'
 
 type RuleType = 'seasonal' | 'duration' | 'early_bird' | 'last_minute' | 'bulk' | 'loyalty'
 type AdjustmentType = 'percentage' | 'fixed'
+type PricingTab = RuleType | 'all' | 'ai-analysis' | 'demand-forecast'
+
+interface PricingAnalysisRow {
+  equipmentId: string
+  equipmentName: string
+  sku: string
+  currentPrice: number
+  utilizationRate: number
+  suggestedPrice: number
+  variance: number
+  rationale?: string
+}
 
 interface PricingRule {
   id: string
@@ -131,7 +155,19 @@ export default function DynamicPricingPage() {
   const { toast } = useToast()
   const [rules, setRules] = useState<PricingRule[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<RuleType | 'all'>('all')
+  const [activeTab, setActiveTab] = useState<PricingTab>('all')
+
+  // AI Analysis tab
+  const [analysisRows, setAnalysisRows] = useState<PricingAnalysisRow[]>([])
+  const [analysisLoading, setAnalysisLoading] = useState(false)
+
+  // Demand Forecast tab
+  const [equipmentList, setEquipmentList] = useState<{ id: string; model: string; sku: string }[]>([])
+  const [forecastEquipmentId, setForecastEquipmentId] = useState('')
+  const [forecastPeriod, setForecastPeriod] = useState<'week' | 'month' | 'quarter' | 'year'>('month')
+  const [forecasts, setForecasts] = useState<{ equipmentId: string; equipmentName: string; sku: string; period: string; predictedDemand: number }[]>([])
+  const [forecastLoading, setForecastLoading] = useState(false)
+  const [forecastChartData, setForecastChartData] = useState<{ week: number; demand: number; label: string }[]>([])
 
   // Dialog state
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -152,6 +188,12 @@ export default function DynamicPricingPage() {
   useEffect(() => {
     loadRules()
   }, [])
+
+  useEffect(() => {
+    if (activeTab === 'demand-forecast' && equipmentList.length === 0) {
+      loadEquipmentForForecast()
+    }
+  }, [activeTab])
 
   const apiTypeToPage = (t: string): RuleType => {
     const map: Record<string, RuleType> = {
@@ -346,7 +388,107 @@ export default function DynamicPricingPage() {
     }
   }
 
-  const filteredRules = activeTab === 'all' ? rules : rules.filter((r) => r.type === activeTab)
+  const filteredRules =
+    activeTab === 'all'
+      ? rules
+      : activeTab === 'ai-analysis' || activeTab === 'demand-forecast'
+        ? []
+        : rules.filter((r) => r.type === activeTab)
+
+  const loadEquipmentForForecast = async () => {
+    try {
+      const res = await fetch('/api/equipment?take=200')
+      if (!res.ok) return
+      const data = await res.json()
+      const list = Array.isArray(data.items) ? data.items : data.equipment ?? data.data ?? []
+      setEquipmentList(list.map((e: { id: string; model?: string; sku?: string }) => ({ id: e.id, model: e.model ?? e.sku ?? e.id, sku: e.sku ?? '' })))
+    } catch {
+      setEquipmentList([])
+    }
+  }
+
+  const runAnalysis = async () => {
+    setAnalysisLoading(true)
+    try {
+      const res = await fetch('/api/ai/pricing/bulk-analyze', { method: 'POST' })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error ?? 'فشل التحليل')
+      }
+      const data = await res.json()
+      setAnalysisRows(data.results ?? [])
+      toast({ title: 'تم', description: `تم تحليل ${(data.results ?? []).length} معدات` })
+    } catch (e) {
+      toast({
+        title: 'خطأ',
+        description: e instanceof Error ? e.message : 'فشل تحليل التسعير',
+        variant: 'destructive',
+      })
+      setAnalysisRows([])
+    } finally {
+      setAnalysisLoading(false)
+    }
+  }
+
+  const runForecast = async () => {
+    setForecastLoading(true)
+    setForecasts([])
+    setForecastChartData([])
+    try {
+      const res = await fetch('/api/ai/demand-forecast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          equipmentId: forecastEquipmentId || undefined,
+          period: forecastPeriod,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error ?? 'فشل التوقع')
+      }
+      const data = await res.json()
+      const list = data.forecasts ?? []
+      setForecasts(list)
+      // Build 12-week chart: use predictedDemand as total for period, spread across 12 weeks
+      const weeks = 12
+      const chartData: { week: number; demand: number; label: string }[] = []
+      if (list.length > 0) {
+        const perWeek = list.reduce((s: number, f: { predictedDemand: number }) => s + f.predictedDemand, 0) / list.length / (forecastPeriod === 'year' ? 52 : forecastPeriod === 'quarter' ? 13 : forecastPeriod === 'month' ? 4 : 1)
+        for (let w = 1; w <= weeks; w++) {
+          chartData.push({ week: w, demand: Math.round(perWeek * 100) / 100, label: `أسبوع ${w}` })
+        }
+      }
+      setForecastChartData(chartData)
+      toast({ title: 'تم', description: `توقع الطلب لـ ${list.length} معدات` })
+    } catch (e) {
+      toast({
+        title: 'خطأ',
+        description: e instanceof Error ? e.message : 'فشل توقع الطلب',
+        variant: 'destructive',
+      })
+    } finally {
+      setForecastLoading(false)
+    }
+  }
+
+  const exportForecastCsv = () => {
+    if (forecasts.length === 0) {
+      toast({ title: 'تنبيه', description: 'لا توجد بيانات للتصدير', variant: 'destructive' })
+      return
+    }
+    const headers = ['معرف المعدات', 'الاسم', 'SKU', 'الفترة', 'الطلب المتوقع']
+    const rows = forecasts.map((f) => [f.equipmentId, f.equipmentName, f.sku, f.period, f.predictedDemand].join(','))
+    const csv = [headers.join(','), ...rows].join('\n')
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `demand-forecast-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+    toast({ title: 'تم', description: 'تم تنزيل الملف' })
+  }
 
   const stats = {
     total: rules.length,
@@ -420,7 +562,7 @@ export default function DynamicPricingPage() {
           <CardDescription>قم بإدارة قواعد التسعير الديناميكي</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as RuleType | 'all')}>
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as PricingTab)}>
             <TabsList className="mb-4 flex-wrap">
               <TabsTrigger value="all">الكل ({rules.length})</TabsTrigger>
               {Object.entries(RULE_TYPE_CONFIG).map(([type, config]) => (
@@ -428,6 +570,14 @@ export default function DynamicPricingPage() {
                   {config.label} ({rules.filter((r) => r.type === type).length})
                 </TabsTrigger>
               ))}
+              <TabsTrigger value="ai-analysis">
+                <BarChart3 className="ml-1 h-4 w-4" />
+                تحليل AI
+              </TabsTrigger>
+              <TabsTrigger value="demand-forecast">
+                <LineChartIcon className="ml-1 h-4 w-4" />
+                توقع الطلب
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value={activeTab} className="mt-0">
@@ -553,6 +703,165 @@ export default function DynamicPricingPage() {
                   </TableBody>
                 </Table>
               )}
+            </TabsContent>
+
+            <TabsContent value="ai-analysis" className="mt-0">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">تحليل أسعار المعدات بالذكاء الاصطناعي (السعر الحالي، الاستخدام، السعر المقترح)</p>
+                  <Button onClick={runAnalysis} disabled={analysisLoading}>
+                    {analysisLoading ? 'جاري التحليل...' : 'تشغيل التحليل'}
+                  </Button>
+                </div>
+                {analysisLoading ? (
+                  <div className="flex gap-2">
+                    {[1, 2, 3].map((i) => (
+                      <Skeleton key={i} className="h-12 flex-1" />
+                    ))}
+                  </div>
+                ) : analysisRows.length === 0 ? (
+                  <div className="py-12 text-center text-muted-foreground">
+                    <BarChart3 className="mx-auto mb-4 h-12 w-12 opacity-50" />
+                    <p className="text-lg font-medium">لم يُجرَ التحليل بعد</p>
+                    <p className="text-sm">اضغط &quot;تشغيل التحليل&quot; لتحليل أسعار جميع المعدات النشطة</p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>المعدات</TableHead>
+                        <TableHead>السعر الحالي</TableHead>
+                        <TableHead>الاستخدام %</TableHead>
+                        <TableHead>السعر المقترح</TableHead>
+                        <TableHead>الفرق</TableHead>
+                        <TableHead>إجراء</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {analysisRows.map((row) => (
+                        <TableRow key={row.equipmentId}>
+                          <TableCell>
+                            <div>
+                              <p className="font-medium">{row.equipmentName}</p>
+                              <p className="text-xs text-muted-foreground">{row.sku}</p>
+                            </div>
+                          </TableCell>
+                          <TableCell>{row.currentPrice.toLocaleString('ar-SA')} ر.س</TableCell>
+                          <TableCell>{(row.utilizationRate * 100).toFixed(1)}%</TableCell>
+                          <TableCell>{row.suggestedPrice.toLocaleString('ar-SA')} ر.س</TableCell>
+                          <TableCell className={row.variance >= 0 ? 'text-green-600' : 'text-red-600'}>
+                            {row.variance >= 0 ? '+' : ''}
+                            {row.variance.toLocaleString('ar-SA')} ر.س
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={async () => {
+                                try {
+                                  const res = await fetch(`/api/equipment/${row.equipmentId}`, {
+                                    method: 'PATCH',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ dailyPrice: row.suggestedPrice }),
+                                  })
+                                  if (!res.ok) throw new Error()
+                                  toast({ title: 'تم', description: 'تم تطبيق السعر المقترح' })
+                                  setAnalysisRows((prev) => prev.filter((r) => r.equipmentId !== row.equipmentId))
+                                } catch {
+                                  toast({ title: 'خطأ', description: 'فشل تطبيق السعر', variant: 'destructive' })
+                                }
+                              }}
+                            >
+                              تطبيق
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="demand-forecast" className="mt-0">
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-end gap-4">
+                  <div className="min-w-[200px]">
+                    <label className="text-sm font-medium">المعدات (اختياري - اتركه فارغاً للكل)</label>
+                    <Select value={forecastEquipmentId || '_all'} onValueChange={(v) => setForecastEquipmentId(v === '_all' ? '' : v)}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="جميع المعدات" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="_all">جميع المعدات</SelectItem>
+                        {equipmentList.map((e) => (
+                          <SelectItem key={e.id} value={e.id}>
+                            {e.model} ({e.sku})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="min-w-[120px]">
+                    <label className="text-sm font-medium">الفترة</label>
+                    <Select value={forecastPeriod} onValueChange={(v) => setForecastPeriod(v as typeof forecastPeriod)}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="week">أسبوع</SelectItem>
+                        <SelectItem value="month">شهر</SelectItem>
+                        <SelectItem value="quarter">ربع سنة</SelectItem>
+                        <SelectItem value="year">سنة</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button onClick={runForecast} disabled={forecastLoading}>
+                    {forecastLoading ? 'جاري التوقع...' : 'توقع الطلب'}
+                  </Button>
+                  {forecasts.length > 0 && (
+                    <Button variant="outline" size="sm" onClick={exportForecastCsv}>
+                      <Download className="ml-1 h-4 w-4" />
+                      تصدير CSV
+                    </Button>
+                  )}
+                </div>
+                {forecastChartData.length > 0 && (
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={forecastChartData} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                        <YAxis tick={{ fontSize: 11 }} />
+                        <Tooltip />
+                        <Line type="monotone" dataKey="demand" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+                {forecasts.length > 0 && (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>المعدات</TableHead>
+                        <TableHead>SKU</TableHead>
+                        <TableHead>الفترة</TableHead>
+                        <TableHead className="text-left">الطلب المتوقع</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {forecasts.map((f) => (
+                        <TableRow key={f.equipmentId}>
+                          <TableCell className="font-medium">{f.equipmentName}</TableCell>
+                          <TableCell>{f.sku}</TableCell>
+                          <TableCell>{f.period}</TableCell>
+                          <TableCell className="text-left">{f.predictedDemand}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </div>
             </TabsContent>
           </Tabs>
         </CardContent>

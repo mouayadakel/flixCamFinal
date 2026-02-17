@@ -114,8 +114,8 @@ const sidebarSections: SidebarSection[] = [
     icon: Brain,
     items: [
       {
-        label: { ar: 'ميزات الذكاء الاصطناعي', en: 'AI Features' },
-        href: '/admin/ai',
+        label: { ar: 'لوحة الذكاء الاصطناعي', en: 'AI Dashboard' },
+        href: '/admin/ai-dashboard',
         permission: 'ai.use',
       },
       {
@@ -358,7 +358,7 @@ const sidebarSections: SidebarSection[] = [
       },
       {
         label: { ar: 'التحكم بالذكاء الاصطناعي', en: 'AI Control' },
-        href: '/admin/settings/ai-control',
+        href: '/admin/settings/ai',
         permission: 'settings.update',
       },
       {

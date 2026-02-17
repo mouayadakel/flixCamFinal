@@ -82,6 +82,7 @@ interface EquipmentWithRelations extends Equipment {
     {
       name?: string
       description?: string
+      longDescription?: string
       shortDescription?: string
       seoTitle?: string
       seoDescription?: string
@@ -505,12 +506,16 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
                             <p className="text-base">{trans.shortDescription}</p>
                           </div>
                         )}
-                        {trans.description && (
+                        {(trans.longDescription ?? trans.description) && (
                           <div>
                             <p className="mb-1 text-sm text-neutral-600">الوصف الكامل</p>
                             <div
                               className="prose prose-sm max-w-none"
-                              dangerouslySetInnerHTML={{ __html: sanitizeHtml(trans.description) }}
+                              dangerouslySetInnerHTML={{
+                                __html: sanitizeHtml(
+                                  (trans.longDescription ?? trans.description) ?? ''
+                                ),
+                              }}
                             />
                           </div>
                         )}

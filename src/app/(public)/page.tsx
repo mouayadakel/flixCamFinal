@@ -19,6 +19,22 @@ import { HomeTestimonials } from '@/components/features/home/home-testimonials'
 import { HomeFaq } from '@/components/features/home/home-faq'
 import { HomeCta } from '@/components/features/home/home-cta'
 
+const FEATURED_DISPLAY_COUNT_KEY = 'settings.featured_equipment_display_count'
+const FEATURED_DISPLAY_COUNT_DEFAULT = 8
+const FEATURED_DISPLAY_COUNT_ALLOWED = [4, 6, 8, 12] as const
+
+async function getFeaturedDisplayCount(): Promise<number> {
+  const row = await prisma.integrationConfig.findFirst({
+    where: { key: FEATURED_DISPLAY_COUNT_KEY, deletedAt: null },
+    select: { value: true },
+  })
+  if (row?.value == null) return FEATURED_DISPLAY_COUNT_DEFAULT
+  const n = parseInt(row.value, 10)
+  return Number.isNaN(n) || !FEATURED_DISPLAY_COUNT_ALLOWED.includes(n)
+    ? FEATURED_DISPLAY_COUNT_DEFAULT
+    : n
+}
+
 function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) {
@@ -29,27 +45,30 @@ function shuffleArray<T>(arr: T[]): T[] {
 }
 
 async function getFeaturedEquipment() {
-  const data = await prisma.equipment.findMany({
-    where: { deletedAt: null, isActive: true, featured: true },
-    take: 200,
-    select: {
-      id: true,
-      sku: true,
-      model: true,
-      dailyPrice: true,
-      quantityAvailable: true,
-      category: { select: { id: true, name: true, slug: true } },
-      brand: { select: { id: true, name: true, slug: true } },
-      media: { take: 1, select: { id: true, url: true, type: true } },
-    },
-  })
+  const [count, data] = await Promise.all([
+    getFeaturedDisplayCount(),
+    prisma.equipment.findMany({
+      where: { deletedAt: null, isActive: true, featured: true },
+      take: 200,
+      select: {
+        id: true,
+        sku: true,
+        model: true,
+        dailyPrice: true,
+        quantityAvailable: true,
+        category: { select: { id: true, name: true, slug: true } },
+        brand: { select: { id: true, name: true, slug: true } },
+        media: { take: 1, select: { id: true, url: true, type: true } },
+      },
+    }),
+  ])
   const mapped = data.map((e) => ({
     ...e,
     dailyPrice: e.dailyPrice ? Number(e.dailyPrice) : 0,
     quantityAvailable: e.quantityAvailable ?? 0,
   }))
   const shuffled = shuffleArray(mapped)
-  return shuffled.slice(0, 8)
+  return shuffled.slice(0, count)
 }
 
 async function getCategoriesForHome() {

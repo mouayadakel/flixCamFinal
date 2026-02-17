@@ -6,9 +6,9 @@
 
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
 import { AuditService } from '@/lib/services/audit.service'
 import { rateLimitAPI } from '@/lib/utils/rate-limit'
-import { hasPermission } from '@/lib/auth/permissions'
 
 export async function GET(request: Request) {
   const rateLimit = rateLimitAPI(request)
@@ -24,8 +24,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Check permission
-    const canView = await hasPermission(session.user.id, 'audit.read' as any)
+    const canView = await hasPermission(session.user.id, PERMISSIONS.AUDIT_READ)
     if (!canView) {
       return NextResponse.json(
         { error: 'Forbidden - Missing audit.read permission' },

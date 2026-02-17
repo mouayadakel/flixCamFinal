@@ -13,7 +13,32 @@ import {
   getCachedTranslation,
   setCachedTranslation,
 } from './translation.service'
-import { generateSEOBatch } from './seo-generation.service'
+import { generateSEOBatch, type SEOResult } from './seo-generation.service'
+import { recordCost } from '@/lib/utils/cost-tracker'
+
+const REGION_CONTEXT =
+  'Saudi Arabia B2B equipment rental market. Use formal Arabic (فصحى) when generating Arabic content.'
+const PLACEHOLDER_PATTERN = /lorem|sample|test|placeholder|example text|\[.*\]/i
+
+function wordCount(text: string): number {
+  return text.trim().split(/\s+/).filter(Boolean).length
+}
+
+function validateGeneratedText(
+  text: string,
+  options?: { minWords?: number; maxWords?: number; maxChars?: number }
+): { valid: boolean; reason?: string } {
+  if (!text || text.trim().length === 0) return { valid: false, reason: 'empty' }
+  if (PLACEHOLDER_PATTERN.test(text)) return { valid: false, reason: 'placeholder_detected' }
+  const words = wordCount(text)
+  if (options?.minWords != null && words < options.minWords)
+    return { valid: false, reason: `below_min_words_${words}` }
+  if (options?.maxWords != null && words > options.maxWords)
+    return { valid: false, reason: `above_max_words_${words}` }
+  if (options?.maxChars != null && text.length > options.maxChars)
+    return { valid: false, reason: 'above_max_chars' }
+  return { valid: true }
+}
 
 export type ProductData = {
   name: string
@@ -263,7 +288,8 @@ export async function autofillProductsBatch(
 }
 
 /**
- * Autofill only missing fields for a product
+ * Autofill only missing fields for a product.
+ * Gemini-first, OpenAI fallback. Optional jobId for cost tracking.
  */
 export async function autofillMissingFields(
   productId: string,
@@ -284,36 +310,77 @@ export async function autofillMissingFields(
   context: {
     category?: string
     brand?: string
-    specifications?: Record<string, any>
+    specifications?: Record<string, unknown>
   },
-  provider?: 'openai' | 'gemini'
+  provider?: 'openai' | 'gemini',
+  options?: { jobId?: string }
 ): Promise<Partial<AutofillResult>> {
   const result: Partial<AutofillResult> = {
     translations: {},
     seo: { metaTitle: '', metaDescription: '', metaKeywords: '' },
   }
+  const effectiveProvider = provider ?? 'gemini'
 
-  // Fill missing SEO
+  const contextualDescription = [
+    existingData.longDescription || existingData.shortDescription,
+    `Product: ${existingData.name ?? ''}.`,
+    context.category ? `Category: ${context.category}.` : '',
+    context.brand ? `Brand: ${context.brand}.` : '',
+    REGION_CONTEXT,
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  // Fill missing SEO — try Gemini first, then OpenAI; validate and retry once if invalid
   if (!existingData.seoTitle || !existingData.seoDescription) {
     try {
-      const seoResult = await generateSEOBatch(
-        [
-          {
-            name: existingData.name || '',
-            description: existingData.longDescription || existingData.shortDescription,
-            category: context.category,
-            brand: context.brand,
-            specifications: context.specifications,
-          },
-        ],
-        provider
-      )
-
-      if (seoResult[0]) {
+      let seoResult: SEOResult[] = []
+      const seoPayload = [
+        {
+          name: existingData.name || '',
+          description: contextualDescription,
+          category: context.category,
+          brand: context.brand,
+          specifications: context.specifications as Record<string, unknown> | undefined,
+        },
+      ]
+      try {
+        seoResult = await generateSEOBatch(seoPayload, effectiveProvider === 'gemini' ? 'gemini' : 'openai')
+      } catch {
+        seoResult = await generateSEOBatch(seoPayload, effectiveProvider === 'gemini' ? 'openai' : 'gemini')
+      }
+      let metaTitle = seoResult[0]?.metaTitle ?? ''
+      let metaDescription = seoResult[0]?.metaDescription ?? ''
+      const metaKeywords = seoResult[0]?.metaKeywords ?? ''
+      const titleValid = validateGeneratedText(metaTitle, { maxChars: 70 })
+      const descValid = validateGeneratedText(metaDescription, { minWords: 20, maxWords: 30 })
+      if ((!titleValid.valid || !descValid.valid) && seoResult[0]) {
+        try {
+          const retry = await generateSEOBatch(seoPayload, effectiveProvider === 'gemini' ? 'openai' : 'gemini')
+          if (retry[0]) {
+            const rTitle = validateGeneratedText(retry[0].metaTitle, { maxChars: 70 })
+            const rDesc = validateGeneratedText(retry[0].metaDescription, { minWords: 20, maxWords: 30 })
+            if (rTitle.valid && rDesc.valid) {
+              metaTitle = retry[0].metaTitle
+              metaDescription = retry[0].metaDescription
+            }
+          }
+        } catch {
+          // keep first result; caller may flag for manual review
+        }
+      }
+      if (metaTitle || metaDescription) {
         result.seo = {
-          metaTitle: existingData.seoTitle || seoResult[0].metaTitle,
-          metaDescription: existingData.seoDescription || seoResult[0].metaDescription,
-          metaKeywords: existingData.seoKeywords || seoResult[0].metaKeywords,
+          metaTitle: existingData.seoTitle || metaTitle,
+          metaDescription: existingData.seoDescription || metaDescription,
+          metaKeywords: existingData.seoKeywords || metaKeywords,
+        }
+        if (options?.jobId && seoResult[0]?.cost != null) {
+          await recordCost({
+            jobId: options.jobId,
+            feature: 'text_backfill',
+            costUsd: seoResult[0].cost,
+          })
         }
       }
     } catch (error) {
@@ -330,28 +397,56 @@ export async function autofillMissingFields(
 
     if (!existingTranslation || !existingTranslation.name) {
       try {
-        const translationContext = `${context.category || ''} ${context.brand || ''}`.trim()
-        const nameTranslation = await translateBatch(
-          [
-            {
-              text: existingData.name || '',
-              sourceLocale,
-              targetLocale,
-              context: translationContext,
-            },
-          ],
-          provider
-        )
-
+        const translationContext = `${context.category ?? ''} ${context.brand ?? ''} ${REGION_CONTEXT}`.trim()
+        const translatePayload = [
+          {
+            text: existingData.name || '',
+            sourceLocale,
+            targetLocale,
+            context: translationContext,
+          },
+        ]
+        let nameTranslation: Awaited<ReturnType<typeof translateBatch>>
+        try {
+          nameTranslation = await translateBatch(
+            translatePayload,
+            effectiveProvider === 'gemini' ? 'gemini' : 'openai'
+          )
+        } catch {
+          nameTranslation = await translateBatch(
+            translatePayload,
+            effectiveProvider === 'gemini' ? 'openai' : 'gemini'
+          )
+        }
+        let translatedName = nameTranslation[0]?.translatedText ?? ''
+        if (translatedName && !validateGeneratedText(translatedName).valid) {
+          try {
+            const retry = await translateBatch(
+              translatePayload,
+              effectiveProvider === 'gemini' ? 'openai' : 'gemini'
+            )
+            if (retry[0]?.translatedText && validateGeneratedText(retry[0].translatedText).valid) {
+              translatedName = retry[0].translatedText
+            }
+          } catch {
+            // keep first result
+          }
+        }
         if (nameTranslation[0] && !result.translations) {
           result.translations = {}
         }
-
-        if (nameTranslation[0]) {
+        if (translatedName) {
           result.translations![targetLocale] = {
-            name: nameTranslation[0].translatedText,
-            shortDescription: existingTranslation?.shortDescription || '',
-            longDescription: existingTranslation?.longDescription || '',
+            name: translatedName,
+            shortDescription: existingTranslation?.shortDescription ?? '',
+            longDescription: existingTranslation?.longDescription ?? '',
+          }
+          if (options?.jobId && nameTranslation[0]?.cost != null) {
+            await recordCost({
+              jobId: options.jobId,
+              feature: 'text_backfill',
+              costUsd: nameTranslation[0].cost,
+            })
           }
         }
       } catch (error) {

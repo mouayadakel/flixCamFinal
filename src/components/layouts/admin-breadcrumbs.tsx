@@ -36,7 +36,8 @@ const routeLabels: Record<string, { ar: string; en: string }> = {
   integrations: { ar: 'التكاملات', en: 'Integrations' },
   features: { ar: 'الميزات', en: 'Features' },
   roles: { ar: 'الأدوار', en: 'Roles' },
-  'ai-control': { ar: 'التحكم بالذكاء الاصطناعي', en: 'AI Control' },
+  'ai': { ar: 'إعدادات الذكاء الاصطناعي', en: 'AI Settings' },
+  'ai-control': { ar: 'إعدادات الذكاء الاصطناعي', en: 'AI Settings' },
   notifications: { ar: 'الإشعارات', en: 'Notifications' },
 }
 

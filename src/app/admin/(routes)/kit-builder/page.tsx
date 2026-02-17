@@ -26,6 +26,8 @@ import {
   Mic,
   AlertTriangle,
   RefreshCw,
+  Sparkles,
+  BarChart3,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -55,6 +57,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts'
 import { useToast } from '@/hooks/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatCurrency } from '@/lib/utils/format.utils'
@@ -120,6 +138,11 @@ export default function KitBuilderPage() {
     items: [] as KitItem[],
   })
   const [saving, setSaving] = useState(false)
+  const [aiSuggestLoading, setAiSuggestLoading] = useState(false)
+  const [aiProjectType, setAiProjectType] = useState('سينمائي')
+  const [aiDuration, setAiDuration] = useState(7)
+  const [aiBudget, setAiBudget] = useState(10000)
+  const [aiRequirements, setAiRequirements] = useState('')
 
   useEffect(() => {
     loadData()
@@ -282,6 +305,61 @@ export default function KitBuilderPage() {
     })
   }
 
+  const handleAISuggest = async () => {
+    setAiSuggestLoading(true)
+    try {
+      const res = await fetch('/api/ai/kit-builder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectType: aiProjectType,
+          duration: aiDuration,
+          budget: aiBudget,
+          requirements: aiRequirements ? aiRequirements.trim().split(/\n/).filter(Boolean) : undefined,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error ?? 'فشل الاقتراح')
+      }
+      const data = await res.json()
+      const kits = data.kits ?? []
+      const firstKit = kits[0]
+      if (!firstKit?.equipment?.length) {
+        toast({ title: 'تنبيه', description: 'لم يُرجع الذكاء الاصطناعي معدات. جرّب تغيير المعايير.' })
+        return
+      }
+      const suggestedItems: KitItem[] = []
+      for (const eq of firstKit.equipment) {
+        const id = eq.equipmentId ?? eq.equipment?.id
+        if (!id) continue
+        const found = equipment.find((e) => e.id === id)
+        if (found) {
+          suggestedItems.push({
+            equipmentId: found.id,
+            sku: found.sku,
+            name: found.model ?? found.sku,
+            quantity: eq.quantity ?? 1,
+            dailyRate: Number(eq.dailyPrice ?? found.dailyPrice ?? 0),
+          })
+        }
+      }
+      setFormData((prev) => ({ ...prev, items: suggestedItems }))
+      toast({
+        title: 'تم',
+        description: `تم اقتراح ${suggestedItems.length} معدات. يمكنك التعديل ثم حفظ الطقم.`,
+      })
+    } catch (e) {
+      toast({
+        title: 'خطأ',
+        description: e instanceof Error ? e.message : 'فشل اقتراح المعدات',
+        variant: 'destructive',
+      })
+    } finally {
+      setAiSuggestLoading(false)
+    }
+  }
+
   const calculateTotals = () => {
     const totalDailyRate = formData.items.reduce(
       (sum, item) => sum + item.dailyRate * item.quantity,
@@ -392,6 +470,16 @@ export default function KitBuilderPage() {
         </Button>
       </div>
 
+      <Tabs defaultValue="kits" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="kits">الحزم</TabsTrigger>
+          <TabsTrigger value="performance">
+            <BarChart3 className="ml-1 h-4 w-4" />
+            أداء الحزم
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="kits" className="space-y-4">
       {/* Filters */}
       <Card>
         <CardContent className="pt-6">
@@ -534,6 +622,72 @@ export default function KitBuilderPage() {
         </div>
       )}
 
+        </TabsContent>
+
+        <TabsContent value="performance" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>أداء الحزم</CardTitle>
+              <CardDescription>أعلى الأطقم حسب عدد مرات الاستخدام والإيرادات</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <Skeleton className="h-64 w-full" />
+              ) : filteredKits.length === 0 ? (
+                <p className="py-8 text-center text-muted-foreground">لا توجد بيانات أطقم لعرضها</p>
+              ) : (
+                <>
+                  <div className="mb-6 h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={[...filteredKits]
+                          .sort((a, b) => b.usageCount - a.usageCount)
+                          .slice(0, 10)
+                          .map((k) => ({
+                            name: k.nameAr || k.name,
+                            استخدامات: k.usageCount,
+                            إيراد: Math.round(k.finalDailyRate * k.usageCount),
+                          }))}
+                        margin={{ top: 8, right: 8, left: 8, bottom: 8 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                        <YAxis tick={{ fontSize: 11 }} />
+                        <Tooltip />
+                        <Bar dataKey="استخدامات" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>الطقم</TableHead>
+                        <TableHead className="text-center">مرات الاستخدام</TableHead>
+                        <TableHead className="text-left">السعر اليومي</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {[...filteredKits]
+                        .sort((a, b) => b.usageCount - a.usageCount)
+                        .slice(0, 20)
+                        .map((kit) => (
+                          <TableRow key={kit.id}>
+                            <TableCell className="font-medium">{kit.nameAr || kit.name}</TableCell>
+                            <TableCell className="text-center">{kit.usageCount}</TableCell>
+                            <TableCell className="text-left">
+                              {formatCurrency(kit.finalDailyRate)}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto" dir="rtl">
@@ -674,6 +828,75 @@ export default function KitBuilderPage() {
 
             {/* Right: Equipment Selection */}
             <div>
+              <Accordion type="single" collapsible className="mb-4">
+                <AccordionItem value="ai-suggest">
+                  <AccordionTrigger className="text-sm">
+                    <Sparkles className="ml-2 h-4 w-4" />
+                    اقتراح ذكي بالذكاء الاصطناعي
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-3 rounded-lg border p-3">
+                      <div>
+                        <label className="text-xs font-medium">نوع المشروع</label>
+                        <Select value={aiProjectType} onValueChange={setAiProjectType}>
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="تصوير أفراح">تصوير أفراح</SelectItem>
+                            <SelectItem value="تصوير أحداث">تصوير أحداث</SelectItem>
+                            <SelectItem value="سينمائي">سينمائي</SelectItem>
+                            <SelectItem value="رياضي">رياضي</SelectItem>
+                            <SelectItem value="استوديو">استوديو</SelectItem>
+                            <SelectItem value="أخرى">أخرى</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-xs font-medium">المدة (أيام)</label>
+                          <Input
+                            type="number"
+                            min={1}
+                            value={aiDuration}
+                            onChange={(e) => setAiDuration(Number(e.target.value) || 1)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium">الميزانية (ر.س)</label>
+                          <Input
+                            type="number"
+                            min={0}
+                            value={aiBudget}
+                            onChange={(e) => setAiBudget(Number(e.target.value) || 0)}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium">متطلبات (اختياري)</label>
+                        <Textarea
+                          placeholder="وصف موجز للمشروع..."
+                          value={aiRequirements}
+                          onChange={(e) => setAiRequirements(e.target.value)}
+                          className="mt-1 min-h-[60px]"
+                          rows={2}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleAISuggest}
+                        disabled={aiSuggestLoading || equipment.length === 0}
+                      >
+                        {aiSuggestLoading ? 'جاري الاقتراح...' : 'اقتراح معدات'}
+                      </Button>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
               <label className="mb-2 block text-sm font-medium">اختر المعدات</label>
               <div className="max-h-[500px] overflow-y-auto rounded-lg border">
                 {equipment.length === 0 ? (

@@ -1,12 +1,12 @@
 /**
  * @file page.tsx
- * @description Admin – Featured content management hub: links to featured equipment and placeholders for offers/homepage content.
+ * @description Admin – Featured content management hub: featured equipment control embedded, placeholders for offers/homepage content.
  */
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
 import { Star, Package, Tag, Layout } from 'lucide-react'
+import { FeaturedEquipmentTable } from '@/components/features/admin/featured-equipment-table'
 
 export default function FeaturedPage() {
   return (
@@ -22,20 +22,18 @@ export default function FeaturedPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+        <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Package className="h-5 w-5" />
               المعدات المميزة
             </CardTitle>
             <CardDescription>
-              اختر المعدات التي تظهر عشوائياً في قسم «معدات مميزة» على الصفحة الرئيسية. يمكنك اختيار عدد غير محدود.
+              واجهة التحكم جاهزة — اختر المعدات التي تظهر في قسم «معدات مميزة» على الصفحة الرئيسية.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild className="w-full">
-              <Link href="/admin/inventory/featured">إدارة المعدات المميزة</Link>
-            </Button>
+            <FeaturedEquipmentTable embedded showLinkToFullPage />
           </CardContent>
         </Card>
 

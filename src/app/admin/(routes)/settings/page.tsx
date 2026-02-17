@@ -147,7 +147,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <Button asChild variant="outline" className="w-full">
-              <Link href="/admin/settings/ai-control">التحكم بالذكاء الاصطناعي</Link>
+              <Link href="/admin/settings/ai">إعدادات الذكاء الاصطناعي</Link>
             </Button>
           </CardContent>
         </Card>

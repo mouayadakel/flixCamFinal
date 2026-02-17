@@ -71,13 +71,15 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { provider, apiKey, batchSize, timeout, fallbackStrategy, enabled } = body as {
+    const { provider, apiKey, batchSize, timeout, fallbackStrategy, enabled, dailyBudgetUsd, monthlyBudgetUsd } = body as {
       provider: 'openai' | 'gemini'
       apiKey?: string
       batchSize?: number
       timeout?: number
       fallbackStrategy?: string
       enabled?: boolean
+      dailyBudgetUsd?: number | null
+      monthlyBudgetUsd?: number | null
     }
 
     if (!provider) {
@@ -106,6 +108,8 @@ export async function POST(request: NextRequest) {
         ...(timeout !== undefined && { timeout }),
         ...(fallbackStrategy !== undefined && { fallbackStrategy }),
         ...(enabled !== undefined && { enabled }),
+        ...(dailyBudgetUsd !== undefined && { dailyBudgetUsd: dailyBudgetUsd == null ? null : dailyBudgetUsd }),
+        ...(monthlyBudgetUsd !== undefined && { monthlyBudgetUsd: monthlyBudgetUsd == null ? null : monthlyBudgetUsd }),
       },
     })
 

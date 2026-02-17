@@ -6,11 +6,12 @@
 
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { KPICard } from '@/components/dashboard/kpi-card'
 import { RevenueChart } from '@/components/dashboard/revenue-chart'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useAdminLive } from '@/lib/hooks/use-admin-live'
 import { DollarSign, Calendar, TrendingUp, Users } from 'lucide-react'
 
 interface KPIs {
@@ -21,21 +22,34 @@ interface KPIs {
   revenueByDay: { date: string; revenue: number }[]
 }
 
+function fetchKpis(): Promise<KPIs> {
+  return fetch('/api/dashboard/kpis').then((res) => {
+    if (!res.ok) throw new Error('Failed to load KPIs')
+    return res.json()
+  })
+}
+
 export default function DashboardOverviewPage() {
   const [kpis, setKpis] = useState<KPIs | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const refetch = useCallback(() => {
+    fetchKpis()
+      .then(setKpis)
+      .catch((e) => setError(e.message))
+  }, [])
+
   useEffect(() => {
-    fetch('/api/dashboard/kpis')
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to load KPIs')
-        return res.json()
-      })
+    fetchKpis()
       .then(setKpis)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false))
   }, [])
+
+  useAdminLive((event) => {
+    if (event.startsWith('booking.') || event.startsWith('payment.')) refetch()
+  })
 
   if (loading) {
     return (

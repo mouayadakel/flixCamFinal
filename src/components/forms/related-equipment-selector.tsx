@@ -49,10 +49,6 @@ export function RelatedEquipmentSelector({
     loadEquipment()
   }, [])
 
-  useEffect(() => {
-    onChange(selected)
-  }, [selected, onChange])
-
   const loadEquipment = async () => {
     setLoading(true)
     try {
@@ -103,11 +99,19 @@ export function RelatedEquipmentSelector({
   }, [equipment, selected])
 
   const handleToggle = (id: string) => {
-    setSelected((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]))
+    setSelected((prev) => {
+      const next = prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      onChange(next)
+      return next
+    })
   }
 
   const handleRemove = (id: string) => {
-    setSelected((prev) => prev.filter((i) => i !== id))
+    setSelected((prev) => {
+      const next = prev.filter((i) => i !== id)
+      onChange(next)
+      return next
+    })
   }
 
   return (

@@ -165,7 +165,7 @@ const contextNavConfig: Record<string, ContextNavItem[]> = {
     },
     {
       label: 'AI Control',
-      href: '/admin/settings/ai-control',
+      href: '/admin/settings/ai',
       icon: Sparkles,
       permission: 'settings.read',
     },

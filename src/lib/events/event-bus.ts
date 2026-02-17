@@ -6,6 +6,7 @@
 
 import { prisma } from '@/lib/db/prisma'
 import { AuditService } from '@/lib/services/audit.service'
+import { publishAdminLive } from '@/lib/live-admin'
 
 export type EventName =
   | 'booking.created'
@@ -247,6 +248,15 @@ export class EventBus {
         status: 'PROCESSED',
         processedAt: new Date(),
       },
+    })
+
+    // 4. Publish to admin live stream (Redis) for real-time dashboard
+    const resourceType = this.getResourceType(event)
+    const resourceId = this.getResourceId(payload)
+    publishAdminLive(event, {
+      resourceType: resourceType ?? undefined,
+      resourceId: resourceId ?? undefined,
+      eventId: eventRecord.id,
     })
   }
 

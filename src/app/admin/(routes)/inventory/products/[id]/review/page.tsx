@@ -32,6 +32,9 @@ interface Product {
   id: string
   sku: string | null
   status: string
+  contentScore?: number | null
+  needsAiReview?: boolean
+  aiReviewReason?: string | null
   translations: ProductTranslation[]
   category: { name: string } | null
   brand: { name: string } | null
@@ -46,6 +49,7 @@ export default function ProductReviewPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [retrying, setRetrying] = useState(false)
+  const [backfilling, setBackfilling] = useState(false)
   const [edits, setEdits] = useState<Record<string, Partial<ProductTranslation>>>({})
 
   useEffect(() => {
@@ -86,10 +90,40 @@ export default function ProductReviewPage() {
         description: 'The product will be reprocessed in the background',
       })
       setTimeout(() => loadProduct(), 2000)
-    } catch (error: any) {
-      toast({ title: 'Failed to retry AI', description: error.message, variant: 'destructive' })
+    } catch (error: unknown) {
+      toast({
+        title: 'Failed to retry AI',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      })
     } finally {
       setRetrying(false)
+    }
+  }
+
+  const handleBackfill = async () => {
+    setBackfilling(true)
+    try {
+      const res = await fetch('/api/admin/ai/backfill/trigger', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productIds: [productId],
+          types: ['text', 'spec'],
+          trigger: 'manual',
+        }),
+      })
+      if (!res.ok) throw new Error('Backfill failed')
+      toast({ title: 'Backfill queued', description: 'Text and specs will be filled in the background.' })
+      setTimeout(() => loadProduct(), 3000)
+    } catch (error: unknown) {
+      toast({
+        title: 'Backfill failed',
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: 'destructive',
+      })
+    } finally {
+      setBackfilling(false)
     }
   }
 
@@ -165,11 +199,25 @@ export default function ProductReviewPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Review Product</h1>
+          <div className="mt-1 flex items-center gap-2">
+            {product.contentScore != null && (
+              <Badge variant={product.contentScore >= 60 ? 'secondary' : product.contentScore >= 40 ? 'outline' : 'destructive'}>
+                Quality score: {product.contentScore}
+              </Badge>
+            )}
+            {product.needsAiReview && (
+              <Badge variant="destructive">Needs review: {product.aiReviewReason ?? 'AI flag'}</Badge>
+            )}
+          </div>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => router.back()}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
+          </Button>
+          <Button variant="outline" onClick={handleBackfill} disabled={backfilling}>
+            {backfilling && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Backfill (text + specs)
           </Button>
           <Button variant="outline" onClick={handleRetryAI} disabled={retrying}>
             {retrying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

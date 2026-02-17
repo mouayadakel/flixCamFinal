@@ -75,6 +75,39 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const body = await request.json()
     const parsed = updatePricingRuleSchema.parse(body)
 
+    const newRange =
+      parsed.conditions != null
+        ? ((parsed.conditions as { dateRange?: { start?: string; end?: string } }).dateRange ?? {})
+        : ((existing.conditions as { dateRange?: { start?: string; end?: string } })?.dateRange ?? {})
+    const rangeToCheck = newRange.start && newRange.end ? newRange : null
+    if (rangeToCheck) {
+      const ruleType = (parsed.ruleType ?? existing.ruleType) as string
+      const others = await prisma.pricingRule.findMany({
+        where: { isActive: true, ruleType, id: { not: id } },
+        select: { id: true, name: true, conditions: true },
+      })
+      const conflicts = others.filter((r) => {
+        const cond = (r.conditions ?? {}) as { dateRange?: { start?: string; end?: string } }
+        const b = cond.dateRange ?? {}
+        if (!b.start || !b.end) return true
+        const aStart = new Date(rangeToCheck.start!).getTime()
+        const aEnd = new Date(rangeToCheck.end!).getTime()
+        const bStart = new Date(b.start).getTime()
+        const bEnd = new Date(b.end).getTime()
+        return aStart <= bEnd && bStart <= aEnd
+      })
+      if (conflicts.length > 0) {
+        return NextResponse.json(
+          {
+            error: 'تعارض مع قواعد تسعير نشطة في نفس الفترة',
+            code: 'CONFLICT',
+            conflictingRules: conflicts.map((c) => ({ id: c.id, name: c.name })),
+          },
+          { status: 409 }
+        )
+      }
+    }
+
     const updateData: Record<string, unknown> = {}
     if (parsed.name !== undefined) updateData.name = parsed.name
     if (parsed.description !== undefined) updateData.description = parsed.description

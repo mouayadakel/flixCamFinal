@@ -209,6 +209,36 @@ export class AIService {
       riskScore,
     })
 
+    let narrativeSummaryAr: string | undefined
+    const llmPrompt = `أنت خبير تقييم مخاطر تأجير معدات. التقييم الحسابي: درجة ${riskScore}، مستوى ${level}، التوصية: ${recommendation}.
+العوامل: تاريخ العميل ${customerHistory}، مدة التأجير ${input.rentalDuration} يوم، القيمة الإجمالية ${input.totalValue.toLocaleString()} ريال، عدد القطع ${input.equipmentIds.length}.
+اكتب فقرة قصيرة (2-3 جمل) بالعربية الفصحى تلخص المخاطر الرئيسية والتوصية، بدون مقدمة.`
+
+    const openai = this.getOpenAIClient()
+    const geminiKey = this.getGeminiApiKey()
+    if (openai) {
+      try {
+        const res = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: llmPrompt }],
+          max_tokens: 200,
+        })
+        narrativeSummaryAr = res.choices[0]?.message?.content?.trim() ?? undefined
+      } catch {
+        // keep undefined
+      }
+    }
+    if (!narrativeSummaryAr && geminiKey) {
+      try {
+        const genAI = new GoogleGenerativeAI(geminiKey)
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        const result = await model.generateContent(llmPrompt)
+        narrativeSummaryAr = result.response.text()?.trim() ?? undefined
+      } catch {
+        // keep undefined
+      }
+    }
+
     return {
       score: riskScore,
       level,
@@ -217,6 +247,7 @@ export class AIService {
       reasoning,
       suggestedDeposit: depositSuggestion.amount,
       requiresApproval,
+      narrativeSummaryAr,
     }
   }
 
@@ -275,8 +306,42 @@ export class AIService {
     }
   }
 
+  /** Cosine similarity between two vectors (0-1 normalized from -1..1 to 0..1 for scoring). */
+  private static cosineSimilarity(a: number[], b: number[]): number {
+    if (a.length !== b.length || a.length === 0) return 0
+    let dot = 0
+    let na = 0
+    let nb = 0
+    for (let i = 0; i < a.length; i++) {
+      dot += a[i] * b[i]
+      na += a[i] * a[i]
+      nb += b[i] * b[i]
+    }
+    const norm = Math.sqrt(na) * Math.sqrt(nb)
+    if (norm === 0) return 0
+    const cos = dot / norm
+    return (cos + 1) / 2 // map [-1,1] to [0,1]
+  }
+
+  /** Get embedding via OpenAI text-embedding-ada-002 (or 3-small). Returns null if unavailable. */
+  private static async getEmbedding(text: string): Promise<number[] | null> {
+    const openai = this.getOpenAIClient()
+    if (!openai) return null
+    try {
+      const model = process.env.OPENAI_EMBEDDINGS_MODEL ?? 'text-embedding-ada-002'
+      const res = await openai.embeddings.create({
+        model: model as 'text-embedding-ada-002',
+        input: text.slice(0, 8000),
+      })
+      return res.data[0]?.embedding ?? null
+    } catch {
+      return null
+    }
+  }
+
   /**
-   * Recommend alternative equipment
+   * Recommend alternative equipment.
+   * Combines categoryMatch 40% + priceSimilarity 20% + cosineSimilarity 40% when embeddings available.
    */
   static async recommendAlternatives(input: {
     unavailableEquipmentId: string
@@ -305,33 +370,55 @@ export class AIService {
       take: 10,
     })
 
-    const recommendations: EquipmentRecommendation[] = alternatives.map((eq) => {
+    const unavailableText = [
+      unavailableEquipment.sku,
+      unavailableEquipment.model,
+      unavailableEquipment.category?.name,
+    ]
+      .filter(Boolean)
+      .join(' ')
+    const unavailableEmbedding = await this.getEmbedding(unavailableText)
+    const altTexts = alternatives.map((eq) =>
+      [eq.sku, eq.model, eq.category?.name].filter(Boolean).join(' ')
+    )
+    let altEmbeddings: (number[] | null)[] = []
+    if (unavailableEmbedding) {
+      try {
+        const openai = this.getOpenAIClient()
+        if (openai) {
+          const model = process.env.OPENAI_EMBEDDINGS_MODEL ?? 'text-embedding-ada-002'
+          const res = await openai.embeddings.create({
+            model: model as 'text-embedding-ada-002',
+            input: altTexts,
+          })
+          altEmbeddings = res.data.map((d) => d.embedding)
+          while (altEmbeddings.length < alternatives.length) altEmbeddings.push(null)
+        }
+      } catch {
+        altEmbeddings = alternatives.map(() => null)
+      }
+    } else {
+      altEmbeddings = alternatives.map(() => null)
+    }
+
+    const unavailablePrice = Number(unavailableEquipment.dailyPrice || 0) || 1
+
+    const recommendations: EquipmentRecommendation[] = alternatives.map((eq, idx) => {
       const dailyPrice = Number(eq.dailyPrice || 0)
-      const unavailablePrice = Number(unavailableEquipment.dailyPrice || 0)
       const priceDifference = dailyPrice - unavailablePrice
-
-      // Calculate match score (0-100)
-      let matchScore = 50 // Base score
-
-      // Same category = +30
-      if (eq.categoryId === unavailableEquipment.categoryId) {
-        matchScore += 30
-      }
-
-      // Similar price = +20
       const priceDiffPercent = Math.abs(priceDifference / unavailablePrice)
-      if (priceDiffPercent < 0.1) {
-        matchScore += 20
-      } else if (priceDiffPercent < 0.3) {
-        matchScore += 10
-      }
 
-      // Same brand = +10
-      if (eq.brandId === unavailableEquipment.brandId) {
-        matchScore += 10
-      }
+      const categoryScore = eq.categoryId === unavailableEquipment.categoryId ? 100 : 0
+      const priceScore = Math.max(0, 100 - Math.min(100, priceDiffPercent * 200))
+      const cosineScore =
+        unavailableEmbedding && altEmbeddings[idx]
+          ? this.cosineSimilarity(unavailableEmbedding, altEmbeddings[idx]!) * 100
+          : 50 // fallback when no embeddings
 
-      matchScore = Math.min(100, matchScore)
+      const matchScore = Math.round(
+        categoryScore * 0.4 + priceScore * 0.2 + cosineScore * 0.4
+      )
+      const clampedScore = Math.max(0, Math.min(100, matchScore))
 
       const reasons: string[] = []
       if (eq.categoryId === unavailableEquipment.categoryId) {
@@ -343,11 +430,14 @@ export class AIService {
       if (priceDiffPercent < 0.3) {
         reasons.push('Similar price')
       }
+      if (cosineScore > 70) {
+        reasons.push('Similar product profile')
+      }
 
       let compatibility: 'exact' | 'compatible' | 'alternative' = 'alternative'
-      if (matchScore >= 80) {
+      if (clampedScore >= 80) {
         compatibility = 'exact'
-      } else if (matchScore >= 60) {
+      } else if (clampedScore >= 60) {
         compatibility = 'compatible'
       }
 
@@ -355,17 +445,15 @@ export class AIService {
         equipmentId: eq.id,
         equipmentName: eq.sku || 'Unknown',
         sku: eq.sku,
-        matchScore,
+        matchScore: clampedScore,
         reasons,
         compatibility,
         priceDifference,
       }
     })
 
-    // Sort by match score descending
     recommendations.sort((a, b) => b.matchScore - a.matchScore)
-
-    return recommendations.slice(0, 5) // Return top 5
+    return recommendations.slice(0, 5)
   }
 
   /**
@@ -714,7 +802,7 @@ export class AIService {
       ]
     }
 
-    // Fallback: rule-based kit from all equipment
+    // Fallback: LLM equipment selection or rule-based kit from all equipment
     const allEquipment = await prisma.equipment.findMany({
       where: {
         isActive: true,
@@ -725,7 +813,96 @@ export class AIService {
       take: 100,
     })
 
+    const equipmentListForLlm = allEquipment.slice(0, 40).map((eq, i) => ({
+      index: i,
+      id: eq.id,
+      sku: eq.sku,
+      model: eq.model,
+      category: eq.category?.name,
+      dailyPrice: Number(eq.dailyPrice || 0),
+    }))
+
+    let llmSelected: { equipmentId: string; quantity: number; reason: string }[] = []
+    const openai = this.getOpenAIClient()
+    const geminiKey = this.getGeminiApiKey()
+    const llmPrompt = `You are a film production kit advisor. Project type: ${input.projectType}. Duration: ${input.duration} days. Budget: ${input.budget ?? 'flexible'} SAR. Requirements: ${(input.requirements ?? []).join(', ') || 'none'}.
+Select 5-10 equipment items from this list (reply with JSON array only). Each object: { "equipmentId": "<id>", "quantity": 1 or 2, "reason": "one short sentence" }. Use exact equipmentId from the list.
+Equipment list (id, sku, category, dailyPrice): ${JSON.stringify(equipmentListForLlm.slice(0, 30))}.`
+
+    if (openai) {
+      try {
+        const res = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: llmPrompt }],
+          max_tokens: 600,
+        })
+        const text = res.choices[0]?.message?.content?.trim()
+        const match = text?.replace(/```json?\s*|\s*```/g, '').match(/\[[\s\S]*\]/)
+        if (match) {
+          const arr = JSON.parse(match[0]) as Array<{ equipmentId: string; quantity: number; reason: string }>
+          if (Array.isArray(arr)) {
+            const idSet = new Set(allEquipment.map((e) => e.id))
+            llmSelected = arr.filter((x) => idSet.has(x.equipmentId)).slice(0, 12)
+          }
+        }
+      } catch {
+        // fall through to rule-based
+      }
+    }
+    if (llmSelected.length === 0 && geminiKey) {
+      try {
+        const genAI = new GoogleGenerativeAI(geminiKey)
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        const result = await model.generateContent(llmPrompt)
+        const text = result.response.text()?.trim()
+        const match = text?.replace(/```json?\s*|\s*```/g, '').match(/\[[\s\S]*\]/)
+        if (match) {
+          const arr = JSON.parse(match[0]) as Array<{ equipmentId: string; quantity: number; reason: string }>
+          if (Array.isArray(arr)) {
+            const idSet = new Set(allEquipment.map((e) => e.id))
+            llmSelected = arr.filter((x) => idSet.has(x.equipmentId)).slice(0, 12)
+          }
+        }
+      } catch {
+        // fall through
+      }
+    }
+
     const kits: KitBundle[] = []
+
+    if (llmSelected.length > 0) {
+      const eqMap = new Map(allEquipment.map((e) => [e.id, e]))
+      const equipment: KitEquipment[] = llmSelected.map((sel, index) => {
+        const eq = eqMap.get(sel.equipmentId)
+        const dailyPrice = eq ? Number(eq.dailyPrice || 0) : 0
+        return {
+          equipmentId: sel.equipmentId,
+          equipmentName: eq?.sku ?? 'Unknown',
+          sku: eq?.sku ?? '',
+          quantity: Math.max(1, Math.min(2, sel.quantity)),
+          dailyPrice,
+          role: (index === 0 ? 'primary' : index < 3 ? 'support' : 'optional') as KitEquipment['role'],
+          reason: sel.reason || `Recommended for ${input.projectType}`,
+        }
+      })
+      const totalPrice = equipment.reduce(
+        (sum, e) => sum + e.dailyPrice * e.quantity * input.duration,
+        0
+      )
+      kits.push({
+        id: 'kit-llm',
+        name: `${input.projectType} Kit (AI suggested)`,
+        description: `Equipment selected by AI for ${input.projectType}, ${input.duration} days`,
+        equipment,
+        totalPrice,
+        projectType: [input.projectType],
+        useCase: input.useCase,
+        reasoning: 'Full LLM equipment selection based on project type, budget and requirements.',
+      })
+      return kits
+    }
+
+    // Rule-based fallback
     const basicKit: KitBundle = {
       id: 'kit-1',
       name: `Basic ${input.projectType} Kit`,
@@ -874,13 +1051,45 @@ export class AIService {
       Math.min(input.currentPrice * 1.3, suggestedPrice)
     )
     change = ((suggestedPrice - input.currentPrice) / input.currentPrice) * 100
+    const finalPrice = Math.round(suggestedPrice * 100) / 100
+    const finalChange = Math.round(change * 10) / 10
+
+    let rationale: string | undefined
+    const llmPrompt = `You are a pricing analyst for equipment rental (Saudi market). Equipment: ${equipment.sku ?? equipment.id}. Current price: ${input.currentPrice} SAR. Utilization rate: ${Math.round(utilizationRate)}%. Demand level: ${demandLevel}. Suggested price: ${finalPrice} SAR (${finalChange > 0 ? '+' : ''}${finalChange}%).
+Write exactly 3 short sentences in English: (1) why this utilization/demand supports the suggestion, (2) seasonality or market position consideration, (3) recommendation. No bullet points.`
+
+    const openai = this.getOpenAIClient()
+    const geminiKey = this.getGeminiApiKey()
+    if (openai) {
+      try {
+        const res = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: llmPrompt }],
+          max_tokens: 180,
+        })
+        rationale = res.choices[0]?.message?.content?.trim() ?? undefined
+      } catch {
+        // keep undefined
+      }
+    }
+    if (!rationale && geminiKey) {
+      try {
+        const genAI = new GoogleGenerativeAI(geminiKey)
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        const result = await model.generateContent(llmPrompt)
+        rationale = result.response.text()?.trim() ?? undefined
+      } catch {
+        // keep undefined
+      }
+    }
 
     return {
       equipmentId: input.equipmentId,
       currentPrice: input.currentPrice,
-      suggestedPrice: Math.round(suggestedPrice * 100) / 100,
-      change: Math.round(change * 10) / 10,
+      suggestedPrice: finalPrice,
+      change: finalChange,
       reasoning,
+      rationale,
       factors: {
         marketPrice: input.currentPrice,
         demandLevel,
@@ -892,7 +1101,7 @@ export class AIService {
   }
 
   /**
-   * Forecast equipment demand
+   * Forecast equipment demand. When LLM is available, adds 12-week weekly projection from last 90 days.
    */
   static async forecastDemand(input: {
     equipmentId?: string
@@ -902,7 +1111,6 @@ export class AIService {
     const startDate = input.startDate || new Date()
     const forecasts: DemandForecast[] = []
 
-    // Get equipment to forecast
     const equipmentList = input.equipmentId
       ? [await prisma.equipment.findUnique({ where: { id: input.equipmentId } })]
       : await prisma.equipment.findMany({ where: { isActive: true }, take: 50 })
@@ -910,19 +1118,18 @@ export class AIService {
     const validEquipment = equipmentList.filter((eq): eq is NonNullable<typeof eq> => eq !== null)
 
     for (const equipment of validEquipment) {
-      // Get historical bookings
+      const ninetyDaysAgo = new Date(startDate.getTime() - 90 * 24 * 60 * 60 * 1000)
       const historicalBookings = await prisma.bookingEquipment.findMany({
         where: {
           equipmentId: equipment.id,
           booking: {
             status: { in: ['CONFIRMED', 'ACTIVE', 'RETURNED', 'CLOSED'] },
-            startDate: { gte: new Date(startDate.getTime() - 90 * 24 * 60 * 60 * 1000) }, // Last 90 days
+            startDate: { gte: ninetyDaysAgo },
           },
         },
         include: { booking: true },
       })
 
-      // Calculate historical demand
       const totalBookings = historicalBookings.length
       const avgBookingsPerMonth =
         (totalBookings / 3) *
@@ -933,11 +1140,8 @@ export class AIService {
             : input.period === 'quarter'
               ? 3
               : 12)
+      const predictedDemand = Math.round(avgBookingsPerMonth * 1.1)
 
-      // Simple prediction (can be enhanced with ML)
-      const predictedDemand = Math.round(avgBookingsPerMonth * 1.1) // 10% growth assumption
-
-      // Determine trend
       const recentBookings = historicalBookings.filter(
         (be) => be.booking.startDate >= new Date(startDate.getTime() - 30 * 24 * 60 * 60 * 1000)
       ).length
@@ -950,6 +1154,47 @@ export class AIService {
         historicalTrend = 'decreasing'
       }
 
+      // Build weekly counts for last 12 weeks (for LLM)
+      const weeklyCounts: number[] = []
+      for (let w = 0; w < 12; w++) {
+        const weekStart = new Date(ninetyDaysAgo)
+        weekStart.setDate(weekStart.getDate() + w * 7)
+        const weekEnd = new Date(weekStart)
+        weekEnd.setDate(weekEnd.getDate() + 7)
+        const count = historicalBookings.filter((be) => {
+          const d = new Date(be.booking.startDate)
+          return d >= weekStart && d < weekEnd
+        }).length
+        weeklyCounts.push(count)
+      }
+
+      let weeklyProjection: number[] | undefined
+      const openai = this.getOpenAIClient()
+      if (openai && totalBookings >= 3) {
+        try {
+          const res = await openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            messages: [
+              {
+                role: 'user',
+                content: `Equipment rental: ${equipment.sku}. Last 12 weeks demand (count per week): ${weeklyCounts.join(', ')}. Predict next 12 weeks demand as a JSON array of 12 integers only (weekly booking count). Consider trend. Reply with only the array, e.g. [1,2,2,3,...]`,
+              },
+            ],
+            max_tokens: 100,
+          })
+          const text = res.choices[0]?.message?.content?.trim()
+          const match = text?.match(/\[[\s\S]*\]/)
+          if (match) {
+            const arr = JSON.parse(match[0]) as number[]
+            if (Array.isArray(arr) && arr.length === 12) {
+              weeklyProjection = arr.map((n) => Math.max(0, Math.round(Number(n))))
+            }
+          }
+        } catch {
+          // keep undefined
+        }
+      }
+
       const forecast: DemandForecast = {
         equipmentId: equipment.id,
         equipmentName: equipment.sku || 'Unknown',
@@ -957,16 +1202,17 @@ export class AIService {
         period: input.period,
         predictedDemand,
         confidence: totalBookings > 10 ? 80 : totalBookings > 5 ? 60 : 40,
+        weeklyProjection,
         factors: {
           historicalTrend,
-          seasonalFactor: 1.0, // Placeholder
+          seasonalFactor: 1.0,
           marketTrend:
             historicalTrend === 'increasing'
               ? 'up'
               : historicalTrend === 'decreasing'
                 ? 'down'
                 : 'stable',
-          competitorActivity: 'medium', // Placeholder
+          competitorActivity: 'medium',
         },
         recommendations: {
           inventoryLevel:
@@ -975,7 +1221,7 @@ export class AIService {
           pricingSuggestion:
             predictedDemand > 10 ? 'increase' : predictedDemand < 3 ? 'decrease' : 'maintain',
         },
-        revenueForecast: predictedDemand * Number(equipment.dailyPrice || 0) * 7, // Estimate
+        revenueForecast: predictedDemand * Number(equipment.dailyPrice || 0) * 7,
       }
 
       forecasts.push(forecast)

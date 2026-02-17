@@ -62,13 +62,13 @@ export function ProviderSettingsCard({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="h-5 w-5" />
-          {provider === 'openai' ? 'OpenAI' : 'Google Gemini'} Settings
+          إعدادات {provider === 'openai' ? 'OpenAI' : 'Google Gemini'}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
           <Label htmlFor={`${provider}-enabled`}>
-            Enable {provider === 'openai' ? 'OpenAI' : 'Gemini'}
+            تفعيل {provider === 'openai' ? 'OpenAI' : 'Gemini'}
           </Label>
           <Switch
             id={`${provider}-enabled`}
@@ -81,22 +81,22 @@ export function ProviderSettingsCard({
         </div>
 
         <div>
-          <Label htmlFor={`${provider}-api-key`}>API Key</Label>
+          <Label htmlFor={`${provider}-api-key`}>مفتاح API</Label>
           <Input
             id={`${provider}-api-key`}
             type="password"
             value={localSetting.apiKey}
             onChange={(e) => setLocalSetting({ ...localSetting, apiKey: e.target.value })}
-            placeholder={`Enter ${provider === 'openai' ? 'OpenAI' : 'Gemini'} API key`}
+            placeholder={`أدخل مفتاح ${provider === 'openai' ? 'OpenAI' : 'Gemini'}`}
           />
           <Button className="mt-2" size="sm" onClick={handleSave} disabled={saving}>
-            Save API Key
+            حفظ المفتاح
           </Button>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label htmlFor={`${provider}-batch-size`}>Batch Size</Label>
+            <Label htmlFor={`${provider}-batch-size`}>حجم الدفعة</Label>
             <Input
               id={`${provider}-batch-size`}
               type="number"
@@ -108,7 +108,7 @@ export function ProviderSettingsCard({
             />
           </div>
           <div>
-            <Label htmlFor={`${provider}-timeout`}>Timeout (ms)</Label>
+            <Label htmlFor={`${provider}-timeout`}>المهلة (مللي ثانية)</Label>
             <Input
               id={`${provider}-timeout`}
               type="number"
@@ -122,7 +122,7 @@ export function ProviderSettingsCard({
         </div>
 
         <div>
-          <Label htmlFor={`${provider}-fallback`}>Fallback Strategy</Label>
+          <Label htmlFor={`${provider}-fallback`}>استراتيجية الاحتياط</Label>
           <Select
             value={localSetting.fallbackStrategy}
             onValueChange={(value) => {
@@ -134,9 +134,9 @@ export function ProviderSettingsCard({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="mark_for_review">Mark for Review</SelectItem>
-              <SelectItem value="use_original">Use Original Text</SelectItem>
-              <SelectItem value="skip">Skip Field</SelectItem>
+              <SelectItem value="mark_for_review">وضع للمراجعة</SelectItem>
+              <SelectItem value="use_original">استخدام النص الأصلي</SelectItem>
+              <SelectItem value="skip">تخطي الحقل</SelectItem>
             </SelectContent>
           </Select>
         </div>

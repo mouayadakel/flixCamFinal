@@ -12,6 +12,8 @@ export interface RiskAssessment {
   reasoning: string
   suggestedDeposit?: number
   requiresApproval?: boolean
+  /** LLM-generated narrative risk summary in Arabic (فصحى) */
+  narrativeSummaryAr?: string
 }
 
 export interface RiskFactor {
@@ -73,6 +75,8 @@ export interface DemandForecast {
   period: 'week' | 'month' | 'quarter' | 'year'
   predictedDemand: number
   confidence: number // 0-100
+  /** Optional 12-week projection from LLM (weekly demand values) */
+  weeklyProjection?: number[]
   factors: {
     historicalTrend: 'increasing' | 'stable' | 'decreasing'
     seasonalFactor: number
@@ -93,6 +97,8 @@ export interface PricingSuggestion {
   suggestedPrice: number
   change: number // Percentage change
   reasoning: string
+  /** Optional 3-sentence LLM rationale (Arabic or English) */
+  rationale?: string
   factors: {
     marketPrice: number
     competitorPrice?: number

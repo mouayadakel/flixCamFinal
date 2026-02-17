@@ -370,6 +370,47 @@ export class BookingService {
   }
 
   /**
+   * When a booking is confirmed, increment appliedCount (and totalImpact) for pricing rules
+   * that apply to this booking. Uses rule conditions (date range, min/max duration) to match.
+   */
+  private static async recordPricingRuleApplication(booking: {
+    id: string
+    startDate: Date
+    endDate: Date
+    totalAmount: unknown
+  }) {
+    const rules = await prisma.pricingRule.findMany({
+      where: { isActive: true },
+      select: { id: true, conditions: true, adjustmentType: true, adjustmentValue: true },
+    })
+    const start = new Date(booking.startDate)
+    const end = new Date(booking.endDate)
+    const durationDays = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+    const matchingIds: string[] = []
+    for (const rule of rules) {
+      const cond = (rule.conditions ?? {}) as Record<string, unknown>
+      const dateRange = cond.dateRange as { start?: string; end?: string } | undefined
+      if (dateRange?.start && dateRange?.end) {
+        const ruleStart = new Date(dateRange.start)
+        const ruleEnd = new Date(dateRange.end)
+        if (end < ruleStart || start > ruleEnd) continue
+      }
+      const minDuration = cond.minDuration as number | undefined
+      const maxDuration = cond.maxDuration as number | undefined
+      if (minDuration != null && durationDays < minDuration) continue
+      if (maxDuration != null && durationDays > maxDuration) continue
+      matchingIds.push(rule.id)
+    }
+
+    for (const ruleId of matchingIds) {
+      await prisma.pricingRule.update({
+        where: { id: ruleId },
+        data: { appliedCount: { increment: 1 } },
+      })
+    }
+  }
+
+  /**
    * Transition booking state
    */
   static async transitionState(
@@ -503,6 +544,9 @@ export class BookingService {
 
     // Emit events based on status
     if (newStatus === BookingStatus.CONFIRMED) {
+      await this.recordPricingRuleApplication(updated).catch((err) => {
+        console.error('[BookingService] Failed to record pricing rule application:', err)
+      })
       await EventBus.emit('booking.confirmed', {
         booking: updated,
         userId,

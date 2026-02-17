@@ -8,6 +8,7 @@ import { AdminSidebar } from '@/components/layouts/admin-sidebar'
 import { AdminHeader } from '@/components/layouts/admin-header'
 import { AdminBreadcrumbs } from '@/components/layouts/admin-breadcrumbs'
 import { ProtectedRoute } from '@/components/auth/protected-route'
+import { AIFloatingWidget } from '@/components/admin/ai-floating-widget'
 import { Suspense } from 'react'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -38,6 +39,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </main>
       </div>
+      <AIFloatingWidget />
     </div>
   )
 }

@@ -38,6 +38,10 @@ export function HomeFeaturedEquipment({ items }: HomeFeaturedEquipmentProps) {
     setFailedImageIds((prev) => new Set(prev).add(itemId))
   }, [])
 
+  if (items.length === 0) {
+    return null
+  }
+
   return (
     <section className="bg-surface-light py-10 md:py-14">
       <PublicContainer>
@@ -58,7 +62,7 @@ export function HomeFeaturedEquipment({ items }: HomeFeaturedEquipmentProps) {
           </Button>
         </div>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:gap-6 lg:grid-cols-4">
-          {items.slice(0, 8).map((item, index) => {
+          {items.map((item, index) => {
             const soldOut = (item.quantityAvailable ?? 0) <= 0
             return (
               <Link

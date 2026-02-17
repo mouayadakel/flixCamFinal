@@ -121,9 +121,9 @@ async function downloadImage(url: string, timeout: number = 10000): Promise<Buff
 }
 
 /**
- * Upload image to Cloudinary
+ * Upload image buffer to Cloudinary (exported for image-sourcing pipeline).
  */
-async function uploadToCloudinary(
+export async function uploadBufferToCloudinary(
   imageBuffer: Buffer,
   folder: string = 'products'
 ): Promise<ImageProcessingResult> {
@@ -190,7 +190,7 @@ export async function processImageFromUrl(
     const imageBuffer = await downloadImage(imageUrl, 10000)
 
     // Upload to Cloudinary
-    const result = await uploadToCloudinary(imageBuffer, folder)
+    const result = await uploadBufferToCloudinary(imageBuffer, folder)
 
     return result
   } catch (error: any) {

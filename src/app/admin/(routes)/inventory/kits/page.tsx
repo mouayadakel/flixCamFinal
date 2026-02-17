@@ -55,7 +55,7 @@ export default function KitsPage() {
   const { toast } = useToast()
   const [kits, setKits] = useState<Kit[]>([])
   const [loading, setLoading] = useState(true)
-  const [isActiveFilter, setIsActiveFilter] = useState<string>('')
+  const [isActiveFilter, setIsActiveFilter] = useState<string>('all')
 
   useEffect(() => {
     loadKits()
@@ -65,8 +65,9 @@ export default function KitsPage() {
     setLoading(true)
     try {
       const params = new URLSearchParams()
-      if (isActiveFilter === 'true' || isActiveFilter === 'false')
+      if (isActiveFilter === 'true' || isActiveFilter === 'false') {
         params.set('isActive', isActiveFilter)
+      }
       const res = await fetch(`/api/kits?${params.toString()}`)
       if (!res.ok) throw new Error('فشل تحميل الحزم')
       const data = await res.json()
@@ -103,7 +104,7 @@ export default function KitsPage() {
             <SelectValue placeholder="الحالة" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">الكل</SelectItem>
+            <SelectItem value="all">الكل</SelectItem>
             <SelectItem value="true">نشط</SelectItem>
             <SelectItem value="false">غير نشط</SelectItem>
           </SelectContent>

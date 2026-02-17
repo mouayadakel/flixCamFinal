@@ -12,14 +12,16 @@ const ALGORITHM = 'aes-256-cbc'
 
 function getEncryptionKey(): string {
   const key = process.env.ENCRYPTION_KEY
-  if (!key) {
-    if (process.env.NODE_ENV === 'production' && typeof process.env.NEXT_PHASE === 'undefined') {
-      throw new Error('ENCRYPTION_KEY must be set in production (min 32 characters)')
+  if (process.env.NODE_ENV === 'production') {
+    if (!key || key.length < 32) {
+      throw new Error(
+        'ENCRYPTION_KEY must be set in production and at least 32 characters (see .env.example)'
+      )
     }
-    return 'default-key-change-in-production'
+    return key
   }
-  if (process.env.NODE_ENV === 'production' && key.length < 32) {
-    throw new Error('ENCRYPTION_KEY must be at least 32 characters in production')
+  if (!key) {
+    return 'default-key-change-in-production'
   }
   return key
 }

@@ -1,0 +1,98 @@
+/**
+ * Category-specific spec field templates for cinema equipment.
+ * Used by SpecParserService to know which specs to infer per category.
+ */
+
+export const CATEGORY_SPEC_TEMPLATES: Record<string, string[]> = {
+  Cameras: [
+    'sensor_size',
+    'resolution',
+    'max_framerate',
+    'dynamic_range',
+    'codec',
+    'mount_type',
+    'weight_kg',
+    'dimensions_cm',
+    'battery_type',
+    'media_type',
+    'sdi_output',
+    'hdmi_output',
+    'built_in_nd',
+    'autofocus',
+    'ibis',
+    'max_iso',
+  ],
+  Lenses: [
+    'focal_length',
+    'max_aperture',
+    'mount_type',
+    'image_circle',
+    'weight_kg',
+    'minimum_focus',
+    'filter_size',
+    'lens_type',
+    'coating',
+    'blade_count',
+    'weather_sealed',
+    'focus_throw',
+  ],
+  Lighting: [
+    'power_watts',
+    'color_temp',
+    'cri',
+    'tlci',
+    'beam_angle',
+    'weight_kg',
+    'dimensions_cm',
+    'power_source',
+    'dmx',
+    'wireless_control',
+    'battery_option',
+    'output_lux',
+  ],
+  Audio: [
+    'type',
+    'polar_pattern',
+    'frequency_response',
+    'sensitivity',
+    'impedance',
+    'connector',
+    'phantom_power',
+    'weight_kg',
+    'wireless_range',
+    'battery_life',
+    'channels',
+  ],
+  Grip: [
+    'max_load_kg',
+    'weight_kg',
+    'max_height_cm',
+    'min_height_cm',
+    'material',
+    'head_type',
+    'quick_release',
+    'folded_length_cm',
+  ],
+  Monitors: [
+    'screen_size',
+    'resolution',
+    'panel_type',
+    'brightness_nits',
+    'color_space',
+    'hdr',
+    'inputs',
+    'outputs',
+    'weight_kg',
+    'battery_type',
+    'touch_screen',
+    'lut_support',
+  ],
+}
+
+export function getExpectedSpecs(categoryName: string): string[] {
+  return CATEGORY_SPEC_TEMPLATES[categoryName] ?? [
+    'weight_kg',
+    'dimensions_cm',
+    'power_source',
+  ]
+}
