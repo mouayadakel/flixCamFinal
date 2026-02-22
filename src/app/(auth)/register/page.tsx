@@ -18,6 +18,7 @@ import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { registerFormSchema, type RegisterFormData } from '@/lib/validators/auth.validator'
 import { Languages, Loader2 } from 'lucide-react'
+import { useLocale } from '@/hooks/use-locale'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -25,6 +26,7 @@ export default function RegisterPage() {
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [language, setLanguage] = useState<'ar' | 'en'>('ar')
+  const { t: i18n } = useLocale()
 
   const {
     register,
@@ -53,32 +55,23 @@ export default function RegisterPage() {
       if (!res.ok) {
         if (res.status === 409) {
           toast({
-            title: language === 'ar' ? 'البريد مسجل مسبقاً' : 'Email already registered',
-            description:
-              message ||
-              (language === 'ar'
-                ? 'سجّل الدخول أو استخدم بريداً آخر.'
-                : 'Sign in or use another email.'),
+            title: i18n('auth.emailAlreadyRegistered'),
+            description: message || i18n('auth.signInOrUseAnother'),
             variant: 'destructive',
           })
           return
         }
         if (res.status === 429) {
           toast({
-            title: language === 'ar' ? 'محاولات كثيرة' : 'Too many attempts',
-            description:
-              language === 'ar' ? 'انتظر قليلاً ثم حاول مجدداً.' : 'Please wait and try again.',
+            title: i18n('auth.tooManyAttempts'),
+            description: i18n('auth.waitAndRetry'),
             variant: 'destructive',
           })
           return
         }
         toast({
-          title: language === 'ar' ? 'خطأ في التسجيل' : 'Registration error',
-          description:
-            message ||
-            (language === 'ar'
-              ? 'تحقق من البيانات وحاول مجدداً.'
-              : 'Check your data and try again.'),
+          title: i18n('auth.registrationError'),
+          description: message || i18n('auth.checkDataAndRetry'),
           variant: 'destructive',
         })
         return
@@ -92,19 +85,16 @@ export default function RegisterPage() {
 
       if (signInResult?.error) {
         toast({
-          title: language === 'ar' ? 'تم إنشاء الحساب' : 'Account created',
-          description:
-            language === 'ar'
-              ? 'سجّل الدخول من الصفحة التالية.'
-              : 'Please sign in on the next page.',
+          title: i18n('auth.accountCreated'),
+          description: i18n('auth.signInNextPage'),
         })
         router.push('/login?email=' + encodeURIComponent(data.email))
         return
       }
 
       toast({
-        title: language === 'ar' ? 'تم إنشاء الحساب' : 'Account created',
-        description: language === 'ar' ? 'جاري التوجيه...' : 'Redirecting...',
+        title: i18n('auth.accountCreated'),
+        description: i18n('auth.redirecting'),
       })
 
       const callbackUrl = searchParams?.get('callbackUrl')
@@ -116,11 +106,8 @@ export default function RegisterPage() {
     } catch (error) {
       console.error('Register error:', error)
       toast({
-        title: language === 'ar' ? 'خطأ' : 'Error',
-        description:
-          language === 'ar'
-            ? 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.'
-            : 'Something went wrong. Please try again.',
+        title: i18n('auth.loginError'),
+        description: i18n('auth.unexpectedError'),
         variant: 'destructive',
       })
     } finally {

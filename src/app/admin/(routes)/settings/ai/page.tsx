@@ -11,8 +11,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Loader2, Settings, BarChart3, History, DollarSign, ToggleLeft, CheckCircle } from 'lucide-react'
+import { Loader2, Settings, BarChart3, History, DollarSign, ToggleLeft, CheckCircle, ExternalLink, Save } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
+import Link from 'next/link'
 import { ProviderSettingsCard } from '@/components/features/import/provider-settings-card'
 import {
   LineChart,
@@ -80,13 +81,29 @@ export default function AISettingsPage() {
   const [monthlyBudget, setMonthlyBudget] = useState('')
   const [dailyBudget, setDailyBudget] = useState('')
   const [alertThreshold, setAlertThreshold] = useState('80')
+  const [savingBudget, setSavingBudget] = useState(false)
   const [spendSummary, setSpendSummary] = useState<{
     daily: { spent: number; budget: number | null; remaining: number | null }
     monthly: { spent: number; budget: number | null; remaining: number | null }
   } | null>(null)
 
+  // AI Feature toggles state
+  const AI_FEATURES = [
+    { id: 'ai_backfill', flag: 'ai_backfill', label: 'ملء المحتوى التلقائي', desc: 'نص، SEO، ترجمات' },
+    { id: 'ai_kit', flag: 'ai_kit_builder', label: 'اقتراح الأطقم', desc: 'منشئ الأطقم' },
+    { id: 'ai_pricing', flag: 'ai_pricing', label: 'اقتراح التسعير', desc: 'تحليل الأسعار' },
+    { id: 'ai_demand', flag: 'ai_demand_forecast', label: 'توقع الطلب', desc: 'التوقعات' },
+    { id: 'ai_risk', flag: 'ai_risk_assessment', label: 'تقييم المخاطر', desc: 'مخاطر الحجز' },
+    { id: 'ai_chatbot', flag: 'ai_chatbot', label: 'الدردشة', desc: 'الروبوت المساعد' },
+  ] as const
+  const [featureStates, setFeatureStates] = useState<Record<string, boolean>>({})
+  const [featureFlagIds, setFeatureFlagIds] = useState<Record<string, string>>({})
+  const [featuresLoaded, setFeaturesLoaded] = useState(false)
+  const [togglingFeature, setTogglingFeature] = useState<string | null>(null)
+
   useEffect(() => {
     loadSettings()
+    loadFeatureFlags()
   }, [])
 
   useEffect(() => {
@@ -96,6 +113,86 @@ export default function AISettingsPage() {
   useEffect(() => {
     if (activeTab === 'costs') loadSpendSummary()
   }, [activeTab])
+
+  const loadFeatureFlags = async () => {
+    try {
+      const res = await fetch('/api/feature-flags')
+      if (!res.ok) return
+      const data = await res.json()
+      const flags = data.flags ?? []
+      const states: Record<string, boolean> = {}
+      const ids: Record<string, string> = {}
+      for (const f of AI_FEATURES) {
+        const match = flags.find((fl: { name: string }) => fl.name === f.flag)
+        if (match) {
+          states[f.flag] = match.enabled
+          ids[f.flag] = match.id
+        } else {
+          states[f.flag] = true // default enabled if flag doesn't exist
+        }
+      }
+      setFeatureStates(states)
+      setFeatureFlagIds(ids)
+    } catch { /* non-critical */ }
+    setFeaturesLoaded(true)
+  }
+
+  const toggleFeature = async (flagName: string, enabled: boolean) => {
+    setTogglingFeature(flagName)
+    setFeatureStates((prev) => ({ ...prev, [flagName]: enabled }))
+    try {
+      const flagId = featureFlagIds[flagName]
+      if (flagId) {
+        const res = await fetch(`/api/feature-flags/${flagId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enabled }),
+        })
+        if (!res.ok) throw new Error('فشل التحديث')
+      } else {
+        // Create new flag
+        const res = await fetch('/api/feature-flags', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: flagName, enabled, scope: 'ADMIN' }),
+        })
+        if (!res.ok) throw new Error('فشل الإنشاء')
+        const data = await res.json()
+        if (data.flag?.id) setFeatureFlagIds((prev) => ({ ...prev, [flagName]: data.flag.id }))
+      }
+      toast({ title: 'تم', description: enabled ? 'تم تفعيل الميزة' : 'تم إيقاف الميزة' })
+    } catch {
+      // Revert on error
+      setFeatureStates((prev) => ({ ...prev, [flagName]: !enabled }))
+      toast({ title: 'خطأ', description: 'فشل تحديث الميزة', variant: 'destructive' })
+    } finally {
+      setTogglingFeature(null)
+    }
+  }
+
+  const saveBudget = async () => {
+    setSavingBudget(true)
+    try {
+      // Save to the primary (first) provider — budget is shared
+      const provider = settings[0]?.provider ?? 'openai'
+      const res = await fetch('/api/admin/settings/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider,
+          dailyBudgetUsd: dailyBudget ? parseFloat(dailyBudget) : null,
+          monthlyBudgetUsd: monthlyBudget ? parseFloat(monthlyBudget) : null,
+        }),
+      })
+      if (!res.ok) throw new Error('فشل الحفظ')
+      toast({ title: 'تم', description: 'تم حفظ حدود الميزانية' })
+      loadSpendSummary()
+    } catch {
+      toast({ title: 'خطأ', description: 'فشل حفظ الميزانية', variant: 'destructive' })
+    } finally {
+      setSavingBudget(false)
+    }
+  }
 
   const loadSpendSummary = async () => {
     try {
@@ -267,24 +364,21 @@ export default function AISettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>تفعيل الميزات</CardTitle>
-              <CardDescription>تشغيل أو إيقاف ميزات الذكاء الاصطناعي (يُطبّق لاحقاً)</CardDescription>
+              <CardDescription>تشغيل أو إيقاف ميزات الذكاء الاصطناعي. التغييرات تُحفظ فوراً.</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {[
-                  { id: 'backfill', label: 'ملء المحتوى التلقائي', desc: 'نص، SEO، ترجمات' },
-                  { id: 'kit', label: 'اقتراح الأطقم', desc: 'منشئ الأطقم' },
-                  { id: 'pricing', label: 'اقتراح التسعير', desc: 'تحليل الأسعار' },
-                  { id: 'demand', label: 'توقع الطلب', desc: 'التوقعات' },
-                  { id: 'risk', label: 'تقييم المخاطر', desc: 'مخاطر الحجز' },
-                  { id: 'chatbot', label: 'الدردشة', desc: 'الروبوت المساعد' },
-                ].map((f) => (
+                {AI_FEATURES.map((f) => (
                   <div key={f.id} className="flex items-center justify-between rounded-lg border p-4">
                     <div>
                       <p className="font-medium">{f.label}</p>
                       <p className="text-sm text-muted-foreground">{f.desc}</p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch
+                      checked={featureStates[f.flag] ?? true}
+                      onCheckedChange={(v) => toggleFeature(f.flag, v)}
+                      disabled={!featuresLoaded || togglingFeature === f.flag}
+                    />
                   </div>
                 ))}
               </div>
@@ -379,6 +473,12 @@ export default function AISettingsPage() {
                     className="mt-1"
                   />
                 </div>
+                <div className="flex items-end">
+                  <Button onClick={saveBudget} disabled={savingBudget} className="w-full">
+                    {savingBudget ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <Save className="ml-2 h-4 w-4" />}
+                    حفظ الحدود
+                  </Button>
+                </div>
               </div>
               {chartData.length > 0 && (
                 <div className="h-64">
@@ -402,11 +502,19 @@ export default function AISettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>سجل المهام</CardTitle>
-              <CardDescription>آخر مهام الذكاء الاصطناعي (ملء، صور، مواصفات)</CardDescription>
+              <CardDescription>
+                عرض تفصيلي لسجل المهام والتحليلات متاح في لوحة الذكاء الاصطناعي
+              </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              <Link href="/admin/ai-dashboard">
+                <Button variant="outline" className="gap-2">
+                  <ExternalLink className="h-4 w-4" />
+                  فتح لوحة الذكاء الاصطناعي (التحليلات)
+                </Button>
+              </Link>
               {jobs.length === 0 ? (
-                <div className="py-12 text-center text-muted-foreground">لا توجد مهام بعد</div>
+                <div className="py-8 text-center text-muted-foreground">لا توجد مهام بعد</div>
               ) : (
                 <Table>
                   <TableHeader>

@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
+import { useLocale } from '@/hooks/use-locale'
 
 const schema = z
   .object({
@@ -37,6 +38,7 @@ function ResetPasswordForm() {
   const searchParams = useSearchParams()
   const token = searchParams?.get('token') ?? ''
   const { toast } = useToast()
+  const { t: i18n } = useLocale()
   const [done, setDone] = useState(false)
 
   const {
@@ -49,7 +51,7 @@ function ResetPasswordForm() {
 
   const onSubmit = async (data: FormData) => {
     if (!token) {
-      toast({ title: 'Invalid link', description: 'Missing reset token.', variant: 'destructive' })
+      toast({ title: i18n('auth.invalidLink'), description: i18n('auth.missingToken'), variant: 'destructive' })
       return
     }
     try {
@@ -61,11 +63,11 @@ function ResetPasswordForm() {
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Request failed')
       setDone(true)
-      toast({ title: 'Password updated', description: 'You can sign in with your new password.' })
+      toast({ title: i18n('auth.passwordUpdated'), description: i18n('auth.canSignInNow') })
     } catch (e) {
       toast({
-        title: 'Error',
-        description: e instanceof Error ? e.message : 'Something went wrong',
+        title: i18n('auth.loginError'),
+        description: e instanceof Error ? e.message : i18n('auth.unexpectedError'),
         variant: 'destructive',
       })
     }
@@ -74,10 +76,10 @@ function ResetPasswordForm() {
   if (done) {
     return (
       <>
-        <h1 className="mb-4 text-2xl font-bold">Password updated</h1>
-        <p className="mb-6 text-muted-foreground">You can now sign in with your new password.</p>
+        <h1 className="mb-4 text-2xl font-bold">{i18n('auth.passwordUpdated')}</h1>
+        <p className="mb-6 text-muted-foreground">{i18n('auth.canSignInNow')}</p>
         <Button asChild>
-          <Link href="/login">Sign in</Link>
+          <Link href="/login">{i18n('auth.signIn')}</Link>
         </Button>
       </>
     )
@@ -86,12 +88,12 @@ function ResetPasswordForm() {
   if (!token) {
     return (
       <>
-        <h1 className="mb-4 text-2xl font-bold">Invalid link</h1>
+        <h1 className="mb-4 text-2xl font-bold">{i18n('auth.invalidLink')}</h1>
         <p className="mb-6 text-muted-foreground">
-          This reset link is missing the token. Request a new one from the forgot password page.
+          {i18n('auth.missingToken')}
         </p>
         <Button asChild variant="outline">
-          <Link href="/forgot-password">Request reset link</Link>
+          <Link href="/forgot-password">{i18n('auth.requestResetLink')}</Link>
         </Button>
       </>
     )
@@ -99,11 +101,11 @@ function ResetPasswordForm() {
 
   return (
     <>
-      <h1 className="mb-4 text-2xl font-bold">Set new password</h1>
-      <p className="mb-6 text-muted-foreground">Enter your new password below.</p>
+      <h1 className="mb-4 text-2xl font-bold">{i18n('auth.setNewPassword')}</h1>
+      <p className="mb-6 text-muted-foreground">{i18n('auth.setNewPasswordDesc')}</p>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <Label htmlFor="password">New password</Label>
+          <Label htmlFor="password">{i18n('auth.newPassword')}</Label>
           <Input
             id="password"
             type="password"
@@ -116,7 +118,7 @@ function ResetPasswordForm() {
           )}
         </div>
         <div>
-          <Label htmlFor="confirmPassword">Confirm password</Label>
+          <Label htmlFor="confirmPassword">{i18n('auth.confirmPassword')}</Label>
           <Input
             id="confirmPassword"
             type="password"
@@ -129,12 +131,12 @@ function ResetPasswordForm() {
           )}
         </div>
         <Button type="submit" className="w-full">
-          Update password
+          {i18n('auth.updatePassword')}
         </Button>
       </form>
       <p className="mt-6 text-center text-sm text-muted-foreground">
         <Link href="/login" className="text-brand-primary underline">
-          Back to login
+          {i18n('auth.backToLogin')}
         </Link>
       </p>
     </>

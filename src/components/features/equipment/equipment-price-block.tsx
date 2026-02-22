@@ -51,7 +51,7 @@ export function EquipmentPriceBlock({
 
   if (weeklyPrice != null && weeklyPrice > 0) {
     tiers.push({
-      label: 'Week',
+      label: t('equipment.week'),
       price: weeklyPrice,
       perDay: Math.round(weeklyPrice / 7),
       isBestValue: false,
@@ -60,7 +60,7 @@ export function EquipmentPriceBlock({
 
   if (monthlyPrice != null && monthlyPrice > 0) {
     tiers.push({
-      label: 'Month',
+      label: t('equipment.month'),
       price: monthlyPrice,
       perDay: Math.round(monthlyPrice / 30),
       isBestValue: false,
@@ -99,7 +99,7 @@ export function EquipmentPriceBlock({
     <div className="space-y-2">
       <div className="flex items-center gap-2 text-sm text-text-muted">
         <Tag className="h-4 w-4" />
-        <span className="font-medium">Rental pricing</span>
+        <span className="font-medium">{t('equipment.rentalPricing')}</span>
       </div>
       <div
         className="grid gap-2"
@@ -118,7 +118,7 @@ export function EquipmentPriceBlock({
             {tier.isBestValue && (
               <span className="absolute inset-x-0 -top-2.5 mx-auto flex w-fit items-center gap-1 rounded-full bg-brand-primary px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
                 <TrendingDown className="h-3 w-3" />
-                Best Value
+                {t('equipment.bestValue')}
               </span>
             )}
             <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-text-muted">

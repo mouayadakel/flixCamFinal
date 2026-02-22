@@ -9,7 +9,7 @@ const COST_PER_1K: Record<string, { in: number; out: number }> = {
   'gpt-4o': { in: 0.005, out: 0.015 },
   'dall-e-3': { in: 0.04, out: 0 },
   'text-embedding-ada-002': { in: 0.0001, out: 0 },
-  'gemini-1.5-flash': { in: 0.075 / 1000, out: 0.30 / 1000 },
+  'gemini-2.0-flash': { in: 0.075 / 1000, out: 0.30 / 1000 },
   'gemini-1.5-pro': { in: 1.25 / 1000, out: 5.0 / 1000 },
 }
 

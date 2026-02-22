@@ -6,9 +6,10 @@
 
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import Link from 'next/link'
-import { Plus, Eye, Search, Download } from 'lucide-react'
+import { Plus, Eye, Search, Download, SlidersHorizontal } from 'lucide-react'
+import { BottomSheet } from '@/components/mobile/bottom-sheet'
 import { TableFilters } from '@/components/tables/table-filters'
 import { SortableTableHead } from '@/components/tables/sortable-table-head'
 import { TablePagination } from '@/components/tables/table-pagination'
@@ -80,6 +81,7 @@ export default function BookingsPage() {
   const [sortBy, setSortBy] = useState<string | null>(null)
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false)
 
   const statuses = [
     'All',
@@ -93,11 +95,7 @@ export default function BookingsPage() {
     'CANCELLED',
   ]
 
-  useEffect(() => {
-    loadBookings()
-  }, [statusFilter, page, pageSize, dateFrom, dateTo])
-
-  const loadBookings = async () => {
+  const loadBookings = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
@@ -125,7 +123,11 @@ export default function BookingsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [search, statusFilter, page, pageSize, dateFrom, dateTo, toast])
+
+  useEffect(() => {
+    loadBookings()
+  }, [loadBookings])
 
   const filteredBookings = useMemo(() => {
     if (!search) return bookings
@@ -339,7 +341,8 @@ export default function BookingsPage() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 pb-4">
+      {/* Desktop: inline filters */}
+      <div className="hidden flex-wrap items-center gap-4 pb-4 lg:flex">
         <input
           type="date"
           value={dateFrom}
@@ -356,6 +359,20 @@ export default function BookingsPage() {
         />
       </div>
 
+      {/* Mobile: Filter button -> opens bottom sheet */}
+      <div className="flex flex-wrap items-center gap-2 pb-4 lg:hidden">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setFilterSheetOpen(true)}
+          className="gap-2"
+        >
+          <SlidersHorizontal className="h-4 w-4" />
+          فلترة وترتيب
+        </Button>
+      </div>
+
+      <div className="hidden lg:block">
       <TableFilters
         searchPlaceholder="بحث بالرقم، العميل..."
         statusOptions={statuses}
@@ -372,8 +389,58 @@ export default function BookingsPage() {
           setStatusFilter(value)
         }}
       />
+      </div>
 
-      <div className="rounded-md border">
+      {/* Mobile: card list */}
+      <div className="space-y-3 lg:hidden">
+        {loading ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="rounded-lg border border-neutral-200 p-4">
+              <div className="h-4 w-3/4 animate-pulse rounded bg-neutral-200" />
+              <div className="mt-2 h-3 w-1/2 animate-pulse rounded bg-neutral-100" />
+              <div className="mt-2 h-3 w-1/4 animate-pulse rounded bg-neutral-100" />
+            </div>
+          ))
+        ) : sortedBookings.length === 0 ? (
+          <div className="rounded-lg border border-neutral-200 py-12 text-center text-neutral-500">
+            لا توجد حجوزات
+          </div>
+        ) : (
+          sortedBookings.map((booking) => {
+            const paymentInfo = getPaymentStatusLabel(booking.status)
+            return (
+              <div
+                key={booking.id}
+                className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <span className="font-mono text-sm font-medium">{booking.bookingNumber}</span>
+                  <Badge className={getStatusColor(booking.status.toLowerCase())}>
+                    {getStatusLabel(booking.status)}
+                  </Badge>
+                </div>
+                <p className="mt-1 font-medium">{booking.customer.name || 'بدون اسم'}</p>
+                <p className="text-sm text-muted-foreground">{booking.customer.email}</p>
+                <p className="mt-2 text-xs text-neutral-500">
+                  {formatDate(booking.startDate)} – {formatDate(booking.endDate)} ·{' '}
+                  {getDurationDays(booking.startDate, booking.endDate)} يوم
+                </p>
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="font-medium">{formatAmount(booking.totalAmount)}</span>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link href={`/admin/bookings/${booking.id}`}>
+                      <Eye className="ml-2 h-4 w-4" />
+                      عرض
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            )
+          })
+        )}
+      </div>
+
+      <div className="hidden rounded-md border lg:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -498,6 +565,66 @@ export default function BookingsPage() {
           </TableBody>
         </Table>
       </div>
+
+      <BottomSheet
+        open={filterSheetOpen}
+        onOpenChange={setFilterSheetOpen}
+        title="فلترة وترتيب"
+      >
+        <div className="space-y-4 p-4">
+          <div>
+            <label htmlFor="bookings-filter-search" className="mb-1 block text-sm font-medium">بحث</label>
+            <input
+              id="bookings-filter-search"
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="رقم الحجز، العميل..."
+              className="w-full rounded-md border px-3 py-2 text-base"
+              aria-label="بحث عن رقم الحجز أو العميل"
+            />
+          </div>
+          <div>
+            <label htmlFor="bookings-filter-status" className="mb-1 block text-sm font-medium">الحالة</label>
+            <select
+              id="bookings-filter-status"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full rounded-md border px-3 py-2 text-base"
+              aria-label="فلترة حسب الحالة"
+            >
+              {statuses.map((s) => (
+                <option key={s} value={s}>{s === 'All' ? 'الكل' : getStatusLabel(s as BookingStatus)}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="bookings-filter-date-from" className="mb-1 block text-sm font-medium">من تاريخ</label>
+            <input
+              id="bookings-filter-date-from"
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="w-full rounded-md border px-3 py-2 text-base"
+              aria-label="من تاريخ"
+            />
+          </div>
+          <div>
+            <label htmlFor="bookings-filter-date-to" className="mb-1 block text-sm font-medium">إلى تاريخ</label>
+            <input
+              id="bookings-filter-date-to"
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="w-full rounded-md border px-3 py-2 text-base"
+              aria-label="إلى تاريخ"
+            />
+          </div>
+          <Button onClick={() => setFilterSheetOpen(false)} className="w-full">
+            تطبيق
+          </Button>
+        </div>
+      </BottomSheet>
 
       {!loading && total > 0 && (
         <TablePagination

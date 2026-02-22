@@ -7,8 +7,10 @@
 import { prisma } from '@/lib/db/prisma'
 import { AuditService } from './audit.service'
 import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
-import { hasPermission } from '@/lib/auth/permissions'
+import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
 import { Decimal } from '@prisma/client/runtime/library'
+import { cacheDelete } from '@/lib/cache'
+import type { UpdateStudioCmsInput } from '@/lib/validators/studio.validator'
 
 export interface StudioInput {
   name: string
@@ -372,6 +374,167 @@ export class StudioService {
     }
 
     return studio
+  }
+
+  /**
+   * Get studio by ID for CMS (includes packages, faqs, media ordered)
+   */
+  static async getByIdForCms(id: string, userId: string) {
+    const canView = await hasPermission(userId, PERMISSIONS.CMS_STUDIO_READ)
+    if (!canView) {
+      throw new ForbiddenError('You do not have permission to view studio CMS')
+    }
+
+    const studio = await prisma.studio.findFirst({
+      where: { id, deletedAt: null },
+      include: {
+        media: {
+          where: { deletedAt: null },
+          orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+        },
+        addOns: { where: { deletedAt: null } },
+        blackoutDates: { where: { deletedAt: null } },
+        packages: {
+          where: { deletedAt: null },
+          orderBy: { order: 'asc' },
+        },
+        faqs: {
+          where: { deletedAt: null },
+          orderBy: { order: 'asc' },
+        },
+        testimonials: {
+          where: { deletedAt: null },
+          orderBy: { order: 'asc' },
+        },
+      },
+    })
+
+    if (!studio) throw new NotFoundError('Studio', id)
+
+    return studio
+  }
+
+  /**
+   * Get studio by slug for public page (no auth)
+   */
+  static async getBySlugPublic(slug: string) {
+    const studio = await prisma.studio.findFirst({
+      where: { slug, deletedAt: null, isActive: true },
+      include: {
+        media: {
+          where: { deletedAt: null },
+          orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+        },
+        addOns: { where: { deletedAt: null, isActive: true } },
+        packages: {
+          where: { deletedAt: null, isActive: true },
+          orderBy: { order: 'asc' },
+        },
+        faqs: {
+          where: { deletedAt: null, isActive: true },
+          orderBy: { order: 'asc' },
+          take: 9,
+        },
+        testimonials: {
+          where: { deletedAt: null, isActive: true },
+          orderBy: { order: 'asc' },
+          take: 10,
+        },
+      },
+    })
+
+    return studio
+  }
+
+  /**
+   * Update studio CMS fields
+   */
+  static async updateCms(id: string, data: UpdateStudioCmsInput, userId: string) {
+    const canUpdate = await hasPermission(userId, PERMISSIONS.CMS_STUDIO_UPDATE)
+    if (!canUpdate) {
+      throw new ForbiddenError('You do not have permission to update studio CMS')
+    }
+
+    const studio = await prisma.studio.findFirst({
+      where: { id, deletedAt: null },
+    })
+    if (!studio) throw new NotFoundError('Studio', id)
+
+    const updated = await prisma.studio.update({
+      where: { id },
+      data: {
+        ...(data.name != null && { name: data.name }),
+        ...(data.description !== undefined && { description: data.description }),
+        ...(data.capacity !== undefined && { capacity: data.capacity }),
+        ...(data.hourlyRate != null && { hourlyRate: new Decimal(data.hourlyRate) }),
+        ...(data.setupBuffer !== undefined && { setupBuffer: data.setupBuffer }),
+        ...(data.cleaningBuffer !== undefined && { cleaningBuffer: data.cleaningBuffer }),
+        ...(data.resetTime !== undefined && { resetTime: data.resetTime }),
+        ...(data.isActive !== undefined && { isActive: data.isActive }),
+        ...(data.areaSqm !== undefined && { areaSqm: data.areaSqm }),
+        ...(data.studioType !== undefined && { studioType: data.studioType }),
+        ...(data.bestUse !== undefined && { bestUse: data.bestUse }),
+        ...(data.availabilityConfidence !== undefined && {
+          availabilityConfidence: data.availabilityConfidence,
+        }),
+        ...(data.videoUrl !== undefined && { videoUrl: data.videoUrl }),
+        ...(data.galleryDisclaimer !== undefined && { galleryDisclaimer: data.galleryDisclaimer }),
+        ...(data.address !== undefined && { address: data.address }),
+        ...(data.googleMapsUrl !== undefined && { googleMapsUrl: data.googleMapsUrl }),
+        ...(data.arrivalTimeFromCenter !== undefined && {
+          arrivalTimeFromCenter: data.arrivalTimeFromCenter,
+        }),
+        ...(data.parkingNotes !== undefined && { parkingNotes: data.parkingNotes }),
+        ...(data.slotDurationMinutes !== undefined && {
+          slotDurationMinutes: data.slotDurationMinutes,
+        }),
+        ...(data.dailyRate !== undefined && {
+          dailyRate: data.dailyRate != null ? new Decimal(data.dailyRate) : null,
+        }),
+        ...(data.minHours !== undefined && { minHours: data.minHours }),
+        ...(data.durationOptions !== undefined && { durationOptions: data.durationOptions }),
+        ...(data.bookingDisclaimer !== undefined && { bookingDisclaimer: data.bookingDisclaimer }),
+        ...(data.vatIncluded !== undefined && { vatIncluded: data.vatIncluded }),
+        ...(data.whatsIncluded !== undefined && { whatsIncluded: data.whatsIncluded }),
+        ...(data.notIncluded !== undefined && { notIncluded: data.notIncluded }),
+        ...(data.hasElectricity !== undefined && { hasElectricity: data.hasElectricity }),
+        ...(data.hasAC !== undefined && { hasAC: data.hasAC }),
+        ...(data.hasChangingRooms !== undefined && { hasChangingRooms: data.hasChangingRooms }),
+        ...(data.hasWifi !== undefined && { hasWifi: data.hasWifi }),
+        ...(data.rulesText !== undefined && { rulesText: data.rulesText }),
+        ...(data.smokingPolicy !== undefined && { smokingPolicy: data.smokingPolicy }),
+        ...(data.foodPolicy !== undefined && { foodPolicy: data.foodPolicy }),
+        ...(data.equipmentCarePolicy !== undefined && {
+          equipmentCarePolicy: data.equipmentCarePolicy,
+        }),
+        ...(data.cancellationPolicyShort !== undefined && {
+          cancellationPolicyShort: data.cancellationPolicyShort,
+        }),
+        ...(data.cancellationPolicyLink !== undefined && {
+          cancellationPolicyLink: data.cancellationPolicyLink,
+        }),
+        ...(data.heroTagline !== undefined && { heroTagline: data.heroTagline }),
+        ...(data.reviewsText !== undefined && { reviewsText: data.reviewsText }),
+        ...(data.whatsappNumber !== undefined && { whatsappNumber: data.whatsappNumber }),
+        ...(data.bookingCountDisplay !== undefined && { bookingCountDisplay: data.bookingCountDisplay }),
+        ...(data.metaTitle !== undefined && { metaTitle: data.metaTitle }),
+        ...(data.metaDescription !== undefined && { metaDescription: data.metaDescription }),
+        updatedBy: userId,
+      },
+    })
+
+    await AuditService.log({
+      action: 'studio.cms.updated',
+      userId,
+      resourceType: 'studio',
+      resourceId: id,
+      metadata: { slug: updated.slug },
+    })
+
+    await cacheDelete('equipmentDetail', `studio:${updated.slug}`)
+    await cacheDelete('equipmentList', 'studios')
+
+    return this.getByIdForCms(id, userId)
   }
 
   /**

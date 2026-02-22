@@ -3,10 +3,8 @@
  * Uses quality-scorer for cached scan and content-health for product IDs with gaps.
  */
 
-import { prisma } from '@/lib/db/prisma'
-import { AiJobType, JobStatus } from '@prisma/client'
 import { getCachedScan } from '@/lib/services/quality-scorer.service'
-import { backfillQueue, type BackfillJobData } from '@/lib/queue/backfill.queue'
+import { addBackfillJob } from '@/lib/queue/backfill.queue'
 import type { BackfillOptions, ContentGapReport } from '@/lib/types/backfill.types'
 
 /**
@@ -64,13 +62,13 @@ export async function scanAndQueue(options: BackfillOptions): Promise<{
     }
   }
 
-  const jobId = await queueBackfillJob({
-    productIds,
+  const result = await addBackfillJob(productIds, {
     types: options.types,
-    trigger: options.trigger,
+    trigger: options.trigger ?? 'scan',
     triggeredBy: options.triggeredBy,
+    previewMode: options.previewMode,
   })
-  return { jobId, report }
+  return { jobId: result.jobId, report }
 }
 
 /**
@@ -82,58 +80,10 @@ export async function queueSingleProduct(
   trigger: 'manual' | 'event',
   options?: { triggeredBy?: string }
 ): Promise<string> {
-  return queueBackfillJob({
-    productIds: [productId],
+  const result = await addBackfillJob([productId], {
     types,
-    trigger,
+    trigger: trigger === 'event' ? 'event' : 'single',
     triggeredBy: options?.triggeredBy,
   })
-}
-
-/**
- * Create AiJob + AiJobItems and add job to BullMQ. Uses new schema (AiJobType, JobStatus, totalItems, etc.).
- */
-async function queueBackfillJob(params: {
-  productIds: string[]
-  types: Array<'text' | 'photo' | 'spec'>
-  trigger: string
-  triggeredBy?: string
-}): Promise<string> {
-  const { productIds, types, trigger, triggeredBy } = params
-  if (productIds.length === 0) return ''
-
-  const jobType: AiJobType =
-    types.length === 3 ? AiJobType.FULL_BACKFILL : types.includes('photo') ? AiJobType.PHOTO_BACKFILL : types.includes('spec') ? AiJobType.SPEC_BACKFILL : AiJobType.TEXT_BACKFILL
-
-  const aiJob = await prisma.aiJob.create({
-    data: {
-      type: jobType,
-      status: JobStatus.PENDING,
-      triggeredBy: trigger,
-      totalItems: productIds.length,
-      metadata: triggeredBy ? { triggeredBy } : undefined,
-    },
-  })
-
-  await prisma.aiJobItem.createMany({
-    data: productIds.map((productId) => ({
-      jobId: aiJob.id,
-      productId,
-      itemType: types.join(','),
-      status: 'pending',
-    })),
-  })
-
-  const jobData: BackfillJobData = {
-    aiJobId: aiJob.id,
-    productIds,
-    types,
-    createdBy: triggeredBy,
-  }
-  await backfillQueue.add('backfill-products', jobData, {
-    jobId: aiJob.id,
-    priority: 1,
-  })
-
-  return aiJob.id
+  return result.jobId
 }

@@ -48,35 +48,38 @@ interface ProgressData {
 
 interface ProgressTrackerProps {
   jobId: string
-  onComplete?: () => void
+  onComplete?: (data: ProgressData) => void
 }
 
 export function ProgressTracker({ jobId, onComplete }: ProgressTrackerProps) {
   const [progress, setProgress] = useState<ProgressData | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const fetchProgress = async () => {
+  const fetchProgress = async (signal?: AbortSignal) => {
     try {
-      const res = await fetch(`/api/admin/imports/${jobId}/progress`)
+      const res = await fetch(`/api/admin/imports/${jobId}/progress`, { signal })
       if (!res.ok) return
       const data = await res.json()
       setProgress(data)
       setLoading(false)
 
-      // Check if completed
       if (data.status === 'COMPLETED' && onComplete) {
-        onComplete()
+        onComplete(data)
       }
     } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return
       console.error('Failed to fetch progress:', error)
     }
   }
 
   useEffect(() => {
-    fetchProgress()
-    // Increased interval to 5 seconds to reduce rate limiting issues
-    const interval = setInterval(fetchProgress, 5000)
-    return () => clearInterval(interval)
+    const controller = new AbortController()
+    fetchProgress(controller.signal)
+    const interval = setInterval(() => fetchProgress(controller.signal), 5000)
+    return () => {
+      controller.abort()
+      clearInterval(interval)
+    }
   }, [jobId])
 
   const handleDownloadErrors = async () => {
@@ -158,6 +161,11 @@ export function ProgressTracker({ jobId, onComplete }: ProgressTrackerProps) {
             </Badge>
           </div>
           <Progress value={products.percentage} />
+          {progress.status === 'PENDING' && products.total > 0 && products.processed === 0 && (
+            <p className="text-xs text-muted-foreground">
+              Job is queued. It will be processed automatically by the server. If progress stays at 0, ensure Redis is running.
+            </p>
+          )}
           <div className="flex gap-4 text-xs text-muted-foreground">
             <span>✓ {products.success} success</span>
             {products.errors > 0 && (

@@ -4,7 +4,31 @@
  * Testimonials, FAQ, CTA.
  */
 
+import type { Metadata } from 'next'
 import { unstable_cache } from 'next/cache'
+import { t } from '@/lib/i18n/translate'
+import { generateAlternatesMetadata } from '@/lib/seo/hreflang'
+
+const BASE_URL = process.env.NEXTAUTH_URL || process.env.APP_URL || 'https://flixcam.rent'
+
+export const metadata: Metadata = {
+  title: t('ar', 'seo.homeTitle'),
+  description: t('ar', 'seo.homeDescription'),
+  alternates: generateAlternatesMetadata('/'),
+  openGraph: {
+    title: t('ar', 'seo.homeTitle'),
+    description: t('ar', 'seo.homeDescription'),
+    url: BASE_URL,
+    siteName: 'FlixCam.rent',
+    locale: 'ar_SA',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: t('ar', 'seo.homeTitle'),
+    description: t('ar', 'seo.homeDescription'),
+  },
+}
 import { prisma } from '@/lib/db/prisma'
 import { HeroBannerService } from '@/lib/services/hero-banner.service'
 import { FeatureFlagService } from '@/lib/services/feature-flag.service'
@@ -18,6 +42,7 @@ import { HomeTopBrands } from '@/components/features/home/home-top-brands'
 import { HomeTestimonials } from '@/components/features/home/home-testimonials'
 import { HomeFaq } from '@/components/features/home/home-faq'
 import { HomeCta } from '@/components/features/home/home-cta'
+import { HomeStudios } from '@/components/features/home/home-studios'
 
 const FEATURED_DISPLAY_COUNT_KEY = 'settings.featured_equipment_display_count'
 const FEATURED_DISPLAY_COUNT_DEFAULT = 8
@@ -30,7 +55,8 @@ async function getFeaturedDisplayCount(): Promise<number> {
   })
   if (row?.value == null) return FEATURED_DISPLAY_COUNT_DEFAULT
   const n = parseInt(row.value, 10)
-  return Number.isNaN(n) || !FEATURED_DISPLAY_COUNT_ALLOWED.includes(n)
+  const allowed = FEATURED_DISPLAY_COUNT_ALLOWED as readonly number[]
+  return Number.isNaN(n) || !allowed.includes(n)
     ? FEATURED_DISPLAY_COUNT_DEFAULT
     : n
 }
@@ -152,6 +178,18 @@ async function getHeroBanner() {
   }
 }
 
+async function getHeroImageUrl(): Promise<string | null> {
+  try {
+    const row = await prisma.integrationConfig.findFirst({
+      where: { key: 'home_hero_image', deletedAt: null },
+      select: { value: true },
+    })
+    return row?.value || null
+  } catch {
+    return null
+  }
+}
+
 export default async function PublicHomePage() {
   let featured: Awaited<ReturnType<typeof getFeaturedEquipment>> = []
   let newArrivals: Awaited<ReturnType<typeof getNewArrivals>> = []
@@ -162,16 +200,20 @@ export default async function PublicHomePage() {
     yearFounded: 2020,
   }
   let heroBanner: Awaited<ReturnType<typeof getHeroBanner>> = null
+  let heroImageUrl: string | null = null
 
   let showKitTeaser = false
+  let showStudios = false
   try {
-    ;[featured, newArrivals, categories, stats, heroBanner, showKitTeaser] = await Promise.all([
+    ;[featured, newArrivals, categories, stats, heroBanner, heroImageUrl, showKitTeaser, showStudios] = await Promise.all([
       getFeaturedEquipment(),
       getNewArrivals(),
       getCategoriesForHome(),
       getHomeStats(),
       getHeroBanner(),
+      getHeroImageUrl(),
       FeatureFlagService.isEnabled('enable_home_kit_teaser'),
+      FeatureFlagService.isEnabled('enable_studios'),
     ])
   } catch (e) {
     console.error('[PublicHomePage] data fetch failed:', e)
@@ -179,9 +221,10 @@ export default async function PublicHomePage() {
 
   return (
     <main className="flex flex-col">
-      <HomeHero banner={heroBanner ?? undefined} />
+      <HomeHero banner={heroBanner ?? undefined} heroImageUrl={heroImageUrl} />
       <HomeCategoryCards categories={categories} />
       <HomeFeaturedEquipment items={featured} />
+      {showStudios && <HomeStudios />}
       <HomeNewArrivals items={newArrivals} />
       {showKitTeaser && <HomeKitTeaser />}
       <HomeTrustSignals

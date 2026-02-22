@@ -33,6 +33,11 @@ interface RelatedEquipmentSelectorProps {
   className?: string
 }
 
+function arraysEqual(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false
+  return a.every((id, i) => id === b[i])
+}
+
 export function RelatedEquipmentSelector({
   value = [],
   onChange,
@@ -43,7 +48,15 @@ export function RelatedEquipmentSelector({
   const [search, setSearch] = useState('')
   const [equipment, setEquipment] = useState<Equipment[]>([])
   const [loading, setLoading] = useState(false)
-  const [selected, setSelected] = useState<string[]>(value)
+  const [selected, setSelected] = useState<string[]>(() =>
+    Array.isArray(value) ? value : []
+  )
+
+  // Sync internal state when controlled value changes (e.g. form reset)
+  useEffect(() => {
+    const v = Array.isArray(value) ? value : []
+    setSelected((prev) => (arraysEqual(prev, v) ? prev : v))
+  }, [value])
 
   useEffect(() => {
     loadEquipment()
@@ -99,19 +112,17 @@ export function RelatedEquipmentSelector({
   }, [equipment, selected])
 
   const handleToggle = (id: string) => {
-    setSelected((prev) => {
-      const next = prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-      onChange(next)
-      return next
-    })
+    const next = selected.includes(id)
+      ? selected.filter((i) => i !== id)
+      : [...selected, id]
+    setSelected(next)
+    onChange(next)
   }
 
   const handleRemove = (id: string) => {
-    setSelected((prev) => {
-      const next = prev.filter((i) => i !== id)
-      onChange(next)
-      return next
-    })
+    const next = selected.filter((i) => i !== id)
+    setSelected(next)
+    onChange(next)
   }
 
   return (

@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import {
   CheckCircle,
@@ -104,16 +104,9 @@ export default function ApprovalsPage() {
   const [actionType, setActionType] = useState<'approve' | 'reject' | null>(null)
   const [notes, setNotes] = useState('')
   const [processing, setProcessing] = useState(false)
-  const [isLoadingRef, setIsLoadingRef] = useState(false)
+  const hasLoadedRef = useRef(false)
 
-  useEffect(() => {
-    if (!isLoadingRef) {
-      setIsLoadingRef(true)
-      loadApprovals()
-    }
-  }, [])
-
-  const loadApprovals = async () => {
+  const loadApprovals = useCallback(async () => {
     setLoading(true)
     try {
       const pendingRes = await fetch('/api/approvals/pending').catch(() => null)
@@ -162,7 +155,14 @@ export default function ApprovalsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
+
+  useEffect(() => {
+    if (!hasLoadedRef.current) {
+      hasLoadedRef.current = true
+      loadApprovals()
+    }
+  }, [loadApprovals])
 
   const handleAction = async () => {
     if (!selectedApproval || !actionType) return

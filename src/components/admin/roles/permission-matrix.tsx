@@ -83,7 +83,7 @@ export function PermissionMatrix({
       .map((cat) => ({
         ...cat,
         permissions: cat.permissions.filter(
-          (p) => p.name.toLowerCase().includes(q) || (p.description || '').toLowerCase().includes(q)
+          (p) => p.name.toLowerCase().includes(q) || (p.description || '').toLowerCase().includes(q) || (p.descriptionAr || '').includes(q)
         ),
       }))
       .filter((c) => c.permissions.length > 0)
@@ -167,9 +167,9 @@ export function PermissionMatrix({
                       />
                       <label htmlFor={perm.id} className="flex-1 cursor-pointer text-sm">
                         <span className="font-mono text-xs">{perm.name}</span>
-                        {perm.description && (
+                        {(perm.descriptionAr || perm.description) && (
                           <span className="mt-0.5 block text-xs text-muted-foreground">
-                            {perm.description}
+                            {perm.descriptionAr || perm.description}
                           </span>
                         )}
                       </label>

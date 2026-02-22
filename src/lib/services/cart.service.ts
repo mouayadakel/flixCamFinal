@@ -34,6 +34,8 @@ export interface CartWithItems {
     itemType: CartItemType
     equipmentId: string | null
     studioId: string | null
+    studioName?: string | null
+    studioSlug?: string | null
     packageId: string | null
     kitId: string | null
     startDate: Date | null
@@ -58,7 +60,7 @@ export class CartService {
 
     const existing = await prisma.cart.findFirst({
       where: userId ? { userId } : { sessionId: sessionId ?? undefined },
-      include: { items: true },
+      include: { items: { include: { studio: { select: { name: true, slug: true } } } } },
     })
 
     if (existing) {
@@ -78,7 +80,7 @@ export class CartService {
         total: new Decimal(0),
         expiresAt,
       },
-      include: { items: true },
+      include: { items: { include: { studio: { select: { name: true, slug: true } } } } },
     })
     return this.toCartWithItems(cart)
   }
@@ -89,6 +91,7 @@ export class CartService {
   static async addItem(cartId: string, input: AddCartItemInput): Promise<CartWithItems> {
     const quantity = Math.max(1, input.quantity ?? 1)
     let dailyRate = input.dailyRate ?? 0
+    let studioTotalOverride: number | null = null
 
     if (input.itemType === 'EQUIPMENT' && input.equipmentId) {
       const eq = await prisma.equipment.findFirst({
@@ -96,10 +99,15 @@ export class CartService {
       })
       dailyRate = eq?.dailyPrice ? Number(eq.dailyPrice) : 0
     } else if (input.itemType === 'STUDIO' && input.studioId) {
-      const st = await prisma.studio.findFirst({
-        where: { id: input.studioId, deletedAt: null },
-      })
-      dailyRate = st?.hourlyRate ? Number(st.hourlyRate) * 24 : 0
+      if (input.dailyRate != null && input.dailyRate > 0) {
+        studioTotalOverride = input.dailyRate
+        dailyRate = input.dailyRate
+      } else {
+        const st = await prisma.studio.findFirst({
+          where: { id: input.studioId, deletedAt: null },
+        })
+        dailyRate = st?.hourlyRate ? Number(st.hourlyRate) : 0
+      }
     } else if (
       (input.itemType === 'KIT' || input.itemType === 'PACKAGE') &&
       (input.kitId || input.packageId)
@@ -121,11 +129,21 @@ export class CartService {
 
     const startDate = input.startDate ?? null
     const endDate = input.endDate ?? null
+    const msDiff = startDate && endDate ? endDate.getTime() - startDate.getTime() : 0
     const days =
       startDate && endDate
-        ? Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000)))
+        ? Math.max(1, Math.ceil(msDiff / (24 * 60 * 60 * 1000)))
         : 1
-    const subtotalItem = dailyRate * quantity * days
+    const hoursSameDay =
+      startDate && endDate && msDiff > 0 && msDiff < 24 * 60 * 60 * 1000
+        ? msDiff / (60 * 60 * 1000)
+        : null
+    const subtotalItem =
+      studioTotalOverride != null && input.itemType === 'STUDIO'
+        ? studioTotalOverride * quantity
+        : hoursSameDay != null && input.itemType === 'STUDIO'
+          ? dailyRate * quantity * hoursSameDay
+          : dailyRate * quantity * days
 
     await prisma.cartItem.create({
       data: {
@@ -287,6 +305,22 @@ export class CartService {
     })
     if (!cart) throw new Error('Cart not found')
 
+    const equipmentIds = [
+      ...new Set(
+        cart.items
+          .filter((i) => i.itemType === 'EQUIPMENT' && i.equipmentId)
+          .map((i) => i.equipmentId!)
+      ),
+    ]
+    const equipmentMap = new Map<string, { quantityTotal: number }>()
+    if (equipmentIds.length > 0) {
+      const equipment = await prisma.equipment.findMany({
+        where: { id: { in: equipmentIds } },
+        select: { id: true, quantityTotal: true },
+      })
+      equipment.forEach((e) => equipmentMap.set(e.id, { quantityTotal: e.quantityTotal }))
+    }
+
     const now = new Date()
     for (const item of cart.items) {
       let available = true
@@ -303,9 +337,7 @@ export class CartService {
           },
           _sum: { quantity: true },
         })
-        const eq = await prisma.equipment.findUnique({
-          where: { id: item.equipmentId },
-        })
+        const eq = equipmentMap.get(item.equipmentId)
         const bookedQty = booked._sum.quantity ?? 0
         available = eq ? eq.quantityTotal - bookedQty >= item.quantity : false
       }
@@ -372,7 +404,7 @@ export class CartService {
 
     const updated = await prisma.cart.findUnique({
       where: { id: cartId },
-      include: { items: true },
+      include: { items: { include: { studio: { select: { name: true, slug: true } } } } },
     })
     return this.toCartWithItems(updated!)
   }
@@ -399,6 +431,7 @@ export class CartService {
       dailyRate: unknown
       subtotal: unknown
       isAvailable: boolean
+      studio?: { name: string; slug: string } | null
     }[]
   }): CartWithItems {
     return {
@@ -415,6 +448,8 @@ export class CartService {
         itemType: i.itemType,
         equipmentId: i.equipmentId,
         studioId: i.studioId,
+        studioName: i.studio?.name ?? null,
+        studioSlug: i.studio?.slug ?? null,
         packageId: i.packageId,
         kitId: i.kitId,
         startDate: i.startDate,

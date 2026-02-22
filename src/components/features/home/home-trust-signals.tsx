@@ -66,8 +66,8 @@ export function HomeTrustSignals({
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="group flex animate-fade-in-up flex-col items-center rounded-2xl border border-border-light/60 bg-surface-light/50 p-8 text-center opacity-0 transition-all duration-300 hover:border-brand-primary/10 hover:bg-white hover:shadow-card-elevated"
-              style={{ animationDelay: `${0.1 * index}s` }}
+              className="group flex animate-fade-in-up flex-col items-center rounded-2xl border border-border-light/60 bg-surface-light/50 p-8 text-center opacity-0 transition-all duration-300 hover:border-brand-primary/10 hover:bg-white hover:shadow-card-elevated trust-stat-card"
+              style={{ ['--animation-delay' as string]: `${0.1 * index}s` }}
             >
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-brand-primary/10 text-brand-primary transition-all duration-300 group-hover:bg-brand-primary group-hover:text-white group-hover:shadow-lg group-hover:shadow-brand-primary/20">
                 <stat.Icon className="h-6 w-6" />
@@ -95,18 +95,20 @@ export function HomeTrustSignals({
           ))}
         </div>
 
-        {/* How It Works – compact row */}
+        {/* How It Works – vertical steps on mobile, row on desktop */}
         <div className="mt-10 border-t border-border-light/50 pt-10">
           <h3 className="mb-6 text-center text-lg font-semibold text-text-heading">
             {t('home.howItWorksTitle')}
           </h3>
-          <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
+          <div className="relative flex flex-col gap-4 md:flex-row md:flex-wrap md:justify-center md:gap-4">
+            {/* Vertical connecting line on mobile (start side for RTL) */}
+            <span className="absolute top-4 bottom-4 start-[13px] w-px bg-border-light/80 md:hidden rtl:start-auto rtl:end-[13px]" aria-hidden />
             {HOW_IT_WORKS_STEPS.map((step, i) => (
               <div
                 key={step.key}
-                className="flex items-center gap-2 rounded-xl border border-border-light/60 bg-surface-light/50 px-3 py-2.5 sm:gap-2.5 sm:px-4 sm:py-3"
+                className="relative flex min-h-[48px] items-center gap-3 rounded-xl border border-border-light/60 bg-surface-light/50 px-4 py-3 ps-10 md:ps-4 md:py-2.5 rtl:ps-4 rtl:pe-10"
               >
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-primary text-xs font-bold text-white sm:h-8 sm:w-8">
+                <span className="absolute start-2 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-primary text-xs font-bold text-white md:relative md:start-auto md:h-8 md:w-8 rtl:start-auto rtl:end-2 rtl:md:end-auto">
                   {i + 1}
                 </span>
                 <span className="text-sm font-medium text-text-heading">{t(step.key)}</span>

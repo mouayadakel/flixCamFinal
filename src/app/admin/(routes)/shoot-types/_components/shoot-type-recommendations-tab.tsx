@@ -126,7 +126,7 @@ export function ShootTypeRecommendationsTab({
             ),
           }))
         })
-        .catch(() => {})
+        .catch((err) => console.error('[shoot-type-recommendations] fetch equipment failed', err))
     })
   }, [categorySteps])
 

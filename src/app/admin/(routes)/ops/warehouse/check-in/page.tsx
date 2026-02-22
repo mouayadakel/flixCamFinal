@@ -270,7 +270,7 @@ export default function CheckInPage() {
                   placeholder="بحث..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pr-10"
+                  className="h-12 pr-10 text-base"
                 />
               </div>
             </CardHeader>
@@ -503,6 +503,8 @@ export default function CheckInPage() {
                     <Button
                       onClick={handleCheckIn}
                       disabled={processing || checkedItems.size === 0}
+                      size="lg"
+                      className="min-h-[44px] w-full sm:w-auto"
                     >
                       {processing ? 'جاري الإرجاع...' : 'تأكيد الإرجاع'}
                     </Button>

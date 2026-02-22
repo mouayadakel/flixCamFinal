@@ -79,6 +79,8 @@ export interface SpecificationsEditorProps {
   label?: string
   className?: string
   categoryHint?: string
+  /** Optional: fetch AI-inferred specs and merge into editor (e.g. from /api/admin/equipment/ai-suggest) */
+  onAiInfer?: () => Promise<Record<string, unknown> | null>
 }
 
 function normalizeValue(
@@ -340,6 +342,7 @@ export function SpecificationsEditor({
   label = 'Specifications',
   className,
   categoryHint,
+  onAiInfer,
 }: SpecificationsEditorProps) {
   const normalized = useMemo(() => normalizeValue(value, categoryHint), [value, categoryHint])
   const [state, setState] = useState<StructuredSpecifications>(normalized)
@@ -349,6 +352,7 @@ export function SpecificationsEditor({
   const [fetchUrl, setFetchUrl] = useState('')
   const [fetchLoading, setFetchLoading] = useState(false)
   const [fetchError, setFetchError] = useState<string | null>(null)
+  const [aiInferLoading, setAiInferLoading] = useState(false)
 
   const lastSyncedFlatRef = useRef<Record<string, unknown> | null>(null)
   useEffect(() => {
@@ -511,6 +515,49 @@ export function SpecificationsEditor({
           <Link2 className="ml-1.5 h-4 w-4" />
           جلب المواصفات من رابط
         </Button>
+        {onAiInfer && (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={aiInferLoading}
+            onClick={async () => {
+              setAiInferLoading(true)
+              try {
+                const flat = await onAiInfer()
+                if (flat && Object.keys(flat).length > 0) {
+                  const inferred = convertFlatToStructured(flat, categoryHint)
+                  const mergedGroups = state.groups.map((g) => ({
+                    ...g,
+                    specs: [...g.specs],
+                  }))
+                  const firstGroup = mergedGroups[0]
+                  if (firstGroup) {
+                    const existingKeys = new Set(firstGroup.specs.map((s) => s.key))
+                    for (const spec of inferred.groups[0]?.specs ?? []) {
+                      if (!existingKeys.has(spec.key)) {
+                        firstGroup.specs.push(spec)
+                        existingKeys.add(spec.key)
+                      }
+                    }
+                    syncChange({ ...state, groups: mergedGroups })
+                  } else {
+                    syncChange({ ...state, ...inferred })
+                  }
+                }
+              } finally {
+                setAiInferLoading(false)
+              }
+            }}
+          >
+            {aiInferLoading ? (
+              <Loader2 className="ml-1.5 h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="ml-1.5 h-4 w-4" />
+            )}
+            استنتاج AI
+          </Button>
+        )}
       </div>
 
       <Dialog open={fetchDialogOpen} onOpenChange={setFetchDialogOpen}>

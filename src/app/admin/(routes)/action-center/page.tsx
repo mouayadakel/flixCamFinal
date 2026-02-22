@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import {
   AlertTriangle,
@@ -103,16 +103,9 @@ export default function ActionCenterPage() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('all')
   const [refreshing, setRefreshing] = useState(false)
-  const [isLoadingRef, setIsLoadingRef] = useState(false)
+  const hasLoadedRef = useRef(false)
 
-  useEffect(() => {
-    if (!isLoadingRef) {
-      setIsLoadingRef(true)
-      loadActions()
-    }
-  }, [])
-
-  const loadActions = async () => {
+  const loadActions = useCallback(async () => {
     setLoading(true)
     try {
       // Fetch pending actions from multiple sources
@@ -209,7 +202,14 @@ export default function ActionCenterPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
+
+  useEffect(() => {
+    if (!hasLoadedRef.current) {
+      hasLoadedRef.current = true
+      loadActions()
+    }
+  }, [loadActions])
 
   const handleRefresh = async () => {
     setRefreshing(true)

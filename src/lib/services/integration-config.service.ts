@@ -103,9 +103,9 @@ export class IntegrationConfigService {
       case 'whatsapp':
         return {
           type: 'whatsapp',
-          enabled: !!process.env.WHATSAPP_API_KEY,
+          enabled: !!process.env.WHATSAPP_ACCESS_TOKEN,
           config: {
-            apiKey: process.env.WHATSAPP_API_KEY ? '***configured***' : undefined,
+            accessToken: process.env.WHATSAPP_ACCESS_TOKEN ? '***configured***' : undefined,
           },
         }
       case 'analytics':

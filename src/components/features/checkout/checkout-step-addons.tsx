@@ -34,11 +34,11 @@ export function CheckoutStepAddons({ onSuccess }: CheckoutStepAddonsProps) {
             onCheckedChange={(v) => setAddons({ ...addons, technician: v === true })}
           />
           <Label htmlFor="addon-technician" className="cursor-pointer font-normal">
-            Add technician (optional)
+            {t('checkout.addTechnician')}
           </Label>
         </div>
         <p className="text-sm text-text-muted">
-          Insurance and optional accessories can be added at payment.
+          {t('checkout.addonsTechNote')}
         </p>
         <Button type="submit" size="lg" className="w-full">
           {t('common.next')}

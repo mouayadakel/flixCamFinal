@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { handlers, signIn, auth } from '@/lib/auth'
+import { checkRateLimitUpstash } from '@/lib/utils/rate-limit-upstash'
 
 const ENABLE_JSON_SIGNIN =
   process.env.NODE_ENV !== 'production' || process.env.ENABLE_TEST_AUTH === 'true'
@@ -35,6 +36,11 @@ function getCredentialsFromBasic(request: NextRequest): {
  * GET or POST form: delegate to NextAuth (login page / form signin).
  */
 export async function POST(request: NextRequest) {
+  const rate = await checkRateLimitUpstash(request, 'auth')
+  if (!rate.allowed) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
+  }
+
   const contentType = request.headers.get('content-type') ?? ''
 
   let email: string | undefined

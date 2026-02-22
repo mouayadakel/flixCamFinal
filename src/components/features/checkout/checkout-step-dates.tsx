@@ -103,7 +103,7 @@ export function CheckoutStepDates({ onSuccess }: CheckoutStepDatesProps) {
                 id="deliveryCity"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="mt-1"
+                className="mt-1 h-12 text-base"
               />
             </div>
             <div>
@@ -112,7 +112,7 @@ export function CheckoutStepDates({ onSuccess }: CheckoutStepDatesProps) {
                 id="deliveryStreet"
                 value={street}
                 onChange={(e) => setStreet(e.target.value)}
-                className="mt-1"
+                className="mt-1 h-12 text-base"
               />
             </div>
           </div>

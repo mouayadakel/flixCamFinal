@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       logo: true,
       _count: { select: { equipment: true } },
     },
-    orderBy: { name: 'asc' },
+    orderBy: { equipment: { _count: 'desc' } },
   })
 
   const data = brands.map((b) => ({

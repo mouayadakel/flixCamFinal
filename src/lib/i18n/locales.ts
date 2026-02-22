@@ -3,7 +3,7 @@
  * Supported: Arabic (RTL), English, Chinese.
  */
 
-export const LOCALES = ['ar', 'en', 'zh'] as const
+export const LOCALES = ['ar', 'en', 'zh', 'fr'] as const
 export type Locale = (typeof LOCALES)[number]
 
 export const DEFAULT_LOCALE: Locale = 'ar'
@@ -15,12 +15,14 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   ar: 'العربية',
   en: 'English',
   zh: '中文',
+  fr: 'Français',
 }
 
 export const LOCALE_NATIVE_LABELS: Record<Locale, string> = {
   ar: 'العربية',
   en: 'English',
   zh: '中文',
+  fr: 'Français',
 }
 
 /**

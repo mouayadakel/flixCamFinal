@@ -29,7 +29,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { useToast } from '@/hooks/use-toast'
-import { FaqFormDialog, type FaqItemForEdit } from './_components/faq-form-dialog'
+import { FaqFormDialog, type FaqItemForEdit } from '@/components/shared/faq-form-dialog'
 
 interface FaqListItem {
   id: string

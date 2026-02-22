@@ -23,29 +23,29 @@ import {
 
 const SECTIONS = [
   {
-    title: 'Main',
+    title: 'الرئيسية',
     items: [
-      { label: 'Dashboard', href: '/portal/dashboard', icon: LayoutDashboard },
-      { label: 'Browse Equipment', href: '/equipment', icon: Camera },
-      { label: 'Packages / Kits', href: '/packages', icon: Package },
-      { label: 'Cart', href: '/cart', icon: ShoppingCart },
+      { label: 'لوحة التحكم', href: '/portal/dashboard', icon: LayoutDashboard },
+      { label: 'تصفح المعدات', href: '/equipment', icon: Camera },
+      { label: 'الحزم والمجموعات', href: '/packages', icon: Package },
+      { label: 'سلة التسوق', href: '/cart', icon: ShoppingCart },
     ],
   },
   {
-    title: 'Rentals',
+    title: 'الإيجارات',
     items: [
-      { label: 'My Bookings', href: '/portal/bookings', icon: Calendar },
-      { label: 'Invoices', href: '/portal/invoices', icon: Receipt },
-      { label: 'Documents', href: '/portal/documents', icon: FolderOpen },
+      { label: 'حجوزاتي', href: '/portal/bookings', icon: Calendar },
+      { label: 'الفواتير', href: '/portal/invoices', icon: Receipt },
+      { label: 'المستندات', href: '/portal/documents', icon: FolderOpen },
     ],
   },
   {
-    title: 'Account',
+    title: 'الحساب',
     items: [
-      { label: 'Saved Gear', href: '/portal/saved', icon: Heart },
-      { label: 'Profile & Company', href: '/portal/profile', icon: User },
-      { label: 'Notifications', href: '/portal/notifications', icon: Bell },
-      { label: 'Support', href: '/support', icon: HelpCircle },
+      { label: 'المعدات المحفوظة', href: '/portal/saved', icon: Heart },
+      { label: 'الملف الشخصي', href: '/portal/profile', icon: User },
+      { label: 'الإشعارات', href: '/portal/notifications', icon: Bell },
+      { label: 'الدعم', href: '/support', icon: HelpCircle },
     ],
   },
 ] as const

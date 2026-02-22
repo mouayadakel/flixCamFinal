@@ -55,63 +55,103 @@ export function RecentBookingsTable({ bookings = [] }: RecentBookingsTableProps)
         {bookings.length === 0 ? (
           <div className="py-12 text-center text-neutral-500">لا توجد حجوزات حديثة</div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>رقم الحجز</TableHead>
-                <TableHead>العميل</TableHead>
-                <TableHead>تاريخ البداية</TableHead>
-                <TableHead>تاريخ النهاية</TableHead>
-                <TableHead>الإجمالي</TableHead>
-                <TableHead>الحالة</TableHead>
-                <TableHead>الإجراءات</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          <>
+            {/* Mobile: card list */}
+            <div className="space-y-3 lg:hidden">
               {bookings.map((booking) => {
                 const stateConfig = STATE_CONFIG[booking.state] || {
                   label: booking.state,
                   color: '#6B7280',
                 }
-
                 return (
-                  <TableRow key={booking.id}>
-                    <TableCell className="font-mono text-sm">{booking.booking_number}</TableCell>
-                    <TableCell>
-                      {booking.client_name || `عميل #${booking.client_id.slice(0, 8)}`}
-                    </TableCell>
-                    <TableCell>
-                      {format(new Date(booking.start_date), 'dd/MM/yyyy', { locale: arSA })}
-                    </TableCell>
-                    <TableCell>
-                      {format(new Date(booking.end_date), 'dd/MM/yyyy', { locale: arSA })}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {booking.total.toLocaleString('ar-SA')} ر.س
-                    </TableCell>
-                    <TableCell>
+                  <Link
+                    key={booking.id}
+                    href={`/admin/bookings/${booking.id}`}
+                    className="block rounded-lg border border-neutral-200 bg-neutral-50/50 p-4 transition-colors hover:bg-neutral-100"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-mono text-sm font-medium">{booking.booking_number}</span>
                       <Badge
-                        style={{
-                          backgroundColor: stateConfig.color,
-                          color: '#fff',
-                        }}
+                        style={{ backgroundColor: stateConfig.color, color: '#fff' }}
+                        className="text-xs"
                       >
                         {stateConfig.label}
                       </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Link
-                        href={`/admin/bookings/${booking.id}`}
-                        className="text-sm text-primary-600 hover:text-primary-700 hover:underline"
-                      >
-                        عرض
-                      </Link>
-                    </TableCell>
-                  </TableRow>
+                    </div>
+                    <p className="mt-1 text-sm text-neutral-600">
+                      {booking.client_name || `عميل #${booking.client_id.slice(0, 8)}`}
+                    </p>
+                    <p className="mt-1 text-xs text-neutral-500">
+                      {format(new Date(booking.start_date), 'dd/MM/yyyy', { locale: arSA })} –{' '}
+                      {format(new Date(booking.end_date), 'dd/MM/yyyy', { locale: arSA })}
+                    </p>
+                    <p className="mt-2 font-medium text-neutral-900">
+                      {booking.total.toLocaleString('ar-SA')} ر.س
+                    </p>
+                  </Link>
                 )
               })}
-            </TableBody>
-          </Table>
+            </div>
+            {/* Desktop: table */}
+            <div className="hidden lg:block overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>رقم الحجز</TableHead>
+                    <TableHead>العميل</TableHead>
+                    <TableHead>تاريخ البداية</TableHead>
+                    <TableHead>تاريخ النهاية</TableHead>
+                    <TableHead>الإجمالي</TableHead>
+                    <TableHead>الحالة</TableHead>
+                    <TableHead>الإجراءات</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {bookings.map((booking) => {
+                    const stateConfig = STATE_CONFIG[booking.state] || {
+                      label: booking.state,
+                      color: '#6B7280',
+                    }
+                    return (
+                      <TableRow key={booking.id}>
+                        <TableCell className="font-mono text-sm">{booking.booking_number}</TableCell>
+                        <TableCell>
+                          {booking.client_name || `عميل #${booking.client_id.slice(0, 8)}`}
+                        </TableCell>
+                        <TableCell>
+                          {format(new Date(booking.start_date), 'dd/MM/yyyy', { locale: arSA })}
+                        </TableCell>
+                        <TableCell>
+                          {format(new Date(booking.end_date), 'dd/MM/yyyy', { locale: arSA })}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {booking.total.toLocaleString('ar-SA')} ر.س
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            style={{
+                              backgroundColor: stateConfig.color,
+                              color: '#fff',
+                            }}
+                          >
+                            {stateConfig.label}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Link
+                            href={`/admin/bookings/${booking.id}`}
+                            className="text-sm text-primary-600 hover:text-primary-700 hover:underline"
+                          >
+                            عرض
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         )}
       </CardContent>
     </Card>

@@ -9,47 +9,72 @@ import { getRedisClient } from './redis.client'
 
 export const IMPORT_QUEUE_NAME = 'product-import'
 
-/**
- * Import job queue configuration
- */
-export const importQueue = new Queue(IMPORT_QUEUE_NAME, {
-  connection: getRedisClient(),
-  defaultJobOptions: {
-    attempts: 3,
-    backoff: {
-      type: 'exponential',
-      delay: 2000,
-    },
-    removeOnComplete: {
-      age: 24 * 3600, // Keep completed jobs for 24 hours
-      count: 1000, // Keep last 1000 completed jobs
-    },
-    removeOnFail: {
-      age: 7 * 24 * 3600, // Keep failed jobs for 7 days
-    },
-  },
-})
+let _importQueue: Queue | null = null
+
+/** Lazily create the import queue so Redis is not contacted at import time (build safety). */
+function getImportQueue(): Queue {
+  if (!_importQueue) {
+    _importQueue = new Queue(IMPORT_QUEUE_NAME, {
+      connection: getRedisClient(),
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 2000,
+        },
+        removeOnComplete: {
+          age: 24 * 3600,
+          count: 1000,
+        },
+        removeOnFail: {
+          age: 7 * 24 * 3600,
+        },
+      },
+    })
+  }
+  return _importQueue
+}
 
 /**
  * Add import job to queue
  */
+export type ApprovedSuggestion = {
+  sheetName: string
+  excelRowNumber: number
+  aiSuggestions: {
+    translations?: Record<
+      string,
+      { name: string; shortDescription: string; longDescription: string }
+    >
+    seo?: { metaTitle: string; metaDescription: string; metaKeywords: string }
+    seoByLocale?: {
+      ar?: { metaTitle: string; metaDescription: string; metaKeywords: string }
+      zh?: { metaTitle: string; metaDescription: string; metaKeywords: string }
+    }
+    specifications?: Record<string, unknown>
+    boxContents?: string
+    tags?: string
+    confidence?: number
+  }
+}
+
 export async function addImportJob(
   jobId: string,
   data: {
-    fileBuffer: Buffer
     mapping: any[]
     selectedSheets?: string[]
     selectedRows?: number[] | Record<string, number[]>
+    approvedSuggestions?: ApprovedSuggestion[]
   }
 ) {
-  return await importQueue.add(
+  return await getImportQueue().add(
     'process-import',
     {
       jobId,
       ...data,
     },
     {
-      jobId, // Use import job ID as BullMQ job ID for easy lookup
+      jobId,
       priority: 1,
     }
   )
@@ -59,7 +84,7 @@ export async function addImportJob(
  * Get job status from queue
  */
 export async function getImportJobStatus(jobId: string) {
-  const job = await importQueue.getJob(jobId)
+  const job = await getImportQueue().getJob(jobId)
   if (!job) {
     return null
   }
@@ -84,7 +109,7 @@ export async function getImportJobStatus(jobId: string) {
  * Cancel import job
  */
 export async function cancelImportJob(jobId: string) {
-  const job = await importQueue.getJob(jobId)
+  const job = await getImportQueue().getJob(jobId)
   if (job) {
     await job.remove()
     return true

@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { formatCurrency, formatDate } from '@/lib/utils/format.utils'
 import { BookingStatus } from '@prisma/client'
+import { t } from '@/lib/i18n/translate'
 
 export default async function PortalBookingsPage({
   searchParams,
@@ -69,14 +70,14 @@ export default async function PortalBookingsPage({
       BookingStatus,
       { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
     > = {
-      DRAFT: { label: 'مسودة', variant: 'outline' },
-      RISK_CHECK: { label: 'فحص المخاطر', variant: 'outline' },
-      PAYMENT_PENDING: { label: 'انتظار الدفع', variant: 'secondary' },
-      CONFIRMED: { label: 'مؤكد', variant: 'default' },
-      ACTIVE: { label: 'نشط', variant: 'default' },
-      RETURNED: { label: 'مرتجع', variant: 'secondary' },
-      CLOSED: { label: 'مغلق', variant: 'outline' },
-      CANCELLED: { label: 'ملغي', variant: 'destructive' },
+      DRAFT: { label: t('ar', 'portal.statusDraft'), variant: 'outline' },
+      RISK_CHECK: { label: t('ar', 'portal.statusRiskCheck'), variant: 'outline' },
+      PAYMENT_PENDING: { label: t('ar', 'portal.statusPaymentPending'), variant: 'secondary' },
+      CONFIRMED: { label: t('ar', 'portal.statusConfirmed'), variant: 'default' },
+      ACTIVE: { label: t('ar', 'portal.statusActive'), variant: 'default' },
+      RETURNED: { label: t('ar', 'portal.statusReturned'), variant: 'secondary' },
+      CLOSED: { label: t('ar', 'portal.statusClosed'), variant: 'outline' },
+      CANCELLED: { label: t('ar', 'portal.statusCancelled'), variant: 'destructive' },
     }
 
     const config = statusConfig[status] || { label: status, variant: 'outline' }
@@ -87,14 +88,14 @@ export default async function PortalBookingsPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">حجوزاتي</h1>
-        <p className="mt-2 text-muted-foreground">عرض وإدارة جميع حجوزاتك</p>
+        <h1 className="text-3xl font-bold">{t('ar', 'portal.myBookings')}</h1>
+        <p className="mt-2 text-muted-foreground">{t('ar', 'portal.myBookingsDesc')}</p>
       </div>
 
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>البحث والتصفية</CardTitle>
+          <CardTitle>{t('ar', 'portal.searchAndFilter')}</CardTitle>
         </CardHeader>
         <CardContent>
           <form method="get" className="flex flex-wrap items-center gap-4">
@@ -102,7 +103,7 @@ export default async function PortalBookingsPage({
               <input
                 type="text"
                 name="search"
-                placeholder="البحث برقم الحجز..."
+                placeholder={t('ar', 'portal.searchByBookingNumber')}
                 defaultValue={searchQuery || ''}
                 className="w-full rounded-lg border px-4 py-2"
               />
@@ -112,15 +113,15 @@ export default async function PortalBookingsPage({
               defaultValue={statusFilter || 'all'}
               className="rounded-lg border px-4 py-2"
             >
-              <option value="all">جميع الحالات</option>
-              <option value="DRAFT">مسودة</option>
-              <option value="CONFIRMED">مؤكد</option>
-              <option value="ACTIVE">نشط</option>
-              <option value="RETURNED">مرتجع</option>
-              <option value="CLOSED">مغلق</option>
-              <option value="CANCELLED">ملغي</option>
+              <option value="all">{t('ar', 'portal.allStatuses')}</option>
+              <option value="DRAFT">{t('ar', 'portal.statusDraft')}</option>
+              <option value="CONFIRMED">{t('ar', 'portal.statusConfirmed')}</option>
+              <option value="ACTIVE">{t('ar', 'portal.statusActive')}</option>
+              <option value="RETURNED">{t('ar', 'portal.statusReturned')}</option>
+              <option value="CLOSED">{t('ar', 'portal.statusClosed')}</option>
+              <option value="CANCELLED">{t('ar', 'portal.statusCancelled')}</option>
             </select>
-            <Button type="submit">تصفية</Button>
+            <Button type="submit">{t('ar', 'portal.filter')}</Button>
           </form>
         </CardContent>
       </Card>
@@ -128,12 +129,12 @@ export default async function PortalBookingsPage({
       {/* Bookings List */}
       <Card>
         <CardHeader>
-          <CardTitle>قائمة الحجوزات</CardTitle>
+          <CardTitle>{t('ar', 'portal.bookingsList')}</CardTitle>
         </CardHeader>
         <CardContent>
           {bookings.length === 0 ? (
             <div className="py-12 text-center">
-              <p className="text-muted-foreground">لا توجد حجوزات</p>
+              <p className="text-muted-foreground">{t('ar', 'portal.noBookings')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -144,28 +145,28 @@ export default async function PortalBookingsPage({
                 >
                   <div className="flex-1">
                     <div className="mb-2 flex items-center gap-3">
-                      <span className="text-lg font-medium">حجز #{booking.bookingNumber}</span>
+                      <span className="text-lg font-medium">{t('ar', 'portal.bookingHash').replace('{number}', booking.bookingNumber)}</span>
                       {getStatusBadge(booking.status)}
                     </div>
                     <div className="space-y-1 text-sm text-muted-foreground">
                       <div>
-                        <span className="font-medium">التواريخ:</span> من{' '}
-                        {formatDate(booking.startDate)} إلى {formatDate(booking.endDate)}
+                        <span className="font-medium">{t('ar', 'portal.dates')}:</span>{' '}
+                        {t('ar', 'portal.fromTo').replace('{from}', formatDate(booking.startDate)).replace('{to}', formatDate(booking.endDate))}
                       </div>
                       <div>
-                        <span className="font-medium">المبلغ:</span>{' '}
+                        <span className="font-medium">{t('ar', 'portal.amount')}:</span>{' '}
                         {formatCurrency(booking.totalAmount.toNumber())}
                       </div>
                       <div>
-                        <span className="font-medium">المعدات:</span> {booking.equipment.length}{' '}
-                        عنصر
+                        <span className="font-medium">{t('ar', 'portal.equipmentCount')}:</span> {booking.equipment.length}{' '}
+                        {t('ar', 'portal.itemUnit')}
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Link href={`/portal/bookings/${booking.id}`}>
                       <Button variant="outline" size="sm">
-                        عرض التفاصيل
+                        {t('ar', 'portal.viewDetails')}
                       </Button>
                     </Link>
                   </div>

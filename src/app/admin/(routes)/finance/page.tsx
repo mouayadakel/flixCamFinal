@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { DollarSign, TrendingUp, TrendingDown, Clock, Eye, Plus, RefreshCw } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -80,11 +80,7 @@ export default function FinancePage() {
   const [stats, setStats] = useState<FinanceStats | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    loadData()
-  }, [])
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true)
     try {
       const [invoicesRes, paymentsRes] = await Promise.all([
@@ -92,23 +88,28 @@ export default function FinancePage() {
         fetch('/api/payments?pageSize=20'),
       ])
 
+      let invoicesData: Invoice[] = []
+      let paymentsData: Payment[] = []
+
       if (invoicesRes.ok) {
         const data = await invoicesRes.json()
-        setInvoices(data.data || [])
+        invoicesData = data.data || []
+        setInvoices(invoicesData)
       }
 
       if (paymentsRes.ok) {
         const data = await paymentsRes.json()
-        setPayments(data.data || [])
+        paymentsData = data.data || []
+        setPayments(paymentsData)
       }
 
-      // Calculate stats from data
-      const successPayments = payments.filter((p) => p.status === 'SUCCESS')
+      // Calculate stats from fetched data
+      const successPayments = paymentsData.filter((p) => p.status === 'SUCCESS')
       const totalRevenue = successPayments.reduce((sum, p) => sum + Number(p.amount), 0)
-      const pendingPayments = payments
+      const pendingPayments = paymentsData
         .filter((p) => p.status === 'PENDING')
         .reduce((sum, p) => sum + Number(p.amount), 0)
-      const overdueInvoices = invoices.filter(
+      const overdueInvoices = invoicesData.filter(
         (i) => i.status === 'overdue' || (new Date(i.dueDate) < new Date() && i.status !== 'paid')
       ).length
 
@@ -127,7 +128,11 @@ export default function FinancePage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
+
+  useEffect(() => {
+    loadData()
+  }, [loadData])
 
   return (
     <div className="space-y-6" dir="rtl">

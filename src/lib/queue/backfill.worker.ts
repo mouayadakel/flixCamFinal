@@ -7,20 +7,42 @@
 import { Worker, Job } from 'bullmq'
 import { getRedisClient } from './redis.client'
 import { prisma } from '@/lib/db/prisma'
-import { AiJobType, ImageSource, JobStatus } from '@prisma/client'
-import { autofillMissingFields } from '@/lib/services/ai-autofill.service'
+import { AiJobType, JobStatus } from '@prisma/client'
+import { generateMasterFill } from '@/lib/services/ai-content-generation.service'
 import { scanAndQueue } from '@/lib/services/catalog-scanner.service'
+import { researchProduct, isWebResearchAvailable } from '@/lib/services/web-researcher.service'
+import { rebuildRelatedProducts } from '@/lib/services/product-similarity.service'
 import { getProductIdsWithGaps } from '@/lib/services/content-health.service'
 import { inferMissingSpecs } from '@/lib/services/ai-spec-parser.service'
 import { sourceImages } from '@/lib/services/photo-sourcing.service'
 import { recordCost, canSpend } from '@/lib/utils/cost-tracker'
 import { captureQualitySnapshot } from '@/lib/services/quality-scorer.service'
+import { sendToDeadLetter } from './dead-letter.queue'
 import type { BackfillJobData } from './backfill.queue'
 
 export const BACKFILL_QUEUE_NAME = 'backfill'
 const NIGHTLY_BATCH_SIZE = 50
-const CONCURRENCY = 10
-const BATCH_DELAY_MS = 500
+
+let isClosing = false
+function checkClosing(): boolean {
+  return isClosing
+}
+
+function getBackfillConcurrency(): number {
+  const raw = process.env.BACKFILL_CONCURRENCY
+  if (raw == null || raw === '') return 10
+  const n = parseInt(raw, 10)
+  if (Number.isNaN(n) || n < 1) return 10
+  return Math.min(n, 50)
+}
+
+function getBackfillRateLimitMs(): number {
+  const raw = process.env.BACKFILL_RATE_LIMIT_MS
+  if (raw == null || raw === '') return 500
+  const n = parseInt(raw, 10)
+  if (Number.isNaN(n) || n < 0) return 500
+  return Math.min(Math.max(n, 100), 10_000)
+}
 
 function createBackfillWorker() {
   const worker = new Worker(
@@ -90,11 +112,33 @@ function createBackfillWorker() {
       let processed = 0
       let succeeded = 0
       let failed = 0
+      const succeededProductIds: string[] = []
       const errorLog: Array<{ productId: string; error: string; timestamp: string }> = []
 
+      const concurrency = getBackfillConcurrency()
+      const batchDelayMs = getBackfillRateLimitMs()
       for (let i = 0; i < productIds.length; i++) {
-        if (i > 0 && i % CONCURRENCY === 0) {
-          await new Promise((r) => setTimeout(r, BATCH_DELAY_MS))
+        if (checkClosing()) {
+          errorLog.push({
+            productId: '',
+            error: 'Worker shutdown (SIGTERM/SIGINT). Partial progress saved.',
+            timestamp: new Date().toISOString(),
+          })
+          await prisma.aiJob.update({
+            where: { id: aiJobId },
+            data: {
+              status: JobStatus.FAILED,
+              processed,
+              succeeded,
+              failed,
+              completedAt: new Date(),
+              errorLog: errorLog.slice(-50) as object,
+            },
+          })
+          return
+        }
+        if (i > 0 && i % concurrency === 0) {
+          await new Promise((r) => setTimeout(r, batchDelayMs))
         }
         const productId = productIds[i]
         try {
@@ -128,121 +172,135 @@ function createBackfillWorker() {
           const enTranslation = existingTranslations.find((t) => t.locale === 'en')
 
           if (runText) {
-          const autofillResult = await autofillMissingFields(
-            productId,
-            {
-              name: enTranslation?.name ?? '',
-              shortDescription: enTranslation?.shortDescription,
-              longDescription: enTranslation?.longDescription,
-              seoTitle: enTranslation?.seoTitle,
-              seoDescription: enTranslation?.seoDescription,
-              seoKeywords: enTranslation?.seoKeywords,
-              translations: existingTranslations,
-            },
-            {
-              category: product.category?.name,
-              brand: product.brand?.name,
-              specifications: enTranslation?.specifications as Record<string, unknown> | undefined,
-            },
-            provider,
-            { jobId: aiJobId }
-          )
+            try {
+              const name = enTranslation?.name ?? product.sku ?? productId
+              const category = product.category?.name ?? 'Equipment'
+              const brand = product.brand?.name ?? ''
+              const specs = (enTranslation?.specifications ?? null) as Record<string, unknown> | undefined
+              const existingDesc = enTranslation?.longDescription ?? enTranslation?.shortDescription ?? undefined
 
-          if (autofillResult.seo) {
-            if (enTranslation) {
-              await prisma.productTranslation.updateMany({
-                where: { productId, locale: 'en' },
-                data: {
-                  seoTitle: autofillResult.seo!.metaTitle || enTranslation.seoTitle,
-                  seoDescription: autofillResult.seo!.metaDescription || enTranslation.seoDescription,
-                  seoKeywords: autofillResult.seo!.metaKeywords || enTranslation.seoKeywords,
-                },
-              })
-            }
-            if (autofillResult.translations?.ar) {
-              await prisma.productTranslation.upsert({
-                where: { productId_locale: { productId, locale: 'ar' } },
-                create: {
-                  productId,
-                  locale: 'ar',
-                  name: autofillResult.translations.ar.name,
-                  shortDescription: autofillResult.translations.ar.shortDescription,
-                  longDescription: autofillResult.translations.ar.longDescription,
-                  seoTitle: autofillResult.seo!.metaTitle,
-                  seoDescription: autofillResult.seo!.metaDescription,
-                  seoKeywords: autofillResult.seo!.metaKeywords,
-                },
-                update: {
-                  name: autofillResult.translations.ar.name,
-                  shortDescription: autofillResult.translations.ar.shortDescription,
-                  longDescription: autofillResult.translations.ar.longDescription,
-                  seoTitle: autofillResult.seo!.metaTitle,
-                  seoDescription: autofillResult.seo!.metaDescription,
-                  seoKeywords: autofillResult.seo!.metaKeywords,
-                },
-              })
-            }
-            if (autofillResult.translations?.zh) {
-              await prisma.productTranslation.upsert({
-                where: { productId_locale: { productId, locale: 'zh' } },
-                create: {
-                  productId,
-                  locale: 'zh',
-                  name: autofillResult.translations.zh.name,
-                  shortDescription: autofillResult.translations.zh.shortDescription,
-                  longDescription: autofillResult.translations.zh.longDescription,
-                  seoTitle: autofillResult.seo!.metaTitle,
-                  seoDescription: autofillResult.seo!.metaDescription,
-                  seoKeywords: autofillResult.seo!.metaKeywords,
-                },
-                update: {
-                  name: autofillResult.translations.zh.name,
-                  shortDescription: autofillResult.translations.zh.shortDescription,
-                  longDescription: autofillResult.translations.zh.longDescription,
-                  seoTitle: autofillResult.seo!.metaTitle,
-                  seoDescription: autofillResult.seo!.metaDescription,
-                  seoKeywords: autofillResult.seo!.metaKeywords,
-                },
-              })
-            }
-          }
+              let webResearchSpecs: Record<string, string> | undefined
+              let webBoxContents: string[] | undefined
+              let webHighlights: string[] | undefined
+              let webSources: string[] | undefined
+              if (isWebResearchAvailable() && (await canSpend(provider, 0.02))) {
+                try {
+                  const research = await researchProduct(name, brand, category)
+                  if (research.specs && Object.keys(research.specs).length > 0) {
+                    webResearchSpecs = research.specs
+                    webBoxContents = research.boxContents?.length ? research.boxContents : undefined
+                    webHighlights = research.marketingHighlights?.length ? research.marketingHighlights : undefined
+                    webSources = research.sources?.map((s) => s.provider + (s.url ? `:${s.url}` : '')) ?? undefined
+                  }
+                } catch {
+                  // fallback without web research
+                }
+              }
 
+              const masterInput = {
+                name,
+                brand,
+                category,
+                specifications: specs ?? undefined,
+                existingDescription: existingDesc ?? undefined,
+                ...(webResearchSpecs && {
+                  webResearchSpecs,
+                  webBoxContents,
+                  webHighlights,
+                  webSources,
+                }),
+              }
+
+              const masterResult = await generateMasterFill(provider, masterInput)
+              if (masterResult) {
+                const draftData = {
+                  generatedEnDescription: {
+                    shortDescription: masterResult.short_desc_en,
+                    longDescription: masterResult.long_desc_en,
+                  },
+                  seo: {
+                    metaTitle: masterResult.seo_title_en,
+                    metaDescription: masterResult.seo_desc_en,
+                    metaKeywords: masterResult.seo_keywords_en,
+                  },
+                  seoByLocale: {
+                    ar: {
+                      metaTitle: masterResult.seo_title_ar,
+                      metaDescription: masterResult.seo_desc_ar,
+                      metaKeywords: masterResult.seo_keywords_ar,
+                    },
+                    zh: {
+                      metaTitle: masterResult.seo_title_zh,
+                      metaDescription: masterResult.seo_desc_zh,
+                      metaKeywords: masterResult.seo_keywords_zh,
+                    },
+                  },
+                  translations: {
+                    ar: {
+                      name: masterResult.name_ar,
+                      shortDescription: masterResult.short_desc_ar,
+                      longDescription: masterResult.long_desc_ar,
+                      seoTitle: masterResult.seo_title_ar,
+                      seoDescription: masterResult.seo_desc_ar,
+                      seoKeywords: masterResult.seo_keywords_ar,
+                    },
+                    en: {
+                      name,
+                      shortDescription: masterResult.short_desc_en,
+                      longDescription: masterResult.long_desc_en,
+                      seoTitle: masterResult.seo_title_en,
+                      seoDescription: masterResult.seo_desc_en,
+                      seoKeywords: masterResult.seo_keywords_en,
+                    },
+                    zh: {
+                      name: masterResult.name_zh,
+                      shortDescription: masterResult.short_desc_zh,
+                      longDescription: masterResult.long_desc_zh,
+                      seoTitle: masterResult.seo_title_zh,
+                      seoDescription: masterResult.seo_desc_zh,
+                      seoKeywords: masterResult.seo_keywords_zh,
+                    },
+                  },
+                  boxContents: masterResult.box_contents ?? undefined,
+                  tags: masterResult.tags ?? undefined,
+                }
+                await prisma.aiContentDraft.create({
+                  data: {
+                    productId,
+                    type: 'text',
+                    suggestedData: JSON.parse(JSON.stringify(draftData)),
+                    status: 'pending',
+                  },
+                })
+              }
+            } catch (textErr) {
+              errorLog.push({
+                productId,
+                error: `Master fill: ${textErr instanceof Error ? textErr.message : String(textErr)}`,
+                timestamp: new Date().toISOString(),
+              })
+            }
           }
 
           if (runPhoto) {
             try {
-              const sourced = await sourceImages(product, 4)
+              const productForSourcing = {
+                ...product,
+                name: enTranslation?.name ?? product.translations[0]?.name ?? product.sku ?? product.id,
+              }
+              const sourced = await sourceImages(productForSourcing, 4)
               if (sourced.length > 0) {
                 const existingGallery = (product.galleryImages as string[] | null) ?? []
                 const newUrls = sourced.filter((s) => s.cloudinaryUrl).map((s) => s.cloudinaryUrl as string)
                 const combined = [...existingGallery, ...newUrls].slice(0, 10)
-                await prisma.product.update({
-                  where: { id: productId },
+                await prisma.aiContentDraft.create({
                   data: {
-                    galleryImages: combined,
-                    photoStatus: combined.length >= 4 ? 'sufficient' : 'needs_sourcing',
+                    productId,
+                    type: 'photo',
+                    suggestedData: JSON.parse(JSON.stringify({ galleryImages: combined, sourced })),
+                    status: 'pending',
                   },
                 })
-                for (const s of sourced) {
-                  if (!s.cloudinaryUrl) continue
-                  const imageSource =
-                    s.source === 'BRAND_ASSET'
-                      ? ImageSource.BRAND_ASSET
-                      : s.source === 'dalle'
-                        ? ImageSource.AI_GENERATED
-                        : s.source === 'pexels'
-                          ? ImageSource.STOCK_PHOTO
-                          : ImageSource.UPLOAD
-                  await prisma.productImage.create({
-                    data: {
-                      productId,
-                      url: s.cloudinaryUrl,
-                      imageSource,
-                      pendingReview: s.pendingReview ?? false,
-                      qualityScore: s.qualityScore ?? null,
-                    },
-                  })
-                }
               }
             } catch (photoErr) {
               errorLog.push({
@@ -259,7 +317,10 @@ function createBackfillWorker() {
               if (specResult.cost > 0) {
                 await recordCost({ jobId: aiJobId, feature: 'spec_inference', costUsd: specResult.cost })
               }
-              const toMerge = specResult.specs.filter((s) => s.confidence >= 70)
+              const toMerge = specResult.specs.filter((s) => {
+                const val = String(s.value ?? '').trim()
+                return val !== '' && val.toLowerCase() !== 'unknown' && val.toLowerCase() !== 'n/a'
+              })
               const firstTrans = product.translations[0]
               if (toMerge.length > 0 && firstTrans) {
                 const current = (firstTrans.specifications as Record<string, unknown>) ?? {}
@@ -269,9 +330,20 @@ function createBackfillWorker() {
                     next[s.key] = s.value
                   }
                 }
-                await prisma.productTranslation.updateMany({
-                  where: { productId },
-                  data: { specifications: next },
+                await prisma.aiContentDraft.create({
+                  data: {
+                    productId,
+                    type: 'spec',
+                    suggestedData: JSON.parse(JSON.stringify({
+                      specifications: next,
+                      specResults: toMerge.map((s) => ({
+                        key: s.key,
+                        value: s.value,
+                        confidence: s.confidence,
+                      })),
+                    })),
+                    status: 'pending',
+                  },
                 })
               }
             } catch (specErr) {
@@ -288,19 +360,36 @@ function createBackfillWorker() {
             data: {
               lastAiRunAt: new Date(),
               aiRunCount: { increment: 1 },
+              needsAiReview: true,
+              aiReviewReason: 'AI content pending approval',
             },
           })
 
           succeeded++
           processed++
+          succeededProductIds.push(productId)
         } catch (err) {
           failed++
           processed++
+          const errorMessage = err instanceof Error ? err.message : String(err)
           errorLog.push({
             productId,
-            error: err instanceof Error ? err.message : String(err),
+            error: errorMessage,
             timestamp: new Date().toISOString(),
           })
+          try {
+            await sendToDeadLetter({
+              originalQueue: BACKFILL_QUEUE_NAME,
+              originalJobId: aiJobId,
+              productId,
+              error: errorMessage,
+              payload: { types, productIds: [productId] },
+              failedAt: new Date().toISOString(),
+            })
+            console.error('[backfill.worker] Product sent to DLQ:', { productId, error: errorMessage })
+          } catch (dlqErr) {
+            console.error('[backfill.worker] Failed to send to DLQ:', dlqErr)
+          }
         }
 
         await job.updateProgress({ processed, total: productIds.length, succeeded, failed })
@@ -321,6 +410,14 @@ function createBackfillWorker() {
           errorLog: errorLog.length ? (errorLog.slice(-50) as object) : undefined,
         },
       })
+
+      if (succeededProductIds.length > 0) {
+        try {
+          await rebuildRelatedProducts(succeededProductIds, 5)
+        } catch (e) {
+          console.error('[backfill.worker] rebuildRelatedProducts failed:', e)
+        }
+      }
 
       try {
         await captureQualitySnapshot()
@@ -351,6 +448,27 @@ function createBackfillWorker() {
 }
 
 let backfillWorkerInstance: Worker | null = null
+
+function gracefulShutdown(): void {
+  isClosing = true
+  if (backfillWorkerInstance) {
+    backfillWorkerInstance
+      .close()
+      .then(() => {
+        console.info('[backfill.worker] Closed gracefully')
+        process.exit(0)
+      })
+      .catch((err) => {
+        console.error('[backfill.worker] Error during close:', err)
+        process.exit(1)
+      })
+  } else {
+    process.exit(0)
+  }
+}
+
+process.on('SIGTERM', gracefulShutdown)
+process.on('SIGINT', gracefulShutdown)
 
 export function getBackfillWorker(): Worker {
   if (!backfillWorkerInstance) {

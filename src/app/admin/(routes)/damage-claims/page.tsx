@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { Plus, Eye, RefreshCw, AlertTriangle } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -76,11 +76,7 @@ export default function DamageClaimsPage() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(50)
 
-  useEffect(() => {
-    loadClaims()
-  }, [statusFilter, page, pageSize])
-
-  const loadClaims = async () => {
+  const loadClaims = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
@@ -101,7 +97,11 @@ export default function DamageClaimsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [statusFilter, page, pageSize, toast])
+
+  useEffect(() => {
+    loadClaims()
+  }, [loadClaims])
 
   return (
     <div className="space-y-6">

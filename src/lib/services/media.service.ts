@@ -19,6 +19,7 @@ const ALLOWED_IMAGE_TYPES = [
   'image/svg+xml',
 ]
 const UPLOAD_DIR = join(process.cwd(), 'public', 'uploads', 'equipment')
+const STUDIO_UPLOAD_DIR = join(process.cwd(), 'public', 'uploads', 'studios')
 
 export interface MediaInput {
   url: string
@@ -28,6 +29,7 @@ export interface MediaInput {
   size?: number
   equipmentId?: string
   studioId?: string
+  altText?: string
 }
 
 export class MediaService {
@@ -111,11 +113,102 @@ export class MediaService {
         size: input.size,
         equipmentId: input.equipmentId,
         studioId: input.studioId,
+        altText: input.altText,
         createdBy: userId,
       },
     })
 
     return media
+  }
+
+  /**
+   * Upload image for studio gallery
+   */
+  static async uploadImageForStudio(
+    file: File | { buffer: Buffer; filename: string; mimetype: string; size: number },
+    studioId: string,
+    userId: string,
+    sortOrder?: number
+  ) {
+    const fileSize = 'buffer' in file ? file.buffer.length : file.size
+    const mimeType = 'mimetype' in file ? file.mimetype : file.type
+
+    if (fileSize > MAX_FILE_SIZE) {
+      throw new Error(`File size exceeds maximum allowed size of ${MAX_FILE_SIZE / 1024 / 1024}MB`)
+    }
+
+    if (!ALLOWED_IMAGE_TYPES.includes(mimeType)) {
+      throw new Error(
+        `File type ${mimeType} is not allowed. Allowed types: ${ALLOWED_IMAGE_TYPES.join(', ')}`
+      )
+    }
+
+    const studioDir = join(STUDIO_UPLOAD_DIR, studioId)
+    if (!existsSync(studioDir)) {
+      await mkdir(studioDir, { recursive: true })
+    }
+
+    const timestamp = Date.now()
+    const extension =
+      'filename' in file
+        ? file.filename.split('.').pop() || 'jpg'
+        : file.name.split('.').pop() || 'jpg'
+    const filename = `${timestamp}-${Math.random().toString(36).substring(7)}.${extension}`
+    const filepath = join(studioDir, filename)
+
+    let buffer: Buffer
+    if ('buffer' in file) {
+      buffer = file.buffer
+    } else {
+      const arrayBuffer = await file.arrayBuffer()
+      buffer = Buffer.from(arrayBuffer)
+    }
+    await writeFile(filepath, buffer)
+
+    const url = `/uploads/studios/${studioId}/${filename}`
+
+    const media = await prisma.media.create({
+      data: {
+        url,
+        type: 'image',
+        filename,
+        mimeType,
+        size: fileSize,
+        studioId,
+        sortOrder: sortOrder ?? 0,
+        createdBy: userId,
+      },
+    })
+
+    return media
+  }
+
+  /**
+   * Get all media for studio (ordered by sortOrder)
+   */
+  static async getMediaByStudio(studioId: string) {
+    return prisma.media.findMany({
+      where: {
+        studioId,
+        deletedAt: null,
+      },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+    })
+  }
+
+  /**
+   * Reorder studio media
+   */
+  static async reorderStudioMedia(studioId: string, orderedIds: string[], userId: string) {
+    await prisma.$transaction(
+      orderedIds.map((id, index) =>
+        prisma.media.updateMany({
+          where: { id, studioId, deletedAt: null },
+          data: { sortOrder: index, updatedBy: userId },
+        })
+      )
+    )
+    return { success: true }
   }
 
   /**

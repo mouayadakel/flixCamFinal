@@ -36,11 +36,11 @@ export function MobileNav() {
     <Button
       variant="ghost"
       size="icon"
-      className="lg:hidden"
+      className="h-11 w-11 lg:hidden"
       onClick={() => {
         window.dispatchEvent(new CustomEvent('toggle-sidebar'))
       }}
-      aria-label="Toggle sidebar"
+      aria-label="فتح القائمة"
     >
       <Menu className="h-5 w-5" />
     </Button>

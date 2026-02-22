@@ -15,21 +15,19 @@ export const dynamic = 'force-dynamic'
  * GET /api/admin/imports/[id]/progress
  * Return detailed progress breakdown
  */
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  // Skip rate limiting for polling endpoints
-  // const rateLimit = rateLimitAPI(request)
-  // if (!rateLimit.allowed) {
-  //   return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
-  // }
-
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const session = await auth()
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
+    const { id } = await params
     const job = await prisma.importJob.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         rows: {
           select: {
@@ -48,11 +46,14 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: 'Job not found' }, { status: 404 })
     }
 
-    // Calculate progress breakdown
+    // Derive progress from row statuses so the UI matches actual row processing
+    // (avoids showing 0 success when the worker updated rows but aggregates lag)
     const totalRows = job.totalRows
-    const processedRows = job.processedRows
-    const successRows = job.successRows
-    const errorRows = job.errorRows
+    const processedRows = job.rows.filter(
+      (r) => r.status === 'SUCCESS' || r.status === 'ERROR'
+    ).length
+    const successRows = job.rows.filter((r) => r.status === 'SUCCESS').length
+    const errorRows = job.rows.filter((r) => r.status === 'ERROR').length
 
     // AI processing progress
     const aiJob = job.aiProcessingJobs[0]

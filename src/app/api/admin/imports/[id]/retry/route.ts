@@ -8,7 +8,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { rateLimitAPI } from '@/lib/utils/rate-limit'
 import { prisma } from '@/lib/db/prisma'
-import { addImportJob } from '@/lib/queue/import.queue'
 import { ImportRowStatus, Prisma } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
@@ -17,7 +16,10 @@ export const dynamic = 'force-dynamic'
  * POST /api/admin/imports/[id]/retry
  * Retry failed rows only
  */
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const rateLimit = rateLimitAPI(request)
   if (!rateLimit.allowed) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
@@ -29,8 +31,9 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   }
 
   try {
+    const { id } = await params
     const job = await prisma.importJob.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         rows: {
           where: {
@@ -75,19 +78,31 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       data: { totalRows: rowsToRetry.length },
     })
 
-    // Get original file buffer (would need to store this or re-upload)
-    // For now, we'll use the existing rows' payload
+    // Build mapping from row payloads (sheetName -> categoryId)
+    const mappingMap = new Map<string, { categoryId: string; subCategoryId?: string | null }>()
+    for (const row of job.rows) {
+      const p = row.payload as { sheetName?: string; categoryId?: string; subCategoryId?: string | null } | null
+      if (p?.sheetName && p?.categoryId && !mappingMap.has(p.sheetName)) {
+        mappingMap.set(p.sheetName, { categoryId: p.categoryId, subCategoryId: p.subCategoryId })
+      }
+    }
+    const mapping = Array.from(mappingMap.entries()).map(([sheetName, v]) => ({
+      sheetName,
+      categoryId: v.categoryId,
+      subCategoryId: v.subCategoryId,
+    }))
+
+    const { addImportJob } = await import('@/lib/queue/import.queue')
     await addImportJob(retryJob.id, {
-      fileBuffer: Buffer.alloc(0), // Empty - we're using existing rows
-      mapping: [], // Will be extracted from row payloads
-      selectedSheets: undefined,
-      selectedRows: undefined,
+      mapping,
+      selectedSheets: (job.selectedSheets as string[] | null) ?? undefined,
+      selectedRows: (job.selectedRows as Record<string, number[]> | null) ?? undefined,
     })
 
     return NextResponse.json({
       jobId: retryJob.id,
       retriedRows: rowsToRetry.length,
-      originalJobId: params.id,
+      originalJobId: id,
     })
   } catch (error: any) {
     console.error('Failed to retry failed rows:', error)

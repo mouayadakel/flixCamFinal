@@ -5,10 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
 import { rateLimitByTier } from '@/lib/utils/rate-limit'
-
-const SLOT_DURATION_MIN = 60
-const DAY_START = 9
-const DAY_END = 22
+import { StudioScheduleService } from '@/lib/services/studio-schedule.service'
 
 export async function POST(
   request: NextRequest,
@@ -44,20 +41,51 @@ export async function POST(
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
+  const slotDurationMin = (studio as any).slotDurationMinutes === 30 ? 30 : 60
+
+  // Get studio-specific schedule for this day of week
+  const dayOfWeek = date.getDay()
+  const sched = await StudioScheduleService.getForDay(studio.id, dayOfWeek)
+
+  if (sched.isClosed) {
+    return NextResponse.json({ data: [] })
+  }
+
+  const openH = parseInt(sched.openTime.split(':')[0], 10)
+  const openM = parseInt(sched.openTime.split(':')[1], 10)
+  const closeH = parseInt(sched.closeTime.split(':')[0], 10)
+  const closeM = parseInt(sched.closeTime.split(':')[1], 10)
+
   const dayStart = new Date(date)
-  dayStart.setHours(DAY_START, 0, 0, 0)
+  dayStart.setHours(openH, openM, 0, 0)
   const dayEnd = new Date(date)
-  dayEnd.setHours(DAY_END, 0, 0, 0)
+  dayEnd.setHours(closeH, closeM, 0, 0)
 
   const bookings = await prisma.booking.findMany({
     where: {
       studioId: studio.id,
       status: { in: ['CONFIRMED', 'ACTIVE'] },
-      startDate: { lt: dayEnd },
-      endDate: { gt: dayStart },
       deletedAt: null,
+      OR: [
+        {
+          AND: [
+            { studioStartTime: { not: null } },
+            { studioEndTime: { not: null } },
+            { studioStartTime: { lt: dayEnd } },
+            { studioEndTime: { gt: dayStart } },
+          ],
+        },
+        {
+          AND: [
+            { studioStartTime: null },
+            { studioEndTime: null },
+            { startDate: { lt: dayEnd } },
+            { endDate: { gt: dayStart } },
+          ],
+        },
+      ],
     },
-    select: { startDate: true, endDate: true },
+    select: { startDate: true, endDate: true, studioStartTime: true, studioEndTime: true },
   })
 
   const blackouts = await prisma.studioBlackoutDate.findMany({
@@ -71,15 +99,20 @@ export async function POST(
   })
 
   const blockedRanges = [
-    ...bookings.map((b) => ({ start: b.startDate.getTime(), end: b.endDate.getTime() })),
+    ...bookings.map((b) => {
+      const start = b.studioStartTime ?? b.startDate
+      const end = b.studioEndTime ?? b.endDate
+      return { start: start.getTime(), end: end.getTime() }
+    }),
     ...blackouts.map((b) => ({ start: b.startDate.getTime(), end: b.endDate.getTime() })),
   ]
 
   const slots: { start: string; end: string }[] = []
-  for (let hour = DAY_START; hour < DAY_END; hour++) {
-    const start = new Date(date)
-    start.setHours(hour, 0, 0, 0)
-    const end = new Date(start.getTime() + SLOT_DURATION_MIN * 60 * 1000)
+  const totalMinutes = (dayEnd.getTime() - dayStart.getTime()) / 60000
+  const totalSlots = Math.floor(totalMinutes / slotDurationMin)
+  for (let i = 0; i < totalSlots; i++) {
+    const start = new Date(dayStart.getTime() + i * slotDurationMin * 60000)
+    const end = new Date(start.getTime() + slotDurationMin * 60 * 1000)
     if (end > dayEnd) break
     const startMs = start.getTime()
     const endMs = end.getTime()

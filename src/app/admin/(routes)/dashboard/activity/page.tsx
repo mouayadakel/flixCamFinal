@@ -9,10 +9,26 @@
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
-import { format } from 'date-fns'
+import { formatDistanceToNow } from 'date-fns'
 import { arSA } from 'date-fns/locale'
-import { Activity } from 'lucide-react'
+import { Activity, RefreshCw } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+
+const RESOURCE_TYPE_LABELS: Record<string, string> = {
+  booking: 'حجز', payment: 'دفعة', equipment: 'معدة', user: 'مستخدم',
+  contract: 'عقد', invoice: 'فاتورة', role: 'دور', vendor: 'مورد',
+  studio: 'استوديو', category: 'فئة', setting: 'إعداد',
+}
+
+function getActionColor(action: string): string {
+  if (action.includes('created') || action.includes('signed') || action.includes('approved')) return 'bg-green-100 text-green-800'
+  if (action.includes('deleted') || action.includes('rejected') || action.includes('cancelled')) return 'bg-red-100 text-red-800'
+  if (action.includes('updated') || action.includes('modified')) return 'bg-blue-100 text-blue-800'
+  if (action.includes('login') || action.includes('logout')) return 'bg-purple-100 text-purple-800'
+  return 'bg-gray-100 text-gray-800'
+}
 
 interface AuditLogEntry {
   id: string
@@ -28,17 +44,20 @@ export default function DashboardActivityPage() {
   const [logs, setLogs] = useState<AuditLogEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
 
-  useEffect(() => {
+  const loadActivity = () => {
     fetch('/api/audit-logs?limit=20&offset=0')
       .then((res) => {
-        if (!res.ok) throw new Error('Failed to load activity')
+        if (!res.ok) throw new Error('فشل تحميل النشاط')
         return res.json()
       })
       .then((data) => setLogs(data.logs ?? []))
       .catch((e) => setError(e.message))
-      .finally(() => setLoading(false))
-  }, [])
+      .finally(() => { setLoading(false); setRefreshing(false) })
+  }
+
+  useEffect(() => { loadActivity() }, [])
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -47,12 +66,23 @@ export default function DashboardActivityPage() {
           <h1 className="text-3xl font-bold">النشاط الأخير</h1>
           <p className="mt-1 text-muted-foreground">سجل الأحداث والتنبيهات على المنصة</p>
         </div>
-        <Link
-          href="/admin/settings/audit-log"
-          className="text-sm font-medium text-primary hover:underline"
-        >
-          عرض سجل التدقيق الكامل
-        </Link>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={refreshing}
+            onClick={() => { setRefreshing(true); loadActivity() }}
+          >
+            <RefreshCw className={`ml-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            تحديث
+          </Button>
+          <Link
+            href="/admin/settings/audit-log"
+            className="text-sm font-medium text-primary hover:underline"
+          >
+            عرض سجل التدقيق الكامل
+          </Link>
+        </div>
       </div>
 
       <Card>
@@ -80,17 +110,20 @@ export default function DashboardActivityPage() {
                   key={log.id}
                   className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3 text-sm"
                 >
-                  <span className="font-medium">{log.action}</span>
-                  <span className="text-muted-foreground">
-                    {log.resourceType && log.resourceId
-                      ? `${log.resourceType} · ${log.resourceId.slice(0, 8)}`
-                      : ''}
-                  </span>
+                  <Badge variant="secondary" className={`text-xs ${getActionColor(log.action)}`}>
+                    {log.action}
+                  </Badge>
+                  {log.resourceType && (
+                    <span className="text-muted-foreground">
+                      {RESOURCE_TYPE_LABELS[log.resourceType] ?? log.resourceType}
+                      {log.resourceId && ` · ${log.resourceId.slice(0, 8)}`}
+                    </span>
+                  )}
                   <span className="text-muted-foreground">
                     {log.user?.name || log.user?.email || 'نظام'}
                   </span>
-                  <time dateTime={log.timestamp} className="text-muted-foreground">
-                    {format(new Date(log.timestamp), 'dd/MM/yyyy HH:mm', { locale: arSA })}
+                  <time dateTime={log.timestamp} className="text-xs text-muted-foreground">
+                    {formatDistanceToNow(new Date(log.timestamp), { addSuffix: true, locale: arSA })}
                   </time>
                 </li>
               ))}

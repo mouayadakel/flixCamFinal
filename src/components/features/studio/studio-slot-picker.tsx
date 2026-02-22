@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react'
 import { useLocale } from '@/hooks/use-locale'
 import { Button } from '@/components/ui/button'
+import { CalendarDays, Clock, Loader2 } from 'lucide-react'
 
 interface StudioSlotPickerProps {
   studioSlug: string
@@ -56,22 +57,34 @@ export function StudioSlotPicker({
   return (
     <div className="space-y-4">
       <div>
-        <label className="mb-1 block text-sm font-medium">Date</label>
+        <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-text-heading">
+          <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+          {t('studios.selectDate')}
+        </label>
         <input
           type="date"
           min={minDate}
           value={selectedDate}
           onChange={(e) => onDateChange(e.target.value)}
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          aria-label="اختر التاريخ"
+          className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm transition-shadow focus:shadow-card-elevated focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
       </div>
       {selectedDate && (
         <div>
-          <label className="mb-2 block text-sm font-medium">Available times</label>
+          <label className="mb-2 flex items-center gap-1.5 text-sm font-medium text-text-heading">
+            <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+            {t('studios.availableTimes')}
+          </label>
           {loading ? (
-            <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
+            <div className="flex items-center gap-2 py-3 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              {t('common.loading')}
+            </div>
           ) : slots.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t('common.unavailable')}</p>
+            <div className="rounded-xl bg-surface-light p-3 text-center text-sm text-text-muted">
+              {t('common.unavailable')}
+            </div>
           ) : (
             <div className="flex flex-wrap gap-2">
               {slots.map((slot) => (
@@ -81,6 +94,11 @@ export function StudioSlotPicker({
                   variant={selectedSlot?.start === slot.start ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => onSlotSelect(slot)}
+                  className={`rounded-xl text-xs ${
+                    selectedSlot?.start === slot.start
+                      ? 'shadow-glow'
+                      : 'hover:border-primary/40 hover:text-primary'
+                  }`}
                 >
                   {formatTime(slot.start)} - {formatTime(slot.end)}
                 </Button>

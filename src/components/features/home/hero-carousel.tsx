@@ -5,11 +5,13 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import useEmblaCarousel from 'embla-carousel-react'
 import Autoplay from 'embla-carousel-autoplay'
 import { useLocale } from '@/hooks/use-locale'
 import { PublicContainer } from '@/components/public/public-container'
+import { PublicSearch } from '@/components/public/public-search'
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 
@@ -184,6 +186,15 @@ export function HeroCarousel({
       <div className="absolute -end-24 -top-24 h-96 w-96 rounded-full bg-white/5 blur-3xl" />
       <div className="absolute -bottom-32 -start-32 h-80 w-80 rounded-full bg-black/10 blur-3xl" />
 
+      {/* Search bar – left corner at golden ratio (38.2% from top) */}
+      <div className="absolute left-0 right-0 top-[38.2%] z-10 pointer-events-none">
+        <PublicContainer className="pointer-events-auto">
+          <div className="w-full max-w-md">
+            <PublicSearch />
+          </div>
+        </PublicContainer>
+      </div>
+
       <div className="embla relative">
         <div
           className="embla__viewport min-h-[400px] overflow-hidden md:min-h-[440px]"
@@ -220,10 +231,12 @@ export function HeroCarousel({
                           aria-label="Image unavailable"
                         />
                       ) : (
-                        <img
+                        <Image
                           src={slide.imageUrl}
-                          alt=""
-                          className="absolute inset-0 h-full w-full object-cover md:hidden"
+                          alt={getSlideText(slide, locale).title || 'FlixCam hero banner'}
+                          fill
+                          className="object-cover md:hidden"
+                          sizes="100vw"
                           aria-hidden
                           onError={() => handleVideoMobileImageError(slide.id)}
                         />
@@ -239,23 +252,40 @@ export function HeroCarousel({
                   ) : (
                     <>
                       {hasValidImageUrl(slide.mobileImageUrl) ? (
-                        <picture>
-                          <source media="(max-width: 768px)" srcSet={slide.mobileImageUrl!} />
-                          <img
-                            src={slide.imageUrl}
-                            alt=""
-                            className="absolute inset-0 h-full w-full object-cover"
-                            loading="eager"
-                            aria-hidden
-                            onError={() => handleImageError(slide.id)}
-                          />
-                        </picture>
+                        <>
+                          <span className="absolute inset-0 md:hidden">
+                            <Image
+                              src={slide.mobileImageUrl!}
+                              alt={getSlideText(slide, locale).title || 'FlixCam hero banner'}
+                              fill
+                              className="object-cover"
+                              sizes="100vw"
+                              priority={index === 0}
+                              aria-hidden
+                              onError={() => handleImageError(slide.id)}
+                            />
+                          </span>
+                          <span className="absolute inset-0 hidden md:block">
+                            <Image
+                              src={slide.imageUrl}
+                              alt={getSlideText(slide, locale).title || 'FlixCam hero banner'}
+                              fill
+                              className="object-cover"
+                              sizes="100vw"
+                              priority={index === 0}
+                              aria-hidden
+                              onError={() => handleImageError(slide.id)}
+                            />
+                          </span>
+                        </>
                       ) : (
-                        <img
+                        <Image
                           src={slide.imageUrl}
-                          alt=""
-                          className="absolute inset-0 h-full w-full object-cover"
-                          loading="eager"
+                          alt={getSlideText(slide, locale).title || 'FlixCam hero banner'}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 100vw"
+                          priority={index === 0}
                           aria-hidden
                           onError={() => handleImageError(slide.id)}
                         />
@@ -264,8 +294,8 @@ export function HeroCarousel({
                   )}
                   {/* Overlay */}
                   <div
-                    className="pointer-events-none absolute inset-0 z-[1] bg-black transition-opacity"
-                    style={{ opacity: slide.overlayOpacity }}
+                    className="pointer-events-none absolute inset-0 z-[1] bg-black transition-opacity hero-carousel-overlay"
+                    style={{ ['--hero-overlay-opacity' as string]: String(slide.overlayOpacity) }}
                     aria-hidden
                   />
                   {/* Content */}
@@ -362,8 +392,8 @@ export function HeroCarousel({
             role="presentation"
           >
             <div
-              className="h-full bg-white/70 transition-all duration-100"
-              style={{ width: `${progress}%` }}
+              className="h-full bg-white/70 transition-all duration-100 hero-carousel-progress-fill"
+              style={{ ['--hero-progress' as string]: `${progress}%` }}
             />
           </div>
         )}

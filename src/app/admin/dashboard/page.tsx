@@ -258,13 +258,13 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6" dir="rtl">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900">لوحة التحكم</h1>
+          <h1 className="text-2xl font-bold text-neutral-900 sm:text-3xl">لوحة التحكم</h1>
           <p className="mt-1 text-sm text-neutral-600">نظرة عامة على الأداء والأنشطة</p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           <Button asChild>
             <Link href="/admin/bookings/new">
               <Calendar className="ml-2 h-4 w-4" />
@@ -280,8 +280,8 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {/* KPI Cards - 2 columns on mobile per plan */}
+      <div className="grid grid-cols-2 gap-4 lg:gap-6 lg:grid-cols-4">
         <KPICard
           title="الإيرادات (هذا الشهر)"
           value={`${kpis.revenue.toLocaleString('ar-SA')} ر.س`}

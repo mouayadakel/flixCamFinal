@@ -21,6 +21,9 @@ import {
   Languages,
   FileText,
   Link as LinkIcon,
+  Wrench,
+  Plus,
+  Loader2,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -36,10 +39,65 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import Image from 'next/image'
 import DOMPurify from 'dompurify'
 import { SpecificationsDisplay } from '@/components/features/equipment/specifications-display'
-import type { Equipment, EquipmentCondition } from '@prisma/client'
+import type { Equipment, EquipmentCondition, MaintenanceType, MaintenanceStatus } from '@prisma/client'
+
+const MAINT_TYPE_LABELS: Record<string, string> = {
+  PREVENTIVE: 'وقائية',
+  CORRECTIVE: 'تصحيحية',
+  INSPECTION: 'فحص',
+  REPAIR: 'إصلاح',
+  CALIBRATION: 'معايرة',
+}
+
+const MAINT_STATUS_LABELS: Record<string, string> = {
+  SCHEDULED: 'مجدولة',
+  IN_PROGRESS: 'جارية',
+  COMPLETED: 'مكتملة',
+  CANCELLED: 'ملغاة',
+  OVERDUE: 'متأخرة',
+}
+
+const MAINT_STATUS_COLORS: Record<string, string> = {
+  SCHEDULED: 'bg-blue-100 text-blue-800',
+  IN_PROGRESS: 'bg-yellow-100 text-yellow-800',
+  COMPLETED: 'bg-green-100 text-green-800',
+  CANCELLED: 'bg-gray-100 text-gray-800',
+  OVERDUE: 'bg-red-100 text-red-800',
+}
+
+interface MaintenanceRecord {
+  id: string
+  maintenanceNumber: string
+  type: string
+  status: string
+  priority: string
+  scheduledDate: string
+  completedDate: string | null
+  description: string
+  cost: number | null
+  equipmentConditionBefore: string | null
+  equipmentConditionAfter: string | null
+}
 
 const ALLOWED_HTML_TAGS = [
   'p',
@@ -124,10 +182,63 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
   const { toast } = useToast()
   const [equipment, setEquipment] = useState<EquipmentWithRelations | null>(null)
   const [loading, setLoading] = useState(true)
+  const [maintenanceRecords, setMaintenanceRecords] = useState<MaintenanceRecord[]>([])
+  const [maintLoading, setMaintLoading] = useState(false)
+  const [showScheduleDialog, setShowScheduleDialog] = useState(false)
+  const [scheduling, setScheduling] = useState(false)
+  const [newMaint, setNewMaint] = useState({
+    type: 'PREVENTIVE' as string,
+    priority: 'medium',
+    scheduledDate: '',
+    description: '',
+  })
 
   useEffect(() => {
     loadEquipment()
+    loadMaintenance()
   }, [params.id])
+
+  const loadMaintenance = async () => {
+    setMaintLoading(true)
+    try {
+      const res = await fetch(`/api/maintenance?equipmentId=${params.id}`)
+      if (res.ok) {
+        const data = await res.json()
+        setMaintenanceRecords(data.records ?? data.data ?? [])
+      }
+    } catch { /* non-critical */ }
+    setMaintLoading(false)
+  }
+
+  const handleScheduleMaintenance = async () => {
+    if (!newMaint.scheduledDate || !newMaint.description) {
+      toast({ title: 'خطأ', description: 'يرجى ملء التاريخ والوصف', variant: 'destructive' })
+      return
+    }
+    setScheduling(true)
+    try {
+      const res = await fetch('/api/maintenance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          equipmentId: params.id,
+          type: newMaint.type,
+          priority: newMaint.priority,
+          scheduledDate: new Date(newMaint.scheduledDate).toISOString(),
+          description: newMaint.description,
+        }),
+      })
+      if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'فشل الجدولة') }
+      toast({ title: 'تم', description: 'تم جدولة الصيانة بنجاح' })
+      setShowScheduleDialog(false)
+      setNewMaint({ type: 'PREVENTIVE', priority: 'medium', scheduledDate: '', description: '' })
+      loadMaintenance()
+    } catch (e) {
+      toast({ title: 'خطأ', description: e instanceof Error ? e.message : 'فشل الجدولة', variant: 'destructive' })
+    } finally {
+      setScheduling(false)
+    }
+  }
 
   const loadEquipment = async () => {
     setLoading(true)
@@ -392,6 +503,7 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
           <TabsTrigger value="translations">الترجمات</TabsTrigger>
           <TabsTrigger value="specifications">المواصفات</TabsTrigger>
           <TabsTrigger value="related">ذات الصلة</TabsTrigger>
+          <TabsTrigger value="maintenance">الصيانة</TabsTrigger>
           <TabsTrigger value="settings">الإعدادات</TabsTrigger>
           {equipment.bookings && equipment.bookings.length > 0 && (
             <TabsTrigger value="bookings">الحجوزات</TabsTrigger>
@@ -584,6 +696,123 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
                 </div>
               ) : (
                 <p className="py-8 text-center text-neutral-500">لا توجد معدات ذات صلة</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Maintenance Tab */}
+        <TabsContent value="maintenance" className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Wrench className="h-5 w-5" />
+                سجل الصيانة
+              </CardTitle>
+              <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
+                <DialogTrigger asChild>
+                  <Button size="sm">
+                    <Plus className="ml-2 h-4 w-4" />
+                    جدولة صيانة
+                  </Button>
+                </DialogTrigger>
+                <DialogContent dir="rtl">
+                  <DialogHeader>
+                    <DialogTitle>جدولة صيانة جديدة</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label>نوع الصيانة</Label>
+                      <Select value={newMaint.type} onValueChange={(v) => setNewMaint((p) => ({ ...p, type: v }))}>
+                        <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(MAINT_TYPE_LABELS).map(([k, v]) => (
+                            <SelectItem key={k} value={k}>{v}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>الأولوية</Label>
+                      <Select value={newMaint.priority} onValueChange={(v) => setNewMaint((p) => ({ ...p, priority: v }))}>
+                        <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">منخفضة</SelectItem>
+                          <SelectItem value="medium">متوسطة</SelectItem>
+                          <SelectItem value="high">عالية</SelectItem>
+                          <SelectItem value="urgent">عاجلة</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>تاريخ الصيانة</Label>
+                      <Input
+                        type="date"
+                        className="mt-1"
+                        value={newMaint.scheduledDate}
+                        onChange={(e) => setNewMaint((p) => ({ ...p, scheduledDate: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <Label>الوصف</Label>
+                      <Textarea
+                        className="mt-1"
+                        rows={3}
+                        placeholder="وصف الصيانة المطلوبة..."
+                        value={newMaint.description}
+                        onChange={(e) => setNewMaint((p) => ({ ...p, description: e.target.value }))}
+                      />
+                    </div>
+                    <Button className="w-full" onClick={handleScheduleMaintenance} disabled={scheduling}>
+                      {scheduling && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                      جدولة
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </CardHeader>
+            <CardContent>
+              {maintLoading ? (
+                <div className="space-y-2">
+                  {[1, 2, 3].map((i) => <Skeleton key={i} className="h-14" />)}
+                </div>
+              ) : maintenanceRecords.length === 0 ? (
+                <p className="py-8 text-center text-neutral-500">لا توجد سجلات صيانة</p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>رقم</TableHead>
+                      <TableHead>النوع</TableHead>
+                      <TableHead>الحالة</TableHead>
+                      <TableHead>الأولوية</TableHead>
+                      <TableHead>التاريخ المجدول</TableHead>
+                      <TableHead>تاريخ الإكمال</TableHead>
+                      <TableHead>الوصف</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {maintenanceRecords.map((m) => (
+                      <TableRow key={m.id}>
+                        <TableCell className="font-mono text-sm">{m.maintenanceNumber}</TableCell>
+                        <TableCell>{MAINT_TYPE_LABELS[m.type] ?? m.type}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className={MAINT_STATUS_COLORS[m.status] ?? ''}>
+                            {MAINT_STATUS_LABELS[m.status] ?? m.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={m.priority === 'urgent' ? 'destructive' : m.priority === 'high' ? 'default' : 'secondary'}>
+                            {m.priority === 'urgent' ? 'عاجلة' : m.priority === 'high' ? 'عالية' : m.priority === 'medium' ? 'متوسطة' : 'منخفضة'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{new Date(m.scheduledDate).toLocaleDateString('ar-SA')}</TableCell>
+                        <TableCell>{m.completedDate ? new Date(m.completedDate).toLocaleDateString('ar-SA') : '—'}</TableCell>
+                        <TableCell className="max-w-[200px] truncate text-sm">{m.description}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               )}
             </CardContent>
           </Card>

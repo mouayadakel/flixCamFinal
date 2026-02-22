@@ -4,9 +4,10 @@
  * @module app/api/admin/ai/spend-summary
  */
 
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
+import { hasAIPermission } from '@/lib/auth/permissions'
+import { aiRateLimitResponse } from '@/lib/utils/rate-limit-upstash'
 import { getSpendSummary } from '@/lib/utils/cost-tracker'
 
 export const dynamic = 'force-dynamic'
@@ -14,14 +15,16 @@ export const dynamic = 'force-dynamic'
 /**
  * GET /api/admin/ai/spend-summary
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   const session = await auth()
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!(await hasPermission(session.user.id, PERMISSIONS.AI_USE))) {
+  if (!(await hasAIPermission(session.user.id, 'view'))) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
+  const rateLimitRes = await aiRateLimitResponse(request, session.user.id)
+  if (rateLimitRes) return rateLimitRes
 
   try {
     const summary = await getSpendSummary()

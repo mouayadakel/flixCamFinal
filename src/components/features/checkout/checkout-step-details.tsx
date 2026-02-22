@@ -99,12 +99,12 @@ export function CheckoutStepDetails({ onSuccess }: CheckoutStepDetailsProps) {
             : null,
       }
       setDetails(details)
-      toast({ title: 'تم الحفظ', description: 'جاري المتابعة للمراجعة...' })
+      toast({ title: t('checkout.detailsSaved'), description: t('checkout.detailsSavedDesc') })
       onSuccess()
     } catch {
       toast({
         title: t('common.error'),
-        description: 'فشل حفظ البيانات',
+        description: t('checkout.detailsSaveFailed'),
         variant: 'destructive',
       })
     }
@@ -124,14 +124,14 @@ export function CheckoutStepDetails({ onSuccess }: CheckoutStepDetailsProps) {
         <div className="grid gap-4 sm:grid-cols-1">
           <div>
             <Label htmlFor="name">{t('checkout.detailsName')}</Label>
-            <Input id="name" {...form.register('name')} className="mt-1" />
+            <Input id="name" {...form.register('name')} className="mt-1 h-12 text-base" />
             {form.formState.errors.name && (
               <p className="mt-1 text-sm text-destructive">{form.formState.errors.name.message}</p>
             )}
           </div>
           <div>
             <Label htmlFor="email">{t('checkout.detailsEmail')}</Label>
-            <Input id="email" type="email" dir="ltr" {...form.register('email')} className="mt-1" />
+            <Input id="email" type="email" dir="ltr" {...form.register('email')} className="mt-1 h-12 text-base" />
             {form.formState.errors.email && (
               <p className="mt-1 text-sm text-destructive">{form.formState.errors.email.message}</p>
             )}
@@ -140,10 +140,11 @@ export function CheckoutStepDetails({ onSuccess }: CheckoutStepDetailsProps) {
             <Label htmlFor="phone">{t('checkout.detailsPhone')}</Label>
             <Input
               id="phone"
+              type="tel"
               dir="ltr"
               placeholder="05XXXXXXXX"
               {...form.register('phone')}
-              className="mt-1"
+              className="mt-1 h-12 text-base"
             />
             {form.formState.errors.phone && (
               <p className="mt-1 text-sm text-destructive">{form.formState.errors.phone.message}</p>
@@ -179,11 +180,11 @@ export function CheckoutStepDetails({ onSuccess }: CheckoutStepDetailsProps) {
           <div className="grid gap-4 rounded-md border bg-muted/30 p-4">
             <div>
               <Label htmlFor="deliveryCity">{t('checkout.deliveryCity')}</Label>
-              <Input id="deliveryCity" {...form.register('deliveryCity')} className="mt-1" />
+              <Input id="deliveryCity" {...form.register('deliveryCity')} className="mt-1 h-12 text-base" />
             </div>
             <div>
               <Label htmlFor="deliveryStreet">{t('checkout.deliveryStreet')}</Label>
-              <Input id="deliveryStreet" {...form.register('deliveryStreet')} className="mt-1" />
+              <Input id="deliveryStreet" {...form.register('deliveryStreet')} className="mt-1 h-12 text-base" />
               {form.formState.errors.deliveryStreet && (
                 <p className="mt-1 text-sm text-destructive">
                   {form.formState.errors.deliveryStreet.message}
@@ -192,7 +193,7 @@ export function CheckoutStepDetails({ onSuccess }: CheckoutStepDetailsProps) {
             </div>
             <div>
               <Label htmlFor="deliveryNotes">{t('checkout.deliveryNotes')}</Label>
-              <Input id="deliveryNotes" {...form.register('deliveryNotes')} className="mt-1" />
+              <Input id="deliveryNotes" {...form.register('deliveryNotes')} className="mt-1 h-12 text-base" />
             </div>
           </div>
         )}

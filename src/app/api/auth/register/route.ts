@@ -12,7 +12,7 @@ import * as bcrypt from 'bcryptjs'
 import { checkRateLimitUpstash } from '@/lib/utils/rate-limit-upstash'
 
 export async function POST(request: NextRequest) {
-  const rate = await checkRateLimitUpstash(request, 'checkout')
+  const rate = await checkRateLimitUpstash(request, 'auth')
   if (!rate.allowed) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }

@@ -44,11 +44,13 @@ export function AdminHeader() {
 
   return (
     <header
-      className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-neutral-200 bg-white px-4 shadow-sm"
+      className="sticky top-0 z-40 flex h-16 min-h-[64px] items-center gap-2 border-b border-neutral-200 bg-white px-4 shadow-sm md:gap-4"
       dir="rtl"
     >
-      {/* Mobile Menu Button */}
-      <MobileNav />
+      {/* Mobile Menu Button - 44px tap target */}
+      <div className="flex min-h-[44px] min-w-[44px] items-center justify-center lg:hidden">
+        <MobileNav />
+      </div>
 
       {/* Main website link */}
       <Button variant="outline" size="sm" className="shrink-0 gap-1.5" asChild>
@@ -58,8 +60,8 @@ export function AdminHeader() {
         </Link>
       </Button>
 
-      {/* Search */}
-      <div className="relative max-w-md flex-1">
+      {/* Search - hidden on smallest screens to give room to logo + actions */}
+      <div className="relative hidden max-w-md flex-1 sm:block md:max-w-sm">
         <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
         <Input placeholder="بحث..." className="pr-10" dir="rtl" />
       </div>
@@ -67,8 +69,8 @@ export function AdminHeader() {
       {/* Right Side - Notifications & User Menu */}
       <div className="flex items-center gap-2">
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative" asChild>
-          <Link href="/admin/notifications">
+        <Button variant="ghost" size="icon" className="relative" asChild aria-label="الإشعارات">
+          <Link href="/admin/notifications" aria-label="الإشعارات">
             <Bell className="h-5 w-5" />
             {notificationsCount > 0 && (
               <Badge
@@ -84,7 +86,7 @@ export function AdminHeader() {
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2">
+            <Button variant="ghost" className="flex items-center gap-2" aria-label="قائمة المستخدم">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-primary-700">
                 <User className="h-4 w-4" />
               </div>

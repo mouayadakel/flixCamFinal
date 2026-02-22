@@ -6,11 +6,11 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowRight, Loader2, Save } from 'lucide-react'
+import { ArrowRight, Loader2, Save, Sparkles, Wand2, CheckCircle2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -38,6 +38,16 @@ import { TranslationSection } from '@/components/forms/translation-section'
 import { SEOSection } from '@/components/forms/seo-section'
 import { SpecificationsEditor } from '@/components/forms/specifications-editor'
 import { RelatedEquipmentSelector } from '@/components/forms/related-equipment-selector'
+import {
+  AISuggestPreviewDialog,
+  type AISuggestPayload,
+} from '@/components/features/equipment/ai-suggest-preview-dialog'
+import { FormProgressSidebar } from '@/components/features/equipment/form-progress-sidebar'
+import { PhotoGateIndicator } from '@/components/features/equipment/photo-gate-indicator'
+import { SmartFillDropdown } from '@/components/features/equipment/smart-fill-dropdown'
+import { TranslationTabSwitcher } from '@/components/features/equipment/translation-tab-switcher'
+import type { FillScope } from '@/components/features/equipment/smart-fill-dropdown'
+import type { TranslationData } from '@/components/features/equipment/translation-tab-switcher'
 
 interface Category {
   id: string
@@ -58,6 +68,14 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
   const [categories, setCategories] = useState<Category[]>([])
   const [brands, setBrands] = useState<Brand[]>([])
   const [activeTab, setActiveTab] = useState('info')
+  const [activeLocale, setActiveLocale] = useState<'ar' | 'en' | 'zh'>('ar')
+  const [applyScope, setApplyScope] = useState<FillScope>('all')
+  const [showAISuggest, setShowAISuggest] = useState(false)
+  const [aiSuggestLoading, setAiSuggestLoading] = useState(false)
+  const [aiSuggestion, setAiSuggestion] = useState<AISuggestPayload | null>(null)
+  const [autoFilling, setAutoFilling] = useState(false)
+  const [aiFilled, setAiFilled] = useState(false)
+  const [aiFilledCount, setAiFilledCount] = useState(0)
 
   const {
     register,
@@ -166,12 +184,15 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
 
       if (categoriesRes.ok) {
         const categoriesData = await categoriesRes.json()
-        setCategories(categoriesData.categories ?? categoriesData)
+        const list =
+          Array.isArray(categoriesData) ? categoriesData : (categoriesData?.categories ?? [])
+        setCategories(Array.isArray(list) ? list : [])
       }
 
       if (brandsRes.ok) {
         const brandsData = await brandsRes.json()
-        setBrands(brandsData)
+        const list = Array.isArray(brandsData) ? brandsData : (brandsData?.brands ?? [])
+        setBrands(Array.isArray(list) ? list : [])
       }
     } catch (error) {
       toast({
@@ -225,6 +246,268 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
     ? categories.find((c) => c.id === watchedCategoryId)?.name
     : undefined
 
+  const photoCount =
+    (watch('galleryImageUrls') || []).filter(Boolean).length + (watch('featuredImageUrl') ? 1 : 0)
+
+  const formSections = useMemo(
+    () => [
+      {
+        id: 'info',
+        label: 'المعلومات الأساسية',
+        status: (watch('sku') && watch('categoryId') ? 'complete' : 'warning') as 'complete' | 'warning' | 'empty',
+      },
+      {
+        id: 'translations',
+        label: 'الترجمات',
+        status: (watchedTranslations.some((t) => t.name) ? 'complete' : 'empty') as 'complete' | 'warning' | 'empty',
+      },
+      {
+        id: 'seo',
+        label: 'SEO',
+        status: (watchedTranslations.some((t) => t.seoTitle) ? 'complete' : 'empty') as 'complete' | 'warning' | 'empty',
+      },
+      {
+        id: 'media',
+        label: 'الوسائط',
+        status: (photoCount >= 4 ? 'complete' : photoCount > 0 ? 'warning' : 'empty') as 'complete' | 'warning' | 'empty',
+        detail: `${photoCount}/4`,
+      },
+      {
+        id: 'specifications',
+        label: 'المواصفات',
+        status: (watchedSpecifications && Object.keys(watchedSpecifications).length > 0 ? 'complete' : 'empty') as 'complete' | 'warning' | 'empty',
+      },
+      { id: 'related', label: 'ذات الصلة', status: 'complete' as const },
+      { id: 'settings', label: 'الإعدادات', status: 'complete' as const },
+    ],
+    [watch('sku'), watch('categoryId'), watchedTranslations, watchedSpecifications, photoCount]
+  )
+
+  const translationDataForSwitcher = useMemo((): Record<'ar' | 'en' | 'zh', TranslationData> => {
+    const base = { ar: {}, en: {}, zh: {} } as Record<'ar' | 'en' | 'zh', TranslationData>
+    for (const t of watchedTranslations) {
+      const loc = t.locale as 'ar' | 'en' | 'zh'
+      if (base[loc]) {
+        base[loc] = {
+          name: t.name,
+          shortDescription: t.shortDescription,
+          description: t.description,
+          seoTitle: t.seoTitle,
+          seoDescription: t.seoDescription,
+          seoKeywords: t.seoKeywords,
+        }
+      }
+    }
+    return base
+  }, [watchedTranslations])
+
+  /** Fetch AI suggestions from the API (shared by preview + auto-fill) */
+  const fetchAISuggestion = async (): Promise<AISuggestPayload | null> => {
+    const name = watch('model') || watch('sku') || ''
+    const categoryId = watch('categoryId')
+    if (!name.trim() || !categoryId) return null
+    const firstTrans = (watch('translations') || [])[0]
+    const res = await fetch('/api/admin/equipment/ai-suggest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name.trim(),
+        categoryId,
+        brandId: watch('brandId') || undefined,
+        existingSpecs: watch('specifications') ?? undefined,
+        existingShortDescription: firstTrans?.shortDescription ?? firstTrans?.description,
+        existingLongDescription: firstTrans?.description ?? firstTrans?.longDescription,
+      }),
+    })
+    if (!res.ok) throw new Error(await res.json().then((d) => d.error || 'Failed'))
+    const data = await res.json()
+    return {
+      specs: data.specs ?? {},
+      shortDescription: data.shortDescription ?? '',
+      longDescription: data.longDescription ?? '',
+      seo: data.seo ?? { metaTitle: '', metaDescription: '', metaKeywords: '' },
+      boxContents: data.boxContents,
+      tags: data.tags,
+      relatedEquipmentIds: data.relatedEquipmentIds,
+      translations: data.translations,
+    }
+  }
+
+  const handleAISuggest = async () => {
+    const name = watch('model') || watch('sku') || ''
+    const categoryId = watch('categoryId')
+    if (!name.trim() || !categoryId) {
+      toast({
+        title: 'أدخل الموديل/الاسم والفئة',
+        description: 'الموديل أو SKU والفئة مطلوبان لاقتراح AI',
+        variant: 'destructive',
+      })
+      return
+    }
+    setAiSuggestLoading(true)
+    setAiSuggestion(null)
+    setShowAISuggest(true)
+    try {
+      const suggestion = await fetchAISuggestion()
+      setAiSuggestion(suggestion)
+    } catch (e) {
+      toast({
+        title: 'فشل اقتراح AI',
+        description: e instanceof Error ? e.message : 'حدث خطأ',
+        variant: 'destructive',
+      })
+      setShowAISuggest(false)
+    } finally {
+      setAiSuggestLoading(false)
+    }
+  }
+
+  const handleSmartFill = async (scope: FillScope) => {
+    setApplyScope(scope)
+    await handleAISuggest()
+  }
+
+  /**
+   * Apply AI suggestion to form. Accepts scope as a direct parameter
+   * to avoid React state-batching race conditions.
+   * Fills ALL 3 locales (ar/en/zh). Returns the count of fields filled.
+   */
+  const applyAISuggestion = (payload: AISuggestPayload, scope: FillScope): number => {
+    let filledCount = 0
+
+    // --- Specs ---
+    if (scope === 'all' || scope === 'specs') {
+      if (payload.specs && Object.keys(payload.specs).length > 0) {
+        const current = (watch('specifications') as Record<string, unknown> | undefined) ?? {}
+        const merged: Record<string, unknown> = { ...current }
+        for (const [k, v] of Object.entries(payload.specs)) {
+          const existing = merged[k]
+          if (existing == null || (typeof existing === 'string' && existing.trim() === '')) {
+            merged[k] = v
+            filledCount++
+          }
+        }
+        setValue('specifications', merged as UpdateEquipmentFormData['specifications'])
+      }
+    }
+
+    // --- Multilingual translations (ar/en/zh) — read fresh from form ---
+    if (scope === 'all' || scope === 'descriptions' || scope === 'seo' || scope === 'translations') {
+      const locales = ['ar', 'en', 'zh'] as const
+      const trans = [...(watch('translations') || [])]
+
+      for (const locale of locales) {
+        const aiLocale = payload.translations?.[locale]
+        let idx = trans.findIndex((t) => t.locale === locale)
+        if (idx < 0) {
+          trans.push({ locale, name: '' } as NonNullable<UpdateEquipmentFormData['translations']>[number])
+          idx = trans.length - 1
+        }
+        const t = { ...trans[idx] }
+
+        if (scope === 'all' || scope === 'descriptions' || scope === 'translations') {
+          if (!t.name || String(t.name).trim() === '') {
+            const aiName = aiLocale?.name
+            if (aiName && aiName.trim() !== '') { t.name = aiName; filledCount++ }
+          }
+          if (!t.shortDescription || String(t.shortDescription).trim() === '') {
+            const aiShort = aiLocale?.shortDescription ?? (locale === 'en' ? payload.shortDescription : '')
+            if (aiShort && aiShort.trim() !== '') { t.shortDescription = aiShort; filledCount++ }
+          }
+          if (!t.description || String(t.description).trim() === '') {
+            const aiLong = aiLocale?.longDescription ?? (locale === 'en' ? payload.longDescription : '')
+            if (aiLong && aiLong.trim() !== '') { t.description = aiLong; filledCount++ }
+          }
+        }
+        if (scope === 'all' || scope === 'seo' || scope === 'translations') {
+          if (!t.seoTitle || String(t.seoTitle).trim() === '') {
+            const aiTitle = aiLocale?.seoTitle ?? (locale === 'en' ? payload.seo?.metaTitle : '')
+            if (aiTitle && aiTitle.trim() !== '') { t.seoTitle = aiTitle; filledCount++ }
+          }
+          if (!t.seoDescription || String(t.seoDescription).trim() === '') {
+            const aiDesc = aiLocale?.seoDescription ?? (locale === 'en' ? payload.seo?.metaDescription : '')
+            if (aiDesc && aiDesc.trim() !== '') { t.seoDescription = aiDesc; filledCount++ }
+          }
+          if (!t.seoKeywords || String(t.seoKeywords).trim() === '') {
+            const aiKw = aiLocale?.seoKeywords ?? (locale === 'en' ? payload.seo?.metaKeywords : '')
+            if (aiKw && aiKw.trim() !== '') { t.seoKeywords = aiKw; filledCount++ }
+          }
+        }
+        trans[idx] = t
+      }
+      setValue('translations', trans)
+    }
+
+    // --- Box contents ---
+    if (scope === 'all' && payload.boxContents != null) {
+      const current = watch('boxContents')
+      if (!current || String(current).trim() === '') {
+        if (String(payload.boxContents).trim() !== '') {
+          setValue('boxContents', payload.boxContents)
+          filledCount++
+        }
+      }
+    }
+
+    // --- Related equipment ---
+    if (scope === 'all' && payload.relatedEquipmentIds?.length) {
+      const current = watch('relatedEquipmentIds') || []
+      if (current.length === 0) {
+        setValue('relatedEquipmentIds', payload.relatedEquipmentIds)
+        filledCount++
+      }
+    }
+
+    return filledCount
+  }
+
+  /** Wrapper used by the preview dialog's Apply button */
+  const handleApplyAISuggestion = (payload: AISuggestPayload) => {
+    const count = applyAISuggestion(payload, applyScope)
+    toast({ title: `تم تطبيق ${count} حقل من اقتراح AI` })
+  }
+
+  /**
+   * One-click Auto AI Fill: fetches AI content and directly applies to all fields
+   * without showing the preview dialog.
+   */
+  const handleAutoFill = async () => {
+    const name = watch('model') || watch('sku') || ''
+    const categoryId = watch('categoryId')
+    if (!name.trim() || !categoryId) {
+      toast({
+        title: 'أدخل الموديل/الاسم والفئة أولاً',
+        description: 'الموديل أو SKU والفئة مطلوبان للملء التلقائي',
+        variant: 'destructive',
+      })
+      return
+    }
+    setAutoFilling(true)
+    setAiFilled(false)
+    try {
+      const suggestion = await fetchAISuggestion()
+      if (!suggestion) {
+        toast({ title: 'لم يتم إنشاء محتوى', description: 'تعذر الحصول على اقتراحات AI', variant: 'destructive' })
+        return
+      }
+      const count = applyAISuggestion(suggestion, 'all')
+      setAiFilled(true)
+      setAiFilledCount(count)
+      toast({
+        title: `تم ملء ${count} حقل تلقائياً`,
+        description: 'الأوصاف والترجمات وSEO والمواصفات — عربي/إنجليزي/صيني',
+      })
+    } catch (e) {
+      toast({
+        title: 'فشل الملء التلقائي',
+        description: e instanceof Error ? e.message : 'حدث خطأ',
+        variant: 'destructive',
+      })
+    } finally {
+      setAutoFilling(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="space-y-6" dir="rtl">
@@ -268,11 +551,32 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
           <h1 className="text-3xl font-bold text-neutral-900">تعديل المعدة</h1>
           <p className="mt-1 text-sm text-neutral-600">تعديل معلومات المعدة: {equipment.sku}</p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={() => router.back()}>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-2 border-violet-300 text-violet-700 hover:bg-violet-50 hover:text-violet-800"
+            onClick={handleAutoFill}
+            disabled={submitting || autoFilling || !(watch('model') || watch('sku')) || !watch('categoryId')}
+            title="يتطلب الموديل/SKU والفئة — يملأ جميع الحقول الفارغة بالذكاء الاصطناعي لـ 3 لغات"
+          >
+            {autoFilling ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Wand2 className="h-4 w-4" />
+            )}
+            {autoFilling ? 'جاري الملء...' : 'ملء تلقائي AI'}
+          </Button>
+          <SmartFillDropdown
+            onFill={handleSmartFill}
+            disabled={submitting || autoFilling || !watch('categoryId')}
+            photoGateLocked={false}
+          />
+          <Button variant="outline" size="sm" onClick={() => router.back()}>
             إلغاء
           </Button>
-          <Button onClick={handleSubmit(onSubmit)} disabled={submitting}>
+          <Button size="sm" onClick={handleSubmit(onSubmit)} disabled={submitting || autoFilling}>
             {submitting && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
             <Save className="ml-2 h-4 w-4" />
             حفظ التغييرات
@@ -280,16 +584,66 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* AI Status Banner */}
+      {autoFilling && (
+        <div className="flex items-center gap-3 rounded-lg border border-violet-200 bg-violet-50 px-4 py-3 text-sm text-violet-800">
+          <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+          <div>
+            <span className="font-medium">جاري إنشاء المحتوى بالذكاء الاصطناعي...</span>
+            <span className="text-violet-600 mr-1">الأوصاف والترجمات وSEO والمواصفات لـ 3 لغات</span>
+          </div>
+        </div>
+      )}
+      {aiFilled && !autoFilling && (
+        <div className="flex items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          <div>
+            <span className="font-medium">تم ملء {aiFilledCount} حقل بنجاح</span>
+            <span className="text-emerald-600 mr-1">— راجع التبويبات أدناه ثم اضغط حفظ</span>
+          </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="mr-auto text-xs text-emerald-600 hover:text-emerald-800"
+            onClick={() => setAiFilled(false)}
+          >
+            إخفاء
+          </Button>
+        </div>
+      )}
+
+      <AISuggestPreviewDialog
+        open={showAISuggest}
+        onOpenChange={setShowAISuggest}
+        loading={aiSuggestLoading}
+        suggestion={aiSuggestion}
+        onApply={handleApplyAISuggestion}
+      />
+
+      <div className="flex gap-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex-1 space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="info">المعلومات الأساسية</TabsTrigger>
-            <TabsTrigger value="translations">الترجمات</TabsTrigger>
-            <TabsTrigger value="seo">SEO</TabsTrigger>
+            <TabsTrigger value="translations" className="relative">
+              الترجمات
+              {aiFilled && <span className="absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-emerald-500" />}
+            </TabsTrigger>
+            <TabsTrigger value="seo" className="relative">
+              SEO
+              {aiFilled && <span className="absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-emerald-500" />}
+            </TabsTrigger>
             <TabsTrigger value="media">الوسائط</TabsTrigger>
-            <TabsTrigger value="specifications">المواصفات</TabsTrigger>
+            <TabsTrigger value="specifications" className="relative">
+              المواصفات
+              {aiFilled && <span className="absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-emerald-500" />}
+            </TabsTrigger>
             <TabsTrigger value="related">ذات الصلة</TabsTrigger>
-            <TabsTrigger value="settings">الإعدادات</TabsTrigger>
+            <TabsTrigger value="settings" className="relative">
+              الإعدادات
+              {aiFilled && <span className="absolute -top-0.5 -left-0.5 h-2 w-2 rounded-full bg-emerald-500" />}
+            </TabsTrigger>
           </TabsList>
 
           {/* Tab 1: Basic Info */}
@@ -324,7 +678,7 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
                         <SelectValue placeholder="اختر الفئة" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.map((cat) => (
+                        {(categories ?? []).map((cat) => (
                           <SelectItem key={cat.id} value={cat.id}>
                             {cat.name}
                           </SelectItem>
@@ -346,7 +700,7 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
                         <SelectValue placeholder="اختر العلامة التجارية" />
                       </SelectTrigger>
                       <SelectContent>
-                        {brands.map((brand) => (
+                        {(brands ?? []).map((brand) => (
                           <SelectItem key={brand.id} value={brand.id}>
                             {brand.name}
                           </SelectItem>
@@ -521,7 +875,34 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
                 </p>
               </CardHeader>
               <CardContent className="space-y-4">
-                {(['ar', 'en', 'zh'] as const).map((locale) => {
+                <TranslationTabSwitcher
+                  activeLocale={activeLocale}
+                  onLocaleChange={setActiveLocale}
+                  translations={translationDataForSwitcher}
+                  onCopyLocale={(from, to) => {
+                    const fromT = watchedTranslations.find((t) => t.locale === from)
+                    if (!fromT) return
+                    const current = [...watchedTranslations]
+                    const toIndex = current.findIndex((t) => t.locale === to)
+                    const target = toIndex >= 0 ? current[toIndex] : { locale: to, name: '', description: '', shortDescription: '', seoTitle: '', seoDescription: '', seoKeywords: '' }
+                    const updated = {
+                      ...target,
+                      name: fromT.name ?? target.name,
+                      shortDescription: fromT.shortDescription ?? target.shortDescription,
+                      description: fromT.description ?? target.description,
+                      seoTitle: fromT.seoTitle ?? target.seoTitle,
+                      seoDescription: fromT.seoDescription ?? target.seoDescription,
+                      seoKeywords: fromT.seoKeywords ?? target.seoKeywords,
+                    }
+                    if (toIndex >= 0) {
+                      current[toIndex] = updated
+                    } else {
+                      current.push(updated)
+                    }
+                    setValue('translations', current)
+                  }}
+                />
+                {([activeLocale] as const).map((locale) => {
                   const translation = watchedTranslations.find((t) => t.locale === locale) || {
                     locale,
                     name: '',
@@ -548,7 +929,7 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
                           ])
                         }
                       }}
-                      defaultExpanded={locale === 'ar'}
+                      defaultExpanded={true}
                     />
                   )
                 })}
@@ -623,6 +1004,7 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
                 <CardTitle>الوسائط</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                <PhotoGateIndicator photoCount={photoCount} />
                 <ImageUpload
                   value={watch('featuredImageUrl')}
                   onChange={(url) => setValue('featuredImageUrl', url)}
@@ -660,6 +1042,24 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
                   value={watchedSpecifications ?? undefined}
                   onChange={(specs) => setValue('specifications', specs)}
                   categoryHint={categoryHint}
+                  onAiInfer={async () => {
+                    const name = watch('model') || watch('sku') || ''
+                    const categoryId = watch('categoryId')
+                    if (!name.trim() || !categoryId) return null
+                    const res = await fetch('/api/admin/equipment/ai-suggest', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        name: name.trim(),
+                        categoryId,
+                        brandId: watch('brandId') || undefined,
+                        existingSpecs: watchedSpecifications ?? undefined,
+                      }),
+                    })
+                    if (!res.ok) return null
+                    const data = await res.json()
+                    return (data.specs ?? null) as Record<string, unknown> | null
+                  }}
                 />
               </CardContent>
             </Card>
@@ -755,6 +1155,21 @@ export default function EditEquipmentPage({ params }: { params: { id: string } }
           </Button>
         </div>
       </form>
+        <aside className="hidden lg:block w-64 shrink-0">
+          <FormProgressSidebar
+            sections={formSections}
+            activeSection={activeTab}
+            onSectionClick={setActiveTab}
+          >
+            <PhotoGateIndicator photoCount={photoCount} />
+            <SmartFillDropdown
+              onFill={handleSmartFill}
+              disabled={submitting}
+              photoGateLocked={false}
+            />
+          </FormProgressSidebar>
+        </aside>
+      </div>
     </div>
   )
 }

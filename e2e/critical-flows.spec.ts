@@ -5,7 +5,7 @@
 
 import { test, expect } from '@playwright/test'
 
-const BASE = process.env.BASE_URL || 'http://localhost:3001'
+const BASE = process.env.BASE_URL || 'http://localhost:3000'
 
 test.describe('Public website', () => {
   test('homepage loads', async ({ page }) => {

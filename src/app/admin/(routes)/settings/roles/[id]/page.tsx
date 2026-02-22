@@ -82,7 +82,7 @@ export default function RoleDetailPage() {
       fetch('/api/admin/permissions')
         .then((r) => r.json())
         .then((data) => setCategories(data.data || []))
-        .catch(() => {})
+        .catch((err) => console.error('[roles] fetch permissions failed', err))
     }
   }, [editMode])
 

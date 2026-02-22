@@ -48,6 +48,8 @@ model Product {
   subCategory     Category?            @relation("ProductSubCategory", fields: [subCategoryId], references: [id])
   translations    ProductTranslation[]
   productImages   ProductImage[]       // per-image tracking for AI workflow
+  equipment       Equipment?           // optional 1:1 sync to Equipment (import/AI flow)
+  aiContentDrafts AiContentDraft[]    // pending AI suggestions (preview workflow)
 
   @@index([status])
   @@index([brandId])
@@ -269,6 +271,37 @@ model AiJobItem {
   @@index([jobId])
   @@index([productId])
   @@index([status])
+}
+
+model AiAuditLog {
+  id           String   @id @default(cuid())
+  userId       String
+  action       String   // e.g. "backfill.trigger", "image.approve", "image.reject", "settings.update"
+  resourceType String?  // "AiJob" | "ProductImage" | "AiSettings"
+  resourceId   String?
+  metadata     Json?    // { jobId?, productId?, imageId?, trigger?, options? }
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model AiContentDraft {
+  id            String    @id @default(cuid())
+  productId     String
+  type          String    // "text" | "spec" | "photo"
+  suggestedData Json      // suggested content (translations, specs, image URLs, etc.)
+  status        String    @default("pending") // "pending" | "approved" | "rejected"
+  createdAt     DateTime  @default(now())
+  reviewedAt    DateTime?
+  reviewedBy    String?
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
 }
 
 model CatalogQualitySnapshot {
@@ -690,7 +723,13 @@ model Brand {
 model Equipment {
   id                       String                    @id @default(cuid())
   sku                      String                    @unique
+  slug                     String?                   @unique // SEO-friendly URL slug (auto-generated from model/sku)
+  productId                String?                   @unique // link to Product for import/AI sync
   model                    String?
+  nameEn                   String?                   // English name
+  nameZh                   String?                   // Chinese name
+  descriptionEn            String?                   @db.Text // English description
+  descriptionZh            String?                   @db.Text // Chinese description
   categoryId               String
   brandId                  String?
   condition                EquipmentCondition        @default(GOOD)
@@ -730,8 +769,11 @@ model Equipment {
   quoteEquipment           QuoteEquipment[]
   savedByUsers             SavedEquipment[]
   shootTypeRecommendations ShootTypeRecommendation[]
+  product                  Product?                  @relation(fields: [productId], references: [id], onDelete: SetNull)
 
   @@index([sku])
+  @@index([slug])
+  @@index([productId])
   @@index([categoryId])
   @@index([brandId])
   @@index([vendorId])
@@ -817,14 +859,76 @@ model ShootTypeRecommendation {
 model Studio {
   id             String               @id @default(cuid())
   name           String
+  nameEn         String?              // English name
+  nameZh         String?              // Chinese name
   slug           String               @unique
   description    String?
+  descriptionEn  String?              @db.Text // English description
+  descriptionZh  String?              @db.Text // Chinese description
   capacity       Int?
   hourlyRate     Decimal              @db.Decimal(10, 2)
   setupBuffer    Int                  @default(30)
   cleaningBuffer Int                  @default(30)
   resetTime      Int                  @default(15)
   isActive       Boolean              @default(true)
+
+  // CMS: Header
+  heroTagline          String?
+  heroTaglineEn        String?        // English tagline
+  heroTaglineZh        String?        // Chinese tagline
+  areaSqm              Int?
+  studioType           String?
+  bestUse              String?
+  availabilityConfidence String? // "available_now" | "requires_review"
+
+  // CMS: Gallery
+  videoUrl             String?
+  galleryDisclaimer    String?
+
+  // CMS: Location
+  address              String?
+  googleMapsUrl        String?
+  arrivalTimeFromCenter String?
+  parkingNotes         String?
+
+  // CMS: Booking
+  slotDurationMinutes  Int                  @default(60)
+  dailyRate            Decimal?             @db.Decimal(10, 2)
+  minHours             Int                  @default(1)
+  durationOptions      String?              // JSON: [1,2,3,"half_day","full_day"]
+  bookingDisclaimer    String?
+  vatIncluded          Boolean              @default(false)
+
+  // CMS: What's included
+  whatsIncluded        String?              // JSON array of strings
+  notIncluded         String?
+  hasElectricity       Boolean              @default(true)
+  hasAC                Boolean              @default(true)
+  hasChangingRooms     Boolean              @default(false)
+  hasWifi              Boolean              @default(true)
+
+  // CMS: Rules
+  rulesText            String?
+  smokingPolicy        String?
+  foodPolicy           String?
+  equipmentCarePolicy  String?
+  cancellationPolicyShort String?
+  cancellationPolicyLink  String?
+
+  // CMS: Discount / Promotion
+  discountPercent      Int?                 // e.g. 15 = 15% off
+  discountMessage      String?              // e.g. "خصم خاص لفترة محدودة"
+  discountActive       Boolean              @default(false)
+
+  // CMS: Trust & Contact
+  reviewsText          String?
+  whatsappNumber       String?
+  bookingCountDisplay  Int?                 // Social proof: "100+ حجز"
+
+  // CMS: SEO
+  metaTitle            String?
+  metaDescription      String?
+
   createdAt      DateTime             @default(now())
   createdBy      String?
   updatedAt      DateTime             @updatedAt
@@ -837,9 +941,91 @@ model Studio {
   quotes         Quote[]
   addOns         StudioAddOn[]
   blackoutDates  StudioBlackoutDate[]
+  packages       StudioPackage[]
+  faqs           StudioFaq[]
+  testimonials   StudioTestimonial[]
+  schedules      StudioSchedule[]
+  cartItems      CartItem[]
 
   @@index([slug])
   @@index([isActive])
+  @@index([deletedAt])
+}
+
+model StudioPackage {
+  id          String   @id @default(cuid())
+  studioId    String
+  name        String
+  nameAr      String?
+  nameZh      String?
+  description String?
+  descriptionAr String?
+  includes    String?  // JSON: ["bullet1","bullet2","bullet3"]
+  price       Decimal  @db.Decimal(10, 2)
+  originalPrice Decimal? @db.Decimal(10, 2)
+  discountPercent Int?
+  hours       Int?
+  recommended Boolean  @default(false)
+  badgeText   String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  createdBy   String?
+  updatedAt   DateTime @updatedAt
+  updatedBy   String?
+  deletedAt   DateTime?
+  deletedBy   String?
+  studio      Studio   @relation(fields: [studioId], references: [id])
+
+  @@index([studioId])
+  @@index([order])
+  @@index([deletedAt])
+}
+
+model StudioFaq {
+  id         String   @id @default(cuid())
+  studioId   String
+  questionAr String
+  questionEn String?
+  questionZh String?
+  answerAr   String
+  answerEn   String?
+  answerZh   String?
+  order      Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  createdBy  String?
+  updatedAt  DateTime @updatedAt
+  updatedBy  String?
+  deletedAt  DateTime?
+  deletedBy  String?
+  studio     Studio   @relation(fields: [studioId], references: [id])
+
+  @@index([studioId])
+  @@index([order])
+  @@index([deletedAt])
+}
+
+model StudioTestimonial {
+  id        String   @id @default(cuid())
+  studioId  String
+  name      String
+  role      String?
+  text      String
+  rating    Int      @default(5)
+  avatarUrl String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  createdBy String?
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+  deletedAt DateTime?
+  deletedBy String?
+  studio    Studio   @relation(fields: [studioId], references: [id])
+
+  @@index([studioId])
+  @@index([order])
   @@index([deletedAt])
 }
 
@@ -862,23 +1048,43 @@ model StudioBlackoutDate {
   @@index([deletedAt])
 }
 
+model StudioSchedule {
+  id        String   @id @default(cuid())
+  studioId  String
+  dayOfWeek Int      // 0=Sunday, 1=Monday, ..., 6=Saturday
+  openTime  String   // "09:00" (HH:mm)
+  closeTime String   // "22:00" (HH:mm)
+  isClosed  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  studio    Studio   @relation(fields: [studioId], references: [id])
+
+  @@unique([studioId, dayOfWeek])
+  @@index([studioId])
+}
+
 model StudioAddOn {
-  id          String    @id @default(cuid())
-  studioId    String
-  name        String
-  description String?
-  price       Decimal   @db.Decimal(10, 2)
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  createdBy   String?
-  updatedAt   DateTime  @updatedAt
-  updatedBy   String?
-  deletedAt   DateTime?
-  deletedBy   String?
-  studio      Studio    @relation(fields: [studioId], references: [id])
+  id            String    @id @default(cuid())
+  studioId      String
+  name          String
+  description   String?
+  price         Decimal   @db.Decimal(10, 2)
+  originalPrice Decimal?  @db.Decimal(10, 2)
+  category      String?   // e.g. "equipment", "lighting", "props", "crew", "catering"
+  iconName      String?   // lucide icon name e.g. "Camera", "Lightbulb"
+  sortOrder     Int       @default(0)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  createdBy     String?
+  updatedAt     DateTime  @updatedAt
+  updatedBy     String?
+  deletedAt     DateTime?
+  deletedBy     String?
+  studio        Studio    @relation(fields: [studioId], references: [id])
 
   @@index([studioId])
   @@index([isActive])
+  @@index([sortOrder])
   @@index([deletedAt])
 }
 
@@ -1004,8 +1210,12 @@ model RecurringSeries {
 model Kit {
   id              String         @id @default(cuid())
   name            String
+  nameEn          String?        // English name
+  nameZh          String?        // Chinese name
   slug            String         @unique
   description     String?
+  descriptionEn   String?        @db.Text // English description
+  descriptionZh   String?        @db.Text // Chinese description
   discountPercent Decimal?       @db.Decimal(5, 2)
   isActive        Boolean        @default(true)
   createdAt       DateTime       @default(now())
@@ -1301,6 +1511,8 @@ model Media {
   size           Int?
   equipmentId    String?
   studioId       String?
+  sortOrder      Int?       @default(0)
+  altText        String?
   pendingReview  Boolean    @default(false)
   imageSource    String?    // "upload" | "ai" | "stock" | "brand"
   qualityScore   Float?
@@ -1557,6 +1769,7 @@ model Coupon {
   usedCount              Int          @default(0)
   status                 CouponStatus @default(ACTIVE)
   applicableEquipmentIds Json?
+  applicableStudioIds    Json?
   description            String?
   createdAt              DateTime     @default(now())
   createdBy              String
@@ -1859,6 +2072,7 @@ model CartItem {
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   cart          Cart         @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  studio        Studio?      @relation(fields: [studioId], references: [id])
 
   @@index([cartId])
   @@index([equipmentId])
@@ -2190,4 +2404,42 @@ enum CartItemType {
   STUDIO
   PACKAGE
   KIT
+}
+
+// ──────────────────────────────────────────────────────────────────
+// AI Smart Import: Feedback Loop & Column Mapping Memory
+// ──────────────────────────────────────────────────────────────────
+
+model AiFeedback {
+  id              String   @id @default(cuid())
+  draftId         String?
+  contentType     String
+  fieldName       String
+  action          String
+  rejectionReason String?
+  originalValue   String?  @db.Text
+  finalValue      String?  @db.Text
+  provider        String?
+  promptHash      String?
+  categoryId      String?
+  createdAt       DateTime @default(now())
+
+  @@index([contentType])
+  @@index([action])
+  @@index([categoryId])
+  @@index([provider])
+  @@index([createdAt])
+}
+
+model ColumnMappingHistory {
+  id           String   @id @default(cuid())
+  sourceHeader String
+  mappedField  String
+  frequency    Int      @default(1)
+  lastUsedAt   DateTime @default(now())
+  createdBy    String?
+
+  @@unique([sourceHeader, mappedField])
+  @@index([sourceHeader])
+  @@index([frequency])
 }

@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -147,13 +147,7 @@ export default function ClientDetailPage() {
   const [deleting, setDeleting] = useState(false)
   const [verificationLoading, setVerificationLoading] = useState(false)
 
-  useEffect(() => {
-    if (params?.id) {
-      loadClient()
-    }
-  }, [params?.id])
-
-  const loadClient = async () => {
+  const loadClient = useCallback(async () => {
     setLoading(true)
     try {
       const response = await fetch(`/api/clients/${params?.id}`)
@@ -198,7 +192,13 @@ export default function ClientDetailPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [params?.id, toast])
+
+  useEffect(() => {
+    if (params?.id) {
+      loadClient()
+    }
+  }, [params?.id, loadClient])
 
   const loadVerification = async () => {
     if (!params?.id) return

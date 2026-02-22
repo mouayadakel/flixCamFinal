@@ -131,25 +131,28 @@ export class BookingService {
       throw new ValidationError('Start date cannot be in the past')
     }
 
-    // Validate equipment
-    if (!input.equipment || input.equipment.length === 0) {
-      throw new ValidationError('At least one equipment item is required')
+    // Validate: need at least equipment or studio
+    const hasEquipment = input.equipment && input.equipment.length > 0
+    const hasStudio = !!(input.studioId && input.studioStartTime && input.studioEndTime)
+    if (!hasEquipment && !hasStudio) {
+      throw new ValidationError('At least one equipment item or studio booking is required')
     }
 
-    // Check equipment availability
-    for (const eq of input.equipment) {
-      const availability = await EquipmentService.checkAvailability(
-        eq.equipmentId,
-        input.startDate,
-        input.endDate
-      )
-
-      const freeInPeriod =
-        (availability.availableQuantity ?? 0) - (availability.rentedQuantity ?? 0)
-      if (!availability.available || freeInPeriod < eq.quantity) {
-        throw new ValidationError(
-          `Equipment ${eq.equipmentId} is not available. Available quantity: ${freeInPeriod}`
+    // Check equipment availability (skip when studio-only)
+    if (hasEquipment) {
+      for (const eq of input.equipment!) {
+        const availability = await EquipmentService.checkAvailability(
+          eq.equipmentId,
+          input.startDate,
+          input.endDate
         )
+        const freeInPeriod =
+          (availability.availableQuantity ?? 0) - (availability.rentedQuantity ?? 0)
+        if (!availability.available || freeInPeriod < eq.quantity) {
+          throw new ValidationError(
+            `Equipment ${eq.equipmentId} is not available. Available quantity: ${freeInPeriod}`
+          )
+        }
       }
     }
 
@@ -200,20 +203,22 @@ export class BookingService {
       },
     })
 
-    // Create booking equipment
-    await Promise.all(
-      input.equipment.map((eq) =>
-        prisma.bookingEquipment.create({
-          data: {
-            bookingId: booking.id,
-            equipmentId: eq.equipmentId,
-            quantity: eq.quantity,
-            createdBy: userId,
-            updatedBy: userId,
-          },
-        })
+    // Create booking equipment (skip when studio-only)
+    if (input.equipment && input.equipment.length > 0) {
+      await Promise.all(
+        input.equipment.map((eq) =>
+          prisma.bookingEquipment.create({
+            data: {
+              bookingId: booking.id,
+              equipmentId: eq.equipmentId,
+              quantity: eq.quantity,
+              createdBy: userId,
+              updatedBy: userId,
+            },
+          })
+        )
       )
-    )
+    }
 
     // Audit log
     await AuditService.log({

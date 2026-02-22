@@ -7,6 +7,7 @@
 import { useState } from 'react'
 import { LayoutGrid, List } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useLocale } from '@/hooks/use-locale'
 import { EquipmentCard } from './equipment-card'
 import { EquipmentCardSkeleton } from './equipment-card-skeleton'
 import type { EquipmentCardItem } from './equipment-card'
@@ -17,6 +18,7 @@ interface EquipmentGridProps {
 }
 
 export function EquipmentGrid({ items, isLoading }: EquipmentGridProps) {
+  const { t } = useLocale()
   const [layout, setLayout] = useState<'grid' | 'list'>('grid')
 
   if (isLoading) {
@@ -30,7 +32,7 @@ export function EquipmentGrid({ items, isLoading }: EquipmentGridProps) {
             <List className="h-4 w-4" />
           </Button>
         </div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <EquipmentCardSkeleton key={i} />
           ))}
@@ -46,7 +48,7 @@ export function EquipmentGrid({ items, isLoading }: EquipmentGridProps) {
           variant={layout === 'grid' ? 'secondary' : 'ghost'}
           size="icon"
           onClick={() => setLayout('grid')}
-          aria-label="Grid view"
+          aria-label={t('equipment.gridView')}
           className="rounded-lg"
         >
           <LayoutGrid className="h-4 w-4" />
@@ -55,7 +57,7 @@ export function EquipmentGrid({ items, isLoading }: EquipmentGridProps) {
           variant={layout === 'list' ? 'secondary' : 'ghost'}
           size="icon"
           onClick={() => setLayout('list')}
-          aria-label="List view"
+          aria-label={t('equipment.listView')}
           className="rounded-lg"
         >
           <List className="h-4 w-4" />
@@ -64,7 +66,7 @@ export function EquipmentGrid({ items, isLoading }: EquipmentGridProps) {
       <div
         className={
           layout === 'grid'
-            ? 'grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+            ? 'grid grid-cols-2 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
             : 'flex flex-col gap-3'
         }
       >

@@ -22,7 +22,7 @@ export function HomeCta() {
 
       <PublicContainer>
         <div className="relative text-center">
-          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm">
+          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-[4px] bg-white/15 backdrop-blur-sm">
             <Sparkles className="h-7 w-7 text-white" />
           </div>
           <h2 className="mx-auto max-w-2xl text-2xl font-bold text-white md:text-3xl">
@@ -32,7 +32,7 @@ export function HomeCta() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Button
               size="lg"
-              className="rounded-xl bg-white px-8 font-semibold text-brand-primary shadow-lg transition-all hover:bg-white/90 hover:shadow-xl active:scale-[0.98]"
+              className="rounded-[4px] bg-white px-8 font-semibold text-[#1A1A1A] shadow-lg transition-all hover:bg-white/90 hover:shadow-xl active:scale-[0.98]"
               asChild
             >
               <Link href="/equipment">
@@ -43,7 +43,7 @@ export function HomeCta() {
             <Button
               size="lg"
               variant="outline"
-              className="rounded-xl border-white/30 px-8 font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
+              className="rounded-[4px] border-white/30 px-8 font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
               asChild
             >
               <Link href="/how-it-works">{t('nav.howItWorks')}</Link>

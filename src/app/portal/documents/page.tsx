@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { prisma } from '@/lib/db/prisma'
 import { formatDate, formatCurrency } from '@/lib/utils/format.utils'
 import { FileText, Receipt, Download } from 'lucide-react'
+import { t } from '@/lib/i18n/translate'
 
 export default async function PortalDocumentsPage() {
   const session = await auth()
@@ -49,7 +50,7 @@ export default async function PortalDocumentsPage() {
 
   const invoiceItems = bookingsWithPayments.map((b) => ({
     id: b.id,
-    label: `فاتورة حجز #${b.bookingNumber}`,
+    label: t('ar', 'portal.bookingInvoiceHash').replace('{number}', b.bookingNumber),
     bookingNumber: b.bookingNumber,
     totalAmount: b.totalAmount,
     createdAt: b.createdAt,
@@ -60,21 +61,21 @@ export default async function PortalDocumentsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">المستندات</h1>
-        <p className="mt-2 text-muted-foreground">العقود والفواتير والملفات المتعلقة بحجوزاتك</p>
+        <h1 className="text-3xl font-bold">{t('ar', 'portal.documents')}</h1>
+        <p className="mt-2 text-muted-foreground">{t('ar', 'portal.documentsDesc')}</p>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            العقود
+            {t('ar', 'portal.contractsSection')}
           </CardTitle>
-          <CardDescription>عقود الحجز والتوقيع الإلكتروني</CardDescription>
+          <CardDescription>{t('ar', 'portal.contractsSectionDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           {contracts.length === 0 ? (
-            <p className="py-6 text-center text-muted-foreground">لا توجد عقود</p>
+            <p className="py-6 text-center text-muted-foreground">{t('ar', 'portal.noContracts')}</p>
           ) : (
             <ul className="space-y-3">
               {contracts.map((c) => (
@@ -83,15 +84,15 @@ export default async function PortalDocumentsPage() {
                   className="flex items-center justify-between rounded-lg border p-3 hover:bg-muted/50"
                 >
                   <div>
-                    <span className="font-medium">عقد حجز #{c.booking.bookingNumber}</span>
+                    <span className="font-medium">{t('ar', 'portal.bookingContractHash').replace('{number}', c.booking.bookingNumber)}</span>
                     <span className="mr-2 text-sm text-muted-foreground">
                       — {formatDate(c.createdAt)}
-                      {c.signedAt && ` · موقع ${formatDate(c.signedAt)}`}
+                      {c.signedAt && ` · ${t('ar', 'portal.signed')} ${formatDate(c.signedAt)}`}
                     </span>
                   </div>
                   <Link href={`/portal/contracts/${c.id}`}>
                     <Button variant="outline" size="sm">
-                      {c.signedAt ? 'عرض' : 'توقيع'}
+                      {c.signedAt ? t('ar', 'portal.view') : t('ar', 'portal.sign')}
                     </Button>
                   </Link>
                 </li>
@@ -101,7 +102,7 @@ export default async function PortalDocumentsPage() {
           <div className="mt-4">
             <Link href="/portal/contracts">
               <Button variant="secondary" size="sm">
-                عرض كل العقود
+                {t('ar', 'portal.viewAllContracts')}
               </Button>
             </Link>
           </div>
@@ -112,13 +113,13 @@ export default async function PortalDocumentsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Receipt className="h-5 w-5" />
-            الفواتير
+            {t('ar', 'portal.invoicesSection')}
           </CardTitle>
-          <CardDescription>فواتير الحجز والمدفوعات</CardDescription>
+          <CardDescription>{t('ar', 'portal.invoicesSectionDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           {invoiceItems.length === 0 ? (
-            <p className="py-6 text-center text-muted-foreground">لا توجد فواتير</p>
+            <p className="py-6 text-center text-muted-foreground">{t('ar', 'portal.noInvoices')}</p>
           ) : (
             <ul className="space-y-3">
               {invoiceItems.map((inv) => {
@@ -135,13 +136,13 @@ export default async function PortalDocumentsPage() {
                       <span className="font-medium">{inv.label}</span>
                       <span className="mr-2 text-sm text-muted-foreground">
                         — {formatCurrency(inv.totalAmount.toNumber())}
-                        {isPaid ? ' · مدفوعة' : ''}
+                        {isPaid ? ` · ${t('ar', 'portal.paid')}` : ''}
                       </span>
                     </div>
                     <div className="flex gap-2">
                       <Link href={`/portal/invoices/${inv.id}`}>
                         <Button variant="outline" size="sm">
-                          عرض
+                          {t('ar', 'portal.view')}
                         </Button>
                       </Link>
                       <Button variant="outline" size="sm">
@@ -157,7 +158,7 @@ export default async function PortalDocumentsPage() {
           <div className="mt-4">
             <Link href="/portal/invoices">
               <Button variant="secondary" size="sm">
-                عرض كل الفواتير
+                {t('ar', 'portal.viewAllInvoices')}
               </Button>
             </Link>
           </div>

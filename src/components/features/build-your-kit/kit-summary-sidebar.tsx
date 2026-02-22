@@ -6,6 +6,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { useLocale } from '@/hooks/use-locale'
 import { useToast } from '@/hooks/use-toast'
 import {
@@ -175,9 +176,15 @@ export function KitSummarySidebar({ className }: { className?: string }) {
       <div className="mb-4 max-h-[200px] space-y-2 overflow-y-auto border-b border-border-light pb-3">
         {Object.entries(selectedEquipment).map(([id, item]) => (
           <div key={id} className="flex items-center gap-2 text-sm">
-            <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-white">
+            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded bg-white">
               {item.imageUrl ? (
-                <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
+                <Image
+                  src={item.imageUrl}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="40px"
+                />
               ) : (
                 <div className="h-full w-full bg-muted" />
               )}

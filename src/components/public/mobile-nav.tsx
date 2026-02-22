@@ -5,7 +5,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Menu } from 'lucide-react'
+import Link from 'next/link'
+import { Menu, MessageCircle } from 'lucide-react'
 import { useAuthModal } from '@/components/auth/auth-modal-provider'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,6 +20,8 @@ import { PublicNav } from './public-nav'
 import { LanguageSwitcher } from './language-switcher'
 import { MiniCart } from './mini-cart'
 import { useLocale } from '@/hooks/use-locale'
+import { siteConfig } from '@/config/site.config'
+import { cn } from '@/lib/utils'
 
 interface MobileNavProps {
   hiddenRoutes?: Set<string>
@@ -32,7 +35,12 @@ export function MobileNav({ hiddenRoutes }: MobileNavProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Open menu">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Open menu"
+          className="min-h-[44px] min-w-[44px]"
+        >
           <Menu className="h-5 w-5" />
         </Button>
       </DialogTrigger>
@@ -76,6 +84,18 @@ export function MobileNav({ hiddenRoutes }: MobileNavProps) {
               {t('nav.register')}
             </Button>
           </div>
+          <a
+            href={`https://wa.me/${siteConfig.contact.whatsappNumber}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              'flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-[#25D366] font-medium text-white transition-opacity hover:opacity-90'
+            )}
+            onClick={() => setOpen(false)}
+          >
+            <MessageCircle className="h-5 w-5" aria-hidden />
+            WhatsApp
+          </a>
         </div>
       </DialogContent>
     </Dialog>

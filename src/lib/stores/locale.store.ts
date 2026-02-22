@@ -6,6 +6,7 @@ import { create } from 'zustand'
 import type { Locale } from '@/lib/i18n/locales'
 import { DEFAULT_LOCALE, getDir } from '@/lib/i18n/locales'
 import { getLocaleFromCookie, setLocaleCookie } from '@/lib/i18n/cookie'
+import { preloadMessages } from '@/lib/i18n/translate'
 
 interface LocaleState {
   locale: Locale
@@ -20,11 +21,16 @@ export const useLocaleStore = create<LocaleState>((set) => ({
   dir: getDir(DEFAULT_LOCALE),
 
   setLocale: (locale: Locale) => {
+    // Preload messages for the new locale before switching
+    preloadMessages(locale)
+    
     setLocaleCookie(locale)
     set({ locale, dir: getDir(locale) })
     if (typeof document !== 'undefined') {
       document.documentElement.lang = locale
       document.documentElement.dir = getDir(locale)
+      // Refresh page to reload content with new locale
+      window.location.reload()
     }
   },
 

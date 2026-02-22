@@ -175,6 +175,8 @@ export const ROLE_DETAILS: Record<
       'coupon.read',
       'coupon.update',
       'coupon.delete',
+      'cms.studio.read',
+      'cms.studio.update',
       'client.read',
       'booking.read',
       'reports.read',

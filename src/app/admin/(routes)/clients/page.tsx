@@ -8,7 +8,7 @@
 
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { Plus, Eye, Mail, Phone, Calendar, Download } from 'lucide-react'
 import {
@@ -73,11 +73,7 @@ export default function ClientsPage() {
 
   const statuses: Array<ClientStatus | 'all'> = ['all', 'active', 'suspended', 'inactive']
 
-  useEffect(() => {
-    loadClients()
-  }, [statusFilter, searchQuery, page, pageSize])
-
-  const loadClients = async () => {
+  const loadClients = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
@@ -103,7 +99,11 @@ export default function ClientsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [statusFilter, searchQuery, page, pageSize, toast])
+
+  useEffect(() => {
+    loadClients()
+  }, [loadClients])
 
   const filteredClients = useMemo(() => {
     return clients

@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { Wallet, RefreshCw, Eye, ArrowLeft } from 'lucide-react'
 import {
@@ -57,7 +57,7 @@ export default function FinanceDepositsPage() {
   } | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true)
     try {
       const res = await fetch('/api/finance/deposits')
@@ -71,11 +71,11 @@ export default function FinanceDepositsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
 
   useEffect(() => {
     load()
-  }, [])
+  }, [load])
 
   return (
     <div className="space-y-6" dir="rtl">

@@ -9,7 +9,33 @@ import { auth } from '@/lib/auth'
 import { AIService } from '@/lib/services/ai.service'
 import { AIPolicy } from '@/lib/policies/ai.policy'
 import { handleApiError } from '@/lib/utils/api-helpers'
-import prisma from '@/lib/db/prisma'
+import { prisma } from '@/lib/db/prisma'
+
+export const dynamic = 'force-dynamic'
+
+const MAX_CONCURRENT_AI_CALLS = 5
+
+function createLimiter(concurrency: number) {
+  let active = 0
+  const queue: (() => void)[] = []
+  return function limit<T>(fn: () => Promise<T>): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      const run = async () => {
+        active++
+        try {
+          resolve(await fn())
+        } catch (e) {
+          reject(e)
+        } finally {
+          active--
+          if (queue.length > 0) queue.shift()!()
+        }
+      }
+      if (active < concurrency) run()
+      else queue.push(run)
+    })
+  }
+}
 
 export async function POST() {
   try {
@@ -39,17 +65,21 @@ export async function POST() {
       rationale?: string
     }[] = []
 
+    const limit = createLimiter(MAX_CONCURRENT_AI_CALLS)
+
     const settled = await Promise.allSettled(
-      equipmentList.map(async (eq) => {
-        const currentPrice =
-          typeof eq.dailyPrice === 'object' && eq.dailyPrice != null && 'toNumber' in eq.dailyPrice
-            ? (eq.dailyPrice as { toNumber: () => number }).toNumber()
-            : Number(eq.dailyPrice)
-        return AIService.suggestPricing({
-          equipmentId: eq.id,
-          currentPrice,
+      equipmentList.map((eq) =>
+        limit(async () => {
+          const currentPrice =
+            typeof eq.dailyPrice === 'object' && eq.dailyPrice != null && 'toNumber' in eq.dailyPrice
+              ? (eq.dailyPrice as { toNumber: () => number }).toNumber()
+              : Number(eq.dailyPrice)
+          return AIService.suggestPricing({
+            equipmentId: eq.id,
+            currentPrice,
+          })
         })
-      })
+      )
     )
 
     settled.forEach((outcome, i) => {

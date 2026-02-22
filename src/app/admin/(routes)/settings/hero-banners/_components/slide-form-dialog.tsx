@@ -5,6 +5,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import {
   Dialog,
   DialogContent,
@@ -230,10 +231,16 @@ export function SlideFormDialog({
         {form.imageUrl && (
           <div className="overflow-hidden rounded-lg border bg-muted/30">
             <div className="relative aspect-video">
-              <img src={form.imageUrl} alt="Preview" className="h-full w-full object-cover" />
+              <Image
+                src={form.imageUrl}
+                alt="Preview"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, 672px"
+              />
               <div
-                className="absolute inset-0 bg-black transition-opacity"
-                style={{ opacity: form.overlayOpacity }}
+                className="absolute inset-0 bg-black transition-opacity hero-slide-overlay"
+                style={{ ['--overlay-opacity' as string]: String(form.overlayOpacity) }}
               />
               <div
                 className={`absolute inset-0 flex flex-col justify-center p-4 text-white ${
@@ -428,8 +435,9 @@ export function SlideFormDialog({
               <Switch checked={form.isActive} onCheckedChange={(v) => update({ isActive: v })} />
             </div>
             <div className="space-y-2">
-              <Label>شفافية الغطاء (0–1): {form.overlayOpacity}</Label>
+              <Label htmlFor="hero-slide-overlay-opacity">شفافية الغطاء (0–1): {form.overlayOpacity}</Label>
               <input
+                id="hero-slide-overlay-opacity"
                 type="range"
                 min="0"
                 max="1"
@@ -437,6 +445,7 @@ export function SlideFormDialog({
                 value={form.overlayOpacity}
                 onChange={(e) => update({ overlayOpacity: parseFloat(e.target.value) })}
                 className="w-full"
+                aria-label="شفافية الغطاء من 0 إلى 1"
               />
             </div>
             <div className="space-y-2">

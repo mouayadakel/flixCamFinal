@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { AlertTriangle, Eye, RefreshCw, Package } from 'lucide-react'
 import {
@@ -51,7 +51,7 @@ export default function BookingConflictsPage() {
   const [conflicts, setConflicts] = useState<ConflictPair[]>([])
   const [loading, setLoading] = useState(true)
 
-  const loadConflicts = async () => {
+  const loadConflicts = useCallback(async () => {
     setLoading(true)
     try {
       const res = await fetch('/api/bookings/conflicts')
@@ -64,11 +64,11 @@ export default function BookingConflictsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
 
   useEffect(() => {
     loadConflicts()
-  }, [])
+  }, [loadConflicts])
 
   return (
     <div className="space-y-6" dir="rtl">

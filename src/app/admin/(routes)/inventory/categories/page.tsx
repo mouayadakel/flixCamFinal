@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Plus, Edit, Trash2, Search, FolderTree, RefreshCw } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -77,11 +77,7 @@ export default function CategoriesPage() {
   })
   const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() => {
-    loadCategories()
-  }, [])
-
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     setLoading(true)
     try {
       const response = await fetch('/api/categories')
@@ -97,7 +93,11 @@ export default function CategoriesPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
+
+  useEffect(() => {
+    loadCategories()
+  }, [loadCategories])
 
   const handleCreate = async () => {
     if (!formData.name.trim()) {

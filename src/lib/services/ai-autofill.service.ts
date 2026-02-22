@@ -48,6 +48,8 @@ export type ProductData = {
   brand?: string
   specifications?: Record<string, any>
   locale?: TranslationLocale
+  /** Existing "what's in the box" from Excel; used to enrich description generation */
+  boxContents?: string
 }
 
 export type AutofillResult = {
@@ -63,6 +65,13 @@ export type AutofillResult = {
     metaDescription: string
     metaKeywords: string
   }
+  /** Locale-specific SEO for ar/zh (when generated instead of copying en) */
+  seoByLocale?: {
+    ar?: { metaTitle: string; metaDescription: string; metaKeywords: string }
+    zh?: { metaTitle: string; metaDescription: string; metaKeywords: string }
+  }
+  /** Generated English description when it was missing */
+  generatedEnDescription?: { shortDescription: string; longDescription: string }
   cost?: number
 }
 
@@ -84,13 +93,37 @@ export async function autofillProduct(
 
   let totalCost = 0
 
+  // When descriptions are missing, generate them so SEO and translations have content (name-only is not enough)
+  let shortDesc = productData.shortDescription ?? ''
+  let longDesc = productData.longDescription ?? ''
+  if (productData.name && (!shortDesc || !longDesc)) {
+    try {
+      const effectiveProvider = (provider ?? 'gemini') as 'openai' | 'gemini'
+      const boxContext = (productData as { boxContents?: string }).boxContents
+      const generated = await generateDescription(
+        productData.name,
+        productData.category,
+        productData.brand,
+        productData.specifications as Record<string, unknown> | undefined,
+        effectiveProvider,
+        boxContext
+      )
+      if (generated.shortDescription && !shortDesc) shortDesc = generated.shortDescription
+      if (generated.longDescription && !longDesc) longDesc = generated.longDescription
+    } catch (e) {
+      console.error('generateDescription in autofillProduct failed:', e)
+    }
+  }
+
+  const descriptionForSeo = longDesc || shortDesc || productData.name
+
   // Generate SEO
   try {
     const seoResult = await generateSEOBatch(
       [
         {
           name: productData.name,
-          description: productData.longDescription || productData.shortDescription,
+          description: descriptionForSeo,
           category: productData.category,
           brand: productData.brand,
           specifications: productData.specifications,
@@ -132,8 +165,8 @@ export async function autofillProduct(
       if (cachedName) {
         result.translations[targetLocale] = {
           name: cachedName,
-          shortDescription: productData.shortDescription || '',
-          longDescription: productData.longDescription || '',
+          shortDescription: shortDesc,
+          longDescription: longDesc,
         }
         continue
       }
@@ -155,13 +188,13 @@ export async function autofillProduct(
         const translatedName = nameTranslation[0].translatedText
         setCachedTranslation(nameKey, translatedName)
 
-        // Translate descriptions if available
-        let translatedShortDesc = productData.shortDescription || ''
-        let translatedLongDesc = productData.longDescription || ''
+        // Translate descriptions if available (use generated shortDesc/longDesc when we had none)
+        let translatedShortDesc = shortDesc
+        let translatedLongDesc = longDesc
 
-        if (productData.shortDescription) {
+        if (shortDesc) {
           const shortDescKey = getTranslationCacheKey(
-            productData.shortDescription,
+            shortDesc,
             sourceLocale,
             targetLocale
           )
@@ -173,7 +206,7 @@ export async function autofillProduct(
             const shortDescTranslation = await translateBatch(
               [
                 {
-                  text: productData.shortDescription,
+                  text: shortDesc,
                   sourceLocale,
                   targetLocale,
                   context,
@@ -191,9 +224,9 @@ export async function autofillProduct(
           }
         }
 
-        if (productData.longDescription) {
+        if (longDesc) {
           const longDescKey = getTranslationCacheKey(
-            productData.longDescription,
+            longDesc,
             sourceLocale,
             targetLocale
           )
@@ -205,7 +238,7 @@ export async function autofillProduct(
             const longDescTranslation = await translateBatch(
               [
                 {
-                  text: productData.longDescription,
+                  text: longDesc,
                   sourceLocale,
                   targetLocale,
                   context,
@@ -240,6 +273,7 @@ export async function autofillProduct(
   }
 
   result.cost = totalCost
+  result.generatedEnDescription = { shortDescription: shortDesc, longDescription: longDesc }
   return result
 }
 
@@ -321,8 +355,33 @@ export async function autofillMissingFields(
   }
   const effectiveProvider = provider ?? 'gemini'
 
+  // Generate English description when empty
+  let enShort = existingData.shortDescription ?? ''
+  let enLong = existingData.longDescription ?? ''
+  if ((!enShort || !enLong) && existingData.name) {
+    try {
+      const generated = await generateDescription(
+        existingData.name,
+        context.category,
+        context.brand,
+        context.specifications,
+        effectiveProvider
+      )
+      if (generated.shortDescription && !enShort) enShort = generated.shortDescription
+      if (generated.longDescription && !enLong) enLong = generated.longDescription
+      if (generated.shortDescription || generated.longDescription) {
+        result.generatedEnDescription = {
+          shortDescription: enShort,
+          longDescription: enLong,
+        }
+      }
+    } catch (e) {
+      console.error('generateDescription failed:', e)
+    }
+  }
+
   const contextualDescription = [
-    existingData.longDescription || existingData.shortDescription,
+    enLong || enShort,
     `Product: ${existingData.name ?? ''}.`,
     context.category ? `Category: ${context.category}.` : '',
     context.brand ? `Brand: ${context.brand}.` : '',
@@ -432,14 +491,32 @@ export async function autofillMissingFields(
             // keep first result
           }
         }
+
+        let translatedShortDesc = ''
+        let translatedLongDesc = ''
+        if (enShort) {
+          const shortRes = await translateBatch(
+            [{ text: enShort, sourceLocale, targetLocale, context: translationContext }],
+            effectiveProvider === 'gemini' ? 'gemini' : 'openai'
+          )
+          translatedShortDesc = shortRes[0]?.translatedText ?? ''
+        }
+        if (enLong) {
+          const longRes = await translateBatch(
+            [{ text: enLong, sourceLocale, targetLocale, context: translationContext }],
+            effectiveProvider === 'gemini' ? 'gemini' : 'openai'
+          )
+          translatedLongDesc = longRes[0]?.translatedText ?? ''
+        }
+
         if (nameTranslation[0] && !result.translations) {
           result.translations = {}
         }
         if (translatedName) {
           result.translations![targetLocale] = {
             name: translatedName,
-            shortDescription: existingTranslation?.shortDescription ?? '',
-            longDescription: existingTranslation?.longDescription ?? '',
+            shortDescription: (translatedShortDesc || existingTranslation?.shortDescription) ?? '',
+            longDescription: (translatedLongDesc || existingTranslation?.longDescription) ?? '',
           }
           if (options?.jobId && nameTranslation[0]?.cost != null) {
             await recordCost({
@@ -455,5 +532,140 @@ export async function autofillMissingFields(
     }
   }
 
+  // Generate locale-specific SEO for ar and zh (instead of copying English)
+  const arTrans = result.translations?.ar
+  const zhTrans = result.translations?.zh
+  if (arTrans || zhTrans) {
+    try {
+      result.seoByLocale = {}
+      const seoPayload: { name: string; description?: string; category?: string; brand?: string; specifications?: Record<string, unknown>; locale: string }[] = []
+      if (arTrans) {
+        seoPayload.push({
+          name: arTrans.name,
+          description: arTrans.longDescription || arTrans.shortDescription,
+          category: context.category,
+          brand: context.brand,
+          specifications: context.specifications,
+          locale: 'ar',
+        })
+      }
+      if (zhTrans) {
+        seoPayload.push({
+          name: zhTrans.name,
+          description: zhTrans.longDescription || zhTrans.shortDescription,
+          category: context.category,
+          brand: context.brand,
+          specifications: context.specifications,
+          locale: 'zh',
+        })
+      }
+      const localeSeoResults = await generateSEOBatch(
+        seoPayload,
+        effectiveProvider === 'gemini' ? 'gemini' : 'openai'
+      )
+      let idx = 0
+      if (arTrans) {
+        const r = localeSeoResults[idx++]
+        if (r) result.seoByLocale!.ar = { metaTitle: r.metaTitle, metaDescription: r.metaDescription, metaKeywords: r.metaKeywords }
+      }
+      if (zhTrans) {
+        const r = localeSeoResults[idx]
+        if (r) result.seoByLocale!.zh = { metaTitle: r.metaTitle, metaDescription: r.metaDescription, metaKeywords: r.metaKeywords }
+      }
+    } catch (error) {
+      console.error('Locale SEO generation failed:', error)
+    }
+  }
+
   return result
+}
+
+type SEOProvider = 'openai' | 'gemini'
+
+export async function generateDescription(
+  productName: string,
+  category?: string,
+  brand?: string,
+  specifications?: Record<string, unknown>,
+  provider?: SEOProvider,
+  existingBoxContents?: string
+): Promise<{ shortDescription: string; longDescription: string }> {
+  const { generateWithLLM } = await import('./ai-content-generation.service')
+  const contextParts = [
+    `Product: ${productName}.`,
+    `Category: ${category ?? 'N/A'}.`,
+    `Brand: ${brand ?? 'N/A'}.`,
+    specifications && Object.keys(specifications).length > 0
+      ? `Specs: ${JSON.stringify(specifications)}`
+      : '',
+    existingBoxContents
+      ? `What's included in the box (use to inform description): ${existingBoxContents.slice(0, 800)}`
+      : '',
+  ].filter(Boolean)
+
+  const out = await generateWithLLM(
+    provider ?? 'gemini',
+    `You are a professional copywriter for B2B film and broadcast equipment rental. Generate real, specific product copy—no placeholders, no "lorem", no generic filler.
+Return valid JSON only: { "shortDescription": "...", "longDescription": "..." }
+- shortDescription: 2–4 sentences, 200–400 characters. Highlight key features, typical use cases, and why renters choose this. Be concrete.
+- longDescription: 4–8 sentences, 400–800 characters. Cover features, use cases (narrative, commercial, documentary), compatibility notes, and professional appeal. Write for a rental catalog.`,
+    contextParts.join(' '),
+    2000
+  )
+  const parsed = typeof out === 'object' && out !== null ? (out as { shortDescription?: string; longDescription?: string }) : {}
+  const short = (parsed.shortDescription ?? '').trim()
+  const long = (parsed.longDescription ?? '').trim()
+  return {
+    shortDescription: short ? short.slice(0, 600) : '',
+    longDescription: long ? long.slice(0, 2500) : '',
+  }
+}
+
+export async function generateBoxContents(
+  productName: string,
+  category?: string,
+  specifications?: Record<string, unknown>,
+  provider?: SEOProvider
+): Promise<string> {
+  const { generateWithLLM } = await import('./ai-content-generation.service')
+  const text = await generateWithLLM(
+    provider ?? 'gemini',
+    `List what is typically included in the box for this product. Return a short paragraph or bullet list (plain text, no JSON). Be concise.`,
+    `Product: ${productName}. Category: ${category ?? 'N/A'}. ${specifications ? `Specs: ${JSON.stringify(specifications)}` : ''}`
+  )
+  const str = typeof text === 'string' ? text : (typeof text === 'object' ? JSON.stringify(text) : String(text))
+  return str.trim().slice(0, 2000)
+}
+
+export async function generateTags(
+  productName: string,
+  category?: string,
+  brand?: string,
+  provider?: SEOProvider
+): Promise<string> {
+  const { generateWithLLM } = await import('./ai-content-generation.service')
+  const text = await generateWithLLM(
+    provider ?? 'gemini',
+    `Return 5-10 comma-separated tags for search/filter (e.g. camera, 4k, cinema). Plain text only, no JSON.`,
+    `Product: ${productName}. Category: ${category ?? 'N/A'}. Brand: ${brand ?? 'N/A'}.`
+  )
+  const str = typeof text === 'string' ? text : (typeof text === 'object' ? JSON.stringify(text) : String(text))
+  return str.trim().slice(0, 500)
+}
+
+export async function suggestRelatedProducts(
+  productId: string,
+  categoryId: string,
+  limit: number = 5
+): Promise<string[]> {
+  const products = await prisma.product.findMany({
+    where: {
+      categoryId,
+      id: { not: productId },
+      deletedAt: null,
+    },
+    select: { id: true },
+    take: limit,
+  })
+  return products.map((p) => p.id)
 }

@@ -81,7 +81,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         : ((existing.conditions as { dateRange?: { start?: string; end?: string } })?.dateRange ?? {})
     const rangeToCheck = newRange.start && newRange.end ? newRange : null
     if (rangeToCheck) {
-      const ruleType = (parsed.ruleType ?? existing.ruleType) as string
+      const ruleType = (parsed.ruleType ?? existing.ruleType) as (typeof existing)['ruleType']
       const others = await prisma.pricingRule.findMany({
         where: { isActive: true, ruleType, id: { not: id } },
         select: { id: true, name: true, conditions: true },

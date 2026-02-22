@@ -14,6 +14,7 @@ export interface EquipmentTranslationInput {
   name?: string
   description?: string
   shortDescription?: string
+  longDescription?: string
   seoTitle?: string
   seoDescription?: string
   seoKeywords?: string
@@ -25,6 +26,7 @@ export interface CreateEquipmentInput {
   sku: string
   model?: string
   categoryId: string
+  subCategoryId?: string
   brandId?: string
   vendorId?: string
   condition?: EquipmentCondition
@@ -33,6 +35,7 @@ export interface CreateEquipmentInput {
   dailyPrice: number
   weeklyPrice?: number
   monthlyPrice?: number
+  depositAmount?: number
   featured?: boolean
   isActive?: boolean
   warehouseLocation?: string
@@ -40,13 +43,13 @@ export interface CreateEquipmentInput {
   specifications?: Record<string, unknown>
   customFields?: Record<string, unknown>
   createdBy: string
-  // New fields
   translations?: EquipmentTranslationInput[]
   featuredImageUrl?: string
   galleryImageUrls?: string[]
   videoUrl?: string
   relatedEquipmentIds?: string[]
   boxContents?: string
+  tags?: string
   bufferTime?: number
   bufferTimeUnit?: 'hours' | 'days'
   vendorSubmissionStatus?: VendorSubmissionStatus
@@ -82,9 +85,12 @@ export class EquipmentService {
       condition,
       isActive,
       featured,
-      skip = 0,
-      take = 50,
+      skip: skipIn = 0,
+      take: takeIn = 50,
     } = filters
+
+    const skip = Number.isFinite(skipIn) && skipIn >= 0 ? Math.min(skipIn, 10000) : 0
+    const take = Number.isFinite(takeIn) && takeIn >= 1 ? Math.min(takeIn, 500) : 50
 
     const where: Record<string, unknown> = {
       deletedAt: null,
@@ -164,7 +170,7 @@ export class EquipmentService {
         skip,
         take,
       }),
-      prisma.equipment.count({ where }),
+      prisma.equipment.count({ where: where as Prisma.EquipmentWhereInput }),
     ])
 
     return {
@@ -302,6 +308,18 @@ export class EquipmentService {
 
     if (input.boxContents) {
       customFields.boxContents = input.boxContents
+    }
+
+    if (input.tags) {
+      customFields.tags = input.tags
+    }
+
+    if (input.depositAmount !== undefined) {
+      customFields.depositAmount = input.depositAmount
+    }
+
+    if (input.subCategoryId) {
+      customFields.subCategoryId = input.subCategoryId
     }
 
     if (input.bufferTime !== undefined) {

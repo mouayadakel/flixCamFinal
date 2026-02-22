@@ -91,7 +91,7 @@ export default function ShootTypeEditPage() {
     fetch(`/api/admin/shoot-types/${id}`)
       .then((res) => res.json())
       .then(setData)
-      .catch(() => {})
+      .catch((err) => console.error('[shoot-types] refresh failed', err))
   }
 
   if (loading && !data) {

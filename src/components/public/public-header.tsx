@@ -1,21 +1,24 @@
 /**
- * Public website header – top bar (contact + language), main bar (logo, search, nav, actions).
- * Sticky with backdrop blur on scroll. Mobile: hamburger, search icon opens overlay.
+ * Public website header – clean single-bar layout.
+ * One sticky bar: logo, nav links, “المزيد” dropdown, then CTAs (search, language, cart, login/register).
+ * Sticky with subtle scroll state. Mobile: hamburger, search in dialog.
  */
 
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useLocale } from '@/hooks/use-locale'
 import { useAuthModalOptional } from '@/components/auth/auth-modal-provider'
-import { Search } from 'lucide-react'
+import { Search, ChevronDown } from 'lucide-react'
 import { PublicContainer } from './public-container'
 import { LanguageSwitcher } from './language-switcher'
-import { PublicNav } from './public-nav'
 import { PublicSearch } from './public-search'
 import { MiniCart } from './mini-cart'
 import { MobileNav } from './mobile-nav'
+import { NotificationBell } from './notification-bell'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -27,18 +30,39 @@ import {
 import { siteConfig } from '@/config/site.config'
 import { cn } from '@/lib/utils'
 
+const MAIN_LINKS = [
+  { href: '/', key: 'nav.home' as const },
+  { href: '/equipment', key: 'nav.equipment' as const },
+  { href: '/studios', key: 'nav.studios' as const },
+  { href: '/packages', key: 'nav.packages' as const },
+] as const
+
+const MORE_LINKS = [
+  { href: '/about', key: 'nav.about' as const },
+  { href: '/faq', key: 'nav.faq' as const },
+  { href: '/terms', key: 'nav.policies' as const },
+] as const
+
 interface PublicHeaderProps {
   hiddenRoutes?: Set<string>
 }
 
 export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
   const { t } = useLocale()
+  const pathname = usePathname()
   const authModal = useAuthModalOptional()
-  const { phone, email } = siteConfig.contact
   const [scrolled, setScrolled] = useState(false)
+  const [logoError, setLogoError] = useState(false)
+
+  const mainLinks = hiddenRoutes?.size
+    ? MAIN_LINKS.filter(({ href }) => !hiddenRoutes.has(href))
+    : MAIN_LINKS
+  const moreLinks = hiddenRoutes?.size
+    ? MORE_LINKS.filter(({ href }) => !hiddenRoutes.has(href))
+    : MORE_LINKS
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 10)
+    const handleScroll = () => setScrolled(window.scrollY > 16)
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -46,134 +70,183 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
   return (
     <header
       className={cn(
-        'sticky top-0 z-40 w-full transition-all duration-300',
-        scrolled ? 'glass-heavy shadow-header-scrolled' : 'bg-white/95 shadow-header'
+        'sticky top-0 z-50 w-full font-header-nav transition-[box-shadow,background-color] duration-300',
+        'border-b border-white/[0.06] bg-header-surface/95 text-white backdrop-blur-md',
+        'min-h-[72px]',
+        scrolled && 'border-white/[0.08] bg-header-surface shadow-header-scrolled'
       )}
     >
-      {/* Top bar – contact + language; hidden on small */}
-      <div
-        className={cn(
-          'hidden overflow-hidden border-b border-border-light/60 transition-all duration-300 md:block',
-          scrolled ? 'max-h-0 border-b-0 opacity-0' : 'max-h-12 opacity-100'
-        )}
-      >
-        <PublicContainer>
-          <div className="flex h-9 items-center justify-between text-label-small uppercase tracking-wider text-text-muted">
-            <span className="flex items-center gap-3">
-              <a
-                href={`tel:${phone.replace(/\s/g, '')}`}
-                className="transition-colors hover:text-brand-primary"
-              >
-                {phone}
-              </a>
-              <span className="h-3 w-px bg-border-light" />
-              <a href={`mailto:${email}`} className="transition-colors hover:text-brand-primary">
-                {email}
-              </a>
-            </span>
-            <LanguageSwitcher />
-          </div>
-        </PublicContainer>
-      </div>
-
-      {/* Main bar – overflow-x-auto ensures auth buttons are reachable when content overflows (RTL) */}
       <div className="overflow-x-auto">
         <PublicContainer>
-          <div className="flex h-16 min-w-max items-center gap-4 md:gap-8">
-            {/* Logo */}
+          <nav
+            className="flex min-h-[72px] min-w-max items-center justify-between gap-6 py-3 md:gap-8"
+            aria-label="Main navigation"
+          >
+            {/* Logo: first in DOM so RTL puts it on the right; order-last in LTR so it stays on the right */}
             <Link
               href="/"
-              className="flex shrink-0 items-center gap-2 transition-opacity hover:opacity-80"
+              className="order-last rtl:order-first group flex shrink-0 flex-col items-end text-end transition-opacity hover:opacity-90 focus:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-header-surface rounded-sm pe-4 sm:pe-6 md:pe-8 rtl:items-start rtl:text-start rtl:pe-0 rtl:ps-4 rtl:sm:ps-6 rtl:md:ps-8"
+              aria-label={siteConfig.brandName}
             >
-              <span className="text-xl font-bold tracking-tight text-text-heading">
-                {siteConfig.brandName}
+              <span
+                className="relative flex h-9 w-[120px] shrink-0 items-center justify-end bg-no-repeat bg-[length:200%_100%] bg-[position:100%_0] md:h-10 md:w-[130px] rtl:justify-start header-logo-bg"
+                style={{
+                  ['--header-logo-url' as string]: logoError ? 'none' : `url(${siteConfig.logoInverted})`,
+                }}
+              >
+                {!logoError && (
+                  <Image
+                    src={siteConfig.logoInverted}
+                    alt=""
+                    width={120}
+                    height={40}
+                    className="absolute inset-0 h-0 w-0 overflow-hidden opacity-0"
+                    onError={() => setLogoError(true)}
+                  />
+                )}
+                {logoError ? (
+                  <span className="text-lg font-bold tracking-tight text-white">
+                    {siteConfig.brandName}
+                  </span>
+                ) : null}
+              </span>
+              <span className="mt-0.5 hidden text-[10px] font-medium uppercase tracking-widest text-white/40 md:block">
+                {siteConfig.tagline}
               </span>
             </Link>
 
-            {/* Search – center on md+, icon on small */}
-            <div className="hidden flex-1 justify-center md:flex">
-              <PublicSearch />
-            </div>
-            <div className="md:hidden">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label={t('common.search')}
-                    className="rounded-full text-text-heading transition-colors hover:bg-brand-primary/5 hover:text-brand-primary"
+            {/* Nav + CTAs block */}
+            <div className="flex flex-1 items-center justify-end gap-5 lg:gap-10">
+              {/* Desktop nav links */}
+              <ul className="hidden items-center gap-7 lg:flex">
+                {mainLinks.map(({ href, key }) => {
+                  const isActive =
+                    pathname !== null &&
+                    (pathname === href || (href !== '/' && pathname.startsWith(href)))
+                  return (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        className={cn(
+                          'group/link relative block py-2 text-[15px] font-medium text-white/85 outline-none transition-colors hover:text-white focus-visible:text-white focus-visible:ring-2 focus-visible:ring-brand-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-header-surface rounded-sm',
+                          isActive && 'text-brand-primary'
+                        )}
+                      >
+                        {t(key)}
+                        <span
+                          className={cn(
+                            'absolute bottom-0 inset-x-0 h-0.5 rounded-full bg-brand-primary transition-all duration-200',
+                            isActive ? 'opacity-100' : 'opacity-0 group-hover/link:opacity-100'
+                          )}
+                          aria-hidden
+                        />
+                      </Link>
+                    </li>
+                  )
+                })}
+                {/* المزيد dropdown */}
+                <li className="relative group/dd">
+                  <span
+                    className="flex cursor-pointer items-center gap-1 py-2 text-[15px] font-medium text-white/85 outline-none transition-colors hover:text-white focus-visible:text-white focus-visible:ring-2 focus-visible:ring-brand-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-header-surface rounded-sm"
+                    tabIndex={0}
+                    aria-label={t('nav.more')}
                   >
-                    <Search className="h-5 w-5" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[420px]" aria-describedby={undefined}>
-                  <DialogHeader>
-                    <DialogTitle id="mobile-search-title" className="sr-only">
-                      {t('common.search')}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="pt-2">
-                    <PublicSearch />
+                    {t('nav.more')}
+                    <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-hover/dd:rotate-180 group-focus-within/dd:rotate-180" aria-hidden />
+                  </span>
+                  <div
+                    className="invisible absolute top-full right-0 z-50 mt-1.5 w-44 rounded-xl border border-white/10 bg-header-dropdown py-1.5 shadow-xl opacity-0 transition-[opacity,visibility] duration-200 group-hover/dd:visible group-hover/dd:opacity-100 group-focus-within/dd:visible group-focus-within/dd:opacity-100"
+                  >
+                    {moreLinks.map(({ href, key }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        className="block rounded-lg px-4 py-2.5 text-sm text-white/90 transition-colors hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white focus:outline-none"
+                      >
+                        {t(key)}
+                      </Link>
+                    ))}
                   </div>
-                </DialogContent>
-              </Dialog>
-            </div>
+                </li>
+              </ul>
 
-            <PublicNav
-              className="hidden flex-shrink-0 md:flex"
-              enableEquipmentDropdown
-              hiddenRoutes={hiddenRoutes}
-            />
-
-            {/* Auth actions – ms-auto keeps them at end (visible in RTL) */}
-            <div className="ms-auto flex flex-shrink-0 items-center gap-1.5">
-              <div className="hidden md:flex md:items-center md:gap-1.5">
-                <LanguageSwitcher />
-                <MiniCart />
-                {authModal ? (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => authModal.openAuthModal('login')}
-                      className="font-medium text-text-body transition-colors hover:bg-transparent hover:text-text-heading"
-                    >
-                      {t('nav.login')}
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="rounded-lg bg-brand-primary px-5 font-semibold shadow-sm transition-all hover:bg-brand-primary-hover hover:shadow-md"
-                      onClick={() => authModal.openAuthModal('register')}
-                    >
-                      {t('nav.register')}
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      asChild
-                      className="font-medium text-text-body transition-colors hover:bg-transparent hover:text-text-heading"
-                    >
-                      <Link href="/login">{t('nav.login')}</Link>
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="rounded-lg bg-brand-primary px-5 font-semibold shadow-sm transition-all hover:bg-brand-primary-hover hover:shadow-md"
-                      asChild
-                    >
-                      <Link href="/register">{t('nav.register')}</Link>
-                    </Button>
-                  </>
-                )}
-              </div>
-              <div className="flex items-center gap-1 md:hidden">
-                <MiniCart />
-                <MobileNav hiddenRoutes={hiddenRoutes} />
+              {/* CTA group: search (mobile), language, notification, cart, auth */}
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="md:hidden">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label={t('common.search')}
+                        className="h-10 w-10 rounded-full text-white/90 transition-colors hover:bg-white/10 hover:text-white"
+                      >
+                        <Search className="h-5 w-5" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[420px]" aria-describedby={undefined}>
+                      <DialogHeader>
+                        <DialogTitle id="mobile-search-title" className="sr-only">
+                          {t('common.search')}
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="pt-2">
+                        <PublicSearch />
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+                <div className="hidden items-center gap-2 lg:flex">
+                  <LanguageSwitcher />
+                  <NotificationBell />
+                  <MiniCart />
+                  <span className="mx-1 h-5 w-px bg-white/20" aria-hidden />
+                  {authModal ? (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => authModal.openAuthModal('login')}
+                        className="h-9 font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                      >
+                        {t('nav.login')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="h-9 rounded-lg bg-brand-primary px-5 font-semibold text-[#1A1A1A] transition-colors hover:bg-brand-primary-hover"
+                        onClick={() => authModal.openAuthModal('register')}
+                      >
+                        {t('nav.register')}
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        asChild
+                        className="hidden h-9 font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white sm:inline-flex"
+                      >
+                        <Link href="/login">{t('nav.login')}</Link>
+                      </Button>
+                      <Button
+                        size="sm"
+                        asChild
+                        className="h-9 rounded-lg bg-brand-primary px-5 font-semibold text-[#1A1A1A] transition-colors hover:bg-brand-primary-hover"
+                      >
+                        <Link href="/register">{t('nav.register')}</Link>
+                      </Button>
+                    </>
+                  )}
+                </div>
+                <div className="flex items-center gap-1 lg:hidden">
+                  <NotificationBell />
+                  <MiniCart />
+                  <MobileNav hiddenRoutes={hiddenRoutes} />
+                </div>
               </div>
             </div>
-          </div>
+          </nav>
         </PublicContainer>
       </div>
     </header>

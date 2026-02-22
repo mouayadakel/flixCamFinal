@@ -22,12 +22,12 @@ function isFilled(value: unknown): boolean {
 }
 
 function getImageCount(product: {
-  productImages?: { isDeleted: boolean }[]
-  galleryImages: unknown
-  featuredImage: string | null
+  productImages?: Array<{ id?: string; isDeleted?: boolean }>
+  galleryImages?: unknown
+  featuredImage?: string | null
 }): number {
   if (product.productImages && product.productImages.length > 0) {
-    const nonDeleted = product.productImages.filter((i) => !i.isDeleted)
+    const nonDeleted = product.productImages.filter((i) => !(i as { isDeleted?: boolean }).isDeleted)
     return nonDeleted.length
   }
   let count = isFilled(product.featuredImage) ? 1 : 0
@@ -92,7 +92,57 @@ export async function scoreProduct(
 }
 
 /**
+ * Score a loaded product in-memory (no DB query). Used by batch operations.
+ */
+function scoreProductInMemory(product: {
+  translations: Array<{
+    locale: string
+    name?: string | null
+    shortDescription?: string | null
+    longDescription?: string | null
+    seoTitle?: string | null
+    seoDescription?: string | null
+    seoKeywords?: string | null
+  }>
+  productImages?: Array<{ id?: string; isDeleted?: boolean }>
+  galleryImages?: unknown
+  featuredImage?: string | null
+}): number {
+  const translations = product.translations
+  const byLocale = new Map(translations.map((t) => [t.locale, t]))
+
+  let score = 0
+  const translationsOk = REQUIRED_LOCALES.every((locale) => {
+    const t = byLocale.get(locale)
+    return t && (t.name?.length ?? 0) > 5
+  })
+  if (translationsOk) score += 25
+
+  const seoOk = translations.some(
+    (t) => isFilled(t.seoTitle) && isFilled(t.seoDescription) && isFilled(t.seoKeywords)
+  )
+  if (seoOk) score += 20
+
+  const shortDescOk = translations.some(
+    (t) => (t.shortDescription?.length ?? 0) >= 20
+  )
+  if (shortDescOk) score += 10
+
+  const longDescOk = translations.some(
+    (t) => (t.longDescription?.length ?? 0) >= 100
+  )
+  if (longDescOk) score += 15
+
+  const imageCount = getImageCount(product)
+  if (imageCount >= MIN_IMAGES) score += 30
+  else score += Math.round((imageCount / MIN_IMAGES) * 30)
+
+  return Math.min(100, score)
+}
+
+/**
  * Score all products and update DB. Returns aggregate stats.
+ * Loads all products with translations + images in a single query to avoid N+1.
  */
 export async function scoreAllProducts(): Promise<{
   total: number
@@ -101,18 +151,38 @@ export async function scoreAllProducts(): Promise<{
 }> {
   const products = await prisma.product.findMany({
     where: { deletedAt: null },
-    select: { id: true },
+    include: {
+      translations: { where: { deletedAt: null } },
+      productImages: { where: { isDeleted: false }, select: { id: true } },
+    },
   })
   let sum = 0
   const distribution = { excellent: 0, good: 0, fair: 0, poor: 0 }
+  const updates: Array<{ id: string; score: number }> = []
+
   for (const p of products) {
-    const s = await scoreProduct(p.id, { persist: true })
+    const s = scoreProductInMemory(p)
     sum += s
+    updates.push({ id: p.id, score: s })
     if (s >= 80) distribution.excellent++
     else if (s >= 60) distribution.good++
     else if (s >= 40) distribution.fair++
     else distribution.poor++
   }
+
+  const BATCH_SIZE = 50
+  for (let i = 0; i < updates.length; i += BATCH_SIZE) {
+    const batch = updates.slice(i, i + BATCH_SIZE)
+    await prisma.$transaction(
+      batch.map((u) =>
+        prisma.product.update({
+          where: { id: u.id },
+          data: { contentScore: u.score, contentScoreAt: new Date() },
+        })
+      )
+    )
+  }
+
   return {
     total: products.length,
     avgScore: products.length ? Math.round(sum / products.length) : 0,
@@ -139,19 +209,23 @@ export async function getProductsWithGaps(
     take: limit * 2,
     orderBy: { contentScore: 'asc' },
   })
-  const byLocale = (t: { locale: string }[]) => new Map(t.map((x) => [x.locale, x]))
+  const byLocale = <T extends { locale: string; name?: string | null }>(t: T[]) =>
+    new Map(t.map((x) => [x.locale, x]))
   const results: Array<{ id: string; name: string; score: number; gap: string }> = []
   for (const product of products) {
     const trans = product.translations
     const map = byLocale(trans)
     let hasGap = false
     if (gapType === 'translations') {
-      hasGap = !REQUIRED_LOCALES.every((l) => map.get(l) && (map.get(l)!.name?.length ?? 0) > 5)
+      hasGap = !REQUIRED_LOCALES.every((l) => {
+        const t = map.get(l)
+        return t && (t.name?.length ?? 0) > 5
+      })
     } else if (gapType === 'seo') {
       hasGap = !trans.some(
         (t) => isFilled(t.seoTitle) && isFilled(t.seoDescription) && isFilled(t.seoKeywords)
       )
-    } else if (gapType === 'descriptions' || gapType === 'shortDescription') {
+    } else if (gapType === 'description') {
       hasGap = !trans.some((t) => (t.shortDescription?.length ?? 0) >= 20)
     } else if (gapType === 'photos') {
       hasGap = getImageCount(product) < MIN_IMAGES
@@ -164,7 +238,7 @@ export async function getProductsWithGaps(
     }
     if (hasGap) {
       const name = trans.find((t) => t.locale === 'en')?.name ?? trans[0]?.name ?? product.sku ?? product.id
-      const score = await scoreProduct(product.id, { persist: false })
+      const score = scoreProductInMemory(product)
       results.push({ id: product.id, name, score, gap: gapType })
       if (results.length >= limit) break
     }
@@ -237,6 +311,7 @@ async function runFullScan(): Promise<{
     gaps: GapType[]
     imageCount: number
     lastAiRunAt: Date | null
+    priceDaily: number
   }>
 }> {
   const products = await prisma.product.findMany({
@@ -261,6 +336,7 @@ async function runFullScan(): Promise<{
     gaps: GapType[]
     imageCount: number
     lastAiRunAt: Date | null
+    priceDaily: number
   }> = []
   for (const p of products) {
     const gaps: GapType[] = []
@@ -293,8 +369,9 @@ async function runFullScan(): Promise<{
         }
       }
     }
-    const contentScore = await scoreProduct(p.id, { persist: false })
+    const contentScore = scoreProductInMemory(p)
     const name = p.translations.find((t) => t.locale === 'en')?.name ?? p.translations[0]?.name ?? p.sku ?? p.id
+    const priceDaily = Number(p.priceDaily ?? 0)
     summaries.push({
       id: p.id,
       name,
@@ -303,6 +380,7 @@ async function runFullScan(): Promise<{
       gaps,
       imageCount,
       lastAiRunAt: p.lastAiRunAt,
+      priceDaily,
     })
   }
   const avgScore = summaries.length
@@ -338,6 +416,7 @@ export async function getCachedScan(): Promise<{
     gaps: GapType[]
     imageCount: number
     lastAiRunAt: Date | null
+    priceDaily: number
   }>
   cached: boolean
 }> {
@@ -358,14 +437,25 @@ export async function getCachedScan(): Promise<{
           gaps: GapType[]
           imageCount: number
           lastAiRunAt: string | null
+          priceDaily: number
         }>
       }
+      const byGap = parsed.byGapType ?? {}
       return {
-        ...parsed,
         scannedAt: new Date(parsed.scannedAt),
+        totalProducts: parsed.totalProducts,
+        catalogQualityScore: parsed.catalogQualityScore,
+        byGapType: {
+          missingTranslations: byGap.missingTranslations ?? 0,
+          missingSeo: byGap.missingSeo ?? 0,
+          missingDescription: byGap.missingDescription ?? 0,
+          missingPhotos: byGap.missingPhotos ?? 0,
+          missingSpecs: byGap.missingSpecs ?? 0,
+        },
         products: parsed.products.map((p) => ({
           ...p,
           lastAiRunAt: p.lastAiRunAt ? new Date(p.lastAiRunAt) : null,
+          priceDaily: (p as { priceDaily?: number }).priceDaily ?? 0,
         })),
         cached: true,
       }

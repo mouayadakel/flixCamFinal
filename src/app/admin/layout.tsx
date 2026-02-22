@@ -26,9 +26,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <AdminHeader />
         </Suspense>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="container mx-auto p-4 md:p-6">
+        {/* Main Content - overflow-x-auto for wide tables on mobile */}
+        <main className="flex-1 overflow-x-auto overflow-y-auto">
+          <div className="container mx-auto min-w-0 p-4 md:p-6">
             {/* Breadcrumbs */}
             <div className="mb-6">
               <AdminBreadcrumbs />

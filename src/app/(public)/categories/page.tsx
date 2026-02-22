@@ -9,6 +9,7 @@ import { prisma } from '@/lib/db/prisma'
 import { PublicContainer } from '@/components/public/public-container'
 import { getIcon } from '@/lib/utils/category-icons'
 import { ChevronRight, LayoutGrid } from 'lucide-react'
+import { t } from '@/lib/i18n/translate'
 
 async function getCategories() {
   return unstable_cache(
@@ -51,10 +52,10 @@ export default async function CategoriesPage() {
               className="mb-4 flex items-center gap-1.5 text-sm text-text-muted"
             >
               <Link href="/" className="transition-colors hover:text-text-heading">
-                Home
+                {t('ar', 'nav.home')}
               </Link>
               <ChevronRight className="h-3.5 w-3.5" />
-              <span className="font-medium text-text-heading">Categories</span>
+              <span className="font-medium text-text-heading">{t('ar', 'equipment.category')}</span>
             </nav>
 
             <div className="flex items-center gap-4">
@@ -62,9 +63,9 @@ export default async function CategoriesPage() {
                 <LayoutGrid className="h-6 w-6 text-brand-primary" />
               </div>
               <div>
-                <h1 className="text-section-title text-text-heading">Browse by Category</h1>
+                <h1 className="text-section-title text-text-heading">{t('ar', 'equipment.browseByCategory')}</h1>
                 <p className="mt-1 text-body-main text-text-body">
-                  {categories.length} categories &middot; {totalItems} items available
+                  {t('ar', 'equipment.categoriesCount').replace('{count}', String(categories.length))} &middot; {t('ar', 'equipment.itemsAvailable').replace('{count}', String(totalItems))}
                 </p>
               </div>
             </div>
@@ -94,10 +95,10 @@ export default async function CategoriesPage() {
                     </h2>
                     <p className="mt-1 text-sm text-text-muted">
                       <span className="font-semibold text-text-body">{cat.equipmentCount}</span>{' '}
-                      {cat.equipmentCount === 1 ? 'item' : 'items'}
+                      {cat.equipmentCount === 1 ? t('ar', 'equipment.item') : t('ar', 'equipment.items')}
                     </p>
                     <div className="mt-4 flex translate-x-[-4px] items-center gap-1 text-sm font-medium text-brand-primary opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
-                      Browse
+                      {t('ar', 'equipment.browse')}
                       <ChevronRight className="h-3.5 w-3.5" />
                     </div>
                   </Link>
@@ -109,9 +110,9 @@ export default async function CategoriesPage() {
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-light">
                 <LayoutGrid className="h-8 w-8 text-text-muted/40" />
               </div>
-              <p className="text-lg font-medium text-text-heading">No categories yet</p>
+              <p className="text-lg font-medium text-text-heading">{t('ar', 'equipment.noCategoriesYet')}</p>
               <p className="mt-1 text-sm text-text-muted">
-                Categories will appear here once equipment is added.
+                {t('ar', 'equipment.noCategoriesDesc')}
               </p>
             </div>
           )}

@@ -3,7 +3,18 @@
  * Guarded by enable_packages feature flag.
  */
 
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import { t } from '@/lib/i18n/translate'
+import { generateAlternatesMetadata } from '@/lib/seo/hreflang'
+
+export const metadata: Metadata = {
+  title: t('ar', 'seo.packagesTitle'),
+  description: t('ar', 'seo.packagesDescription'),
+  alternates: generateAlternatesMetadata('/packages'),
+  keywords: ['باقات تأجير', 'rental packages', 'كيت تصوير', 'equipment bundles', 'FlixCam'],
+}
+
 import { prisma } from '@/lib/db/prisma'
 import { FeatureFlagService } from '@/lib/services/feature-flag.service'
 import { PackagesListClient } from './packages-list-client'

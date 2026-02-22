@@ -88,6 +88,9 @@ export default async function middleware(req: NextRequest) {
     '/how-it-works',
     '/policies',
     '/payment',
+    '/about',
+    '/contact',
+    '/faq',
   ]
   if (publicRoutes.some((route) => pathname.startsWith(route))) {
     return NextResponse.next()
@@ -190,7 +193,6 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except static assets and Next.js internals.
-     * Excluding _next entirely avoids middleware running on chunks/css (prevents HTML responses for assets).
      */
     '/((?!_next|favicon.ico|robots.txt|sitemap|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js)$).*)',
   ],

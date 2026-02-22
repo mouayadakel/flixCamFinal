@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, AlertTriangle, CheckCircle, XCircle } from 'lucide-react'
@@ -76,11 +76,7 @@ export default function DamageClaimDetailPage() {
   const [customerNotified, setCustomerNotified] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() => {
-    if (params?.id) loadClaim()
-  }, [params?.id])
-
-  const loadClaim = async () => {
+  const loadClaim = useCallback(async () => {
     const id = params?.id
     if (!id) return
     setLoading(true)
@@ -98,7 +94,11 @@ export default function DamageClaimDetailPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [params?.id, toast])
+
+  useEffect(() => {
+    if (params?.id) loadClaim()
+  }, [params?.id, loadClaim])
 
   const handleResolve = async () => {
     if (!claim || !resolveResolution.trim()) {

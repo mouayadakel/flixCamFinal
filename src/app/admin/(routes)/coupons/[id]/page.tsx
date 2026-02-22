@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -76,13 +76,7 @@ export default function CouponDetailPage() {
   const [deleting, setDeleting] = useState(false)
   const [toggling, setToggling] = useState(false)
 
-  useEffect(() => {
-    if (params?.id) {
-      loadCoupon()
-    }
-  }, [params?.id])
-
-  const loadCoupon = async () => {
+  const loadCoupon = useCallback(async () => {
     setLoading(true)
     try {
       const response = await fetch(`/api/coupons/${params?.id}`)
@@ -100,7 +94,13 @@ export default function CouponDetailPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [params?.id, toast])
+
+  useEffect(() => {
+    if (params?.id) {
+      loadCoupon()
+    }
+  }, [params?.id, loadCoupon])
 
   const handleToggleStatus = async () => {
     if (!coupon) return

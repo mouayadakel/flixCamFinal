@@ -11,6 +11,7 @@ import { getCartSessionId } from '@/lib/cart-session'
 import { checkRateLimitUpstash } from '@/lib/utils/rate-limit-upstash'
 import { TapClient } from '@/lib/integrations/tap/client'
 import { prisma } from '@/lib/db/prisma'
+import { EmailService } from '@/lib/services/email.service'
 
 export async function POST(request: NextRequest) {
   const rate = await checkRateLimitUpstash(request, 'payment')
@@ -37,6 +38,10 @@ export async function POST(request: NextRequest) {
   }
 
   const equipment: { equipmentId: string; quantity: number }[] = []
+  const studioItems = cart.items.filter(
+    (i): i is typeof i & { studioId: string; startDate: Date; endDate: Date } =>
+      i.itemType === 'STUDIO' && !!i.studioId && !!i.startDate && !!i.endDate
+  )
   let startDate: Date | null = null
   let endDate: Date | null = null
 
@@ -57,22 +62,37 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  if (!equipment.length) {
+  const hasEquipment = equipment.length > 0
+  const hasStudio = studioItems.length > 0
+  if (!hasEquipment && !hasStudio) {
     return NextResponse.json(
-      { error: 'Cart must contain at least one equipment or kit' },
+      { error: 'Cart must contain at least one equipment, kit, or studio booking' },
       { status: 400 }
     )
   }
 
-  const start = startDate ?? new Date()
-  const end = endDate ?? new Date(Date.now() + 24 * 60 * 60 * 1000)
+  let studioId: string | undefined
+  let studioStartTime: Date | undefined
+  let studioEndTime: Date | undefined
+
+  let start = startDate ?? new Date()
+  let end = endDate ?? new Date(Date.now() + 24 * 60 * 60 * 1000)
+  if (hasStudio) {
+    const first = studioItems[0]
+    studioId = first.studioId
+    studioStartTime = first.startDate instanceof Date ? first.startDate : new Date(first.startDate)
+    studioEndTime = first.endDate instanceof Date ? first.endDate : new Date(first.endDate)
+    start = studioStartTime
+    end = studioEndTime
+  }
+
   if (end <= start) {
     return NextResponse.json({ error: 'Invalid dates' }, { status: 400 })
   }
 
   const totalAmount = cart.total
   const vatAmount = totalAmount * 0.15
-  const depositAmount = await PricingService.calculateDeposit(equipment)
+  const depositAmount = hasEquipment ? await PricingService.calculateDeposit(equipment) : 0
 
   const booking = await BookingService.create(
     {
@@ -80,11 +100,44 @@ export async function POST(request: NextRequest) {
       startDate: start,
       endDate: end,
       equipment,
+      studioId,
+      studioStartTime,
+      studioEndTime,
       totalAmount,
       vatAmount,
     },
     session.user.id
   )
+
+  // Send confirmation email (fire-and-forget)
+  const emailCustomer = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { name: true, email: true },
+  })
+  if (emailCustomer?.email) {
+    const studioRecord = studioId
+      ? await prisma.studio.findUnique({ where: { id: studioId }, select: { name: true, address: true } })
+      : null
+    const eqNames = equipment.length
+      ? await prisma.equipment.findMany({
+          where: { id: { in: equipment.map((e) => e.equipmentId) } },
+        }).then((rows) => rows.map((r) => (r as any).name as string).filter(Boolean))
+      : []
+    EmailService.sendBookingConfirmation({
+      to: emailCustomer.email,
+      customerName: emailCustomer.name || 'عميل',
+      bookingNumber: booking.bookingNumber,
+      bookingId: booking.id,
+      startDate: start,
+      endDate: end,
+      totalAmount,
+      studioName: studioRecord?.name,
+      studioAddress: (studioRecord as any)?.address,
+      studioStartTime: studioStartTime ?? null,
+      studioEndTime: studioEndTime ?? null,
+      equipmentList: eqNames,
+    }).catch((e) => console.error('Booking confirmation email error:', e))
+  }
 
   await BookingService.performRiskCheck(booking.id, session.user.id)
   const updated = await prisma.booking.findUnique({

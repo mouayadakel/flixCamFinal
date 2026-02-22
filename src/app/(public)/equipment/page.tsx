@@ -3,7 +3,33 @@
  * Guarded by enable_equipment_catalog feature flag.
  */
 
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import { t } from '@/lib/i18n/translate'
+import { generateAlternatesMetadata } from '@/lib/seo/hreflang'
+
+export const metadata: Metadata = {
+  title: t('ar', 'seo.equipmentTitle'),
+  description: t('ar', 'seo.equipmentDescription'),
+  alternates: generateAlternatesMetadata('/equipment'),
+  keywords: [
+    'تأجير معدات تصوير',
+    'cinematic equipment rental',
+    'كاميرات سينمائية',
+    'film equipment Riyadh',
+    'استوديوهات الرياض',
+  ],
+  openGraph: {
+    title: 'معدات التصوير السينمائي | FlixCam.rent',
+    description: 'تصفح واحجز معدات تصوير سينمائي احترافية في الرياض.',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'معدات التصوير السينمائي | FlixCam.rent',
+    description: 'تصفح واحجز معدات تصوير سينمائي احترافية في الرياض.',
+  },
+}
 import { Suspense } from 'react'
 import { FeatureFlagService } from '@/lib/services/feature-flag.service'
 import { EquipmentCatalogClient } from './equipment-catalog-client'

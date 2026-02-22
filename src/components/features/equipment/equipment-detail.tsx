@@ -8,6 +8,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useLocale } from '@/hooks/use-locale'
+import { BottomSheet } from '@/components/mobile/bottom-sheet'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,8 +19,11 @@ import { EquipmentPriceBlock } from './equipment-price-block'
 import { EquipmentCard } from './equipment-card'
 import { useCartStore } from '@/lib/stores/cart.store'
 import { AvailabilityBadge, getAvailabilityStatus } from './availability-badge'
+import { AvailabilityPreview } from './availability-preview'
 import { SaveEquipmentButton } from './save-equipment-button'
 import { SpecificationsDisplay, QuickSpecPills } from './specifications-display'
+import { FrequentlyRentedTogether } from './frequently-rented-together'
+import { WhatsAppRentButton } from './whatsapp-rent-button'
 import type { EquipmentCardItem } from './equipment-card'
 import type { AnySpecifications } from '@/lib/types/specifications.types'
 import { isStructuredSpecifications } from '@/lib/types/specifications.types'
@@ -62,6 +66,9 @@ interface EquipmentDetailProps {
       | null
     customFields?: Record<string, unknown> | null
     vendor?: { companyName: string; logo?: string | null } | null
+    shortDescription?: string | null
+    longDescription?: string | null
+    boxContents?: string | null
   }
   recommendations: EquipmentCardItem[]
 }
@@ -75,6 +82,9 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
   const [endDate, setEndDate] = useState(defaultDates.end)
   const [isAdding, setIsAdding] = useState(false)
   const [added, setAdded] = useState(false)
+  const [quantity, setQuantity] = useState(1)
+  const [bookingSheetOpen, setBookingSheetOpen] = useState(false)
+  const maxQty = Math.min(equipment.quantityAvailable ?? 1, 10)
   const availabilityStatus = getAvailabilityStatus(equipment.quantityAvailable, true)
   const available = availabilityStatus === 'available' || availabilityStatus === 'limited'
 
@@ -97,7 +107,7 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
         equipmentId: equipment.id,
         startDate: start.toISOString().slice(0, 10),
         endDate: end.toISOString().slice(0, 10),
-        quantity: 1,
+        quantity,
         dailyRate: equipment.dailyPrice,
       })
       setAdded(true)
@@ -118,8 +128,18 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
 
   const title = equipment.model ?? equipment.sku
 
+  const rentalDays = useMemo(() => {
+    const s = new Date(startDate)
+    const e = new Date(endDate)
+    const diff = Math.ceil((e.getTime() - s.getTime()) / 86400000)
+    return diff > 0 ? diff : 1
+  }, [startDate, endDate])
+
+  const estimatedTotal = rentalDays * equipment.dailyPrice * quantity
+
   return (
-    <div className="space-y-10">
+    <>
+    <div className="space-y-10 pb-24 lg:pb-0">
       {/* Breadcrumb */}
       <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm text-text-muted">
         <Link href="/" className="transition-colors hover:text-text-heading">
@@ -158,30 +178,30 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
               <QuickSpecPills specs={equipment.specifications.quickSpecs} />
             )}
 
-          {/* Product info tabs */}
+          {/* Product info tabs – horizontal scroll on mobile */}
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="h-auto w-full justify-start gap-0 rounded-2xl border border-border-light/60 bg-surface-light p-1">
+            <TabsList className="h-auto w-full justify-start gap-0 overflow-x-auto scrollbar-hide snap-x snap-mandatory rounded-2xl border border-border-light/60 bg-surface-light p-1 lg:overflow-visible">
               <TabsTrigger
                 value="overview"
-                className="rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-text-heading data-[state=active]:shadow-sm"
+                className="min-w-0 shrink-0 snap-start rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-text-heading data-[state=active]:shadow-sm"
               >
                 {t('equipment.tabOverview') ?? 'Overview'}
               </TabsTrigger>
               <TabsTrigger
                 value="specs"
-                className="rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-text-heading data-[state=active]:shadow-sm"
+                className="min-w-0 shrink-0 snap-start rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-text-heading data-[state=active]:shadow-sm"
               >
                 {t('equipment.tabSpecs') ?? 'Specifications'}
               </TabsTrigger>
               <TabsTrigger
                 value="included"
-                className="rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-text-heading data-[state=active]:shadow-sm"
+                className="min-w-0 shrink-0 snap-start rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-text-heading data-[state=active]:shadow-sm"
               >
                 {t('equipment.tabIncluded') ?? "What's Included"}
               </TabsTrigger>
               <TabsTrigger
                 value="addons"
-                className="rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-text-heading data-[state=active]:shadow-sm"
+                className="min-w-0 shrink-0 snap-start rounded-xl px-5 py-2.5 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-text-heading data-[state=active]:shadow-sm"
               >
                 {t('equipment.tabAddons') ?? 'Add-ons'}
               </TabsTrigger>
@@ -189,11 +209,17 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
 
             <TabsContent value="overview" className="pt-6">
               <div className="rounded-2xl border border-border-light/60 bg-white p-6 shadow-card">
-                <p className="text-body-main leading-relaxed text-text-body">
-                  {title} — {equipment.brand?.name ?? ''} {equipment.category?.name ?? ''}. SKU:{' '}
-                  <span className="font-mono text-sm text-text-muted">{equipment.sku}</span>.
-                  Available for daily, weekly, and monthly rental.
-                </p>
+                {equipment.shortDescription || equipment.longDescription ? (
+                  <div className="space-y-3 text-body-main leading-relaxed text-text-body">
+                    {equipment.shortDescription && <p>{equipment.shortDescription}</p>}
+                    {equipment.longDescription && <p>{equipment.longDescription}</p>}
+                  </div>
+                ) : (
+                  <p className="text-body-main leading-relaxed text-text-body">
+                    {title} — {equipment.brand?.name ?? ''} {equipment.category?.name ?? ''}. SKU:{' '}
+                    <span className="font-mono text-sm text-text-muted">{equipment.sku}</span>.
+                  </p>
+                )}
               </div>
             </TabsContent>
 
@@ -209,10 +235,13 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
 
             <TabsContent value="included" className="pt-6">
               <div className="rounded-2xl border border-border-light/60 bg-white p-6 shadow-card">
-                <p className="text-body-main text-text-body">
-                  {t('equipment.includedPlaceholder') ??
-                    'Standard rental includes the unit as described. Accessories or cases may be listed in specifications.'}
-                </p>
+                {equipment.boxContents ? (
+                  <p className="text-body-main text-text-body whitespace-pre-line">{equipment.boxContents}</p>
+                ) : (
+                  <p className="text-body-main text-text-body">
+                    {t('equipment.includedPlaceholder')}
+                  </p>
+                )}
               </div>
             </TabsContent>
 
@@ -227,8 +256,8 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
           </Tabs>
         </div>
 
-        {/* Right column: Sticky booking sidebar */}
-        <div className="lg:sticky lg:top-24 lg:self-start">
+        {/* Right column: Sticky booking sidebar (hidden on mobile; use bottom bar + sheet) */}
+        <div className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
           <div className="space-y-5 rounded-2xl border border-border-light/60 bg-white p-6 shadow-card-elevated">
             {/* Title + brand */}
             <div>
@@ -255,17 +284,20 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
               )}
               {equipment.vendor && (
                 <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-sm">
-                  <span className="text-muted-foreground">Listed by</span>
+                  <span className="text-muted-foreground">{t('equipment.listedBy')}</span>
                   <span className="font-medium">{equipment.vendor.companyName}</span>
                 </div>
               )}
             </div>
 
             {/* Availability */}
+            <div className="flex items-center gap-3">
             <AvailabilityBadge
               status={availabilityStatus}
               quantityAvailable={equipment.quantityAvailable ?? 0}
             />
+            <AvailabilityPreview equipmentId={equipment.id} />
+            </div>
 
             {/* Pricing */}
             <EquipmentPriceBlock
@@ -281,7 +313,7 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
             <div className="space-y-3">
               <p className="flex items-center gap-2 text-sm font-semibold text-text-heading">
                 <Calendar className="h-4 w-4 text-brand-primary" />
-                Select rental dates
+                {t('equipment.selectDates')}
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
@@ -312,6 +344,35 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
                 </div>
               </div>
             </div>
+
+            {/* Quantity */}
+            {maxQty > 1 && (
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-text-muted">{t('equipment.qty')}</Label>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg" disabled={quantity <= 1} onClick={() => setQuantity((q) => Math.max(1, q - 1))}>
+                    <span className="text-lg">−</span>
+                  </Button>
+                  <span className="w-8 text-center font-semibold">{quantity}</span>
+                  <Button variant="outline" size="icon" className="h-8 w-8 rounded-lg" disabled={quantity >= maxQty} onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}>
+                    <span className="text-lg">+</span>
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Estimated total */}
+            {equipment.dailyPrice > 0 && (
+              <div className="rounded-xl bg-surface-light px-4 py-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-text-muted">{t('equipment.estimatedTotal')}</span>
+                  <span className="text-lg font-bold text-brand-primary">{estimatedTotal.toLocaleString()} SAR</span>
+                </div>
+                <p className="mt-0.5 text-xs text-text-muted">
+                  {t('equipment.forDays').replace('{days}', String(rentalDays))} × {quantity > 1 ? `${quantity} ×` : ''} {equipment.dailyPrice.toLocaleString()} SAR
+                </p>
+              </div>
+            )}
 
             {/* Add to cart */}
             <div className="space-y-3">
@@ -349,12 +410,25 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
               )}
             </div>
 
+            {/* WhatsApp Quick Rent */}
+            <WhatsAppRentButton
+              equipmentName={title}
+              equipmentId={equipment.id}
+            />
+
+            {/* Deposit notice */}
+            <div className="rounded-xl border border-amber-200/60 bg-amber-50/50 px-4 py-3">
+              <p className="text-xs text-amber-700">
+                {t('checkout.depositNote')}
+              </p>
+            </div>
+
             {/* Trust signals */}
             <div className="space-y-2.5 border-t border-border-light/60 pt-4">
               {[
-                { Icon: Clock, text: t('home.trustSupport') || '24/7 support' },
-                { Icon: Truck, text: 'Delivery available' },
-                { Icon: CheckCircle2, text: 'Tested & verified equipment' },
+                { Icon: Clock, text: t('home.trustSupport') },
+                { Icon: Truck, text: t('equipment.trustDelivery') },
+                { Icon: CheckCircle2, text: t('equipment.trustVerified') },
               ].map(({ Icon, text }) => (
                 <div key={text} className="flex items-center gap-2.5 text-sm text-text-muted">
                   <Icon className="h-4 w-4 shrink-0 text-emerald-500" />
@@ -366,6 +440,86 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
         </div>
       </div>
 
+      {/* Mobile: sticky Add to Booking bar (above bottom nav) */}
+      <div className="fixed bottom-20 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-border bg-white/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_12px_rgba(0,0,0,0.08)] lg:hidden">
+        <div>
+          <span className="text-lg font-bold text-brand-primary">{equipment.dailyPrice.toLocaleString()} SAR</span>
+          <span className="ms-1 text-sm text-text-muted">/ {t('common.pricePerDay')}</span>
+        </div>
+        <Button
+          size="lg"
+          disabled={!available}
+          onClick={() => setBookingSheetOpen(true)}
+          className="min-h-[44px] flex-1 max-w-[200px] rounded-xl bg-brand-primary font-semibold hover:bg-brand-primary-hover active:scale-95"
+        >
+          {t('common.addToBooking') ?? 'Add to Booking'}
+        </Button>
+      </div>
+
+      <BottomSheet
+        open={bookingSheetOpen}
+        onOpenChange={setBookingSheetOpen}
+        title={t('common.addToBooking') ?? 'Add to Booking'}
+      >
+        <div className="space-y-5 p-4">
+          <EquipmentPriceBlock
+            dailyPrice={equipment.dailyPrice}
+            weeklyPrice={equipment.weeklyPrice}
+            monthlyPrice={equipment.monthlyPrice}
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="mobile-start-date" className="text-xs font-medium text-text-muted">{t('checkout.startDate')}</Label>
+              <Input
+                id="mobile-start-date"
+                type="date"
+                value={startDate}
+                min={defaultDates.start}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="h-12 w-full rounded-xl border-border-light text-base"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="mobile-end-date" className="text-xs font-medium text-text-muted">{t('checkout.endDate')}</Label>
+              <Input
+                id="mobile-end-date"
+                type="date"
+                value={endDate}
+                min={startDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="h-12 w-full rounded-xl border-border-light text-base"
+              />
+            </div>
+          </div>
+          {maxQty > 1 && (
+            <div className="flex items-center gap-2">
+              <Label className="text-xs font-medium text-text-muted">{t('equipment.qty')}</Label>
+              <Button variant="outline" size="icon" className="h-10 w-10 rounded-lg" disabled={quantity <= 1} onClick={() => setQuantity((q) => Math.max(1, q - 1))}>−</Button>
+              <span className="w-8 text-center font-semibold">{quantity}</span>
+              <Button variant="outline" size="icon" className="h-10 w-10 rounded-lg" disabled={quantity >= maxQty} onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))}>+</Button>
+            </div>
+          )}
+          <div className="rounded-xl bg-surface-light px-4 py-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-text-muted">{t('equipment.estimatedTotal')}</span>
+              <span className="text-lg font-bold text-brand-primary">{estimatedTotal.toLocaleString()} SAR</span>
+            </div>
+          </div>
+          <Button
+            size="lg"
+            disabled={!available || isAdding}
+            onClick={() => { handleAddToCart(); setBookingSheetOpen(false); }}
+            className="h-12 w-full rounded-xl bg-brand-primary font-semibold"
+          >
+            {isAdding ? (t('common.loading') ?? 'Adding...') : (t('common.addToCart'))}
+          </Button>
+        </div>
+      </BottomSheet>
+    </div>
+
+      {/* Frequently Rented Together */}
+      <FrequentlyRentedTogether equipmentId={equipment.id} />
+
       {/* Recommendations */}
       {recommendations.length > 0 && (
         <section className="border-t border-border-light/50 pt-10">
@@ -374,7 +528,7 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
               <h2 className="text-section-title text-text-heading">
                 {t('common.recommendations')}
               </h2>
-              <p className="mt-1 text-sm text-text-muted">Similar equipment you might like</p>
+              <p className="mt-1 text-sm text-text-muted">{t('equipment.similarItems')}</p>
             </div>
             <Button
               variant="ghost"
@@ -387,13 +541,15 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
               </Link>
             </Button>
           </div>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 scrollbar-hide snap-x snap-mandatory sm:mx-0 sm:grid sm:grid-cols-2 sm:snap-none sm:overflow-visible sm:px-0 lg:grid-cols-4">
             {recommendations.map((item) => (
-              <EquipmentCard key={item.id} item={item} />
+              <div key={item.id} className="w-[75vw] shrink-0 snap-start sm:w-auto">
+                <EquipmentCard item={item} />
+              </div>
             ))}
           </div>
         </section>
       )}
-    </div>
+    </>
   )
 }

@@ -5,16 +5,16 @@ import { ImportService } from '@/lib/services/import.service'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  // Skip rate limiting for polling endpoints
-  // const rateLimit = rateLimitAPI(request)
-  // if (!rateLimit.allowed) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
-
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const session = await auth()
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
-    const job = await ImportService.getJob(params.id)
+    const { id } = await params
+    const job = await ImportService.getJob(id)
     if (!job) return NextResponse.json({ error: 'Not found' }, { status: 404 })
     return NextResponse.json(job)
   } catch (error: any) {

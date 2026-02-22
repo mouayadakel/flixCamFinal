@@ -31,3 +31,24 @@ export function reportWebVitalsToGA4(metric: WebVitalsMetric): void {
     })
   }
 }
+
+/**
+ * Track a custom studio event via GA4 (or console in dev).
+ */
+export function trackStudioEvent(
+  eventName: 'package_selected' | 'addon_toggled' | 'booking_started' | 'compare_opened',
+  params: Record<string, string | number | boolean | null>
+): void {
+  if (typeof window === 'undefined') return
+  const gtag = (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag
+  if (gtag && GA4_MEASUREMENT_ID) {
+    gtag('event', eventName, {
+      event_category: 'Studio Booking',
+      ...params,
+    })
+  }
+  if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.debug('[studio-analytics]', eventName, params)
+  }
+}

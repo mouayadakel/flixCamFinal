@@ -9,13 +9,21 @@ import { getRedisClient } from './redis.client'
 
 export const DEAD_LETTER_QUEUE_NAME = 'dead-letter'
 
-export const deadLetterQueue = new Queue(DEAD_LETTER_QUEUE_NAME, {
-  connection: getRedisClient(),
-  defaultJobOptions: {
-    removeOnComplete: false,
-    removeOnFail: false,
-  },
-})
+let _deadLetterQueue: Queue | null = null
+
+/** Lazily create the dead-letter queue so Redis is not contacted at import time. */
+function getDeadLetterQueue(): Queue {
+  if (!_deadLetterQueue) {
+    _deadLetterQueue = new Queue(DEAD_LETTER_QUEUE_NAME, {
+      connection: getRedisClient(),
+      defaultJobOptions: {
+        removeOnComplete: false,
+        removeOnFail: false,
+      },
+    })
+  }
+  return _deadLetterQueue
+}
 
 export interface DeadLetterJobData {
   originalQueue: string
@@ -31,7 +39,7 @@ export interface DeadLetterJobData {
  * Add a failed job to the dead-letter queue for later review.
  */
 export async function sendToDeadLetter(data: DeadLetterJobData): Promise<string> {
-  const job = await deadLetterQueue.add('dlq-item', data, {
+  const job = await getDeadLetterQueue().add('dlq-item', data, {
     jobId: `dlq-${data.originalJobId}-${Date.now()}`,
   })
   return job.id ?? ''

@@ -5,7 +5,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Select,
@@ -47,38 +47,39 @@ export default function DashboardRevenuePage() {
   } | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true)
-      try {
-        const [trendsRes, revenueRes] = await Promise.all([
-          fetch(`/api/analytics/trends?days=${period}&period=daily`),
-          fetch('/api/dashboard/revenue?period=month'),
-        ])
-        if (trendsRes.ok) {
-          const trendsJson = await trendsRes.json()
-          setData(trendsJson)
-        }
-        if (revenueRes.ok) {
-          const revenueJson = await revenueRes.json()
-          setRevenueStats({
-            totalRevenue: revenueJson.thisMonthRevenue ?? revenueJson.totalRevenue ?? 0,
-            growthPercentage: revenueJson.growthPercentage ?? 0,
-            averageOrderValue: revenueJson.averageOrderValue ?? 0,
-          })
-        }
-      } catch {
-        toast({
-          title: 'Error',
-          description: 'Failed to load revenue data',
-          variant: 'destructive',
-        })
-      } finally {
-        setLoading(false)
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const [trendsRes, revenueRes] = await Promise.all([
+        fetch(`/api/analytics/trends?days=${period}&period=daily`),
+        fetch('/api/dashboard/revenue?period=month'),
+      ])
+      if (trendsRes.ok) {
+        const trendsJson = await trendsRes.json()
+        setData(trendsJson)
       }
+      if (revenueRes.ok) {
+        const revenueJson = await revenueRes.json()
+        setRevenueStats({
+          totalRevenue: revenueJson.thisMonthRevenue ?? revenueJson.totalRevenue ?? 0,
+          growthPercentage: revenueJson.growthPercentage ?? 0,
+          averageOrderValue: revenueJson.averageOrderValue ?? 0,
+        })
+      }
+    } catch {
+      toast({
+        title: 'خطأ',
+        description: 'فشل تحميل بيانات الإيرادات',
+        variant: 'destructive',
+      })
+    } finally {
+      setLoading(false)
     }
+  }, [period, toast])
+
+  useEffect(() => {
     load()
-  }, [period])
+  }, [load])
 
   if (loading && !data) {
     return (
@@ -92,11 +93,11 @@ export default function DashboardRevenuePage() {
   const chartData = data?.revenueByPeriod ?? []
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <h1 className="flex items-center gap-3 text-3xl font-bold">
           <DollarSign className="h-8 w-8" />
-          Dashboard · Revenue
+          لوحة التحكم · الإيرادات
         </h1>
         <div className="flex gap-2">
           <Select value={period} onValueChange={setPeriod}>
@@ -104,9 +105,9 @@ export default function DashboardRevenuePage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="7">Last 7 days</SelectItem>
-              <SelectItem value="30">Last 30 days</SelectItem>
-              <SelectItem value="90">Last 90 days</SelectItem>
+              <SelectItem value="7">آخر 7 أيام</SelectItem>
+              <SelectItem value="30">آخر 30 يوم</SelectItem>
+              <SelectItem value="90">آخر 90 يوم</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -117,7 +118,7 @@ export default function DashboardRevenuePage() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Revenue (this month)
+                الإيرادات (هذا الشهر)
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -127,7 +128,7 @@ export default function DashboardRevenuePage() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Growth vs last month
+                النمو مقارنة بالشهر السابق
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -141,7 +142,7 @@ export default function DashboardRevenuePage() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Avg order value
+                متوسط قيمة الطلب
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -153,15 +154,15 @@ export default function DashboardRevenuePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Revenue over time</CardTitle>
+          <CardTitle>الإيرادات بمرور الوقت</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Daily revenue and booking count for the selected period
+            الإيرادات اليومية وعدد الحجوزات للفترة المحددة
           </p>
         </CardHeader>
         <CardContent>
           {chartData.length === 0 ? (
             <div className="flex h-80 items-center justify-center text-muted-foreground">
-              No data for this period
+              لا توجد بيانات لهذه الفترة
             </div>
           ) : (
             <ResponsiveContainer width="100%" height={320}>
@@ -172,7 +173,7 @@ export default function DashboardRevenuePage() {
                 <Tooltip
                   formatter={(value, name) => [
                     name === 'revenue' ? formatCurrency(Number(value ?? 0)) : Number(value ?? 0),
-                    name === 'revenue' ? 'Revenue' : 'Bookings',
+                    name === 'revenue' ? 'الإيرادات' : 'الحجوزات',
                   ]}
                 />
                 <Legend />
@@ -180,14 +181,14 @@ export default function DashboardRevenuePage() {
                   type="monotone"
                   dataKey="revenue"
                   stroke="#1F87E8"
-                  name="Revenue"
+                  name="الإيرادات"
                   strokeWidth={2}
                 />
                 <Line
                   type="monotone"
                   dataKey="bookings"
                   stroke="#10B981"
-                  name="Bookings"
+                  name="الحجوزات"
                   strokeWidth={2}
                 />
               </LineChart>

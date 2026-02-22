@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -74,13 +74,7 @@ export default function ContractDetailPage() {
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
 
-  useEffect(() => {
-    if (params?.id) {
-      loadContract()
-    }
-  }, [params?.id])
-
-  const loadContract = async () => {
+  const loadContract = useCallback(async () => {
     setLoading(true)
     try {
       const response = await fetch(`/api/contracts/${params?.id}`)
@@ -98,7 +92,13 @@ export default function ContractDetailPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [params?.id, toast])
+
+  useEffect(() => {
+    if (params?.id) {
+      loadContract()
+    }
+  }, [params?.id, loadContract])
 
   const handleSendForSignature = async () => {
     setSending(true)

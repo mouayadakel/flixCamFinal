@@ -10,7 +10,8 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { Plus, Eye, FileText, ArrowRight } from 'lucide-react'
+import { Plus, Eye, FileText, ArrowRight, RefreshCw, AlertTriangle, Clock } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -142,6 +143,24 @@ export default function QuotesPage() {
     )
   }, [quotes, search])
 
+  const summary = useMemo(() => {
+    const now = new Date()
+    return {
+      draft: quotes.filter((q) => q.status === 'draft').length,
+      sent: quotes.filter((q) => q.status === 'sent').length,
+      accepted: quotes.filter((q) => q.status === 'accepted').length,
+      expiringSoon: quotes.filter(
+        (q) =>
+          (q.status === 'sent' || q.status === 'draft') &&
+          new Date(q.validUntil) > now &&
+          (new Date(q.validUntil).getTime() - now.getTime()) / 86400000 <= 3
+      ).length,
+      totalValue: quotes
+        .filter((q) => q.status !== 'rejected' && q.status !== 'expired')
+        .reduce((s, q) => s + Number(q.totalAmount), 0),
+    }
+  }, [quotes])
+
   const getStatusLabel = (status: QuoteStatus) => {
     return STATUS_LABELS[status]?.ar || status
   }
@@ -153,12 +172,55 @@ export default function QuotesPage() {
           <h1 className="text-3xl font-bold">عروض الأسعار</h1>
           <p className="mt-2 text-muted-foreground">إدارة عروض الأسعار وتحويلها إلى حجوزات</p>
         </div>
-        <Button asChild>
-          <Link href="/admin/quotes/new">
-            <Plus className="ml-2 h-4 w-4" />
-            عرض جديد
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={loadQuotes} disabled={loading}>
+            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            تحديث
+          </Button>
+          <Button asChild>
+            <Link href="/admin/quotes/new">
+              <Plus className="ml-2 h-4 w-4" />
+              عرض جديد
+            </Link>
+          </Button>
+        </div>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+        <Card className="cursor-pointer hover:border-primary/50" onClick={() => setStatusFilter('draft')}>
+          <CardContent className="pb-3 pt-4">
+            <p className="text-sm text-muted-foreground">مسودة</p>
+            <p className="text-2xl font-bold">{summary.draft}</p>
+          </CardContent>
+        </Card>
+        <Card className="cursor-pointer hover:border-primary/50" onClick={() => setStatusFilter('sent')}>
+          <CardContent className="pb-3 pt-4">
+            <p className="text-sm text-muted-foreground">مرسل</p>
+            <p className="text-2xl font-bold text-blue-600">{summary.sent}</p>
+          </CardContent>
+        </Card>
+        <Card className="cursor-pointer hover:border-primary/50" onClick={() => setStatusFilter('accepted')}>
+          <CardContent className="pb-3 pt-4">
+            <p className="text-sm text-muted-foreground">مقبول</p>
+            <p className="text-2xl font-bold text-green-600">{summary.accepted}</p>
+          </CardContent>
+        </Card>
+        <Card className={`cursor-pointer hover:border-primary/50 ${summary.expiringSoon > 0 ? 'border-amber-300' : ''}`}>
+          <CardContent className="pb-3 pt-4">
+            <div className="flex items-center gap-1">
+              <Clock className="h-3 w-3 text-amber-500" />
+              <p className="text-sm text-muted-foreground">تنتهي قريباً</p>
+            </div>
+            <p className={`text-2xl font-bold ${summary.expiringSoon > 0 ? 'text-amber-600' : ''}`}>{summary.expiringSoon}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pb-3 pt-4">
+            <p className="text-sm text-muted-foreground">إجمالي القيمة</p>
+            <p className="text-lg font-bold">{summary.totalValue.toLocaleString('ar-SA')} ر.س</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Filters */}
@@ -241,11 +303,28 @@ export default function QuotesPage() {
                   </TableCell>
                   <TableCell>{formatCurrency(quote.totalAmount)}</TableCell>
                   <TableCell>
-                    <span
-                      className={new Date(quote.validUntil) < new Date() ? 'text-destructive' : ''}
-                    >
-                      {formatDate(quote.validUntil)}
-                    </span>
+                    {(() => {
+                      const now = new Date()
+                      const expiry = new Date(quote.validUntil)
+                      const daysLeft = Math.ceil((expiry.getTime() - now.getTime()) / 86400000)
+                      const isExpired = expiry < now
+                      const isExpiringSoon = !isExpired && daysLeft <= 3
+                      return (
+                        <div className="flex items-center gap-1">
+                          {isExpired ? (
+                            <span className="text-destructive">{formatDate(quote.validUntil)}</span>
+                          ) : isExpiringSoon ? (
+                            <>
+                              <AlertTriangle className="h-3 w-3 text-amber-500" />
+                              <span className="text-amber-600">{formatDate(quote.validUntil)}</span>
+                              <span className="text-xs text-amber-500">({daysLeft}د)</span>
+                            </>
+                          ) : (
+                            <span>{formatDate(quote.validUntil)}</span>
+                          )}
+                        </div>
+                      )
+                    })()}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">

@@ -6,7 +6,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { Layout, HelpCircle, FileText, Star } from 'lucide-react'
+import { Layout, HelpCircle, FileText, Star, Video } from 'lucide-react'
 
 const cmsSections = [
   {
@@ -29,6 +29,13 @@ const cmsSections = [
     href: '/admin/cms/featured',
     icon: Star,
     description: 'إدارة المحتوى المميز على الموقع',
+  },
+  {
+    titleAr: 'الاستوديوهات',
+    titleEn: 'Studios',
+    href: '/admin/cms/studios',
+    icon: Video,
+    description: 'إدارة محتوى صفحات الاستوديوهات: صور، أسعار، باكجات، موقع، أسئلة شائعة',
   },
 ]
 

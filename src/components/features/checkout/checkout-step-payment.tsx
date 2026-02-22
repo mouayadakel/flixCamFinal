@@ -32,13 +32,11 @@ export function CheckoutStepPayment({ depositAmount, onSuccess }: CheckoutStepPa
         <h3 className="mb-4 font-semibold">{t('checkout.deposit')}</h3>
         {depositAmount != null && depositAmount > 0 && (
           <p className="mb-4 text-sm text-text-muted">
-            A deposit of{' '}
-            {depositAmount.toLocaleString('en-SA', { style: 'currency', currency: 'SAR' })} will be
-            held and released after equipment return.
+            {t('checkout.depositHeldNote').replace('{amount}', depositAmount.toLocaleString('en-SA', { style: 'currency', currency: 'SAR' }))}
           </p>
         )}
         <p className="mb-4 text-sm text-text-muted">
-          Payment method: Card / Apple Pay / Bank transfer
+          {t('checkout.paymentMethods')}
         </p>
         <div className="mb-6 flex items-start gap-2">
           <Checkbox

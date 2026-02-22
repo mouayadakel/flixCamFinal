@@ -32,7 +32,7 @@ export function EquipmentGallery({ media, alt }: EquipmentGalleryProps) {
     return (
       <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 rounded-2xl border border-border-light/60 bg-surface-light text-text-muted">
         <ImageOff className="h-10 w-10 text-text-muted/40" />
-        <span className="text-sm">No images available</span>
+        <span className="text-sm">لا توجد صور</span>
       </div>
     )
   }
@@ -106,7 +106,7 @@ export function EquipmentGallery({ media, alt }: EquipmentGalleryProps) {
                   : 'border-transparent opacity-70 hover:border-border-light hover:opacity-100'
               )}
             >
-              <Image src={m.url} alt="" fill className="object-cover" sizes="92px" />
+              <Image src={m.url} alt={`${alt} - thumbnail ${i + 1}`} fill className="object-cover" sizes="92px" />
             </button>
           ))}
         </div>

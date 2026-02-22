@@ -26,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
 import { Loader2, RefreshCw, Download, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react'
 import { format } from 'date-fns'
 import Link from 'next/link'
@@ -43,17 +44,30 @@ interface AuditLogEntry {
   user?: { id: string; email: string; name: string | null } | null
 }
 
-const RESOURCE_TYPES = [
-  'booking',
-  'payment',
-  'invoice',
-  'contract',
-  'user',
-  'approval',
-  'feature_flag',
-  'equipment',
-  'quote',
+const RESOURCE_TYPES: { value: string; label: string }[] = [
+  { value: 'booking', label: 'حجز' },
+  { value: 'payment', label: 'دفع' },
+  { value: 'invoice', label: 'فاتورة' },
+  { value: 'contract', label: 'عقد' },
+  { value: 'user', label: 'مستخدم' },
+  { value: 'approval', label: 'موافقة' },
+  { value: 'feature_flag', label: 'ميزة' },
+  { value: 'equipment', label: 'معدة' },
+  { value: 'quote', label: 'عرض سعر' },
 ]
+
+const RESOURCE_TYPE_AR: Record<string, string> = Object.fromEntries(
+  RESOURCE_TYPES.map((r) => [r.value, r.label])
+)
+
+function getActionColor(action: string): string {
+  if (action.includes('created') || action.includes('signed')) return 'bg-green-100 text-green-800'
+  if (action.includes('confirmed') || action.includes('success')) return 'bg-blue-100 text-blue-800'
+  if (action.includes('cancelled') || action.includes('deleted') || action.includes('failed')) return 'bg-red-100 text-red-800'
+  if (action.includes('updated') || action.includes('risk_check')) return 'bg-yellow-100 text-yellow-800'
+  if (action.includes('refund')) return 'bg-orange-100 text-orange-800'
+  return 'bg-gray-100 text-gray-800'
+}
 
 function buildResourceLink(resourceType: string | null, resourceId: string | null): string | null {
   if (!resourceId) return null
@@ -177,8 +191,8 @@ export default function AuditLogPage() {
                 <SelectContent>
                   <SelectItem value="">الكل</SelectItem>
                   {RESOURCE_TYPES.map((t) => (
-                    <SelectItem key={t} value={t}>
-                      {t}
+                    <SelectItem key={t.value} value={t.value}>
+                      {t.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -298,8 +312,12 @@ export default function AuditLogPage() {
                           <TableCell className="text-sm">
                             {log.user ? log.user.name || log.user.email : (log.userId ?? '—')}
                           </TableCell>
-                          <TableCell className="font-mono text-sm">{log.action}</TableCell>
-                          <TableCell>{log.resourceType ?? '—'}</TableCell>
+                          <TableCell>
+                            <Badge variant="secondary" className={`font-mono text-xs ${getActionColor(log.action)}`}>
+                              {log.action}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{log.resourceType ? (RESOURCE_TYPE_AR[log.resourceType] ?? log.resourceType) : '—'}</TableCell>
                           <TableCell>
                             {link && log.resourceId ? (
                               <Link

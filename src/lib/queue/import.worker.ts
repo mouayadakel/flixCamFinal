@@ -6,7 +6,7 @@
 
 import { Worker, Job } from 'bullmq'
 import { getRedisClient } from './redis.client'
-import { IMPORT_QUEUE_NAME } from './import.queue'
+import { IMPORT_QUEUE_NAME, type ApprovedSuggestion } from './import.queue'
 import { processImportJob } from '@/lib/services/import-worker'
 
 /**
@@ -17,14 +17,17 @@ export function createImportWorker() {
   const worker = new Worker(
     IMPORT_QUEUE_NAME,
     async (job: Job) => {
-      const { jobId } = job.data as { jobId: string }
+      const { jobId, approvedSuggestions } = job.data as {
+        jobId: string
+        approvedSuggestions?: ApprovedSuggestion[]
+      }
 
       // Update job progress
       await job.updateProgress(0)
 
       try {
-        // Process the import job
-        await processImportJob(jobId)
+        // Process the import job (with optional AI-approved suggestions)
+        await processImportJob(jobId, { approvedSuggestions })
 
         // Mark as complete
         await job.updateProgress(100)

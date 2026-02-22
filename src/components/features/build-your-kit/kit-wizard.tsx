@@ -90,7 +90,7 @@ export function KitWizard() {
             setShootTypeData(data)
             setPhase('budget')
           })
-          .catch(() => {})
+          .catch((err) => console.error('[kit-wizard] fetch shoot-type failed', err))
       } else setPhase('budget')
       return
     }

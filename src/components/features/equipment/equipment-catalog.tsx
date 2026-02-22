@@ -5,21 +5,22 @@
 
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useEffect, useState, useMemo } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLocale } from '@/hooks/use-locale'
 import { EquipmentCategoryBar } from './equipment-category-bar'
 import { FilterPanel } from './filter-panel'
 import { EquipmentGrid } from './equipment-grid'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import type { EquipmentCardItem } from './equipment-card'
 
 const PAGE_SIZE = 24
 
 export function EquipmentCatalog() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const { t } = useLocale()
   const [equipment, setEquipment] = useState<EquipmentCardItem[]>([])
   const [total, setTotal] = useState(0)
@@ -38,6 +39,40 @@ export function EquipmentCatalog() {
   const sort = searchParams?.get('sort') ?? ''
   const priceMin = searchParams?.get('priceMin') ?? ''
   const priceMax = searchParams?.get('priceMax') ?? ''
+
+  const activeChips = useMemo(() => {
+    const chips: { key: string; label: string }[] = []
+    if (q) chips.push({ key: 'q', label: `"${q}"` })
+    if (categoryId) {
+      const cat = categories.find((c) => c.id === categoryId)
+      if (cat) chips.push({ key: 'categoryId', label: cat.name })
+    }
+    if (sort && sort !== 'recommended') chips.push({ key: 'sort', label: sort })
+    if (priceMin) chips.push({ key: 'priceMin', label: `Min ${priceMin}` })
+    if (priceMax) chips.push({ key: 'priceMax', label: `Max ${priceMax}` })
+    brandIds.split(',').forEach((bid) => {
+      const b = brands.find((x) => x.id === bid.trim())
+      if (b) chips.push({ key: `brand:${b.id}`, label: b.name })
+    })
+    return chips
+  }, [q, categoryId, sort, priceMin, priceMax, brandIds, categories, brands])
+
+  const removeChip = (key: string) => {
+    const next = new URLSearchParams(searchParams?.toString() ?? '')
+    if (key === 'q') next.delete('q')
+    else if (key === 'categoryId') next.delete('categoryId')
+    else if (key === 'sort') next.delete('sort')
+    else if (key === 'priceMin') next.delete('priceMin')
+    else if (key === 'priceMax') next.delete('priceMax')
+    else if (key.startsWith('brand:')) {
+      const bid = key.replace('brand:', '')
+      const rest = brandIds.split(',').map((s) => s.trim()).filter((id) => id !== bid)
+      if (rest.length) next.set('brandIds', rest.join(','))
+      else next.delete('brandIds')
+    }
+    next.delete('skip')
+    router.push(`/equipment?${next.toString()}`, { scroll: false })
+  }
 
   useEffect(() => {
     const params = new URLSearchParams()
@@ -89,10 +124,36 @@ export function EquipmentCatalog() {
         />
       )}
       <div className="flex flex-col gap-8 lg:flex-row">
-        <div className="w-full shrink-0 lg:w-72">
+        <div className="sticky top-[72px] z-30 w-full shrink-0 lg:relative lg:top-0 lg:z-0 lg:w-72">
           <FilterPanel categories={categories} brands={brands} total={total} />
         </div>
       <div className="min-w-0 flex-1 space-y-6">
+        {activeChips.length > 0 && (
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
+            {activeChips.map((chip) => (
+              <span
+                key={chip.key}
+                className="flex shrink-0 items-center gap-1 rounded-full border border-border bg-muted/50 px-3 py-1.5 text-sm"
+              >
+                <span className="truncate max-w-[120px]">{chip.label}</span>
+                <button
+                  type="button"
+                  onClick={() => removeChip(chip.key)}
+                  className="min-h-[24px] min-w-[24px] rounded-full p-0.5 hover:bg-muted"
+                  aria-label={t('common.remove') ?? 'Remove'}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </span>
+            ))}
+            <Link
+              href="/equipment"
+              className="shrink-0 text-sm font-medium text-primary hover:underline"
+            >
+              {t('common.clearAll') ?? 'Clear all'}
+            </Link>
+          </div>
+        )}
         {q && (
           <p className="text-body-main text-text-muted">
             {t('common.resultsFor').replace('{query}', q)}
@@ -122,7 +183,7 @@ export function EquipmentCatalog() {
                   <span className="text-3xl">🔍</span>
                 </div>
                 <p className="text-lg font-medium text-text-heading">{t('common.noResults')}</p>
-                <p className="mt-1 text-sm text-text-muted">Try adjusting your filters</p>
+                <p className="mt-1 text-sm text-text-muted">{t('equipment.adjustFilters')}</p>
                 <Button
                   variant="outline"
                   asChild
@@ -134,36 +195,52 @@ export function EquipmentCatalog() {
             )}
 
             {totalPages > 1 && !isLoading && (
-              <nav className="flex items-center justify-center gap-2 pt-6" aria-label="Pagination">
-                {hasPrev && (
-                  <Button variant="outline" size="sm" asChild className="rounded-xl">
-                    <Link
-                      href={`/equipment?${new URLSearchParams({
-                        ...Object.fromEntries(searchParams?.entries() ?? []),
-                        skip: String(Math.max(0, skip - PAGE_SIZE)),
-                      }).toString()}`}
-                    >
-                      <ChevronLeft className="me-1 h-4 w-4" />
-                      {t('common.back')}
-                    </Link>
-                  </Button>
-                )}
-                <span className="rounded-xl bg-surface-light px-4 py-2 text-sm font-medium text-text-heading">
-                  {currentPage} / {totalPages}
-                </span>
+              <nav className="flex flex-col items-center gap-4 pt-6 sm:flex-row sm:justify-center sm:gap-2" aria-label="Pagination">
+                {/* Mobile: Load more only */}
                 {hasNext && (
-                  <Button variant="outline" size="sm" asChild className="rounded-xl">
+                  <Button variant="outline" size="sm" asChild className="w-full min-h-[44px] rounded-xl sm:w-auto lg:hidden">
                     <Link
                       href={`/equipment?${new URLSearchParams({
                         ...Object.fromEntries(searchParams?.entries() ?? []),
                         skip: String(skip + PAGE_SIZE),
                       }).toString()}`}
                     >
-                      {t('common.next')}
-                      <ChevronRight className="ms-1 h-4 w-4" />
+                      {t('common.loadMore') ?? 'Load more'}
                     </Link>
                   </Button>
                 )}
+                {/* Desktop: full pagination */}
+                <div className="hidden items-center justify-center gap-2 lg:flex">
+                  {hasPrev && (
+                    <Button variant="outline" size="sm" asChild className="rounded-xl">
+                      <Link
+                        href={`/equipment?${new URLSearchParams({
+                          ...Object.fromEntries(searchParams?.entries() ?? []),
+                          skip: String(Math.max(0, skip - PAGE_SIZE)),
+                        }).toString()}`}
+                      >
+                        <ChevronLeft className="me-1 h-4 w-4" />
+                        {t('common.back')}
+                      </Link>
+                    </Button>
+                  )}
+                  <span className="rounded-xl bg-surface-light px-4 py-2 text-sm font-medium text-text-heading">
+                    {currentPage} / {totalPages}
+                  </span>
+                  {hasNext && (
+                    <Button variant="outline" size="sm" asChild className="rounded-xl">
+                      <Link
+                        href={`/equipment?${new URLSearchParams({
+                          ...Object.fromEntries(searchParams?.entries() ?? []),
+                          skip: String(skip + PAGE_SIZE),
+                        }).toString()}`}
+                      >
+                        {t('common.next')}
+                        <ChevronRight className="ms-1 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  )}
+                </div>
               </nav>
             )}
           </>

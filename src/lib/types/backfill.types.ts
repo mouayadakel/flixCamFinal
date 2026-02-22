@@ -5,13 +5,7 @@
 
 // ─── Gap & content health ───────────────────────────────────────────────────
 
-export type GapType =
-  | 'photos'
-  | 'descriptions'
-  | 'seo'
-  | 'specs'
-  | 'translations'
-  | 'shortDescription'
+export type GapType = 'description' | 'seo' | 'photos' | 'translations' | 'specs'
 
 export interface ContentGapReport {
   scannedAt: Date
@@ -56,6 +50,8 @@ export interface BackfillOptions {
   dryRun?: boolean
   trigger: 'manual' | 'scheduled' | 'event' | 'import'
   triggeredBy?: string
+  /** When true, backfill creates AiContentDraft instead of writing to Product (preview workflow) */
+  previewMode?: boolean
 }
 
 export interface BackfillJobStatus {

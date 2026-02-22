@@ -98,8 +98,8 @@ export default function FeaturesPage() {
       setFilteredFlags(data.flags || [])
     } catch (error: unknown) {
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to load feature flags',
+        title: 'خطأ',
+        description: error instanceof Error ? error.message : 'فشل تحميل أعلام الميزات',
         variant: 'destructive',
       })
     } finally {
@@ -136,13 +136,13 @@ export default function FeaturesPage() {
       await fetch('/api/feature-flags', { cache: 'no-store' })
 
       toast({
-        title: 'Success',
-        description: `${getFlagLabel(flag)} ${data.flag.enabled ? 'enabled' : 'disabled'}`,
+        title: 'تم',
+        description: `${getFlagLabelAr(flag)} ${data.flag.enabled ? 'مفعّل' : 'معطّل'}`,
       })
     } catch (error: unknown) {
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to toggle feature flag',
+        title: 'خطأ',
+        description: error instanceof Error ? error.message : 'فشل تغيير حالة الميزة',
         variant: 'destructive',
       })
     } finally {
@@ -177,20 +177,20 @@ export default function FeaturesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       <div>
-        <h1 className="text-3xl font-bold">Feature Controls</h1>
+        <h1 className="text-3xl font-bold">التحكم في الميزات</h1>
         <p className="mt-1 text-muted-foreground">
-          Enable or disable features on the public website and control panel.
+          تفعيل أو تعطيل الميزات على الموقع العام ولوحة التحكم.
         </p>
       </div>
 
-      <Tabs defaultValue="flags" className="space-y-4">
+      <Tabs defaultValue="flags" className="space-y-4" dir="rtl">
         <TabsList>
-          <TabsTrigger value="flags">Feature Flags</TabsTrigger>
+          <TabsTrigger value="flags">أعلام الميزات</TabsTrigger>
           <TabsTrigger value="audit">
-            <History className="mr-2 h-4 w-4" />
-            Audit Trail
+            <History className="ml-2 h-4 w-4" />
+            سجل التغييرات
           </TabsTrigger>
         </TabsList>
 
@@ -199,11 +199,11 @@ export default function FeaturesPage() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search by name, label, or description..."
+                placeholder="البحث بالاسم أو التسمية أو الوصف..."
                 className="pl-9"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                aria-label="Search features"
+                aria-label="البحث في الميزات"
               />
             </div>
           </div>
@@ -232,12 +232,12 @@ export default function FeaturesPage() {
                                 {getFlagLabel(flag)}
                                 {flag.requiresApproval && (
                                   <Badge variant="secondary" className="text-xs">
-                                    Requires Approval
+                                    يتطلب موافقة
                                   </Badge>
                                 )}
                               </CardTitle>
                               <CardDescription>
-                                {flag.description || 'No description'}
+                                {flag.description || 'لا يوجد وصف'}
                               </CardDescription>
                             </div>
                             <div className="flex shrink-0 items-center gap-2">
@@ -253,7 +253,7 @@ export default function FeaturesPage() {
                               <span
                                 className={`w-14 text-sm font-medium ${flag.enabled ? 'text-green-600' : 'text-muted-foreground'}`}
                               >
-                                {flag.enabled ? 'On' : 'Off'}
+                                {flag.enabled ? 'مفعّل' : 'معطّل'}
                               </span>
                             </div>
                           </div>
@@ -269,8 +269,8 @@ export default function FeaturesPage() {
               <Card>
                 <CardContent className="py-12 text-center text-muted-foreground">
                   {searchQuery
-                    ? 'No feature flags match your search.'
-                    : 'No feature flags found. Run the seed to create default flags.'}
+                    ? 'لا توجد ميزات تطابق بحثك.'
+                    : 'لا توجد أعلام ميزات. شغّل البذر لإنشاء الأعلام الافتراضية.'}
                 </CardContent>
               </Card>
             )}

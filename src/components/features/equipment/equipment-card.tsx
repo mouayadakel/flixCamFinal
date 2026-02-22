@@ -13,6 +13,7 @@ import { isExternalImageUrl } from '@/lib/utils/image.utils'
 import { cn } from '@/lib/utils'
 import { SaveEquipmentButton } from './save-equipment-button'
 import { Eye } from 'lucide-react'
+import { getLocalizedName } from '@/lib/i18n/content-helper'
 
 const EQUIPMENT_PLACEHOLDER_IMAGE = '/images/placeholder.jpg'
 
@@ -20,6 +21,8 @@ export interface EquipmentCardItem {
   id: string
   sku: string | null
   model: string | null
+  nameEn?: string | null
+  nameZh?: string | null
   dailyPrice: number
   quantityAvailable: number | null
   category: { name: string; slug: string } | null
@@ -34,9 +37,12 @@ interface EquipmentCardProps {
 }
 
 export function EquipmentCard({ item, layout = 'grid' }: EquipmentCardProps) {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
   const [imageFailed, setImageFailed] = useState(false)
   const handleImageError = useCallback(() => setImageFailed(true), [])
+  
+  // Get localized name, fallback to model or SKU
+  const displayName = getLocalizedName(item as any, locale) || item.model || item.sku || item.id
 
   if (layout === 'list') {
     return (
@@ -64,7 +70,7 @@ export function EquipmentCard({ item, layout = 'grid' }: EquipmentCardProps) {
             {item.brand?.name ?? item.category?.name ?? '—'}
           </p>
           <p className="mt-1 truncate font-semibold text-text-heading transition-colors group-hover:text-brand-primary">
-            {item.model ?? item.sku}
+            {displayName}
           </p>
           {item.vendor && (
             <p className="mt-0.5 text-xs text-muted-foreground">by {item.vendor.companyName}</p>
@@ -118,7 +124,7 @@ export function EquipmentCard({ item, layout = 'grid' }: EquipmentCardProps) {
           {item.brand?.name ?? item.category?.name ?? '—'}
         </p>
         <p className="mt-1.5 truncate text-card-title text-text-heading transition-colors group-hover:text-brand-primary">
-          {item.model ?? item.sku ?? item.id}
+          {displayName}
         </p>
         {item.vendor && (
           <p className="mt-0.5 text-xs text-muted-foreground">by {item.vendor.companyName}</p>

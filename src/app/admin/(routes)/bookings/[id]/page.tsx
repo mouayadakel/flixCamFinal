@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -17,6 +17,10 @@ import {
   Package,
   FileText,
   AlertTriangle,
+  Clock,
+  CheckCircle,
+  XCircle,
+  RotateCcw,
 } from 'lucide-react'
 import { BookingStateMachine } from '@/components/features/bookings/booking-state-machine'
 import { Button } from '@/components/ui/button'
@@ -182,21 +186,9 @@ export default function BookingDetailPage() {
       estimatedCost: string
     }>
   >([])
+  const [auditLogs, setAuditLogs] = useState<Array<{ id: string; action: string; description: string | null; createdAt: string }>>([])
 
-  useEffect(() => {
-    loadBooking()
-  }, [params?.id])
-
-  useEffect(() => {
-    if (booking?.id) {
-      fetch(`/api/bookings/${booking.id}/damage-claims`)
-        .then((r) => (r.ok ? r.json() : { claims: [] }))
-        .then((d) => setDamageClaims(d.claims ?? []))
-        .catch(() => setDamageClaims([]))
-    }
-  }, [booking?.id])
-
-  const loadBooking = async () => {
+  const loadBooking = useCallback(async () => {
     const id = params?.id
     if (!id) return
     setLoading(true)
@@ -216,7 +208,24 @@ export default function BookingDetailPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [params?.id, toast])
+
+  useEffect(() => {
+    loadBooking()
+  }, [loadBooking])
+
+  useEffect(() => {
+    if (booking?.id) {
+      fetch(`/api/bookings/${booking.id}/damage-claims`)
+        .then((r) => (r.ok ? r.json() : { claims: [] }))
+        .then((d) => setDamageClaims(d.claims ?? []))
+        .catch(() => setDamageClaims([]))
+      fetch(`/api/audit-logs?resourceType=Booking&resourceId=${booking.id}&limit=30`)
+        .then((r) => (r.ok ? r.json() : { logs: [] }))
+        .then((d) => setAuditLogs(d.logs ?? d.data ?? []))
+        .catch(() => setAuditLogs([]))
+    }
+  }, [booking?.id])
 
   const handleStateTransition = async (toState: BookingState) => {
     if (!booking) return
@@ -257,6 +266,10 @@ export default function BookingDetailPage() {
     }
   }
 
+  const isLateReturn = booking &&
+    booking.status === 'ACTIVE' &&
+    new Date(booking.endDate) < new Date()
+
   const formatAmount = (amount: number | string | null) => {
     if (!amount) return '0.00'
     const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount
@@ -283,8 +296,27 @@ export default function BookingDetailPage() {
     )
   }
 
+  const PAYMENT_STATUS_LABELS: Record<string, { ar: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+    PENDING: { ar: 'معلق', variant: 'secondary' },
+    COMPLETED: { ar: 'مكتمل', variant: 'default' },
+    FAILED: { ar: 'فشل', variant: 'destructive' },
+    REFUNDED: { ar: 'مسترد', variant: 'outline' },
+    PARTIAL: { ar: 'جزئي', variant: 'secondary' },
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
+      {isLateReturn && (
+        <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
+          <AlertTriangle className="h-5 w-5 shrink-0 text-red-600" />
+          <div>
+            <p className="font-medium text-red-800">تأخر في الإرجاع</p>
+            <p className="text-sm text-red-700">
+              كان المفترض إرجاع المعدات في {formatDate(booking.endDate)} — الحجز لا يزال نشطاً
+            </p>
+          </div>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">حجز #{booking.bookingNumber}</h1>
@@ -475,21 +507,58 @@ export default function BookingDetailPage() {
             </CardHeader>
             <CardContent>
               {booking.payments && booking.payments.length > 0 ? (
-                <div className="space-y-4">
-                  {booking.payments.map((payment) => (
-                    <div
-                      key={payment.id}
-                      className="flex items-center justify-between rounded-lg border p-4"
-                    >
-                      <div>
-                        <div className="font-medium">{formatAmount(payment.amount)}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {formatDate(payment.createdAt)}
-                        </div>
-                      </div>
-                      <Badge>{payment.status}</Badge>
+                <div className="space-y-3">
+                  {/* Payment summary */}
+                  <div className="mb-4 grid grid-cols-2 gap-3 rounded-lg bg-muted/40 p-3 md:grid-cols-4">
+                    <div>
+                      <p className="text-xs text-muted-foreground">الإجمالي</p>
+                      <p className="font-semibold">{formatAmount(booking.totalAmount)}</p>
                     </div>
-                  ))}
+                    <div>
+                      <p className="text-xs text-muted-foreground">ضريبة القيمة المضافة</p>
+                      <p className="font-semibold">{formatAmount(booking.vatAmount)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">عدد الدفعات</p>
+                      <p className="font-semibold">{booking.payments.length}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">المجموع المدفوع</p>
+                      <p className="font-semibold text-green-700">
+                        {formatAmount(
+                          booking.payments
+                            .filter((p) => p.status === 'COMPLETED')
+                            .reduce((s, p) => s + Number(p.amount), 0)
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  {booking.payments.map((payment) => {
+                    const statusInfo = PAYMENT_STATUS_LABELS[payment.status] ?? { ar: payment.status, variant: 'secondary' as const }
+                    return (
+                      <div
+                        key={payment.id}
+                        className="flex items-center justify-between rounded-lg border p-4"
+                      >
+                        <div className="flex items-center gap-3">
+                          {payment.status === 'COMPLETED' ? (
+                            <CheckCircle className="h-5 w-5 text-green-500" />
+                          ) : payment.status === 'FAILED' ? (
+                            <XCircle className="h-5 w-5 text-red-500" />
+                          ) : (
+                            <Clock className="h-5 w-5 text-amber-500" />
+                          )}
+                          <div>
+                            <div className="font-medium">{formatAmount(payment.amount)}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {formatDate(payment.createdAt)}
+                            </div>
+                          </div>
+                        </div>
+                        <Badge variant={statusInfo.variant}>{statusInfo.ar}</Badge>
+                      </div>
+                    )
+                  })}
                 </div>
               ) : (
                 <p className="text-muted-foreground">لا توجد دفعات</p>
@@ -626,23 +695,41 @@ export default function BookingDetailPage() {
         <TabsContent value="returns">
           <Card>
             <CardHeader>
-              <CardTitle>الإرجاع</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <RotateCcw className="h-5 w-5" />
+                الإرجاع
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              {booking.status === 'RETURNED' || booking.status === 'CLOSED' ? (
-                <div className="space-y-2">
-                  <div className="rounded-lg border p-3">
-                    <div className="font-medium">تاريخ الإرجاع</div>
-                    <div className="text-sm text-muted-foreground">
-                      {formatDate(booking.endDate)}
-                    </div>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                <div className="rounded-lg border p-3">
+                  <p className="text-sm text-muted-foreground">تاريخ الإرجاع المخطط</p>
+                  <p className="font-medium">{formatDate(booking.endDate)}</p>
+                </div>
+                <div className="rounded-lg border p-3">
+                  <p className="text-sm text-muted-foreground">حالة الإرجاع</p>
+                  <div className="mt-1">
+                    {booking.status === 'RETURNED' || booking.status === 'CLOSED' ? (
+                      <Badge className="bg-green-100 text-green-800">تم الإرجاع</Badge>
+                    ) : isLateReturn ? (
+                      <Badge variant="destructive">تأخر في الإرجاع</Badge>
+                    ) : (
+                      <Badge variant="secondary">لم يُرجع بعد</Badge>
+                    )}
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    تم إرجاع المعدات - في انتظار الفحص النهائي
+                </div>
+                <div className="rounded-lg border p-3">
+                  <p className="text-sm text-muted-foreground">عدد المعدات</p>
+                  <p className="font-medium">{booking.equipment?.length ?? 0} عنصر</p>
+                </div>
+              </div>
+              {isLateReturn && (
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+                  <p className="text-sm font-medium text-red-800">تجاوز تاريخ الإرجاع</p>
+                  <p className="mt-1 text-xs text-red-700">
+                    الحجز لا يزال نشطاً بعد {formatDate(booking.endDate)}. قد تنطبق رسوم تأخير.
                   </p>
                 </div>
-              ) : (
-                <p className="text-muted-foreground">لم يتم إرجاع المعدات بعد</p>
               )}
             </CardContent>
           </Card>
@@ -670,27 +757,37 @@ export default function BookingDetailPage() {
         <TabsContent value="audit">
           <Card>
             <CardHeader>
-              <CardTitle>سجل التغييرات</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5" />
+                سجل التغييرات
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                <div className="rounded-lg border p-3">
-                  <div className="font-medium">تم الإنشاء</div>
-                  <div className="text-sm text-muted-foreground">
-                    {formatDate(booking.createdAt)}
-                  </div>
-                </div>
-                {booking.updatedAt && booking.updatedAt !== booking.createdAt && (
-                  <div className="rounded-lg border p-3">
-                    <div className="font-medium">آخر تحديث</div>
-                    <div className="text-sm text-muted-foreground">
-                      {formatDate(booking.updatedAt)}
+              {/* Always show creation + last update */}
+              <div className="relative space-y-0">
+                {[
+                  { label: 'تم الإنشاء', date: booking.createdAt },
+                  ...(booking.updatedAt && booking.updatedAt !== booking.createdAt
+                    ? [{ label: 'آخر تحديث', date: booking.updatedAt }]
+                    : []),
+                  ...auditLogs.map((l) => ({ label: l.action, date: l.createdAt, description: l.description }))
+                ].map((entry, i) => (
+                  <div key={i} className="flex gap-3 pb-4">
+                    <div className="flex flex-col items-center">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                        <Clock className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="mt-1 w-px flex-1 bg-border" />
+                    </div>
+                    <div className="min-w-0 flex-1 pb-2">
+                      <p className="font-medium">{entry.label}</p>
+                      {'description' in entry && entry.description && (
+                        <p className="text-sm text-muted-foreground">{entry.description}</p>
+                      )}
+                      <p className="text-xs text-muted-foreground">{formatDate(entry.date)}</p>
                     </div>
                   </div>
-                )}
-                <p className="mt-4 text-sm text-muted-foreground">
-                  سجل التغييرات التفصيلي سيتم إضافته قريباً
-                </p>
+                ))}
               </div>
             </CardContent>
           </Card>

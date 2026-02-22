@@ -8,12 +8,16 @@ import { prisma } from '@/lib/db/prisma'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency, formatDate } from '@/lib/utils/format.utils'
+import { t } from '@/lib/i18n/translate'
 
-const STATUS_LABELS: Record<string, string> = {
-  PENDING: 'معلق',
-  PROCESSING: 'قيد المعالجة',
-  PAID: 'مدفوع',
-  FAILED: 'فشل',
+function getPayoutStatusLabel(status: string): string {
+  const map: Record<string, string> = {
+    PENDING: t('ar', 'vendor.statusPending'),
+    PROCESSING: t('ar', 'vendor.statusProcessing'),
+    PAID: t('ar', 'vendor.statusPaid'),
+    FAILED: t('ar', 'vendor.statusFailed'),
+  }
+  return map[status] || status
 }
 
 export default async function VendorPayoutsPage() {
@@ -46,42 +50,42 @@ export default async function VendorPayoutsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">المدفوعات</h1>
-        <p className="mt-1 text-muted-foreground">سجل مدفوعاتك من المنصة</p>
+        <h1 className="text-3xl font-bold">{t('ar', 'vendor.payoutsPage')}</h1>
+        <p className="mt-1 text-muted-foreground">{t('ar', 'vendor.payoutsDesc')}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium">معلق الدفع</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('ar', 'vendor.pendingPayout')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {formatCurrency(Number(pendingSum._sum.netAmount ?? 0))}
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">{pendingSum._count} دفعة</p>
+            <p className="mt-1 text-xs text-muted-foreground">{pendingSum._count} {t('ar', 'vendor.paymentUnit')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium">تم الدفع</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('ar', 'vendor.paidOut')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {formatCurrency(Number(paidSum._sum.netAmount ?? 0))}
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">{paidSum._count} دفعة</p>
+            <p className="mt-1 text-xs text-muted-foreground">{paidSum._count} {t('ar', 'vendor.paymentUnit')}</p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>سجل المدفوعات</CardTitle>
+          <CardTitle>{t('ar', 'vendor.payoutsHistory')}</CardTitle>
         </CardHeader>
         <CardContent>
           {payouts.length === 0 ? (
-            <p className="py-12 text-center text-muted-foreground">لا توجد مدفوعات بعد</p>
+            <p className="py-12 text-center text-muted-foreground">{t('ar', 'vendor.noPayoutsYet')}</p>
           ) : (
             <div className="space-y-4">
               {payouts.map((p) => (
@@ -97,24 +101,23 @@ export default async function VendorPayoutsPage() {
                               : 'secondary'
                         }
                       >
-                        {STATUS_LABELS[p.status] || p.status}
+                        {getPayoutStatusLabel(p.status)}
                       </Badge>
                       {p.bookingId && (
                         <span className="text-sm text-muted-foreground">
-                          حجز #{p.bookingId.slice(0, 8)}
+                          {t('ar', 'vendor.bookingHash').replace('{id}', p.bookingId.slice(0, 8))}
                         </span>
                       )}
                     </div>
                     <div className="mt-1 text-sm text-muted-foreground">
                       {formatDate(p.createdAt)}
-                      {p.paidAt && ` • تم الدفع: ${formatDate(p.paidAt)}`}
+                      {p.paidAt && ` • ${t('ar', 'vendor.paidAt').replace('{date}', formatDate(p.paidAt))}`}
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="font-medium">{formatCurrency(Number(p.netAmount))}</div>
                     <div className="text-xs text-muted-foreground">
-                      إجمالي {formatCurrency(Number(p.grossAmount))} – عمولة{' '}
-                      {formatCurrency(Number(p.commissionAmount))}
+                      {t('ar', 'vendor.grossMinusCommission').replace('{gross}', formatCurrency(Number(p.grossAmount))).replace('{commission}', formatCurrency(Number(p.commissionAmount)))}
                     </div>
                   </div>
                 </div>

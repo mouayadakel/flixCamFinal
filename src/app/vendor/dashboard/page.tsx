@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { Package, Calendar, DollarSign, TrendingUp, ArrowLeft } from 'lucide-react'
 import { formatCurrency, formatDate } from '@/lib/utils/format.utils'
 import { VendorDashboardClient } from './vendor-dashboard-client'
+import { t } from '@/lib/i18n/translate'
 
 export default async function VendorDashboardPage() {
   const session = await auth()
@@ -80,52 +81,52 @@ export default async function VendorDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">لوحة تحكم المورد</h1>
-        <p className="mt-2 text-muted-foreground">مرحباً، {vendor.companyName}</p>
+        <h1 className="text-3xl font-bold">{t('ar', 'vendor.dashboard')}</h1>
+        <p className="mt-2 text-muted-foreground">{t('ar', 'vendor.welcome').replace('{name}', vendor.companyName)}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">المعدات المدرجة</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('ar', 'vendor.listedEquipment')}</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{equipmentCount}</div>
-            <p className="mt-1 text-xs text-muted-foreground">معدات نشطة</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('ar', 'vendor.activeEquipment')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">التأجيرات النشطة</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('ar', 'vendor.activeRentals')}</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{activeRentalsCount}</div>
-            <p className="mt-1 text-xs text-muted-foreground">الآن</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('ar', 'vendor.now')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">أرباح هذا الشهر</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('ar', 'vendor.monthEarnings')}</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(monthNet)}</div>
-            <p className="mt-1 text-xs text-muted-foreground">صافي بعد العمولة</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('ar', 'vendor.netAfterCommission')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي الأرباح</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('ar', 'vendor.totalEarnings')}</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(allTimeNet)}</div>
-            <p className="mt-1 text-xs text-muted-foreground">كل الوقت</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('ar', 'vendor.allTime')}</p>
           </CardContent>
         </Card>
       </div>
@@ -133,7 +134,7 @@ export default async function VendorDashboardPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>الأرباح الشهرية</CardTitle>
+            <CardTitle>{t('ar', 'vendor.monthlyEarnings')}</CardTitle>
           </CardHeader>
           <CardContent>
             <VendorDashboardClient monthlyData={monthlyData} />
@@ -142,16 +143,16 @@ export default async function VendorDashboardPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>أحدث الحجوزات</CardTitle>
+            <CardTitle>{t('ar', 'vendor.recentBookings')}</CardTitle>
             <Link href="/vendor/bookings">
               <Button variant="ghost" size="sm">
-                عرض الكل
+                {t('ar', 'vendor.viewAll')}
               </Button>
             </Link>
           </CardHeader>
           <CardContent>
             {recentBookings.length === 0 ? (
-              <p className="text-sm text-muted-foreground">لا توجد حجوزات بعد</p>
+              <p className="text-sm text-muted-foreground">{t('ar', 'vendor.noBookingsYet')}</p>
             ) : (
               <div className="space-y-3">
                 {recentBookings.map((b) => (
@@ -181,21 +182,21 @@ export default async function VendorDashboardPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>إجراءات سريعة</CardTitle>
+          <CardTitle>{t('ar', 'vendor.quickActions')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-4">
             <Link href="/vendor/equipment/new">
               <Button>
                 <ArrowLeft className="ml-2 h-4 w-4" />
-                إضافة معدات جديدة
+                {t('ar', 'vendor.addNewEquipment')}
               </Button>
             </Link>
             <Link href="/vendor/equipment">
-              <Button variant="outline">عرض المعدات</Button>
+              <Button variant="outline">{t('ar', 'vendor.viewEquipment')}</Button>
             </Link>
             <Link href="/vendor/payouts">
-              <Button variant="outline">عرض المدفوعات</Button>
+              <Button variant="outline">{t('ar', 'vendor.viewPayouts')}</Button>
             </Link>
           </div>
         </CardContent>

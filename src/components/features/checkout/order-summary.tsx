@@ -8,6 +8,7 @@
 import { useLocale } from '@/hooks/use-locale'
 import { useCartStore } from '@/lib/stores/cart.store'
 import { cn } from '@/lib/utils'
+import { DepositInsuranceSummary } from './deposit-insurance-summary'
 
 const VAT_RATE = 0.15
 
@@ -69,7 +70,7 @@ export function OrderSummary({ holdExpiresAt, depositAmount, className }: OrderS
         {items.map((item) => (
           <li key={item.id} className="flex justify-between text-sm">
             <span className="text-text-heading">
-              {item.itemType === 'EQUIPMENT' ? 'Equipment' : item.itemType}
+              {(item as any).name || ({ EQUIPMENT: 'معدة', STUDIO: 'استوديو', ADDON: 'إضافة', PACKAGE: 'باقة' }[item.itemType] ?? item.itemType)}
               {item.quantity > 1 && ` × ${item.quantity}`}
               {item.startDate && item.endDate && (
                 <span className="block text-xs text-text-muted">
@@ -108,6 +109,8 @@ export function OrderSummary({ holdExpiresAt, depositAmount, className }: OrderS
           <dd>{formatSar(deposit > 0 ? totalWithDeposit : total)}</dd>
         </div>
       </dl>
+
+      <DepositInsuranceSummary depositAmount={depositAmount ?? null} />
 
       {heldForMinutes !== null && heldForMinutes > 0 && (
         <p className="mt-4 text-xs text-text-muted">

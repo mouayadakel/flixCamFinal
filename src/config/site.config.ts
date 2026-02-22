@@ -1,7 +1,10 @@
 /**
  * Site-wide configuration (contact, branding, URLs).
  * Use env vars for production; placeholders are for development only.
+ * Brand tokens (colors, logo paths) come from theme.ts.
  */
+
+import { theme } from './theme'
 
 export const siteConfig = {
   /** Contact information – replace via NEXT_PUBLIC_CONTACT_* in production */
@@ -12,6 +15,10 @@ export const siteConfig = {
     whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '966500000000',
     instagramUrl: process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? 'https://instagram.com',
   },
-  /** Brand name used in header/footer */
-  brandName: 'FlixCam.rent',
+  /** Brand name and tagline from theme (FLIXCAM) */
+  brandName: theme.brandName,
+  tagline: theme.industry,
+  /** Logo paths for header (dark bg) and footer/print (light bg) */
+  logoInverted: theme.assets.logoInverted,
+  logoMain: theme.assets.logoMain,
 } as const

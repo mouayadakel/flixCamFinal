@@ -103,6 +103,38 @@ src/
 - `npm run format` - Format code with Prettier
 - `npm run type-check` - Run TypeScript type checking
 
+## Deployment
+
+1. **Set up environment variables**
+   - Copy `.env.example` to `.env` and configure production values.
+   - Ensure `DATABASE_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL` (or `APP_URL`), and `CRON_SECRET` are set.
+
+2. **Run migrations**
+   ```bash
+   npx prisma migrate deploy
+   ```
+
+3. **Build**
+   ```bash
+   npm run build
+   ```
+
+4. **Start**
+   ```bash
+   npm run start
+   ```
+
+5. **Health check**
+   ```bash
+   curl http://localhost:3000/api/health
+   ```
+   Expect `{ "status": "ok", "db": "connected" }` when healthy.
+
+6. **Docker (optional)**
+   ```bash
+   docker-compose up -d
+   ```
+
 ## Documentation
 
 See `/docs` folder for comprehensive documentation:

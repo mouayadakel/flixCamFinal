@@ -5,8 +5,10 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'الشروط والأحكام | FlixCam.rent',
-  description: 'الشروط والأحكام العامة لاستخدام FlixCam.rent',
+  title: 'الشروط والأحكام | Terms of Service | FlixCam.rent',
+  description:
+    'الشروط والأحكام العامة لاستخدام FlixCam.rent. شروط الخدمة، القبول، الدفع، الإلغاء، والمسؤولية.',
+  keywords: ['شروط الاستخدام', 'terms of service', 'الشروط والأحكام', 'FlixCam'],
 }
 
 export default function TermsPage() {

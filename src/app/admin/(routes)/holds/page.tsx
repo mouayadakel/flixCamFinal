@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { Clock, RefreshCw, Unlock, Plus, Package, User } from 'lucide-react'
 import {
@@ -58,7 +58,7 @@ export default function HoldsPage() {
   const [loading, setLoading] = useState(true)
   const [releasingId, setReleasingId] = useState<string | null>(null)
 
-  const loadHolds = async () => {
+  const loadHolds = useCallback(async () => {
     setLoading(true)
     try {
       const res = await fetch('/api/holds')
@@ -72,13 +72,13 @@ export default function HoldsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
 
   useEffect(() => {
     loadHolds()
     const t = setInterval(loadHolds, 30000)
     return () => clearInterval(t)
-  }, [])
+  }, [loadHolds])
 
   const handleRelease = async (id: string) => {
     setReleasingId(id)

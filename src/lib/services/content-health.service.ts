@@ -5,7 +5,7 @@
  */
 
 import { prisma } from '@/lib/db/prisma'
-import { TranslationLocale } from '@prisma/client'
+import { Prisma, TranslationLocale } from '@prisma/client'
 
 const REQUIRED_LOCALES: TranslationLocale[] = ['ar', 'en', 'zh']
 const MIN_IMAGES = 4
@@ -127,13 +127,25 @@ export async function findProductsWithGaps(options?: {
   page?: number
   limit?: number
   gapType?: GapType
+  q?: string
 }): Promise<ContentGapReport> {
   const page = options?.page ?? 1
   const limit = options?.limit ?? 100
   const skip = (page - 1) * limit
+  const q = options?.q?.trim()
+
+  const where: Prisma.ProductWhereInput = { deletedAt: null }
+  if (q) {
+    where.translations = {
+      some: {
+        deletedAt: null,
+        name: { contains: q, mode: 'insensitive' },
+      },
+    }
+  }
 
   const products = await prisma.product.findMany({
-    where: { deletedAt: null },
+    where,
     include: { translations: { where: { deletedAt: null } } },
     skip,
     take: limit,
@@ -212,7 +224,7 @@ export async function findProductsWithGaps(options?: {
     })
   }
 
-  const total = await prisma.product.count({ where: { deletedAt: null } })
+  const total = await prisma.product.count({ where })
 
   return {
     total,
@@ -221,49 +233,99 @@ export async function findProductsWithGaps(options?: {
   }
 }
 
-/**
- * Get product IDs that have at least one content gap (for batch backfill)
- */
-export async function getProductIdsWithGaps(): Promise<string[]> {
-  const products = await prisma.product.findMany({
+const GAP_SELECT = {
+  id: true,
+  featuredImage: true,
+  galleryImages: true,
+  priceDaily: true,
+  contentScore: true,
+  translations: {
     where: { deletedAt: null },
-    select: { id: true, featuredImage: true, galleryImages: true, translations: { where: { deletedAt: null }, select: { locale: true, name: true, shortDescription: true, longDescription: true, seoTitle: true, seoDescription: true, seoKeywords: true, specifications: true } } },
-  })
+    select: {
+      locale: true,
+      name: true,
+      shortDescription: true,
+      longDescription: true,
+      seoTitle: true,
+      seoDescription: true,
+      seoKeywords: true,
+      specifications: true,
+    },
+  },
+} as const
 
+type GapProduct = Prisma.ProductGetPayload<{ select: typeof GAP_SELECT }>
+
+function hasContentGap(product: GapProduct): boolean {
+  const byLocale = new Map(product.translations.map((t) => [t.locale, t]))
+  const translationsOk = REQUIRED_LOCALES.every((locale) => {
+    const t = byLocale.get(locale)
+    return t && isFilled(t.name) && (isFilled(t.shortDescription) || isFilled(t.longDescription))
+  })
+  if (!translationsOk) return true
+
+  const seoOk = product.translations.some(
+    (t) => isFilled(t.seoTitle) && isFilled(t.seoDescription) && isFilled(t.seoKeywords)
+  )
+  if (!seoOk) return true
+
+  const shortDescOk = product.translations.some((t) => isFilled(t.shortDescription))
+  const longDescOk = product.translations.some((t) => isFilled(t.longDescription))
+  if (!shortDescOk || !longDescOk) return true
+
+  const imageCount = getImageCount(product.galleryImages, isFilled(product.featuredImage))
+  if (imageCount < MIN_IMAGES) return true
+
+  const firstSpecs = product.translations[0]?.specifications
+  const specsCompleteness = getSpecsCompleteness(firstSpecs)
+  if (firstSpecs && specsCompleteness < SPECS_COMPLETENESS_THRESHOLD) return true
+
+  return false
+}
+
+const GAP_BATCH_SIZE = 100
+
+/**
+ * Get product IDs that have at least one content gap (for batch backfill).
+ * Uses cursor-based pagination to avoid loading all products into memory.
+ * @param options.revenueWeighted - when true, order by priceDaily desc so high-revenue products are filled first
+ * @param options.minQualityScore - when set, only include products with contentScore < this (fill worst first)
+ */
+export async function getProductIdsWithGaps(options?: { revenueWeighted?: boolean; minQualityScore?: number }): Promise<string[]> {
   const ids: string[] = []
-  for (const product of products) {
-    const byLocale = new Map(product.translations.map((t) => [t.locale, t]))
-    const translationsOk = REQUIRED_LOCALES.every((locale) => {
-      const t = byLocale.get(locale)
-      return t && isFilled(t.name) && (isFilled(t.shortDescription) || isFilled(t.longDescription))
+  let cursor: string | undefined
+  const revenueWeighted = options?.revenueWeighted ?? false
+  const minQualityScore = options?.minQualityScore
+
+  while (true) {
+    const products = await prisma.product.findMany({
+      where: { deletedAt: null },
+      select: GAP_SELECT,
+      take: GAP_BATCH_SIZE,
+      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+      orderBy: { id: 'asc' },
     })
-    if (!translationsOk) {
-      ids.push(product.id)
-      continue
+
+    if (products.length === 0) break
+
+    let withGaps = products.filter((p) => hasContentGap(p))
+    if (minQualityScore != null) {
+      withGaps = withGaps.filter((p) => (p.contentScore ?? 0) < minQualityScore)
     }
-    const seoOk = product.translations.some(
-      (t) => isFilled(t.seoTitle) && isFilled(t.seoDescription) && isFilled(t.seoKeywords)
-    )
-    if (!seoOk) {
-      ids.push(product.id)
-      continue
+    if (revenueWeighted && withGaps.length > 0) {
+      const sorted = [...withGaps].sort((a, b) => {
+        const aPrice = Number(a.priceDaily ?? 0)
+        const bPrice = Number(b.priceDaily ?? 0)
+        return bPrice - aPrice
+      })
+      sorted.forEach((p) => ids.push(p.id))
+    } else {
+      withGaps.forEach((p) => ids.push(p.id))
     }
-    const shortDescOk = product.translations.some((t) => isFilled(t.shortDescription))
-    const longDescOk = product.translations.some((t) => isFilled(t.longDescription))
-    if (!shortDescOk || !longDescOk) {
-      ids.push(product.id)
-      continue
-    }
-    const imageCount = getImageCount(product.galleryImages, isFilled(product.featuredImage))
-    if (imageCount < MIN_IMAGES) {
-      ids.push(product.id)
-      continue
-    }
-    const firstSpecs = product.translations[0]?.specifications
-    const specsCompleteness = getSpecsCompleteness(firstSpecs)
-    if (firstSpecs && specsCompleteness < SPECS_COMPLETENESS_THRESHOLD) {
-      ids.push(product.id)
-    }
+
+    cursor = products[products.length - 1].id
+    if (products.length < GAP_BATCH_SIZE) break
   }
+
   return ids
 }

@@ -6,6 +6,7 @@
 
 import { useState, useEffect } from 'react'
 import { SavedGearList } from '@/components/features/saved/saved-gear-list'
+import { useLocale } from '@/hooks/use-locale'
 
 interface SavedItem {
   id: string
@@ -23,6 +24,7 @@ interface SavedItem {
 }
 
 export default function PortalSavedPage() {
+  const { t } = useLocale()
   const [items, setItems] = useState<SavedItem[]>([])
   const [loading, setLoading] = useState(true)
   const [removingId, setRemovingId] = useState<string | null>(null)
@@ -61,9 +63,9 @@ export default function PortalSavedPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Saved Gear</h1>
+      <h1 className="text-2xl font-bold">{t('portal.savedGear')}</h1>
       {loading ? (
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground">{t('common.loading')}</p>
       ) : (
         <SavedGearList items={items} onRemove={handleRemove} removingId={removingId} />
       )}

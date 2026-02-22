@@ -263,7 +263,7 @@ function FilterContent({
         {/* Dates */}
         <AccordionItem value="dates" className="border-b-0">
           <AccordionTrigger className="px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-muted hover:text-text-heading hover:no-underline">
-            Rental dates
+            {t('equipment.rentalDates')}
           </AccordionTrigger>
           <AccordionContent className="pb-3 pt-0">
             <DateRangePicker
@@ -281,7 +281,7 @@ function FilterContent({
         {/* Price */}
         <AccordionItem value="price" className="border-b-0">
           <AccordionTrigger className="px-0 py-3 text-xs font-medium uppercase tracking-wider text-text-muted hover:text-text-heading hover:no-underline">
-            Price range
+            {t('equipment.priceRange')}
           </AccordionTrigger>
           <AccordionContent className="space-y-3 pb-3 pt-0">
             <PriceRangeSlider
@@ -521,11 +521,11 @@ export function FilterPanel({ categories, brands, total, className }: FilterPane
           <DialogTrigger asChild>
             <Button
               variant="outline"
-              className="w-full justify-between rounded-xl border-border-light"
+              className="w-full min-h-[44px] justify-between rounded-xl border-border-light active:scale-[0.98]"
             >
               <span className="flex items-center gap-2">
                 <SlidersHorizontal className="h-4 w-4" />
-                {t('common.filter')}
+                {filterCount > 0 ? `${t('common.filter')} (${filterCount})` : `${t('common.filter')} & ${t('equipment.sortBy') ?? 'Sort'}`}
               </span>
               {filterCount > 0 && (
                 <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-primary px-1.5 text-[10px] font-bold text-white">
@@ -552,7 +552,7 @@ export function FilterPanel({ categories, brands, total, className }: FilterPane
                 className="w-full rounded-xl bg-brand-primary font-semibold hover:bg-brand-primary-hover"
                 onClick={() => setMobileOpen(false)}
               >
-                Show {total} results
+                {t('equipment.showResults').replace('{count}', String(total))}
               </Button>
             </div>
           </DialogContent>

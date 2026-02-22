@@ -24,6 +24,18 @@ import { toast } from '@/hooks/use-toast'
 import { ProgressTracker } from '@/components/features/import/progress-tracker'
 import { AIPreviewDialog } from '@/components/features/import/ai-preview-dialog'
 import { Checkbox } from '@/components/ui/checkbox'
+import { DropZone } from '@/components/features/import/drop-zone'
+import { ColumnMapper, type MappedColumn } from '@/components/features/import/column-mapper'
+import { ValidationReport } from '@/components/features/import/validation-report'
+import { ImportSummary } from '@/components/features/import/import-summary'
+import { StatusBadge } from '@/components/shared/status-badge'
+import type { ValidationResult } from '@/lib/services/import-validation.service'
+import {
+  type ImportMode,
+  IMPORT_MODE_LABELS,
+  shouldSendApprovedSuggestions,
+  shouldTriggerBackfillAfterImport,
+} from './import-mode.utils'
 
 interface Lookup {
   categories: { id: string; name: string; parentId: string | null }[]
@@ -57,7 +69,7 @@ type ValidationWarning = {
 
 type SheetSkipMap = Record<string, number[]>
 
-const NAME_KEYS = ['Name', 'name', 'Product Name', 'Product', 'اسم']
+const NAME_KEYS = ['Name', 'name', 'Product Name', 'Product', 'اسم', '*']
 
 const getRowNameValue = (row: Record<string, any>) => {
   for (const key of NAME_KEYS) {
@@ -68,6 +80,75 @@ const getRowNameValue = (row: Record<string, any>) => {
     }
   }
   return ''
+}
+
+/** Normalize a string for matching: lowercase, trim, collapse spaces, remove common punctuation */
+function normalizeForMatch(s: string): string {
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/[-_./()[\]']/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+const MIN_MATCH_LENGTH = 3
+
+/**
+ * Auto-match sheet name to a category and optional subcategory.
+ * Uses strict matching to avoid wrong links: exact match first, then prefix-only (no loose "includes").
+ * Prefers root category when sheet name exactly matches a root; otherwise best prefix match.
+ */
+function matchSheetToCategory(
+  sheetName: string,
+  categories: { id: string; name: string; parentId: string | null }[]
+): { categoryId: string; subCategoryId: string | null } {
+  if (!categories.length || !sheetName.trim()) return { categoryId: '', subCategoryId: null }
+  const sheetNorm = normalizeForMatch(sheetName)
+  if (!sheetNorm || sheetNorm.length < MIN_MATCH_LENGTH) return { categoryId: '', subCategoryId: null }
+
+  const roots = categories.filter((c) => !c.parentId)
+  const children = categories.filter((c) => c.parentId)
+
+  // 1) Exact match: prefer root so "Cameras" sheet -> root Cameras, not a sub named "Cameras"
+  for (const root of roots) {
+    const nameNorm = normalizeForMatch(root.name)
+    if (nameNorm && sheetNorm === nameNorm) return { categoryId: root.id, subCategoryId: null }
+  }
+  for (const sub of children) {
+    const nameNorm = normalizeForMatch(sub.name)
+    if (nameNorm && sheetNorm === nameNorm) {
+      return { categoryId: sub.parentId!, subCategoryId: sub.id }
+    }
+  }
+
+  // 2) Prefix match only (no loose includes): e.g. sheet "DSLR" -> category "DSLR Cameras"
+  // Require shorter part >= MIN_MATCH_LENGTH; pick best fit (closest name length)
+  type Candidate = { categoryId: string; subCategoryId: string | null; score: number }
+  const candidates: Candidate[] = []
+
+  for (const root of roots) {
+    const nameNorm = normalizeForMatch(root.name)
+    if (!nameNorm || nameNorm.length < MIN_MATCH_LENGTH) continue
+    if (sheetNorm.startsWith(nameNorm) || nameNorm.startsWith(sheetNorm)) {
+      const lenDiff = Math.abs(sheetNorm.length - nameNorm.length)
+      candidates.push({ categoryId: root.id, subCategoryId: null, score: -lenDiff })
+    }
+  }
+  for (const sub of children) {
+    const nameNorm = normalizeForMatch(sub.name)
+    if (!nameNorm || nameNorm.length < MIN_MATCH_LENGTH) continue
+    if (sheetNorm.startsWith(nameNorm) || nameNorm.startsWith(sheetNorm)) {
+      const lenDiff = Math.abs(sheetNorm.length - nameNorm.length)
+      candidates.push({ categoryId: sub.parentId!, subCategoryId: sub.id, score: -lenDiff })
+    }
+  }
+
+  if (candidates.length === 0) return { categoryId: '', subCategoryId: null }
+  // Best score = smallest length difference (prefer closest name length)
+  const best = candidates.reduce((a, b) => (a.score >= b.score ? a : b))
+  return { categoryId: best.categoryId, subCategoryId: best.subCategoryId }
 }
 
 export default function ImportPage() {
@@ -86,7 +167,26 @@ export default function ImportPage() {
   const [skippedNameRows, setSkippedNameRows] = useState<SheetSkipMap>({})
   const [showAIPreview, setShowAIPreview] = useState(false)
   const [aiPreviewRows, setAIPreviewRows] = useState<any[]>([])
+  const [approvedSuggestions, setApprovedSuggestions] = useState<
+    Array<{ sheetName: string; excelRowNumber: number; aiSuggestions: any }>
+  >([])
+  const [importMode, setImportMode] = useState<ImportMode>('preview_edit')
+  const [columnMappings, setColumnMappings] = useState<Record<string, MappedColumn[]>>({})
+  const [validationSummary, setValidationSummary] = useState<ValidationResult | null>(null)
+  const [importComplete, setImportComplete] = useState(false)
+  const [importResults, setImportResults] = useState<{
+    total: number
+    ready: number
+    draft: number
+    needsReview: number
+    aiFilled: number
+    estimatedCost?: number
+  }>({ total: 0, ready: 0, draft: 0, needsReview: 0, aiFilled: 0 })
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+
+  const updateColumnMappings = (sheetName: string, mappings: MappedColumn[]) => {
+    setColumnMappings((prev) => ({ ...prev, [sheetName]: mappings }))
+  }
 
   useEffect(() => {
     const load = async () => {
@@ -114,6 +214,22 @@ export default function ImportPage() {
     [lookups]
   )
 
+  // When lookups load after file was already uploaded, re-run category auto-match for sheets that still have no category
+  useEffect(() => {
+    if (!lookups?.categories?.length || !sheetsMetadata.length) return
+    setMapping((prev) =>
+      prev.map((m) => {
+        if (m.categoryId) return m
+        const matched = matchSheetToCategory(m.sheetName, lookups.categories)
+        return {
+          ...m,
+          categoryId: matched.categoryId,
+          subCategoryId: matched.subCategoryId ?? m.subCategoryId,
+        }
+      })
+    )
+  }, [lookups?.categories, sheetsMetadata.length])
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0]
     if (!selected) return
@@ -123,6 +239,7 @@ export default function ImportPage() {
     setSheetsMetadata([])
     setMapping([])
     setValidationResults({})
+    setValidationSummary(null)
 
     try {
       // Use new sheet metadata API
@@ -140,22 +257,61 @@ export default function ImportPage() {
       }
 
       const data = await res.json()
-      setSheetsMetadata(data.sheets || [])
+      const sheets = data.sheets || []
+      setSheetsMetadata(sheets)
 
-      // Initialize mapping for all sheets (only one selected at a time)
-      setMapping(
-        (data.sheets || []).map((sheet: SheetMetadata, index: number) => ({
-          sheetName: sheet.name,
-          categoryId: '',
-          subCategoryId: null,
-          selected: index === 0,
-          selectedRows: [], // Empty = all rows selected
-        }))
+      // Auto-match sheet names to categories/subcategories
+      const categories = lookups?.categories ?? []
+      const initialMapping: SheetMapping[] = sheets.map(
+        (sheet: SheetMetadata, index: number) => {
+          const matched = matchSheetToCategory(sheet.name, categories)
+          return {
+            sheetName: sheet.name,
+            categoryId: matched.categoryId,
+            subCategoryId: matched.subCategoryId,
+            selected: index === 0,
+            selectedRows: [],
+          }
+        }
       )
+      setMapping(initialMapping)
       setSkippedNameRows({})
 
+      // Auto-link columns: fetch suggested mappings for each sheet's headers
+      const nextColumnMappings: Record<string, MappedColumn[]> = {}
+      const emptyMapping = (headers: string[]) =>
+        headers.map((h: string) => ({
+          sourceHeader: h,
+          mappedField: null,
+          confidence: 0,
+          method: 'skip' as const,
+        }))
+      for (const sheet of sheets) {
+        const headers = sheet.columns ?? []
+        if (!headers.length) {
+          nextColumnMappings[sheet.name] = []
+          continue
+        }
+        try {
+          const mapRes = await fetch('/api/admin/imports/map-columns', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ headers }),
+          })
+          if (mapRes.ok) {
+            const { mappings } = await mapRes.json()
+            nextColumnMappings[sheet.name] = mappings ?? []
+          } else {
+            nextColumnMappings[sheet.name] = emptyMapping(headers)
+          }
+        } catch {
+          nextColumnMappings[sheet.name] = emptyMapping(headers)
+        }
+      }
+      setColumnMappings((prev) => ({ ...prev, ...nextColumnMappings }))
+
       // Auto-validate after parsing
-      await validateSheets(data.sheets || [])
+      await validateSheets(sheets)
     } catch (err: any) {
       toast({ title: 'Failed to read file', description: err.message, variant: 'destructive' })
       setFile(null)
@@ -205,7 +361,8 @@ export default function ImportPage() {
       })
 
       if (res.ok) {
-        const result = await res.json()
+        const result: ValidationResult = await res.json()
+        setValidationSummary(result)
         // Group warnings by sheet
         const warningsBySheet: Record<string, ValidationWarning[]> = {}
         for (const warning of [...result.errors, ...result.warnings]) {
@@ -273,13 +430,16 @@ export default function ImportPage() {
   }
 
   const handleAIPreview = () => {
-    // Collect preview rows from selected sheets
+    // Collect preview rows from selected sheets (with category name for AI context)
     const previewRows: any[] = []
     mapping
       .filter((m) => m.selected && m.categoryId)
       .forEach((m) => {
         const sheet = sheetsMetadata.find((s) => s.name === m.sheetName)
         if (!sheet) return
+
+        const categoryName =
+          lookups?.categories.find((c) => c.id === m.categoryId)?.name ?? undefined
 
         const rowsToPreview =
           m.selectedRows.length === 0
@@ -292,19 +452,33 @@ export default function ImportPage() {
                 .slice(0, 5)
 
         rowsToPreview.forEach((row) => {
+          const excelRowNum = row.rowNumber ?? sheet.previewRows.indexOf(row) + 2
+          const name = getRowNameValue(row)
+          if (!name) return // skip rows without a name so AI preview has real data
           previewRows.push({
-            name: row['Name'] || row['name'] || row['Product Name'] || '',
-            shortDescription: row['Short Description'] || row['short_description'] || '',
-            longDescription: row['Long Description'] || row['long_description'] || '',
+            name,
+            shortDescription:
+              row['Short Description'] ?? row['short_description'] ?? row['Description'] ?? row['Discription '] ?? row['Discription'] ?? row['وصف مختصر'] ?? '',
+            longDescription:
+              row['Long Description'] ?? row['long_description'] ?? row['وصف طويل'] ?? '',
             category: m.categoryId,
-            brand: row['Brand'] || row['brand'] || '',
-            specifications: row['Specifications'] || row['specifications'] || {},
+            categoryName,
+            brand: row['Brand'] ?? row['brand'] ?? row['Manufacturer'] ?? row['الماركة'] ?? '',
+            specifications: row['Specifications'] ?? row['specifications'] ?? {},
+            boxContents:
+              row['WITB'] ?? row['Box Contents'] ?? row['box_contents'] ?? row["What's in the box"] ?? '',
+            sheetName: m.sheetName,
+            excelRowNumber: excelRowNum,
           })
         })
       })
 
     if (previewRows.length === 0) {
-      toast({ title: 'No rows to preview', variant: 'destructive' })
+      toast({
+        title: 'No rows to preview',
+        description: 'Select a category for the sheet and ensure rows have a name (Name / Product Name / اسم).',
+        variant: 'destructive',
+      })
       return
     }
 
@@ -371,6 +545,9 @@ export default function ImportPage() {
       if (Object.keys(selectedRowsMap).length > 0) {
         formData.append('selectedRows', JSON.stringify(selectedRowsMap))
       }
+      if (shouldSendApprovedSuggestions(importMode, approvedSuggestions.length)) {
+        formData.append('approvedSuggestions', JSON.stringify(approvedSuggestions))
+      }
 
       const res = await fetch('/api/admin/imports', {
         method: 'POST',
@@ -384,6 +561,7 @@ export default function ImportPage() {
 
       const data = await res.json()
       setJobId(data.jobId)
+      setImportComplete(false)
       const descriptionParts = [`Job: ${data.jobId}`, `rows: ${data.totalRows}`]
       if (data.skippedRowsCount) {
         descriptionParts.push(`Skipped ${data.skippedRowsCount} unnamed row(s)`)
@@ -392,6 +570,28 @@ export default function ImportPage() {
         title: 'Import started',
         description: descriptionParts.join(' • '),
       })
+      if (shouldTriggerBackfillAfterImport(importMode)) {
+        try {
+          const backfillRes = await fetch('/api/admin/ai/backfill', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fillAll: true, minQualityScore: 0 }),
+          })
+          const backfillData = await backfillRes.json()
+          if (backfillRes.ok && backfillData.queued > 0) {
+            toast({
+              title: 'AI fill queued',
+              description: `${backfillData.queued} product(s) added to AI fill. Check AI Dashboard for progress.`,
+            })
+          }
+        } catch {
+          toast({
+            title: 'AI fill not started',
+            description: 'Import succeeded. Run Fill All from AI Dashboard to fill content.',
+            variant: 'destructive',
+          })
+        }
+      }
     } catch (err: any) {
       toast({ title: 'Upload failed', description: err.message, variant: 'destructive' })
     } finally {
@@ -422,50 +622,101 @@ export default function ImportPage() {
   //   }
   // }, [jobId])
 
+  const currentStep = !file ? 0 : sheetsMetadata.length === 0 ? 0 : jobId ? 3 : allSheetsMapped ? 2 : 1
+  const stepLabels = ['رفع الملف', 'ربط الأعمدة', 'معاينة واستيراد', 'النتائج']
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Import Equipment (Excel)</h1>
+          <h1 className="text-3xl font-bold">استيراد المعدات</h1>
+          <p className="text-muted-foreground mt-1">استيراد ذكي من Excel مع ملء تلقائي بالذكاء الاصطناعي</p>
         </div>
       </div>
 
+      {/* Step indicator */}
+      <nav className="flex items-center gap-1">
+        {stepLabels.map((label, i) => (
+          <div key={i} className="flex items-center gap-1 flex-1">
+            <div className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium w-full transition-colors ${
+              i === currentStep ? 'bg-primary text-primary-foreground shadow-sm' :
+              i < currentStep ? 'bg-green-100 text-green-800' :
+              'bg-muted text-muted-foreground/50'
+            }`}>
+              <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                i < currentStep ? 'bg-green-200 text-green-800' :
+                i === currentStep ? 'bg-primary-foreground/20 text-primary-foreground' :
+                'bg-background text-muted-foreground'
+              }`}>
+                {i < currentStep ? <CheckCircle2 className="h-3.5 w-3.5" /> : i + 1}
+              </span>
+              <span className="hidden sm:inline truncate">{label}</span>
+            </div>
+            {i < stepLabels.length - 1 && (
+              <div className={`h-0.5 w-4 shrink-0 ${i < currentStep ? 'bg-green-400' : 'bg-muted'}`} />
+            )}
+          </div>
+        ))}
+      </nav>
+
       <Card>
         <CardHeader>
-          <CardTitle>Upload File</CardTitle>
+          <CardTitle>رفع الملف</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Excel/CSV/TSV File</Label>
-            <div className="flex flex-wrap items-center gap-3">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={parsing}
-              >
-                Choose File
-              </Button>
-              <Input
-                ref={fileInputRef}
-                type="file"
-                accept=".xlsx,.xls,.csv,.tsv"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              <span className="text-sm text-muted-foreground">
-                {file ? file.name : 'No file selected'}
-              </span>
-            </div>
+            <Label>وضع الاستيراد</Label>
+            <Select
+              value={importMode}
+              onValueChange={(v) => setImportMode(v as ImportMode)}
+            >
+              <SelectTrigger className="max-w-md">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="preview_edit">{IMPORT_MODE_LABELS.preview_edit}</SelectItem>
+                <SelectItem value="import_then_fill">{IMPORT_MODE_LABELS.import_then_fill}</SelectItem>
+                <SelectItem value="import_autofill">{IMPORT_MODE_LABELS.import_autofill}</SelectItem>
+              </SelectContent>
+            </Select>
             <p className="text-sm text-muted-foreground">
-              Max 50MB, 5,000 rows. Supports .xlsx, .xls, .csv, .tsv
+              {importMode === 'preview_edit' && 'تحليل بالذكاء الاصطناعي، مراجعة وتعديل، ثم استيراد.'}
+              {importMode === 'import_then_fill' && 'استيراد كما هو. شغل الملء من لوحة AI لاحقاً.'}
+              {importMode === 'import_autofill' && 'استيراد ثم ملء تلقائي بالذكاء الاصطناعي لجميع المنتجات.'}
             </p>
           </div>
-          {file && (
+          <DropZone
+            file={file}
+            onFileSelect={(f) => {
+              setFile(f)
+              const fakeEvent = { target: { files: [f] } } as unknown as React.ChangeEvent<HTMLInputElement>
+              handleFileChange(fakeEvent)
+            }}
+onClear={() => {
+                        setFile(null)
+                        setSheetsMetadata([])
+                        setMapping([])
+                        setValidationResults({})
+                        setValidationSummary(null)
+                        setJobId('')
+                        setSkippedNameRows({})
+                        setApprovedSuggestions([])
+                      }}
+            disabled={parsing}
+          />
+          {/* Hidden file input kept for backward compatibility */}
+          <Input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls,.csv,.tsv"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          {parsing && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <UploadCloud className="h-4 w-4" /> {file.name}
-              {parsing && <Loader2 className="h-4 w-4 animate-spin" />}
-              {validating && <span className="text-xs">Validating...</span>}
+              <Loader2 className="h-4 w-4 animate-spin" />
+              جاري تحليل الملف...
+              {validating && <span className="text-xs">(التحقق...)</span>}
             </div>
           )}
         </CardContent>
@@ -501,6 +752,7 @@ export default function ImportPage() {
                           }}
                           className="h-4 w-4 accent-primary"
                           onClick={(e) => e.stopPropagation()}
+                          aria-label={`Select sheet ${sheet.name} for import`}
                         />
                         <span className="font-medium">{sheet.name}</span>
                         <Badge variant="outline">{sheet.rowCount} rows</Badge>
@@ -564,7 +816,7 @@ export default function ImportPage() {
                         )}
 
                         {/* Category Mapping */}
-                        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                           <div className="space-y-1">
                             <Label>Category *</Label>
                             <Select
@@ -615,22 +867,17 @@ export default function ImportPage() {
                               </SelectContent>
                             </Select>
                           </div>
-                          <div className="space-y-1">
-                            <Label>Columns ({sheet.columns.length})</Label>
-                            <div className="flex flex-wrap gap-1 text-xs text-muted-foreground">
-                              {sheet.columns.slice(0, 5).map((col) => (
-                                <Badge key={col} variant="outline" className="text-xs">
-                                  {col}
-                                </Badge>
-                              ))}
-                              {sheet.columns.length > 5 && (
-                                <Badge variant="outline" className="text-xs">
-                                  +{sheet.columns.length - 5} more
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
                         </div>
+
+                        <ColumnMapper
+                          headers={sheet.columns}
+                          initialMappings={columnMappings[sheet.name]}
+                          sampleRows={sheet.previewRows.slice(0, 3).map((r) => {
+                            const { rowNumber: _, ...rest } = r as Record<string, unknown> & { rowNumber?: number }
+                            return rest
+                          })}
+                          onMappingsChange={(mappings) => updateColumnMappings(sheet.name, mappings)}
+                        />
 
                         {/* Row Selection */}
                         <div className="space-y-2">
@@ -746,6 +993,10 @@ export default function ImportPage() {
               })}
             </Accordion>
 
+            {validationSummary && (
+              <ValidationReport result={validationSummary} />
+            )}
+
             {!allSheetsMapped && (
               <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
                 <AlertCircle className="h-4 w-4" />
@@ -782,9 +1033,32 @@ export default function ImportPage() {
       {jobId && (
         <ProgressTracker
           jobId={jobId}
-          onComplete={() => {
+          onComplete={(data) => {
+            setImportComplete(true)
+            const products = data?.progress?.products
+            const ai = data?.progress?.ai
+            setImportResults({
+              total: products?.total ?? 0,
+              ready: products?.success ?? 0,
+              draft: 0,
+              needsReview: 0,
+              aiFilled: ai?.processed ?? 0,
+              estimatedCost: ai?.cost,
+            })
             toast({ title: 'Import completed!' })
           }}
+        />
+      )}
+
+      {jobId && importComplete && (
+        <ImportSummary
+          totalItems={importResults.total}
+          readyCount={importResults.ready}
+          draftCount={importResults.draft}
+          needsReviewCount={importResults.needsReview}
+          categoryCount={selectedSheetsCount}
+          aiFilled={importResults.aiFilled}
+          estimatedCost={importResults.estimatedCost}
         />
       )}
 
@@ -792,13 +1066,20 @@ export default function ImportPage() {
         open={showAIPreview}
         onOpenChange={setShowAIPreview}
         rows={aiPreviewRows}
-        onApply={(approvedSuggestions) => {
+        onApply={(suggestions) => {
+          const withKeys = suggestions
+            .filter((s) => s.original?.sheetName != null && s.original?.excelRowNumber != null)
+            .map((s) => ({
+              sheetName: s.original.sheetName as string,
+              excelRowNumber: s.original.excelRowNumber as number,
+              aiSuggestions: s.aiSuggestions,
+            }))
+          setApprovedSuggestions(withKeys)
+          setShowAIPreview(false)
           toast({
             title: 'AI suggestions approved',
-            description: `${approvedSuggestions.length} suggestions will be applied during import`,
+            description: `${withKeys.length} suggestions will be applied when you start import`,
           })
-          // The approved suggestions will be used during import
-          // This would need to be stored and passed to the import API
         }}
         onSkip={() => {
           toast({

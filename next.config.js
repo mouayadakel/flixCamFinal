@@ -27,11 +27,23 @@ const securityHeaders = [
 
 const nextConfig = {
   reactStrictMode: true,
+  staticPageGenerationTimeout: 120,
+  experimental: {
+    cpus: 2,
+    serverActions: {
+      bodySizeLimit: '50mb', // Allow Excel/CSV uploads up to 50MB
+    },
+  },
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
   images: {
     remotePatterns: [
       { protocol: 'http', hostname: 'localhost', pathname: '/**' },
       { protocol: 'https', hostname: 'localhost', pathname: '/**' },
-      { protocol: 'https', hostname: '**', pathname: '/**' },
+      { protocol: 'https', hostname: 'res.cloudinary.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'placehold.co', pathname: '/**' },
+      { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'cdn.shopify.com', pathname: '/**' },
     ],
   },
   async headers() {

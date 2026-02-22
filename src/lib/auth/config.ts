@@ -16,31 +16,12 @@ export const authConfig: NextAuthConfig = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        // #region agent log
-        const log = (loc: string, msg: string, data: Record<string, unknown>) =>
-          fetch('http://127.0.0.1:7247/ingest/d745db1b-a338-48e7-a9b9-281bdcdffd3a', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              location: loc,
-              message: msg,
-              data,
-              timestamp: Date.now(),
-              hypothesisId: 'H4',
-            }),
-          }).catch(() => {})
-        // #endregion
         if (!credentials?.email || !credentials?.password) {
-          log('auth/config.ts:authorize', 'missing credentials', {
-            hasEmail: !!credentials?.email,
-            hasPassword: !!credentials?.password,
-          })
           return null
         }
 
         const email = credentials.email as string
         const password = credentials.password as string
-        log('auth/config.ts:authorize:entry', 'authorize called', { email })
 
         const { prisma } = await import('@/lib/db/prisma')
         const user = await prisma.user.findUnique({
@@ -48,24 +29,19 @@ export const authConfig: NextAuthConfig = {
         })
 
         if (!user || user.deletedAt) {
-          log('auth/config.ts:authorize', 'user not found or deleted', { userFound: !!user })
           return null
         }
 
         if (user.status !== 'active') {
-          log('auth/config.ts:authorize', 'user not active', { status: user.status })
           return null
         }
 
         const bcrypt = await import('bcryptjs')
         const isValid = await bcrypt.compare(password, user.passwordHash)
-        log('auth/config.ts:authorize', 'password check', { passwordValid: isValid })
 
         if (!isValid) {
           return null
         }
-
-        log('auth/config.ts:authorize', 'authorized', { userId: user.id, role: user.role })
         return {
           id: user.id,
           email: user.email,
@@ -146,4 +122,6 @@ export const authConfig: NextAuthConfig = {
     },
   },
   secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  // NEXTAUTH_URL must match the app URL (including port). If running on 3001, set NEXTAUTH_URL=http://localhost:3001
+  trustHost: true,
 }

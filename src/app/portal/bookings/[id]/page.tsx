@@ -18,6 +18,8 @@ import { BookingStatus } from '@prisma/client'
 import { ArrowRight, Package, FileText, Receipt, Calendar } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { BookingActions } from '@/components/features/portal/booking-actions'
+import { BookingTimeline } from '@/components/features/portal/booking-timeline'
+import { t } from '@/lib/i18n/translate'
 
 const CANCELLATION_HOURS_BEFORE_START = 48
 
@@ -78,7 +80,7 @@ export default async function PortalBookingDetailPage({ params }: { params: { id
 
   const cancelNotAllowedMessage =
     booking.status === 'CONFIRMED' && !canCancel
-      ? `الإلغاء مسموح قبل ${CANCELLATION_HOURS_BEFORE_START} ساعة على الأقل من تاريخ البداية.`
+      ? t('ar', 'portal.cancelNotAllowed').replace('{hours}', String(CANCELLATION_HOURS_BEFORE_START))
       : undefined
 
   function getStatusBadge(status: BookingStatus) {
@@ -86,14 +88,14 @@ export default async function PortalBookingDetailPage({ params }: { params: { id
       BookingStatus,
       { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
     > = {
-      DRAFT: { label: 'مسودة', variant: 'outline' },
-      RISK_CHECK: { label: 'فحص المخاطر', variant: 'outline' },
-      PAYMENT_PENDING: { label: 'انتظار الدفع', variant: 'secondary' },
-      CONFIRMED: { label: 'مؤكد', variant: 'default' },
-      ACTIVE: { label: 'نشط', variant: 'default' },
-      RETURNED: { label: 'مرتجع', variant: 'secondary' },
-      CLOSED: { label: 'مغلق', variant: 'outline' },
-      CANCELLED: { label: 'ملغي', variant: 'destructive' },
+      DRAFT: { label: t('ar', 'portal.statusDraft'), variant: 'outline' },
+      RISK_CHECK: { label: t('ar', 'portal.statusRiskCheck'), variant: 'outline' },
+      PAYMENT_PENDING: { label: t('ar', 'portal.statusPaymentPending'), variant: 'secondary' },
+      CONFIRMED: { label: t('ar', 'portal.statusConfirmed'), variant: 'default' },
+      ACTIVE: { label: t('ar', 'portal.statusActive'), variant: 'default' },
+      RETURNED: { label: t('ar', 'portal.statusReturned'), variant: 'secondary' },
+      CLOSED: { label: t('ar', 'portal.statusClosed'), variant: 'outline' },
+      CANCELLED: { label: t('ar', 'portal.statusCancelled'), variant: 'destructive' },
     }
 
     const config = statusConfig[status] || { label: status, variant: 'outline' }
@@ -110,12 +112,32 @@ export default async function PortalBookingDetailPage({ params }: { params: { id
             className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowRight className="h-4 w-4" />
-            العودة إلى الحجوزات
+            {t('ar', 'portal.backToBookings')}
           </Link>
-          <h1 className="text-3xl font-bold">حجز #{booking.bookingNumber}</h1>
+          <h1 className="text-3xl font-bold">{t('ar', 'portal.booking')} #{booking.bookingNumber}</h1>
         </div>
         {getStatusBadge(booking.status)}
       </div>
+
+      {/* Booking Timeline */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('ar', 'portal.bookingStages')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <BookingTimeline
+            status={booking.status}
+            createdAt={booking.createdAt.toISOString()}
+            startDate={booking.startDate.toISOString()}
+            endDate={booking.endDate.toISOString()}
+            actualReturnDate={
+              'actualReturnDate' in booking && booking.actualReturnDate
+                ? (booking.actualReturnDate as Date).toISOString()
+                : null
+            }
+          />
+        </CardContent>
+      </Card>
 
       {/* Booking Information */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -123,27 +145,27 @@ export default async function PortalBookingDetailPage({ params }: { params: { id
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              معلومات الحجز
+              {t('ar', 'portal.bookingInfo')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <div className="text-sm text-muted-foreground">تاريخ البداية</div>
+              <div className="text-sm text-muted-foreground">{t('ar', 'portal.startDate')}</div>
               <div className="font-medium">{formatDate(booking.startDate)}</div>
             </div>
             <div>
-              <div className="text-sm text-muted-foreground">تاريخ النهاية</div>
+              <div className="text-sm text-muted-foreground">{t('ar', 'portal.endDate')}</div>
               <div className="font-medium">{formatDate(booking.endDate)}</div>
             </div>
             <div>
-              <div className="text-sm text-muted-foreground">المبلغ الإجمالي</div>
+              <div className="text-sm text-muted-foreground">{t('ar', 'portal.totalAmount')}</div>
               <div className="text-lg font-medium">
                 {formatCurrency(booking.totalAmount.toNumber())}
               </div>
             </div>
             {booking.depositAmount && (
               <div>
-                <div className="text-sm text-muted-foreground">العهدة</div>
+                <div className="text-sm text-muted-foreground">{t('ar', 'portal.deposit')}</div>
                 <div className="font-medium">
                   {formatCurrency(booking.depositAmount.toNumber())}
                 </div>
@@ -151,7 +173,7 @@ export default async function PortalBookingDetailPage({ params }: { params: { id
             )}
             {'actualReturnDate' in booking && booking.actualReturnDate && (
               <div>
-                <div className="text-sm text-muted-foreground">تاريخ الإرجاع الفعلي</div>
+                <div className="text-sm text-muted-foreground">{t('ar', 'portal.actualReturnDate')}</div>
                 <div className="font-medium">{formatDate(booking.actualReturnDate)}</div>
               </div>
             )}
@@ -159,7 +181,7 @@ export default async function PortalBookingDetailPage({ params }: { params: { id
               booking.lateFeeAmount &&
               Number(booking.lateFeeAmount) > 0 && (
                 <div>
-                  <div className="text-sm text-muted-foreground">رسوم التأخير (150%)</div>
+                  <div className="text-sm text-muted-foreground">{t('ar', 'portal.lateFee')}</div>
                   <div className="font-medium text-amber-600">
                     {formatCurrency(Number(booking.lateFeeAmount))}
                   </div>
@@ -172,12 +194,12 @@ export default async function PortalBookingDetailPage({ params }: { params: { id
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Package className="h-5 w-5" />
-              المعدات
+              {t('ar', 'portal.equipment')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {booking.equipment.length === 0 ? (
-              <p className="text-muted-foreground">لا توجد معدات</p>
+              <p className="text-muted-foreground">{t('ar', 'portal.noEquipment')}</p>
             ) : (
               <div className="space-y-3">
                 {booking.equipment.map((item) => (
@@ -196,7 +218,7 @@ export default async function PortalBookingDetailPage({ params }: { params: { id
                         </div>
                       )}
                     </div>
-                    <Badge variant="outline">الكمية: {item.quantity}</Badge>
+                    <Badge variant="outline">{t('ar', 'portal.quantity').replace('{count}', String(item.quantity))}</Badge>
                   </div>
                 ))}
               </div>
@@ -208,7 +230,7 @@ export default async function PortalBookingDetailPage({ params }: { params: { id
       {/* Quick Actions */}
       <Card>
         <CardHeader>
-          <CardTitle>إجراءات سريعة</CardTitle>
+          <CardTitle>{t('ar', 'portal.quickActions')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap gap-2">
@@ -231,20 +253,20 @@ export default async function PortalBookingDetailPage({ params }: { params: { id
               <Link href={`/portal/contracts/${booking.contracts[0].id}`}>
                 <Button variant="outline" className="w-full justify-start">
                   <FileText className="ml-2 h-4 w-4" />
-                  عرض العقد
+                  {t('ar', 'portal.viewContract')}
                 </Button>
               </Link>
             )}
             {booking.status === 'PAYMENT_PENDING' && (
               <Button variant="default" className="w-full justify-start">
                 <Receipt className="ml-2 h-4 w-4" />
-                دفع الآن
+                {t('ar', 'portal.payNow')}
               </Button>
             )}
             <Link href="/portal/invoices">
               <Button variant="outline" className="w-full justify-start">
                 <Receipt className="ml-2 h-4 w-4" />
-                الفواتير
+                {t('ar', 'portal.invoicesSection')}
               </Button>
             </Link>
           </div>
@@ -255,7 +277,7 @@ export default async function PortalBookingDetailPage({ params }: { params: { id
       {booking.payments.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>سجل الدفعات</CardTitle>
+            <CardTitle>{t('ar', 'portal.paymentHistory')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -272,15 +294,15 @@ export default async function PortalBookingDetailPage({ params }: { params: { id
                   </div>
                   <Badge variant={payment.status === 'SUCCESS' ? 'default' : 'secondary'}>
                     {payment.status === 'SUCCESS'
-                      ? 'مدفوع'
+                      ? t('ar', 'portal.paymentPaid')
                       : payment.status === 'PENDING'
-                        ? 'قيد الانتظار'
+                        ? t('ar', 'portal.paymentPending')
                         : payment.status === 'PROCESSING'
-                          ? 'قيد المعالجة'
+                          ? t('ar', 'portal.paymentProcessing')
                           : payment.status === 'FAILED'
-                            ? 'فشل'
+                            ? t('ar', 'portal.paymentFailed')
                             : payment.status === 'REFUNDED'
-                              ? 'مسترد'
+                              ? t('ar', 'portal.paymentRefunded')
                               : payment.status}
                   </Badge>
                 </div>

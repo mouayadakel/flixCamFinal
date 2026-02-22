@@ -10,7 +10,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Package, ArrowRight, ArrowLeft, Box } from 'lucide-react'
+import { Package, ArrowRight, ArrowLeft, Box, QrCode } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -84,8 +84,20 @@ export default function WarehousePage() {
         <p className="mt-2 text-muted-foreground">إدارة عمليات إخراج وإرجاع المعدات</p>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      {/* Mobile: Giant QR scan CTA */}
+      <Link
+        href="/admin/ops/warehouse/check-out"
+        className="flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-primary bg-primary/5 py-10 transition-colors active:scale-[0.98] lg:hidden"
+      >
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary text-white">
+          <QrCode className="h-10 w-10" />
+        </div>
+        <span className="text-lg font-bold text-primary">مسح QR للإخراج أو الإرجاع</span>
+        <span className="text-sm text-muted-foreground">اضغط للانتقال إلى إخراج / إرجاع معدات</span>
+      </Link>
+
+      {/* Quick Stats - 2 col on mobile per plan */}
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">جاهز للإخراج</CardTitle>
@@ -132,23 +144,23 @@ export default function WarehousePage() {
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <div className="flex gap-4">
-        <Link href="/admin/ops/warehouse/check-out">
-          <Button>
-            <ArrowRight className="ml-2 h-4 w-4" />
+      {/* Quick Actions - stacked full-width on mobile, large tap targets */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
+        <Link href="/admin/ops/warehouse/check-out" className="w-full sm:w-auto">
+          <Button className="h-12 w-full min-h-[44px] sm:h-auto sm:w-auto" size="lg">
+            <ArrowRight className="ml-2 h-5 w-5" />
             إخراج معدات
           </Button>
         </Link>
-        <Link href="/admin/ops/warehouse/check-in">
-          <Button variant="outline">
-            <ArrowLeft className="ml-2 h-4 w-4" />
+        <Link href="/admin/ops/warehouse/check-in" className="w-full sm:w-auto">
+          <Button variant="outline" className="h-12 w-full min-h-[44px] sm:h-auto sm:w-auto" size="lg">
+            <ArrowLeft className="ml-2 h-5 w-5" />
             إرجاع معدات
           </Button>
         </Link>
-        <Link href="/admin/ops/warehouse/inventory">
-          <Button variant="outline">
-            <Package className="ml-2 h-4 w-4" />
+        <Link href="/admin/ops/warehouse/inventory" className="w-full sm:w-auto">
+          <Button variant="outline" className="h-12 w-full min-h-[44px] sm:h-auto sm:w-auto" size="lg">
+            <Package className="ml-2 h-5 w-5" />
             عرض المخزون
           </Button>
         </Link>

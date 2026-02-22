@@ -40,9 +40,9 @@ export function CheckoutStepConfirm({ depositAmount }: CheckoutStepConfirmProps)
   if (!details) {
     return (
       <div className="rounded-lg border bg-card p-6 text-center text-muted-foreground">
-        <p>Please complete the previous steps first.</p>
+        <p>{t('checkout.completePrevious')}</p>
         <Button variant="link" onClick={() => router.push('/checkout')}>
-          Back to checkout
+          {t('checkout.backToCheckout')}
         </Button>
       </div>
     )

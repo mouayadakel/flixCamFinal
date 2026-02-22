@@ -15,7 +15,10 @@ export const dynamic = 'force-dynamic'
  * GET /api/admin/imports/[id]/errors.csv
  * Download CSV error report
  */
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const rateLimit = rateLimitAPI(request)
   if (!rateLimit.allowed) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
@@ -27,8 +30,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 
   try {
+    const { id } = await params
     const job = await prisma.importJob.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         rows: {
           where: {
@@ -62,7 +66,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     return new NextResponse(csvContent, {
       headers: {
         'Content-Type': 'text/csv',
-        'Content-Disposition': `attachment; filename="import-errors-${params.id}.csv"`,
+        'Content-Disposition': `attachment; filename="import-errors-${id}.csv"`,
       },
     })
   } catch (error: any) {

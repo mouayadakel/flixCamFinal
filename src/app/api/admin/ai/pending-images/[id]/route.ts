@@ -6,8 +6,10 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
+import { hasAIPermission } from '@/lib/auth/permissions'
+import { aiRateLimitResponse } from '@/lib/utils/rate-limit-upstash'
 import { prisma } from '@/lib/db/prisma'
+import { logAiAudit, AI_AUDIT_ACTIONS } from '@/lib/services/ai-audit.service'
 import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
@@ -28,9 +30,11 @@ export async function PATCH(
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!(await hasPermission(session.user.id, PERMISSIONS.AI_USE))) {
+  if (!(await hasAIPermission(session.user.id, 'review'))) {
     return NextResponse.json({ error: 'Forbidden - ai.use required' }, { status: 403 })
   }
+  const rateLimitRes = await aiRateLimitResponse(request, session.user.id)
+  if (rateLimitRes) return rateLimitRes
 
   const { id } = await params
   let body: z.infer<typeof bodySchema>
@@ -60,6 +64,13 @@ export async function PATCH(
           reviewedBy: userId,
         },
       })
+      await logAiAudit({
+        userId,
+        action: AI_AUDIT_ACTIONS.IMAGE_APPROVE,
+        resourceType: 'ProductImage',
+        resourceId: id,
+        metadata: { productId: image.productId },
+      })
       return NextResponse.json({ ok: true, message: 'تمت الموافقة على الصورة' })
     }
 
@@ -78,6 +89,13 @@ export async function PATCH(
       await prisma.product.update({
         where: { id: image.productId },
         data: { galleryImages: updatedGallery },
+      })
+      await logAiAudit({
+        userId,
+        action: AI_AUDIT_ACTIONS.IMAGE_REJECT,
+        resourceType: 'ProductImage',
+        resourceId: id,
+        metadata: { productId: image.productId },
       })
       return NextResponse.json({ ok: true, message: 'تم رفض الصورة' })
     }

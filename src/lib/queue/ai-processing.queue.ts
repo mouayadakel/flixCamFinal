@@ -9,26 +9,31 @@ import { getRedisClient } from './redis.client'
 
 export const AI_PROCESSING_QUEUE_NAME = 'ai-processing'
 
-/**
- * AI processing queue
- */
-export const aiProcessingQueue = new Queue(AI_PROCESSING_QUEUE_NAME, {
-  connection: getRedisClient(),
-  defaultJobOptions: {
-    attempts: 2,
-    backoff: {
-      type: 'exponential',
-      delay: 5000,
-    },
-    removeOnComplete: {
-      age: 24 * 3600,
-      count: 500,
-    },
-    removeOnFail: {
-      age: 7 * 24 * 3600,
-    },
-  },
-})
+let _aiProcessingQueue: Queue | null = null
+
+/** Lazily create the AI processing queue so Redis is not contacted at import time. */
+function getAIProcessingQueue(): Queue {
+  if (!_aiProcessingQueue) {
+    _aiProcessingQueue = new Queue(AI_PROCESSING_QUEUE_NAME, {
+      connection: getRedisClient(),
+      defaultJobOptions: {
+        attempts: 2,
+        backoff: {
+          type: 'exponential',
+          delay: 5000,
+        },
+        removeOnComplete: {
+          age: 24 * 3600,
+          count: 500,
+        },
+        removeOnFail: {
+          age: 7 * 24 * 3600,
+        },
+      },
+    })
+  }
+  return _aiProcessingQueue
+}
 
 /**
  * Add AI processing job to queue
@@ -38,7 +43,7 @@ export async function addAIProcessingJob(
   productIds: string[],
   provider?: 'openai' | 'gemini'
 ) {
-  return await aiProcessingQueue.add(
+  return await getAIProcessingQueue().add(
     'process-ai',
     {
       importJobId,

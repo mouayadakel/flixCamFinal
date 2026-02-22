@@ -1,19 +1,28 @@
 /**
  * @file invoice-pdf.ts
- * @description PDF template for invoices with ZATCA compliance support
+ * @description PDF template for invoices with ZATCA compliance support.
+ * FLIXCAM brand: light mode (white bg), charcoal text, green accent for borders/totals.
  * @module lib/services/pdf
- * @author Engineering Team
- * @created 2026-01-28
  */
 
 import { jsPDF } from 'jspdf'
 import { toDataURL } from 'qrcode'
 import type { Invoice, InvoiceItem } from '@/lib/types/invoice.types'
+import { theme } from '@/config/theme'
 
 const VAT_RATE = 0.15
-const COMPANY_NAME = 'FlixCam.rent'
+const COMPANY_NAME = theme.brandName
 const COMPANY_VAT = ''
 const COMPANY_ADDRESS = ''
+const PRIMARY_ACCENT = theme.invoiceSettings.primaryAccent
+const TEXT_CHARCOAL = theme.colors.textOnLight
+const SHOW_TAGLINE = theme.invoiceSettings.showTagline
+const TAGLINE = theme.industry
+
+function hexToRgb(hex: string): [number, number, number] {
+  const n = hex.replace('#', '')
+  return [parseInt(n.slice(0, 2), 16), parseInt(n.slice(2, 4), 16), parseInt(n.slice(4, 6), 16)]
+}
 
 export interface InvoicePdfOptions {
   locale?: 'ar' | 'en'
@@ -62,21 +71,39 @@ export async function generateInvoicePdf(
   const pageWidth = doc.internal.pageSize.getWidth()
   const margin = 20
   let y = 20
+  const [rCharcoal, gCharcoal, bCharcoal] = hexToRgb(TEXT_CHARCOAL)
+  const [rGreen, gGreen, bGreen] = hexToRgb(PRIMARY_ACCENT)
 
-  // Header - Company
+  doc.setTextColor(rCharcoal, gCharcoal, bCharcoal)
+
+  // Header - Company (light mode: white bg implied, charcoal text)
   doc.setFontSize(18)
-  doc.text(COMPANY_NAME || 'FlixCam.rent', margin, y)
-  y += 8
+  doc.setFont('helvetica', 'bold')
+  doc.text(COMPANY_NAME, margin, y)
+  y += 6
+  if (SHOW_TAGLINE && TAGLINE) {
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'normal')
+    doc.text(TAGLINE, margin, y)
+    y += 6
+  }
   doc.setFontSize(10)
   doc.text(COMPANY_ADDRESS || 'Saudi Arabia', margin, y)
   if (COMPANY_VAT) {
     y += 5
     doc.text(`VAT: ${COMPANY_VAT}`, margin, y)
   }
-  y += 12
+  y += 8
+
+  // Accent line under header
+  doc.setDrawColor(rGreen, gGreen, bGreen)
+  doc.setLineWidth(0.5)
+  doc.line(margin, y, pageWidth - margin, y)
+  y += 10
 
   // Title
   doc.setFontSize(16)
+  doc.setFont('helvetica', 'bold')
   doc.text(locale === 'ar' ? 'فاتورة' : 'INVOICE', margin, y)
   y += 10
 
@@ -112,7 +139,7 @@ export async function generateInvoicePdf(
     y += 8
   }
 
-  // Items table
+  // Items table - header row with green underline
   const colWidths = isRtl ? [25, 70, 20, 25, 25, 25] : [25, 70, 20, 25, 25, 25]
   const headers =
     locale === 'ar'
@@ -122,11 +149,16 @@ export async function generateInvoicePdf(
   let colX = margin
   doc.setFontSize(10)
   doc.setFont('helvetica', 'bold')
+  doc.setTextColor(rCharcoal, gCharcoal, bCharcoal)
   for (let i = 0; i < headers.length; i++) {
     doc.text(headers[i], colX + 2, y)
     colX += colWidths[i]
   }
-  y += 8
+  y += 4
+  doc.setDrawColor(rGreen, gGreen, bGreen)
+  doc.setLineWidth(0.3)
+  doc.line(margin, y, pageWidth - margin, y)
+  y += 6
   doc.setFont('helvetica', 'normal')
 
   const items = invoice.items as InvoiceItem[]
@@ -153,6 +185,7 @@ export async function generateInvoicePdf(
 
   y += 8
   doc.setFont('helvetica', 'bold')
+  doc.setTextColor(rCharcoal, gCharcoal, bCharcoal)
   doc.text(
     `${locale === 'ar' ? 'المجموع الفرعي' : 'Subtotal'}: ${formatAmount(invoice.subtotal, locale)}`,
     pageWidth - margin - 50,
@@ -173,11 +206,16 @@ export async function generateInvoicePdf(
     y
   )
   y += 6
+  doc.setDrawColor(rGreen, gGreen, bGreen)
+  doc.setLineWidth(0.4)
+  doc.line(pageWidth - margin - 50, y - 2, pageWidth - margin, y - 2)
+  doc.setTextColor(rGreen, gGreen, bGreen)
   doc.text(
     `${locale === 'ar' ? 'الإجمالي' : 'Total'}: ${formatAmount(invoice.totalAmount, locale)}`,
     pageWidth - margin - 50,
     y
   )
+  doc.setTextColor(rCharcoal, gCharcoal, bCharcoal)
   doc.setFont('helvetica', 'normal')
   y += 12
 

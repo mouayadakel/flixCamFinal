@@ -37,54 +37,52 @@ const ALLOWED_DOMAINS = [
   // Add more trusted domains as needed
 ]
 
-const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/800x600?text=Product+Image'
+const PLACEHOLDER_IMAGE = '/images/placeholder.jpg'
+
+const PRIVATE_IPV4_RANGES = [
+  /^127\./, /^10\./, /^172\.(1[6-9]|2\d|3[01])\./, /^192\.168\./,
+  /^169\.254\./, /^0\.0\.0\.0$/,
+]
 
 /**
- * Validate URL for SSRF protection
+ * Validate URL for SSRF protection.
+ * Blocks private IPs, IPv6 loopback, HTTP in production, and any domain not in ALLOWED_DOMAINS.
  */
 function isValidImageUrl(url: string): boolean {
   try {
     const parsed = new URL(url)
+    const hostname = parsed.hostname
 
-    // Block private IPs
-    if (
-      parsed.hostname === 'localhost' ||
-      parsed.hostname === '127.0.0.1' ||
-      parsed.hostname.startsWith('192.168.') ||
-      parsed.hostname.startsWith('10.') ||
-      parsed.hostname.startsWith('172.16.') ||
-      parsed.hostname.startsWith('172.17.') ||
-      parsed.hostname.startsWith('172.18.') ||
-      parsed.hostname.startsWith('172.19.') ||
-      parsed.hostname.startsWith('172.20.') ||
-      parsed.hostname.startsWith('172.21.') ||
-      parsed.hostname.startsWith('172.22.') ||
-      parsed.hostname.startsWith('172.23.') ||
-      parsed.hostname.startsWith('172.24.') ||
-      parsed.hostname.startsWith('172.25.') ||
-      parsed.hostname.startsWith('172.26.') ||
-      parsed.hostname.startsWith('172.27.') ||
-      parsed.hostname.startsWith('172.28.') ||
-      parsed.hostname.startsWith('172.29.') ||
-      parsed.hostname.startsWith('172.30.') ||
-      parsed.hostname.startsWith('172.31.')
-    ) {
-      return false
-    }
-
-    // Allow only HTTPS (or HTTP for localhost in dev)
     if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+      console.warn('[SSRF] Rejected non-HTTP(S) protocol:', parsed.protocol)
       return false
     }
 
-    // If allowlist is configured, check it
+    if (process.env.NODE_ENV === 'production' && parsed.protocol === 'http:') {
+      console.warn('[SSRF] Rejected HTTP URL in production:', url)
+      return false
+    }
+
+    if (PRIVATE_IPV4_RANGES.some((r) => r.test(hostname))) {
+      console.warn('[SSRF] Rejected private IPv4:', hostname)
+      return false
+    }
+
     if (
-      ALLOWED_DOMAINS.length > 0 &&
-      !ALLOWED_DOMAINS.some((domain) => parsed.hostname.includes(domain))
+      hostname === 'localhost' ||
+      hostname === '::1' ||
+      hostname.startsWith('fc00') ||
+      hostname.startsWith('fe80') ||
+      hostname.startsWith('fd')
     ) {
-      // Allow if domain is not in allowlist but is a valid public domain
-      // In production, you might want to be stricter
-      return true
+      console.warn('[SSRF] Rejected loopback/private hostname:', hostname)
+      return false
+    }
+
+    // Strict allowlist: never allow domains not in ALLOWED_DOMAINS (no fallback)
+    if (!ALLOWED_DOMAINS.some((domain) => hostname === domain || hostname.endsWith(`.${domain}`))) {
+      console.warn('[SSRF] Rejected non-allowlisted domain:', hostname)
+      return false
     }
 
     return true

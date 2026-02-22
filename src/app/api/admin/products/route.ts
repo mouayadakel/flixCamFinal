@@ -24,16 +24,27 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const products = await prisma.product.findMany({
-      where: { deletedAt: null },
-      include: {
-        brand: { select: { name: true } },
-        category: { select: { name: true } },
-        translations: { select: { locale: true, name: true }, where: { locale: 'en' } },
-        _count: { select: { inventoryItems: true } },
-      },
-      orderBy: { updatedAt: 'desc' },
-    })
+    const { searchParams } = new URL(request.url)
+    const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))
+    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') ?? '20', 10)))
+    const skip = (page - 1) * limit
+    const where = { deletedAt: null }
+
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        include: {
+          brand: { select: { name: true } },
+          category: { select: { name: true } },
+          translations: { select: { locale: true, name: true }, where: { locale: 'en' } },
+          _count: { select: { inventoryItems: true } },
+        },
+        orderBy: { updatedAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.product.count({ where }),
+    ])
 
     const items = products.map((p) => ({
       id: p.id,
@@ -48,7 +59,10 @@ export async function GET(request: NextRequest) {
       boxMissing: !p.boxContents || p.boxContents.trim().length === 0,
     }))
 
-    return NextResponse.json({ items })
+    return NextResponse.json({
+      items,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    })
   } catch (error: any) {
     console.error('List products failed', error)
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 })

@@ -1,29 +1,130 @@
 /**
  * Translation helpers (Phase 1.4).
  * Loads messages by locale and provides t() for nested keys.
+ * Now with lazy loading for better performance.
  */
 
 import type { Locale } from './locales'
 import { DEFAULT_LOCALE } from './locales'
 
-import ar from '@/messages/ar.json'
-import en from '@/messages/en.json'
-import zh from '@/messages/zh.json'
-
 // Message structure: nested objects with string values
 type Messages = Record<string, string | Record<string, unknown>>
 
-const messages: Record<Locale, Messages> = {
-  ar: ar as Messages,
-  en: en as Messages,
-  zh: zh as Messages,
+// Cache for loaded messages
+const messageCache = new Map<Locale, Messages>()
+
+/**
+ * Dynamically load messages for a locale (lazy loading)
+ */
+async function loadMessages(locale: Locale): Promise<Messages> {
+  // Check cache first
+  if (messageCache.has(locale)) {
+    return messageCache.get(locale)!
+  }
+
+  // Dynamic import based on locale
+  let messages: Messages
+  
+  switch (locale) {
+    case 'ar':
+      messages = (await import('@/messages/ar.json')).default as Messages
+      break
+    case 'en':
+      messages = (await import('@/messages/en.json')).default as Messages
+      break
+    case 'zh':
+      messages = (await import('@/messages/zh.json')).default as Messages
+      break
+    case 'fr':
+      messages = (await import('@/messages/fr.json')).default as Messages
+      break
+    default:
+      // Fallback to Arabic
+      messages = (await import('@/messages/ar.json')).default as Messages
+  }
+
+  // Cache the loaded messages
+  messageCache.set(locale, messages)
+  return messages
 }
 
 /**
- * Get messages for a locale.
+ * Get messages for a locale (synchronous version for backward compatibility).
+ * Attempts to load messages synchronously for server-side rendering.
  */
 export function getMessages(locale: Locale): Messages {
-  return messages[locale] ?? messages[DEFAULT_LOCALE]
+  // Check cache first
+  if (messageCache.has(locale)) {
+    return messageCache.get(locale)!
+  }
+  
+  // For server-side rendering, try to load messages synchronously
+  if (typeof window === 'undefined') {
+    try {
+      // Server-side: require the messages directly
+      let messages: Messages
+      switch (locale) {
+        case 'ar':
+          messages = require('@/messages/ar.json')
+          break
+        case 'en':
+          messages = require('@/messages/en.json')
+          break
+        case 'zh':
+          messages = require('@/messages/zh.json')
+          break
+        case 'fr':
+          messages = require('@/messages/fr.json')
+          break
+        default:
+          messages = require('@/messages/ar.json')
+      }
+      messageCache.set(locale, messages)
+      return messages
+    } catch (error) {
+      console.error(`Failed to load messages for locale ${locale}:`, error)
+    }
+  }
+  
+  // Client-side: load synchronously so first paint matches server (avoids hydration mismatch)
+  try {
+    let messages: Messages
+    switch (locale) {
+      case 'ar':
+        messages = require('@/messages/ar.json') as Messages
+        break
+      case 'en':
+        messages = require('@/messages/en.json') as Messages
+        break
+      case 'zh':
+        messages = require('@/messages/zh.json') as Messages
+        break
+      case 'fr':
+        messages = require('@/messages/fr.json') as Messages
+        break
+      default:
+        messages = require('@/messages/ar.json') as Messages
+    }
+    messageCache.set(locale, messages)
+    return messages
+  } catch (error) {
+    console.error(`Failed to load messages for locale ${locale}:`, error)
+    return {} as Messages
+  }
+}
+
+/**
+ * Async version of getMessages for client-side use
+ */
+export async function getMessagesAsync(locale: Locale): Promise<Messages> {
+  return loadMessages(locale)
+}
+
+/**
+ * Preload messages for a locale (useful for prefetching)
+ */
+export function preloadMessages(locale: Locale): void {
+  loadMessages(locale).catch(console.error)
 }
 
 /**

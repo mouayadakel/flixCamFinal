@@ -9,9 +9,56 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useLocale } from '@/hooks/use-locale'
 import { Button } from '@/components/ui/button'
-import { CheckCircle, FileText, Calendar, MessageCircle } from 'lucide-react'
+import { CheckCircle, Calendar, MessageCircle, Download, Share2 } from 'lucide-react'
 
 import { siteConfig } from '@/config/site.config'
+
+function ShareBookingButton({
+  bookingNumber,
+  id,
+  t,
+}: {
+  bookingNumber: string
+  id: string
+  t: (key: string) => string
+}) {
+  const [copied, setCopied] = useState(false)
+  const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/booking/confirmation/${id}` : ''
+
+  const handleShare = async () => {
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: `FlixCam – ${t('checkout.bookingNumber').replace('{number}', bookingNumber)}`,
+          url: shareUrl,
+          text: t('checkout.bookingConfirmed'),
+        })
+        return
+      } catch {
+        // fall through to copy
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      window.open(shareUrl, '_blank')
+    }
+  }
+
+  return (
+    <Button
+      variant="outline"
+      onClick={handleShare}
+      className="h-12 w-full gap-2 sm:w-auto"
+      size="lg"
+    >
+      <Share2 className="h-4 w-4" />
+      {copied ? t('common.copied') ?? 'Copied!' : t('common.share') ?? 'Share'}
+    </Button>
+  )
+}
 
 export default function BookingConfirmationPage() {
   const params = useParams()
@@ -23,9 +70,12 @@ export default function BookingConfirmationPage() {
     status: string
     startDate: string
     endDate: string
+    studioStartTime?: string | null
+    studioEndTime?: string | null
     totalAmount: number
     customer?: { name?: string; email?: string }
     equipment?: { quantity: number; equipment: { name: string } }[]
+    studio?: { name: string; slug: string; address?: string | null } | null
   } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -94,17 +144,17 @@ export default function BookingConfirmationPage() {
   if (error || !booking) {
     return (
       <main className="container mx-auto max-w-lg px-4 py-16 text-center">
-        <h1 className="mb-4 text-2xl font-bold">تم تأكيد الحجز</h1>
-        <p className="mb-2 text-muted-foreground">رقم الحجز: {id}</p>
+        <h1 className="mb-4 text-2xl font-bold">{t('checkout.bookingConfirmed')}</h1>
+        <p className="mb-2 text-muted-foreground">{t('checkout.bookingNumber').replace('{number}', id)}</p>
         <p className="mb-6 text-sm text-muted-foreground">
-          سجّل الدخول لعرض التفاصيل أو تواصل مع الدعم.
+          {t('checkout.bookingLoginPrompt')}
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Button asChild>
-            <Link href="/login">تسجيل الدخول</Link>
+            <Link href="/login">{t('nav.login')}</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link href="/support">الدعم</Link>
+            <Link href="/support">{t('nav.support')}</Link>
           </Button>
         </div>
       </main>
@@ -112,42 +162,71 @@ export default function BookingConfirmationPage() {
   }
 
   return (
-    <main className="container mx-auto max-w-lg px-4 py-12">
+    <main className="container mx-auto max-w-lg px-4 py-12 pb-24 lg:pb-12">
       <div className="mb-8 text-center">
         <CheckCircle className="mx-auto mb-4 h-16 w-16 text-green-600" />
-        <h1 className="mb-2 text-2xl font-bold">تم تأكيد الحجز</h1>
-        <p className="text-muted-foreground">رقم الحجز: {booking.bookingNumber}</p>
+        <h1 className="mb-2 text-2xl font-bold">{t('checkout.bookingConfirmed')}</h1>
+        <p className="text-muted-foreground">{t('checkout.bookingNumber').replace('{number}', booking.bookingNumber)}</p>
       </div>
 
       <div className="mb-6 space-y-4 rounded-lg border bg-card p-6">
+        {booking.studio && (
+          <>
+            <p>
+              <strong>{t('checkout.bookingStudio')}:</strong> {booking.studio.name}
+            </p>
+            {booking.studio.address && (
+              <p className="text-sm text-muted-foreground">{booking.studio.address}</p>
+            )}
+            {booking.studioStartTime && booking.studioEndTime && (
+              <p>
+                <strong>{t('checkout.bookingAppointment')}:</strong>{' '}
+                {new Date(booking.studioStartTime).toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                {' · '}
+                {new Date(booking.studioStartTime).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
+                {' – '}
+                {new Date(booking.studioEndTime).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
+              </p>
+            )}
+          </>
+        )}
+        {!booking.studio && (
+          <p>
+            <strong>{t('checkout.bookingDates')}:</strong> {new Date(booking.startDate).toLocaleDateString('ar-SA')} –{' '}
+            {new Date(booking.endDate).toLocaleDateString('ar-SA')}
+          </p>
+        )}
         <p>
-          <strong>التواريخ:</strong> {new Date(booking.startDate).toLocaleDateString('ar-SA')} –{' '}
-          {new Date(booking.endDate).toLocaleDateString('ar-SA')}
-        </p>
-        <p>
-          <strong>الإجمالي:</strong> {Number(booking.totalAmount).toLocaleString()} SAR
+          <strong>{t('checkout.bookingTotal')}:</strong> {Number(booking.totalAmount).toLocaleString()} SAR
         </p>
         {booking.equipment?.length ? (
           <p>
-            <strong>المعدات:</strong>{' '}
+            <strong>{t('checkout.bookingEquipment')}:</strong>{' '}
             {booking.equipment.map((e) => `${e.equipment?.name ?? ''} × ${e.quantity}`).join('، ')}
           </p>
         ) : null}
       </div>
 
-      <div className="flex flex-col justify-center gap-3 sm:flex-row">
-        <Button variant="outline" onClick={addToCalendar} className="gap-2">
-          <Calendar className="h-4 w-4" />
-          إضافة للتقويم
-        </Button>
-        <Button asChild variant="outline" className="gap-2">
-          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-            <MessageCircle className="h-4 w-4" />
-            واتساب
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
+        <Button asChild variant="outline" className="h-12 w-full gap-2 sm:w-auto" size="lg">
+          <a href={`/api/bookings/${booking.id}/invoice-pdf`} download>
+            <Download className="h-4 w-4" />
+            {t('checkout.downloadInvoice')}
           </a>
         </Button>
-        <Button asChild>
-          <Link href="/portal/bookings">حجوزاتي</Link>
+        <Button variant="outline" onClick={addToCalendar} className="h-12 w-full gap-2 sm:w-auto" size="lg">
+          <Calendar className="h-4 w-4" />
+          {t('checkout.addToCalendar')}
+        </Button>
+        <Button asChild variant="outline" className="h-12 w-full gap-2 sm:w-auto" size="lg">
+          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+            <MessageCircle className="h-4 w-4" />
+            {t('checkout.whatsapp')}
+          </a>
+        </Button>
+        <ShareBookingButton bookingNumber={booking.bookingNumber} id={booking.id} t={t} />
+        <Button asChild size="lg" className="h-12 w-full sm:w-auto">
+          <Link href="/portal/bookings">{t('checkout.myBookings')}</Link>
         </Button>
       </div>
     </main>

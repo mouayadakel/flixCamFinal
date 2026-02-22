@@ -29,13 +29,24 @@ export type SEOResult = {
 }
 
 /**
- * Get active AI settings
+ * Get active AI settings (DB only)
  */
 async function getAISettings(provider: SEOProvider) {
   const settings = await prisma.aISettings.findUnique({
     where: { provider },
   })
   return settings
+}
+
+/**
+ * Get API key for provider: DB first (if real key), then env fallback.
+ * So .env works without saving keys in Admin > Settings > AI.
+ */
+function getApiKeyFromEnv(provider: SEOProvider): string | null {
+  if (provider === 'openai') {
+    return process.env.OPENAI_API_KEY ?? null
+  }
+  return process.env.GEMINI_API_KEY ?? process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? null
 }
 
 /**
@@ -119,7 +130,7 @@ Generate SEO metadata:`
  */
 async function generateSEOWithGemini(context: SEOContext, apiKey: string): Promise<SEOResult> {
   const genAI = new GoogleGenerativeAI(apiKey)
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
 
   const prompt = `You are an SEO expert specializing in e-commerce and equipment rental platforms. Generate optimized SEO metadata for a product.
 
@@ -187,19 +198,15 @@ export async function generateSEO(context: SEOContext, provider?: SEOProvider): 
   const effectiveProvider = provider || ((process.env.AI_PROVIDER || 'openai') as SEOProvider)
   const settings = await getAISettings(effectiveProvider)
 
-  if (!settings || !settings.enabled) {
-    // Fallback to basic SEO if AI is disabled
-    return {
-      metaTitle: context.name.substring(0, 60),
-      metaDescription: (context.description || context.name).substring(0, 160),
-      metaKeywords: [context.brand, context.category, context.name].filter(Boolean).join(', '),
-      provider: effectiveProvider,
-    }
-  }
-
-  const apiKey = settings.apiKey
+  // Prefer DB key if present and valid (not masked placeholder)
+  let apiKey: string | null =
+    settings?.enabled && settings?.apiKey && settings.apiKey.length >= 10 && !settings.apiKey.startsWith('****')
+      ? settings.apiKey
+      : null
   if (!apiKey) {
-    // Fallback to basic SEO if no API key
+    apiKey = getApiKeyFromEnv(effectiveProvider)
+  }
+  if (!apiKey) {
     return {
       metaTitle: context.name.substring(0, 60),
       metaDescription: (context.description || context.name).substring(0, 160),
@@ -227,19 +234,14 @@ export async function generateSEOBatch(
   const effectiveProvider = provider || ((process.env.AI_PROVIDER || 'openai') as SEOProvider)
   const settings = await getAISettings(effectiveProvider)
 
-  if (!settings || !settings.enabled) {
-    // Fallback to basic SEO for all
-    return contexts.map((ctx) => ({
-      metaTitle: ctx.name.substring(0, 60),
-      metaDescription: (ctx.description || ctx.name).substring(0, 160),
-      metaKeywords: [ctx.brand, ctx.category, ctx.name].filter(Boolean).join(', '),
-      provider: effectiveProvider,
-    }))
-  }
-
-  const apiKey = settings.apiKey
+  let apiKey: string | null =
+    settings?.enabled && settings?.apiKey && settings.apiKey.length >= 10 && !settings.apiKey.startsWith('****')
+      ? settings.apiKey
+      : null
   if (!apiKey) {
-    // Fallback to basic SEO for all
+    apiKey = getApiKeyFromEnv(effectiveProvider)
+  }
+  if (!apiKey) {
     return contexts.map((ctx) => ({
       metaTitle: ctx.name.substring(0, 60),
       metaDescription: (ctx.description || ctx.name).substring(0, 160),
@@ -249,7 +251,7 @@ export async function generateSEOBatch(
   }
 
   const results: SEOResult[] = []
-  const batchSize = settings.batchSize || 50
+  const batchSize = settings?.batchSize || 50
 
   // Process in batches
   for (let i = 0; i < contexts.length; i += batchSize) {

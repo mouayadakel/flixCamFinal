@@ -6,11 +6,10 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
-import { addBackfillJob } from '@/lib/queue/backfill.queue'
-import { getProductIdsWithGaps } from '@/lib/services/content-health.service'
+import { hasAIPermission } from '@/lib/auth/permissions'
+import { aiRateLimitResponse } from '@/lib/utils/rate-limit-upstash'
 import { prisma } from '@/lib/db/prisma'
-import { JobStatus } from '@prisma/client'
+import { AiJobType, JobStatus } from '@prisma/client'
 import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
@@ -18,9 +17,11 @@ export const dynamic = 'force-dynamic'
 const postBodySchema = z.object({
   productIds: z.array(z.string().cuid()).optional(),
   fillAll: z.boolean().optional().default(false),
+  revenueWeighted: z.boolean().optional().default(false),
+  types: z.array(z.enum(['text', 'photo', 'spec'])).optional(),
+  minQualityScore: z.number().int().min(0).max(100).optional(),
 })
 
-/** User-friendly message when queue/Redis is unavailable */
 function isQueueConnectionError(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err)
   return (
@@ -38,9 +39,11 @@ export async function POST(request: NextRequest) {
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!(await hasPermission(session.user.id, PERMISSIONS.AI_USE))) {
-    return NextResponse.json({ error: 'Forbidden - ai.use required' }, { status: 403 })
+  if (!(await hasAIPermission(session.user.id, 'run'))) {
+    return NextResponse.json({ error: 'Forbidden - ai.run required' }, { status: 403 })
   }
+  const rateLimitRes = await aiRateLimitResponse(request, session.user.id)
+  if (rateLimitRes) return rateLimitRes
 
   try {
     const body = await request.json().catch(() => ({}))
@@ -51,11 +54,12 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    const { productIds, fillAll } = parsed.data
+    const { productIds, fillAll, revenueWeighted, types = [], minQualityScore } = parsed.data
 
     let ids: string[]
     if (fillAll) {
-      ids = await getProductIdsWithGaps()
+      const { getProductIdsWithGaps } = await import('@/lib/services/content-health.service')
+      ids = await getProductIdsWithGaps({ revenueWeighted, minQualityScore })
     } else if (productIds?.length) {
       ids = productIds
     } else {
@@ -74,14 +78,97 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    const result = await addBackfillJob(ids, {
-      createdBy: session.user.id,
+    // Atomic guard: check for active job AND create new job in one transaction
+    // Auto-cleanup stale jobs: PENDING >30min or RUNNING >60min are marked FAILED
+    const STALE_PENDING_MS = 30 * 60 * 1000
+    const STALE_RUNNING_MS = 60 * 60 * 1000
+    const txResult = await prisma.$transaction(async (tx) => {
+      const activeJob = await tx.aiJob.findFirst({
+        where: { status: { in: [JobStatus.RUNNING, JobStatus.PENDING] } },
+        select: { id: true, status: true, triggeredAt: true, startedAt: true },
+      })
+      if (activeJob) {
+        const now = Date.now()
+        const triggeredAge = now - new Date(activeJob.triggeredAt).getTime()
+        const startedAge = activeJob.startedAt ? now - new Date(activeJob.startedAt).getTime() : Infinity
+        const isStale =
+          (activeJob.status === JobStatus.PENDING && triggeredAge > STALE_PENDING_MS) ||
+          (activeJob.status === JobStatus.RUNNING && startedAge > STALE_RUNNING_MS)
+        if (isStale) {
+          await tx.aiJob.update({
+            where: { id: activeJob.id },
+            data: {
+              status: JobStatus.FAILED,
+              completedAt: new Date(),
+              errorLog: [{ error: 'Auto-cleaned: stale job exceeded timeout', timestamp: new Date().toISOString() }] as object,
+            },
+          })
+          // Stale job cleared — proceed to create new job below
+        } else {
+          return { conflict: true as const, activeJobId: activeJob.id }
+        }
+      }
+
+      const newJob = await tx.aiJob.create({
+        data: {
+          type: AiJobType.FULL_BACKFILL,
+          status: JobStatus.PENDING,
+          triggeredBy: 'manual',
+          totalItems: ids.length,
+          metadata: { triggeredBy: session.user!.id },
+        },
+      })
+
+      await tx.aiJobItem.createMany({
+        data: ids.map((productId) => ({
+          jobId: newJob.id,
+          productId,
+          itemType: 'text',
+          status: 'pending',
+        })),
+      })
+
+      return { conflict: false as const, jobId: newJob.id }
     })
 
+    if (txResult.conflict) {
+      return NextResponse.json(
+        {
+          error: 'مهمة ذكاء اصطناعي قيد التشغيل بالفعل. انتظر حتى تنتهي.',
+          code: 'JOB_ALREADY_RUNNING',
+          activeJobId: txResult.activeJobId,
+        },
+        { status: 409 }
+      )
+    }
+
+    // Enqueue BullMQ job outside transaction (non-blocking)
+    const { getBackfillQueue } = await import('@/lib/queue/backfill.queue')
+    await getBackfillQueue().add(
+      'backfill-products',
+      {
+        aiJobId: txResult.jobId,
+        productIds: ids,
+        types: types.length > 0 ? types : ['text'],
+        createdBy: session.user.id,
+      },
+      { jobId: txResult.jobId, priority: 1 }
+    )
+
+    const { logAiAudit } = await import('@/lib/services/ai-audit.service')
+    await logAiAudit({
+      userId: session.user.id,
+      action: 'backfill.trigger',
+      resourceType: 'AiJob',
+      resourceId: txResult.jobId,
+      metadata: { queued: ids.length, fillAll },
+    })
+
+    const estimatedMinutes = Math.max(1, Math.ceil(ids.length / 5))
     return NextResponse.json({
-      jobId: result.jobId,
-      queued: result.queued,
-      estimatedMinutes: result.estimatedMinutes,
+      jobId: txResult.jobId,
+      queued: ids.length,
+      estimatedMinutes,
     })
   } catch (error) {
     console.error('Backfill trigger failed:', error)
@@ -103,9 +190,11 @@ export async function GET(request: NextRequest) {
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!(await hasPermission(session.user.id, PERMISSIONS.AI_USE))) {
-    return NextResponse.json({ error: 'Forbidden - ai.use required' }, { status: 403 })
+  if (!(await hasAIPermission(session.user.id, 'view'))) {
+    return NextResponse.json({ error: 'Forbidden - ai.view required' }, { status: 403 })
   }
+  const rateLimitRes = await aiRateLimitResponse(request, session.user.id)
+  if (rateLimitRes) return rateLimitRes
 
   const jobId = request.nextUrl.searchParams.get('jobId')
   if (!jobId) {
@@ -133,6 +222,20 @@ export async function GET(request: NextRequest) {
             ? 'running'
             : String(statusRaw).toLowerCase()
 
+    const MAX_ERROR_MESSAGE_LENGTH = 120
+    const sanitizeError = (err: unknown): string => {
+      const s = typeof err === 'string' ? err : err instanceof Error ? err.message : String(err)
+      const noStack = s.split(/\n\s*at\s/)[0].trim()
+      return noStack.length > MAX_ERROR_MESSAGE_LENGTH
+        ? noStack.slice(0, MAX_ERROR_MESSAGE_LENGTH) + '…'
+        : noStack
+    }
+    const rawLog = (job.errorLog as Array<{ productId?: string; error?: unknown; timestamp?: string }>) ?? []
+    const errorLog = rawLog.map((entry) => ({
+      ...entry,
+      error: entry.error != null ? sanitizeError(entry.error) : undefined,
+    }))
+
     return NextResponse.json({
       status,
       progress,
@@ -142,7 +245,7 @@ export async function GET(request: NextRequest) {
       failed: job.failed,
       skipped: job.skipped,
       completedAt: job.completedAt,
-      errorLog: job.errorLog,
+      errorLog,
     })
   } catch (error) {
     console.error('Backfill status failed:', error)

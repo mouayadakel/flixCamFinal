@@ -8,10 +8,12 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { Plus, Search, Package, RefreshCw, Loader2 } from 'lucide-react'
+import { Plus, Search, Package, RefreshCw, Loader2, AlertTriangle, CheckSquare, Power, PowerOff, Trash2 } from 'lucide-react'
 import { SpecificationsAuditDialog } from '@/components/admin/specifications/SpecificationsAuditDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   Select,
   SelectContent,
@@ -70,6 +72,10 @@ export default function EquipmentPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([])
   const [migratingSpecs, setMigratingSpecs] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [bulkLoading, setBulkLoading] = useState(false)
+
+  const LOW_STOCK_THRESHOLD = 1
 
   useEffect(() => {
     loadEquipment()
@@ -147,6 +153,15 @@ export default function EquipmentPage() {
     }
   }
 
+  // Inventory summary stats
+  const inventoryStats = useMemo(() => {
+    const total = equipment.length
+    const active = equipment.filter((e) => e.isActive).length
+    const lowStock = equipment.filter((e) => e.quantityAvailable <= LOW_STOCK_THRESHOLD && e.isActive).length
+    const inMaintenance = equipment.filter((e) => e.condition === 'MAINTENANCE' || e.condition === 'DAMAGED').length
+    return { total, active, lowStock, inMaintenance }
+  }, [equipment])
+
   const filteredEquipment = useMemo(() => {
     if (!search) return equipment
 
@@ -160,6 +175,40 @@ export default function EquipmentPage() {
       )
     })
   }, [equipment, search])
+
+  // Bulk actions
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id])
+  }
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredEquipment.length) {
+      setSelectedIds([])
+    } else {
+      setSelectedIds(filteredEquipment.map((e) => e.id))
+    }
+  }
+  const handleBulkAction = async (action: 'activate' | 'deactivate' | 'delete') => {
+    if (selectedIds.length === 0) return
+    const labels = { activate: 'تفعيل', deactivate: 'إلغاء تفعيل', delete: 'حذف' }
+    if (action === 'delete' && !confirm(`هل أنت متأكد من حذف ${selectedIds.length} معدة؟`)) return
+    setBulkLoading(true)
+    try {
+      const res = await fetch('/api/equipment/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedIds, action }),
+      })
+      if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'فشل العملية') }
+      const data = await res.json()
+      toast({ title: 'تم', description: `تم ${labels[action]} ${data.updated} معدة` })
+      setSelectedIds([])
+      loadEquipment()
+    } catch (e) {
+      toast({ title: 'خطأ', description: e instanceof Error ? e.message : 'فشل العملية', variant: 'destructive' })
+    } finally {
+      setBulkLoading(false)
+    }
+  }
 
   const handleDelete = async (id: string) => {
     if (!confirm('هل أنت متأكد من حذف هذه المعدة؟')) return
@@ -223,6 +272,67 @@ export default function EquipmentPage() {
           </Button>
         </div>
       </div>
+
+      {/* Inventory Summary */}
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <Card>
+          <CardContent className="pt-4 pb-3">
+            <p className="text-sm text-muted-foreground">إجمالي المعدات</p>
+            <p className="text-2xl font-bold">{inventoryStats.total}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4 pb-3">
+            <p className="text-sm text-muted-foreground">نشطة</p>
+            <p className="text-2xl font-bold text-green-600">{inventoryStats.active}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4 pb-3">
+            <p className="text-sm text-muted-foreground">مخزون منخفض</p>
+            <p className={`text-2xl font-bold ${inventoryStats.lowStock > 0 ? 'text-amber-600' : ''}`}>{inventoryStats.lowStock}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4 pb-3">
+            <p className="text-sm text-muted-foreground">صيانة / تالفة</p>
+            <p className={`text-2xl font-bold ${inventoryStats.inMaintenance > 0 ? 'text-red-600' : ''}`}>{inventoryStats.inMaintenance}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Low stock alert */}
+      {inventoryStats.lowStock > 0 && (
+        <Alert className="border-amber-200 bg-amber-50">
+          <AlertTriangle className="h-4 w-4 text-amber-600" />
+          <AlertTitle className="text-amber-800">تنبيه مخزون منخفض</AlertTitle>
+          <AlertDescription className="text-amber-700">
+            {inventoryStats.lowStock} معدة لديها مخزون متاح ≤ {LOW_STOCK_THRESHOLD}. تحقق من الكميات وأعد التعبئة.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Bulk action bar */}
+      {selectedIds.length > 0 && (
+        <Card className="border-blue-200 bg-blue-50/50">
+          <CardContent className="flex flex-wrap items-center gap-3 py-3">
+            <span className="text-sm font-medium">{selectedIds.length} معدة محددة</span>
+            <Button size="sm" variant="outline" disabled={bulkLoading} onClick={() => handleBulkAction('activate')}>
+              <Power className="ml-1 h-4 w-4" /> تفعيل
+            </Button>
+            <Button size="sm" variant="outline" disabled={bulkLoading} onClick={() => handleBulkAction('deactivate')}>
+              <PowerOff className="ml-1 h-4 w-4" /> إلغاء تفعيل
+            </Button>
+            <Button size="sm" variant="destructive" disabled={bulkLoading} onClick={() => handleBulkAction('delete')}>
+              {bulkLoading ? <Loader2 className="ml-1 h-4 w-4 animate-spin" /> : <Trash2 className="ml-1 h-4 w-4" />}
+              حذف
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setSelectedIds([])}>
+              إلغاء التحديد
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Filters */}
       <Card>
@@ -300,6 +410,12 @@ export default function EquipmentPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-10">
+                    <Checkbox
+                      checked={filteredEquipment.length > 0 && selectedIds.length === filteredEquipment.length}
+                      onCheckedChange={toggleSelectAll}
+                    />
+                  </TableHead>
                   <TableHead>الصورة</TableHead>
                   <TableHead>SKU</TableHead>
                   <TableHead>الموديل</TableHead>
@@ -317,7 +433,13 @@ export default function EquipmentPage() {
                 {filteredEquipment.map((item) => {
                   const featuredImage = item.media?.[0]?.url
                   return (
-                    <TableRow key={item.id}>
+                    <TableRow key={item.id} className={item.quantityAvailable <= LOW_STOCK_THRESHOLD && item.isActive ? 'bg-amber-50/50' : ''}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedIds.includes(item.id)}
+                          onCheckedChange={() => toggleSelect(item.id)}
+                        />
+                      </TableCell>
                       <TableCell>
                         {featuredImage ? (
                           <div className="relative h-12 w-12 overflow-hidden rounded border border-neutral-200">
@@ -350,7 +472,13 @@ export default function EquipmentPage() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {item.quantityAvailable} / {item.quantityTotal}
+                        <span className={item.quantityAvailable <= LOW_STOCK_THRESHOLD && item.isActive ? 'font-bold text-amber-600' : ''}>
+                          {item.quantityAvailable}
+                        </span>
+                        {' / '}{item.quantityTotal}
+                        {item.quantityAvailable <= LOW_STOCK_THRESHOLD && item.isActive && (
+                          <AlertTriangle className="mr-1 inline h-3.5 w-3.5 text-amber-500" />
+                        )}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {item.maintenance?.[0]?.completedDate

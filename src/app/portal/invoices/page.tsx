@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { formatCurrency, formatDate } from '@/lib/utils/format.utils'
 import { Receipt, Download, CheckCircle, Clock } from 'lucide-react'
+import { t } from '@/lib/i18n/translate'
 
 export default async function PortalInvoicesPage() {
   const session = await auth()
@@ -61,18 +62,18 @@ export default async function PortalInvoicesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">فواتيري</h1>
-        <p className="mt-2 text-muted-foreground">عرض وتحميل جميع فواتيرك</p>
+        <h1 className="text-3xl font-bold">{t('ar', 'portal.myInvoices')}</h1>
+        <p className="mt-2 text-muted-foreground">{t('ar', 'portal.myInvoicesDesc')}</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>قائمة الفواتير</CardTitle>
+          <CardTitle>{t('ar', 'portal.invoicesList')}</CardTitle>
         </CardHeader>
         <CardContent>
           {invoices.length === 0 ? (
             <div className="py-12 text-center">
-              <p className="text-muted-foreground">لا توجد فواتير</p>
+              <p className="text-muted-foreground">{t('ar', 'portal.noInvoices')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -91,35 +92,35 @@ export default async function PortalInvoicesPage() {
                     <div className="flex-1">
                       <div className="mb-2 flex items-center gap-3">
                         <Receipt className="h-5 w-5 text-muted-foreground" />
-                        <span className="text-lg font-medium">فاتورة #{invoice.invoiceNumber}</span>
+                        <span className="text-lg font-medium">{t('ar', 'portal.invoiceHash').replace('{number}', invoice.invoiceNumber)}</span>
                         <Badge
                           variant={isPaid ? 'default' : isPartiallyPaid ? 'secondary' : 'outline'}
                         >
-                          {isPaid ? 'مدفوعة' : isPartiallyPaid ? 'مدفوعة جزئياً' : 'غير مدفوعة'}
+                          {isPaid ? t('ar', 'portal.paid') : isPartiallyPaid ? t('ar', 'portal.partiallyPaid') : t('ar', 'portal.unpaid')}
                         </Badge>
                       </div>
                       <div className="space-y-1 text-sm text-muted-foreground">
                         <div>
-                          <span className="font-medium">الحجز:</span> #{invoice.bookingNumber}
+                          <span className="font-medium">{t('ar', 'portal.booking')}:</span> #{invoice.bookingNumber}
                         </div>
                         <div>
-                          <span className="font-medium">المبلغ:</span>{' '}
+                          <span className="font-medium">{t('ar', 'portal.amount')}:</span>{' '}
                           {formatCurrency(invoice.totalAmount.toNumber())}
                         </div>
                         {isPartiallyPaid && (
                           <div>
-                            <span className="font-medium">المدفوع:</span>{' '}
+                            <span className="font-medium">{t('ar', 'portal.paidAmount')}:</span>{' '}
                             {formatCurrency(paidAmount)} /{' '}
                             {formatCurrency(invoice.totalAmount.toNumber())}
                           </div>
                         )}
                         <div>
-                          <span className="font-medium">تاريخ الإنشاء:</span>{' '}
+                          <span className="font-medium">{t('ar', 'portal.createdDate')}:</span>{' '}
                           {formatDate(invoice.createdAt)}
                         </div>
                         {invoice.dueDate && (
                           <div>
-                            <span className="font-medium">تاريخ الاستحقاق:</span>{' '}
+                            <span className="font-medium">{t('ar', 'portal.dueDate')}:</span>{' '}
                             {formatDate(invoice.dueDate)}
                           </div>
                         )}
@@ -128,12 +129,12 @@ export default async function PortalInvoicesPage() {
                     <div className="flex items-center gap-2">
                       <Link href={`/portal/invoices/${invoice.id}`}>
                         <Button variant="outline" size="sm">
-                          عرض التفاصيل
+                          {t('ar', 'portal.viewDetails')}
                         </Button>
                       </Link>
                       <Button variant="outline" size="sm">
                         <Download className="ml-2 h-4 w-4" />
-                        تحميل
+                        {t('ar', 'portal.download')}
                       </Button>
                     </div>
                   </div>

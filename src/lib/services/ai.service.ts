@@ -5,8 +5,6 @@
  */
 
 import { prisma } from '@/lib/db/prisma'
-import { EventBus } from '@/lib/events/event-bus'
-import { AuditService } from './audit.service'
 import { ShootTypeService } from './shoot-type.service'
 import { getSpecValue, getSpecArray } from '@/lib/utils/specifications.utils'
 import { NotFoundError, ValidationError } from '@/lib/errors'
@@ -224,17 +222,25 @@ export class AIService {
           max_tokens: 200,
         })
         narrativeSummaryAr = res.choices[0]?.message?.content?.trim() ?? undefined
-      } catch {
+      } catch (error) {
+        console.error('[ai.service] assessRisk narrativeSummaryAr OpenAI failed:', {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
+        })
         // keep undefined
       }
     }
     if (!narrativeSummaryAr && geminiKey) {
       try {
         const genAI = new GoogleGenerativeAI(geminiKey)
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
         const result = await model.generateContent(llmPrompt)
         narrativeSummaryAr = result.response.text()?.trim() ?? undefined
-      } catch {
+      } catch (error) {
+        console.error('[ai.service] assessRisk narrativeSummaryAr Gemini failed:', {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
+        })
         // keep undefined
       }
     }
@@ -334,7 +340,11 @@ export class AIService {
         input: text.slice(0, 8000),
       })
       return res.data[0]?.embedding ?? null
-    } catch {
+    } catch (error) {
+      console.error('[ai.service] getEmbedding failed:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
+      })
       return null
     }
   }
@@ -394,7 +404,11 @@ export class AIService {
           altEmbeddings = res.data.map((d) => d.embedding)
           while (altEmbeddings.length < alternatives.length) altEmbeddings.push(null)
         }
-      } catch {
+      } catch (error) {
+        console.error('[ai.service] recommendAlternatives embeddings batch failed:', {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
+        })
         altEmbeddings = alternatives.map(() => null)
       }
     } else {
@@ -673,7 +687,11 @@ export class AIService {
     } else if (id) {
       try {
         shootTypeConfig = await ShootTypeService.getById(id)
-      } catch {
+      } catch (error) {
+        console.error('[ai.service] buildKit ShootTypeService.getById failed:', {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
+        })
         shootTypeConfig = null
       }
     }
@@ -746,7 +764,7 @@ export class AIService {
         if (geminiKey) {
           try {
             const genAI = new GoogleGenerativeAI(geminiKey)
-            const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
             const result = await model.generateContent(prompt)
             const text = result.response.text()?.trim()
             const arr = text ? parseReasons(text) : null
@@ -754,7 +772,11 @@ export class AIService {
               equipment = equipment.map((e, i) => ({ ...e, reason: arr[i] ?? e.reason }))
               enhanced = true
             }
-          } catch {
+          } catch (error) {
+            console.error('[ai.service] buildKit Gemini kit reasons failed:', {
+              error: error instanceof Error ? error.message : String(error),
+              stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
+            })
             // fall through to OpenAI or rule-based
           }
         }
@@ -773,7 +795,11 @@ export class AIService {
               if (arr) {
                 equipment = equipment.map((e, i) => ({ ...e, reason: arr[i] ?? e.reason }))
               }
-            } catch {
+            } catch (error) {
+              console.error('[ai.service] buildKit OpenAI kit reasons failed:', {
+                error: error instanceof Error ? error.message : String(error),
+                stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
+              })
               // keep rule-based reasons
             }
           }
@@ -845,14 +871,18 @@ Equipment list (id, sku, category, dailyPrice): ${JSON.stringify(equipmentListFo
             llmSelected = arr.filter((x) => idSet.has(x.equipmentId)).slice(0, 12)
           }
         }
-      } catch {
+      } catch (error) {
+        console.error('[ai.service] buildKit OpenAI kit selection failed:', {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
+        })
         // fall through to rule-based
       }
     }
     if (llmSelected.length === 0 && geminiKey) {
       try {
         const genAI = new GoogleGenerativeAI(geminiKey)
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
         const result = await model.generateContent(llmPrompt)
         const text = result.response.text()?.trim()
         const match = text?.replace(/```json?\s*|\s*```/g, '').match(/\[[\s\S]*\]/)
@@ -863,7 +893,11 @@ Equipment list (id, sku, category, dailyPrice): ${JSON.stringify(equipmentListFo
             llmSelected = arr.filter((x) => idSet.has(x.equipmentId)).slice(0, 12)
           }
         }
-      } catch {
+      } catch (error) {
+        console.error('[ai.service] buildKit Gemini kit selection failed:', {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
+        })
         // fall through
       }
     }
@@ -1068,17 +1102,25 @@ Write exactly 3 short sentences in English: (1) why this utilization/demand supp
           max_tokens: 180,
         })
         rationale = res.choices[0]?.message?.content?.trim() ?? undefined
-      } catch {
+      } catch (error) {
+        console.error('[ai.service] suggestPricing OpenAI rationale failed:', {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
+        })
         // keep undefined
       }
     }
     if (!rationale && geminiKey) {
       try {
         const genAI = new GoogleGenerativeAI(geminiKey)
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
         const result = await model.generateContent(llmPrompt)
         rationale = result.response.text()?.trim() ?? undefined
-      } catch {
+      } catch (error) {
+        console.error('[ai.service] suggestPricing Gemini rationale failed:', {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
+        })
         // keep undefined
       }
     }
@@ -1094,7 +1136,7 @@ Write exactly 3 short sentences in English: (1) why this utilization/demand supp
         marketPrice: input.currentPrice,
         demandLevel,
         utilizationRate: Math.round(utilizationRate * 10) / 10,
-        seasonality: 1.0, // Placeholder
+        seasonality: parseFloat(process.env.AI_SEASONALITY_FACTOR || '1.0') || 1.0,
       },
       confidence: 75, // Base confidence
     }
@@ -1190,7 +1232,11 @@ Write exactly 3 short sentences in English: (1) why this utilization/demand supp
               weeklyProjection = arr.map((n) => Math.max(0, Math.round(Number(n))))
             }
           }
-        } catch {
+        } catch (error) {
+          console.error('[ai.service] forecastDemand weekly projection failed:', {
+            error: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
+          })
           // keep undefined
         }
       }
@@ -1413,7 +1459,7 @@ ${pageText.slice(0, 18_000)}
     if (geminiKey) {
       try {
         const genAI = new GoogleGenerativeAI(geminiKey)
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
         const result = await model.generateContent(prompt)
         const text = result.response.text()?.trim()
         if (text) {
@@ -1434,7 +1480,11 @@ ${pageText.slice(0, 18_000)}
             }
           }
         }
-      } catch {
+      } catch (error) {
+        console.error('[ai.service] extractSpecificationsFromProductPage Gemini failed:', {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
+        })
         // fall through to OpenAI
       }
     }

@@ -7,6 +7,8 @@
 import { prisma } from '@/lib/db/prisma'
 import { AuditService } from '@/lib/services/audit.service'
 import { publishAdminLive } from '@/lib/live-admin'
+import { NotificationService } from '@/lib/services/notification.service'
+import { NotificationChannel } from '@prisma/client'
 
 export type EventName =
   | 'booking.created'
@@ -257,6 +259,58 @@ export class EventBus {
       resourceType: resourceType ?? undefined,
       resourceId: resourceId ?? undefined,
       eventId: eventRecord.id,
+    })
+
+    // 5. Auto-create in-app notifications (fire-and-forget)
+    this.createNotification(event, payload).catch((e) =>
+      console.error('[EventBus] notification error:', e)
+    )
+  }
+
+  private static async createNotification(event: EventName, payload: any): Promise<void> {
+    const p = payload as any
+    const userId = p.booking?.customerId ?? p.userId
+    if (!userId) return
+
+    const NOTIFICATION_MAP: Record<string, { title: string; message: (p: any) => string }> = {
+      'booking.created': {
+        title: 'تم إنشاء الحجز',
+        message: (d) => `تم إنشاء حجزك رقم ${d.booking?.bookingNumber ?? ''} بنجاح. في انتظار الدفع.`,
+      },
+      'booking.confirmed': {
+        title: 'تم تأكيد الحجز',
+        message: (d) => `تم تأكيد حجزك رقم ${d.booking?.bookingNumber ?? ''}.`,
+      },
+      'booking.cancelled': {
+        title: 'تم إلغاء الحجز',
+        message: (d) => `تم إلغاء حجزك رقم ${d.booking?.bookingNumber ?? ''}.`,
+      },
+      'payment.success': {
+        title: 'تم الدفع بنجاح',
+        message: (d) => `تم استلام دفعتك بمبلغ ${d.amount ?? ''} ر.س.`,
+      },
+      'payment.failed': {
+        title: 'فشل الدفع',
+        message: () => 'فشلت عملية الدفع. يرجى المحاولة مرة أخرى.',
+      },
+      'contract.signed': {
+        title: 'تم توقيع العقد',
+        message: () => 'تم توقيع العقد بنجاح.',
+      },
+    }
+
+    const template = NOTIFICATION_MAP[event]
+    if (!template) return
+
+    const bookingId = p.booking?.id ?? p.bookingId ?? null
+
+    await NotificationService.send({
+      userId,
+      channel: NotificationChannel.IN_APP,
+      type: event,
+      title: template.title,
+      message: template.message(p),
+      data: bookingId ? { bookingId } : undefined,
     })
   }
 

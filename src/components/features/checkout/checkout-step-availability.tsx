@@ -60,7 +60,7 @@ export function CheckoutStepAvailability({ onSuccess }: CheckoutStepAvailability
         {items.map((item) => (
           <li key={item.id} className="flex items-center justify-between text-sm">
             <span>
-              {item.itemType} × {item.quantity}
+              {({ EQUIPMENT: 'معدة', STUDIO: 'استوديو', ADDON: 'إضافة', PACKAGE: 'باقة' }[item.itemType] ?? item.itemType)} × {item.quantity}
             </span>
             {item.isAvailable === true && (
               <span className="flex items-center gap-1 text-green-600">

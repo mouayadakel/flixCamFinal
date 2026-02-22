@@ -9,6 +9,8 @@ export interface CartItem {
   itemType: string
   equipmentId: string | null
   studioId: string | null
+  studioName?: string | null
+  studioSlug?: string | null
   packageId: string | null
   kitId: string | null
   startDate: string | null

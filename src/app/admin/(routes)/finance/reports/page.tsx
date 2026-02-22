@@ -8,15 +8,101 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { BarChart3, TrendingUp, Download, Calendar } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { formatCurrency, formatDate } from '@/lib/utils/format.utils'
 import { useToast } from '@/hooks/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { ReportType } from '@/lib/types/reports.types'
+
+function ReportTable({ data }: { data: any }) {
+  if (!data) return null
+
+  // If it's an array of objects, render as table
+  if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object') {
+    const keys = Object.keys(data[0])
+    return (
+      <div className="overflow-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {keys.map((k) => (
+                <TableHead key={k}>{k}</TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.slice(0, 50).map((row: any, i: number) => (
+              <TableRow key={i}>
+                {keys.map((k) => (
+                  <TableCell key={k} className="text-sm">
+                    {typeof row[k] === 'number'
+                      ? row[k].toLocaleString('ar-SA')
+                      : row[k] instanceof Date
+                        ? new Date(row[k]).toLocaleDateString('ar-SA')
+                        : typeof row[k] === 'object'
+                          ? JSON.stringify(row[k])
+                          : String(row[k] ?? '—')}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        {data.length > 50 && (
+          <p className="mt-2 text-xs text-muted-foreground">عرض 50 من {data.length} سجل</p>
+        )}
+      </div>
+    )
+  }
+
+  // If it's a plain object, render key-value pairs
+  if (typeof data === 'object' && !Array.isArray(data)) {
+    const entries = Object.entries(data)
+    const simpleEntries = entries.filter(([, v]) => typeof v !== 'object' || v === null)
+    const complexEntries = entries.filter(([, v]) => typeof v === 'object' && v !== null)
+
+    return (
+      <div className="space-y-4">
+        {simpleEntries.length > 0 && (
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4">
+            {simpleEntries.map(([key, val]) => (
+              <div key={key} className="rounded-lg border p-3">
+                <p className="text-xs text-muted-foreground">{key}</p>
+                <p className="font-medium">
+                  {typeof val === 'number' ? val.toLocaleString('ar-SA') : String(val ?? '—')}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+        {complexEntries.map(([key, val]) => (
+          <Card key={key}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">{key}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ReportTable data={val} />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )
+  }
+
+  return <p className="text-sm">{String(data)}</p>
+}
 
 export default function FinancialReportsPage() {
   const { toast } = useToast()
@@ -37,7 +123,7 @@ export default function FinancialReportsPage() {
     { value: 'inventory', label: { ar: 'المخزون', en: 'Inventory' } },
   ]
 
-  const generateReport = async () => {
+  const generateReport = useCallback(async () => {
     setLoading(true)
     try {
       const response = await fetch(`/api/reports/${reportType}`, {
@@ -67,11 +153,11 @@ export default function FinancialReportsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [reportType, dateFrom, dateTo, toast])
 
   useEffect(() => {
     generateReport()
-  }, [])
+  }, [generateReport])
 
   const [exporting, setExporting] = useState(false)
   const [exportFormat, setExportFormat] = useState<'pdf' | 'xlsx'>('xlsx')
@@ -255,9 +341,7 @@ export default function FinancialReportsPage() {
               <CardTitle>تفاصيل التقرير</CardTitle>
             </CardHeader>
             <CardContent>
-              <pre className="overflow-auto rounded-lg bg-muted p-4 text-sm">
-                {JSON.stringify(reportData, null, 2)}
-              </pre>
+              <ReportTable data={reportData} />
             </CardContent>
           </Card>
         </div>

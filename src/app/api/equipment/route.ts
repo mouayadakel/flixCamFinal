@@ -6,7 +6,40 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
 import { EquipmentService } from '@/lib/services/equipment.service'
+import { createEquipmentSchema } from '@/lib/validators/equipment.validator'
+
+function coerceEquipmentBody(body: Record<string, unknown>) {
+  const out: Record<string, unknown> = { ...body }
+  const numberFields = [
+    'quantityTotal',
+    'quantityAvailable',
+    'dailyPrice',
+    'weeklyPrice',
+    'monthlyPrice',
+    'depositAmount',
+    'bufferTime',
+  ]
+  for (const key of numberFields) {
+    const v = out[key]
+    if (typeof v === 'string' && v.trim() !== '') {
+      const n = Number(v)
+      out[key] = Number.isNaN(n) ? v : n
+    }
+  }
+
+  const booleanFields = ['featured', 'isActive']
+  for (const key of booleanFields) {
+    const v = out[key]
+    if (typeof v === 'string') {
+      if (v === 'true') out[key] = true
+      if (v === 'false') out[key] = false
+    }
+  }
+
+  return out
+}
 
 /**
  * GET /api/equipment - Get equipment list
@@ -15,11 +48,23 @@ export async function GET(request: NextRequest) {
   try {
     const session = await auth()
 
-    if (!session) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    if (!(await hasPermission(session.user.id, PERMISSIONS.EQUIPMENT_READ))) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const searchParams = request.nextUrl.searchParams
+    const skipRaw = parseInt(searchParams.get('skip') ?? searchParams.get('page') ?? '0', 10)
+    const takeRaw = parseInt(
+      searchParams.get('take') ?? searchParams.get('limit') ?? '50',
+      10
+    )
+    const skip = Number.isNaN(skipRaw) || skipRaw < 0 ? 0 : Math.min(skipRaw, 10000)
+    const take = Number.isNaN(takeRaw) || takeRaw < 1 ? 50 : Math.min(takeRaw, 500)
+
     const filters = {
       search: searchParams.get('search') || undefined,
       categoryId: searchParams.get('categoryId') || undefined,
@@ -37,8 +82,8 @@ export async function GET(request: NextRequest) {
           : searchParams.get('featured') === 'false'
             ? false
             : undefined,
-      skip: parseInt(searchParams.get('skip') || '0'),
-      take: parseInt(searchParams.get('take') || '50'),
+      skip,
+      take,
     }
 
     const result = await EquipmentService.getEquipmentList(filters)
@@ -64,10 +109,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await request.json()
+    if (!(await hasPermission(session.user.id, PERMISSIONS.EQUIPMENT_CREATE))) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const bodyRaw = (await request.json()) as Record<string, unknown>
+    const body = coerceEquipmentBody(bodyRaw)
     const { featured: _featured, ...rest } = body
+
+    const parsed = createEquipmentSchema.safeParse(rest)
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      )
+    }
+
     const equipment = await EquipmentService.createEquipment({
-      ...rest,
+      ...parsed.data,
       createdBy: session.user.id,
     })
 

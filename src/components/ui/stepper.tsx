@@ -22,10 +22,42 @@ interface StepperProps {
   onStepClick?: (index: number) => void
 }
 
+const STEPPER_ARIA_MIN = 1
+
 export function Stepper({ steps, currentStep, className, onStepClick }: StepperProps) {
+  const valueNow = steps.length > 0 ? currentStep + 1 : 0
+  const valueMax = Math.max(steps.length, 1)
+  const progressPercent = steps.length > 0 ? `${((currentStep + 1) / steps.length) * 100}%` : '0%'
+  const progressbarAria = {
+    'aria-valuenow': valueNow,
+    'aria-valuemin': STEPPER_ARIA_MIN,
+    'aria-valuemax': valueMax,
+    'aria-label': `Step ${currentStep + 1} of ${steps.length}`,
+  }
+
   return (
     <nav aria-label="Progress" className={className}>
-      <ol className="flex items-center">
+      {/* Mobile: compact step indicator + progress bar */}
+      <div className="lg:hidden">
+        <p className="text-sm font-medium text-text-muted">
+          {currentStep + 1} / {steps.length}
+        </p>
+        <div
+          className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-light stepper-progress-track"
+          role="progressbar"
+          {...progressbarAria}
+        >
+          <div
+            className="h-full rounded-full bg-brand-primary transition-all duration-300 stepper-progress-fill"
+            style={{ ['--stepper-progress' as string]: progressPercent }}
+          />
+        </div>
+        <p className="mt-1 text-sm font-semibold text-brand-primary">
+          {steps[currentStep]?.label}
+        </p>
+      </div>
+      {/* Desktop: full stepper */}
+      <ol className="hidden lg:flex lg:items-center">
         {steps.map((step, index) => {
           const isCompleted = currentStep > index
           const isActive = currentStep === index

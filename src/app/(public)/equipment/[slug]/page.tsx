@@ -4,30 +4,58 @@
  * Guarded by enable_equipment_catalog feature flag.
  */
 
+import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { prisma } from '@/lib/db/prisma'
 import { FeatureFlagService } from '@/lib/services/feature-flag.service'
 import { EquipmentDetail } from '@/components/features/equipment/equipment-detail'
 
-async function getEquipment(id: string) {
-  const e = await prisma.equipment.findFirst({
-    where: { id, deletedAt: null, isActive: true },
-    include: {
-      category: { select: { id: true, name: true, slug: true } },
-      brand: { select: { id: true, name: true, slug: true } },
-      media: { select: { id: true, url: true, type: true } },
-      vendor: {
-        select: { companyName: true, logo: true, isNameVisible: true },
+async function getEquipment(slugOrId: string) {
+  const include = {
+    category: { select: { id: true, name: true, slug: true } },
+    brand: { select: { id: true, name: true, slug: true } },
+    media: { select: { id: true, url: true, type: true } },
+    vendor: {
+      select: { companyName: true, logo: true, isNameVisible: true },
+    },
+    product: {
+      select: {
+        translations: {
+          where: { deletedAt: null },
+          select: {
+            locale: true,
+            shortDescription: true,
+            longDescription: true,
+            seoTitle: true,
+            seoDescription: true,
+            seoKeywords: true,
+          },
+        },
       },
     },
+  }
+
+  let e = await prisma.equipment.findFirst({
+    where: { slug: slugOrId, deletedAt: null, isActive: true },
+    include,
   })
+  if (!e) {
+    e = await prisma.equipment.findFirst({
+      where: { id: slugOrId, deletedAt: null, isActive: true },
+      include,
+    })
+  }
+
   if (!e) return null
-  const v = e.vendor as { companyName: string; logo: string | null; isNameVisible: boolean } | null
+  const v = e.vendor
   const vendor = v?.isNameVisible ? { companyName: v.companyName, logo: v.logo } : null
-  // Return plain serializable object (no Prisma Decimal/Date that could break RSC)
+  const translations = e.product?.translations ?? []
+  const enTrans = translations.find((t) => t.locale === 'en')
+
   return {
     id: e.id,
     sku: e.sku,
+    slug: e.slug ?? null,
     model: e.model,
     categoryId: e.categoryId,
     brandId: e.brandId,
@@ -41,6 +69,11 @@ async function getEquipment(id: string) {
     monthlyPrice: e.monthlyPrice ? Number(e.monthlyPrice) : null,
     specifications: e.specifications as Record<string, unknown> | null,
     customFields: e.customFields as Record<string, unknown> | null,
+    shortDescription: enTrans?.shortDescription ?? null,
+    longDescription: enTrans?.longDescription ?? null,
+    seoTitle: enTrans?.seoTitle ?? null,
+    seoDescription: enTrans?.seoDescription ?? null,
+    seoKeywords: enTrans?.seoKeywords ?? null,
   }
 }
 
@@ -77,6 +110,54 @@ async function getRecommendations(equipmentId: string, categoryId: string) {
   }))
 }
 
+const BASE_URL = process.env.NEXTAUTH_URL || process.env.APP_URL || 'https://flixcam.rent'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug: id } = await params
+  const equipment = await getEquipment(id)
+  if (!equipment) {
+    return { title: 'معدة غير موجودة | FlixCam.rent' }
+  }
+  const name = equipment.model || equipment.sku || 'معدة'
+  const title = equipment.seoTitle || `${name} | FlixCam.rent`
+  const description =
+    equipment.seoDescription ||
+    equipment.shortDescription ||
+    `تأجير ${name} – معدات تصوير سينمائي في الرياض. احجز أونلاين من FlixCam.rent.` +
+      (equipment.brand?.name ? ` ماركة ${equipment.brand.name}.` : '')
+  const keywords = equipment.seoKeywords ?? undefined
+  const canonicalSlug = equipment.slug ?? id
+  const imageUrl =
+    equipment.media?.[0]?.url && equipment.media[0].url.startsWith('http')
+      ? equipment.media[0].url
+      : equipment.media?.[0]?.url
+        ? `${BASE_URL}${equipment.media[0].url}`
+        : undefined
+  return {
+    title,
+    description,
+    keywords,
+    alternates: { canonical: `${BASE_URL}/equipment/${canonicalSlug}` },
+    openGraph: {
+      title,
+      description,
+      url: `${BASE_URL}/equipment/${canonicalSlug}`,
+      type: 'website',
+      images: imageUrl ? [{ url: imageUrl, alt: name }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: imageUrl ? [imageUrl] : undefined,
+    },
+  }
+}
+
 export default async function EquipmentDetailPage({
   params,
 }: {
@@ -93,9 +174,52 @@ export default async function EquipmentDetailPage({
       ? await getRecommendations(equipment.id, equipment.categoryId)
       : []
 
+    const equipmentName = equipment.model || equipment.sku || 'Equipment'
+    const equipmentSlug = equipment.slug ?? equipment.id
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: equipmentName,
+      url: `${BASE_URL}/equipment/${equipmentSlug}`,
+      image: equipment.media?.[0]?.url
+        ? (equipment.media[0].url.startsWith('http')
+            ? equipment.media[0].url
+            : `${BASE_URL}${equipment.media[0].url}`)
+        : undefined,
+      description:
+        equipment.shortDescription ||
+        `تأجير ${equipmentName} – معدات تصوير سينمائي في الرياض`,
+      brand: equipment.brand
+        ? { '@type': 'Brand', name: equipment.brand.name }
+        : undefined,
+      category: equipment.category?.name,
+      sku: equipment.sku,
+      offers: {
+        '@type': 'Offer',
+        priceCurrency: 'SAR',
+        price: equipment.dailyPrice,
+        availability:
+          (equipment.quantityAvailable ?? 0) > 0
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock',
+        url: `${BASE_URL}/equipment/${equipmentSlug}`,
+      },
+    }
+
     return (
       <main className="mx-auto w-full max-w-public-container px-4 py-8 sm:px-6 md:py-12 lg:px-8">
-        <EquipmentDetail equipment={equipment} recommendations={recommendations} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <EquipmentDetail equipment={{
+      ...equipment,
+      category: equipment.category ? { name: equipment.category.name, slug: equipment.category.slug ?? '' } : null,
+      brand: equipment.brand ? { name: equipment.brand.name, slug: equipment.brand.slug ?? '' } : null,
+      shortDescription: equipment.shortDescription ?? null,
+      longDescription: equipment.longDescription ?? null,
+      boxContents: (equipment as any).boxContents ?? null,
+    }} recommendations={recommendations} />
       </main>
     )
   } catch (err) {

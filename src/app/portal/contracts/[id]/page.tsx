@@ -16,6 +16,7 @@ import Link from 'next/link'
 import { formatDate } from '@/lib/utils/format.utils'
 import { ArrowRight, FileText, Download } from 'lucide-react'
 import { notFound } from 'next/navigation'
+import { t } from '@/lib/i18n/translate'
 
 export default async function PortalContractDetailPage({ params }: { params: { id: string } }) {
   const session = await auth()
@@ -69,12 +70,12 @@ export default async function PortalContractDetailPage({ params }: { params: { i
             className="mb-2 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowRight className="h-4 w-4" />
-            العودة إلى العقود
+            {t('ar', 'portal.backToContracts')}
           </Link>
-          <h1 className="text-3xl font-bold">عقد #{contract.id.slice(0, 8)}</h1>
+          <h1 className="text-3xl font-bold">{t('ar', 'portal.contractHash').replace('{id}', contract.id.slice(0, 8))}</h1>
         </div>
         <Badge variant={contract.signedAt ? 'default' : 'secondary'}>
-          {contract.signedAt ? 'موقع' : 'في انتظار التوقيع'}
+          {contract.signedAt ? t('ar', 'portal.signed') : t('ar', 'portal.awaitingSignature')}
         </Badge>
       </div>
 
@@ -83,27 +84,27 @@ export default async function PortalContractDetailPage({ params }: { params: { i
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            معلومات العقد
+            {t('ar', 'portal.contractInfo')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <div className="text-sm text-muted-foreground">رقم الحجز</div>
+            <div className="text-sm text-muted-foreground">{t('ar', 'portal.bookingNumber')}</div>
             <div className="font-medium">#{contract.booking.bookingNumber}</div>
           </div>
           <div>
-            <div className="text-sm text-muted-foreground">تاريخ الإنشاء</div>
+            <div className="text-sm text-muted-foreground">{t('ar', 'portal.createdDate')}</div>
             <div className="font-medium">{formatDate(contract.createdAt)}</div>
           </div>
           {contract.signedAt && (
             <div>
-              <div className="text-sm text-muted-foreground">تاريخ التوقيع</div>
+              <div className="text-sm text-muted-foreground">{t('ar', 'portal.signedDate')}</div>
               <div className="font-medium">{formatDate(contract.signedAt)}</div>
             </div>
           )}
           <div>
-            <div className="text-sm text-muted-foreground">الحالة</div>
-            <div className="font-medium">{contract.signedAt ? 'موقع' : 'في انتظار التوقيع'}</div>
+            <div className="text-sm text-muted-foreground">{t('ar', 'portal.status')}</div>
+            <div className="font-medium">{contract.signedAt ? t('ar', 'portal.signed') : t('ar', 'portal.awaitingSignature')}</div>
           </div>
         </CardContent>
       </Card>
@@ -111,7 +112,7 @@ export default async function PortalContractDetailPage({ params }: { params: { i
       {/* Contract Content */}
       <Card>
         <CardHeader>
-          <CardTitle>محتوى العقد</CardTitle>
+          <CardTitle>{t('ar', 'portal.contractContent')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="prose max-w-none">
@@ -127,7 +128,7 @@ export default async function PortalContractDetailPage({ params }: { params: { i
                 }}
               />
             ) : (
-              <p className="text-muted-foreground">لا يوجد محتوى للعقد</p>
+              <p className="text-muted-foreground">{t('ar', 'portal.noContractContent')}</p>
             )}
           </div>
         </CardContent>
@@ -136,21 +137,21 @@ export default async function PortalContractDetailPage({ params }: { params: { i
       {/* Actions */}
       <Card>
         <CardHeader>
-          <CardTitle>الإجراءات</CardTitle>
+          <CardTitle>{t('ar', 'portal.actions')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4">
             {!contract.signedAt && (
               <Link href={`/portal/contracts/${contract.id}/sign`}>
-                <Button>توقيع العقد</Button>
+                <Button>{t('ar', 'portal.signContract')}</Button>
               </Link>
             )}
             <Button variant="outline">
               <Download className="ml-2 h-4 w-4" />
-              تحميل PDF
+              {t('ar', 'portal.downloadPDF')}
             </Button>
             <Link href={`/portal/bookings/${contract.bookingId}`}>
-              <Button variant="outline">عرض الحجز</Button>
+              <Button variant="outline">{t('ar', 'portal.viewBooking')}</Button>
             </Link>
           </div>
         </CardContent>

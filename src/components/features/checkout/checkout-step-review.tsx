@@ -14,6 +14,17 @@ import { useCartStore } from '@/lib/stores/cart.store'
 import { useCheckoutStore } from '@/lib/stores/checkout.store'
 import { PriceLockNotice } from './price-lock-notice'
 
+const ITEM_TYPE_LABELS: Record<string, string> = {
+  EQUIPMENT: 'معدة',
+  STUDIO: 'استوديو',
+  ADDON: 'إضافة',
+  PACKAGE: 'باقة',
+}
+
+function formatSar(value: number): string {
+  return `${value.toLocaleString('ar-SA')} ر.س`
+}
+
 export function CheckoutStepReview() {
   const { t } = useLocale()
   const router = useRouter()
@@ -58,9 +69,9 @@ export function CheckoutStepReview() {
   if (!details) {
     return (
       <div className="rounded-lg border bg-card p-6 text-center text-muted-foreground">
-        <p>يرجى إكمال خطوة البيانات أولاً.</p>
+        <p>{t('checkout.completePrevious')}</p>
         <Button variant="link" onClick={() => router.push('/checkout')}>
-          العودة للطلبات
+          {t('checkout.backToCheckout')}
         </Button>
       </div>
     )
@@ -74,31 +85,32 @@ export function CheckoutStepReview() {
           {items.map((item) => (
             <li key={item.id} className="flex justify-between">
               <span>
-                {item.itemType} × {item.quantity}
+                {(item as any).name || ITEM_TYPE_LABELS[item.itemType] || item.itemType}
+                {item.quantity > 1 && ` × ${item.quantity}`}
                 {item.startDate && (
-                  <span className="ms-1 text-muted-foreground">
-                    ({item.startDate} – {item.endDate})
+                  <span className="block text-xs text-muted-foreground">
+                    {item.startDate} – {item.endDate}
                   </span>
                 )}
               </span>
-              <span>{item.subtotal?.toLocaleString() ?? 0} SAR</span>
+              <span className="font-medium">{formatSar(item.subtotal ?? 0)}</span>
             </li>
           ))}
         </ul>
         <div className="mt-3 space-y-1 border-t pt-3 text-sm">
           <div className="flex justify-between">
             <span>{t('cart.subtotal')}</span>
-            <span>{subtotal.toLocaleString()} SAR</span>
+            <span>{formatSar(subtotal)}</span>
           </div>
           {discountAmount > 0 && (
             <div className="flex justify-between text-green-600 dark:text-green-400">
               <span>{t('cart.discount')}</span>
-              <span>-{discountAmount.toLocaleString()} SAR</span>
+              <span>-{formatSar(discountAmount)}</span>
             </div>
           )}
           <div className="flex justify-between font-semibold">
             <span>{t('cart.total')}</span>
-            <span>{total.toLocaleString()} SAR</span>
+            <span>{formatSar(total)}</span>
           </div>
         </div>
       </div>
@@ -144,7 +156,7 @@ export function CheckoutStepReview() {
       </div>
 
       <Button size="lg" className="w-full" disabled={!canPay} onClick={handlePayNow}>
-        {t('checkout.payNow')} – {total.toLocaleString()} SAR
+        {t('checkout.payNow')} – {formatSar(total)}
       </Button>
     </div>
   )

@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   DollarSign,
   Plus,
@@ -185,15 +185,17 @@ export default function DynamicPricingPage() {
   })
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => {
-    loadRules()
-  }, [])
-
-  useEffect(() => {
-    if (activeTab === 'demand-forecast' && equipmentList.length === 0) {
-      loadEquipmentForForecast()
+  const loadEquipmentForForecast = useCallback(async () => {
+    try {
+      const res = await fetch('/api/equipment?take=200')
+      if (!res.ok) return
+      const data = await res.json()
+      const list = Array.isArray(data.items) ? data.items : data.equipment ?? data.data ?? []
+      setEquipmentList(list.map((e: { id: string; model?: string; sku?: string }) => ({ id: e.id, model: e.model ?? e.sku ?? e.id, sku: e.sku ?? '' })))
+    } catch {
+      setEquipmentList([])
     }
-  }, [activeTab])
+  }, [])
 
   const apiTypeToPage = (t: string): RuleType => {
     const map: Record<string, RuleType> = {
@@ -218,7 +220,7 @@ export default function DynamicPricingPage() {
     return map[t] ?? 'SEASONAL'
   }
 
-  const loadRules = async () => {
+  const loadRules = useCallback(async () => {
     setLoading(true)
     try {
       const res = await fetch('/api/pricing-rules')
@@ -262,7 +264,17 @@ export default function DynamicPricingPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
+
+  useEffect(() => {
+    loadRules()
+  }, [loadRules])
+
+  useEffect(() => {
+    if (activeTab === 'demand-forecast' && equipmentList.length === 0) {
+      loadEquipmentForForecast()
+    }
+  }, [activeTab, equipmentList.length, loadEquipmentForForecast])
 
   const handleCreateRule = () => {
     setEditingRule(null)
@@ -394,18 +406,6 @@ export default function DynamicPricingPage() {
       : activeTab === 'ai-analysis' || activeTab === 'demand-forecast'
         ? []
         : rules.filter((r) => r.type === activeTab)
-
-  const loadEquipmentForForecast = async () => {
-    try {
-      const res = await fetch('/api/equipment?take=200')
-      if (!res.ok) return
-      const data = await res.json()
-      const list = Array.isArray(data.items) ? data.items : data.equipment ?? data.data ?? []
-      setEquipmentList(list.map((e: { id: string; model?: string; sku?: string }) => ({ id: e.id, model: e.model ?? e.sku ?? e.id, sku: e.sku ?? '' })))
-    } catch {
-      setEquipmentList([])
-    }
-  }
 
   const runAnalysis = async () => {
     setAnalysisLoading(true)

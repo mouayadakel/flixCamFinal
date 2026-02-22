@@ -16,6 +16,7 @@ import Link from 'next/link'
 import { Calendar, DollarSign, Package, Clock, ArrowLeft, FileText, Receipt } from 'lucide-react'
 import { formatCurrency, formatDate } from '@/lib/utils/format.utils'
 import { BookingStatus } from '@prisma/client'
+import { t } from '@/lib/i18n/translate'
 
 export default async function PortalDashboardPage() {
   const session = await auth()
@@ -105,14 +106,14 @@ export default async function PortalDashboardPage() {
       BookingStatus,
       { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
     > = {
-      DRAFT: { label: 'مسودة', variant: 'outline' },
-      RISK_CHECK: { label: 'فحص المخاطر', variant: 'outline' },
-      PAYMENT_PENDING: { label: 'انتظار الدفع', variant: 'secondary' },
-      CONFIRMED: { label: 'مؤكد', variant: 'default' },
-      ACTIVE: { label: 'نشط', variant: 'default' },
-      RETURNED: { label: 'مرتجع', variant: 'secondary' },
-      CLOSED: { label: 'مغلق', variant: 'outline' },
-      CANCELLED: { label: 'ملغي', variant: 'destructive' },
+      DRAFT: { label: t('ar', 'portal.statusDraft'), variant: 'outline' },
+      RISK_CHECK: { label: t('ar', 'portal.statusRiskCheck'), variant: 'outline' },
+      PAYMENT_PENDING: { label: t('ar', 'portal.statusPaymentPending'), variant: 'secondary' },
+      CONFIRMED: { label: t('ar', 'portal.statusConfirmed'), variant: 'default' },
+      ACTIVE: { label: t('ar', 'portal.statusActive'), variant: 'default' },
+      RETURNED: { label: t('ar', 'portal.statusReturned'), variant: 'secondary' },
+      CLOSED: { label: t('ar', 'portal.statusClosed'), variant: 'outline' },
+      CANCELLED: { label: t('ar', 'portal.statusCancelled'), variant: 'destructive' },
     }
 
     const config = statusConfig[status] || { label: status, variant: 'outline' }
@@ -123,44 +124,44 @@ export default async function PortalDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">لوحة التحكم</h1>
-        <p className="mt-2 text-muted-foreground">مرحباً بك في لوحة تحكم العميل</p>
+        <h1 className="text-3xl font-bold">{t('ar', 'portal.dashboard')}</h1>
+        <p className="mt-2 text-muted-foreground">{t('ar', 'portal.welcomeMessage')}</p>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي الحجوزات</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('ar', 'portal.totalBookings')}</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalBookings}</div>
-            <p className="mt-1 text-xs text-muted-foreground">جميع الحجوزات</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('ar', 'portal.allBookings')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">إجمالي الإنفاق</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('ar', 'portal.totalSpent')}</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {formatCurrency(totalSpent._sum.amount?.toNumber() ?? 0)}
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">المدفوع حتى الآن</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('ar', 'portal.paidSoFar')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">الإرجاعات القادمة</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('ar', 'portal.upcomingReturns')}</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{upcomingReturns}</div>
-            <p className="mt-1 text-xs text-muted-foreground">خلال 7 أيام القادمة</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('ar', 'portal.nextSevenDays')}</p>
           </CardContent>
         </Card>
       </div>
@@ -171,7 +172,7 @@ export default async function PortalDashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Package className="h-5 w-5" />
-              الحجوزات النشطة
+              {t('ar', 'portal.activeBookings')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -183,12 +184,12 @@ export default async function PortalDashboardPage() {
                 >
                   <div className="flex-1">
                     <div className="mb-2 flex items-center gap-3">
-                      <span className="font-medium">حجز #{booking.bookingNumber}</span>
+                      <span className="font-medium">{t('ar', 'portal.bookingHash').replace('{number}', booking.bookingNumber)}</span>
                       {getStatusBadge(booking.status)}
                     </div>
                     <div className="space-y-1 text-sm text-muted-foreground">
                       <div>
-                        من {formatDate(booking.startDate)} إلى {formatDate(booking.endDate)}
+                        {t('ar', 'portal.fromTo').replace('{from}', formatDate(booking.startDate)).replace('{to}', formatDate(booking.endDate))}
                       </div>
                       <div>{formatCurrency(booking.totalAmount.toNumber())}</div>
                     </div>
@@ -196,7 +197,7 @@ export default async function PortalDashboardPage() {
                   <div className="flex items-center gap-2">
                     <Link href={`/portal/bookings/${booking.id}`}>
                       <Button variant="outline" size="sm">
-                        عرض التفاصيل
+                        {t('ar', 'portal.viewDetails')}
                       </Button>
                     </Link>
                   </div>
@@ -213,7 +214,7 @@ export default async function PortalDashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              الحجوزات القادمة
+              {t('ar', 'portal.upcomingBookings')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -225,12 +226,12 @@ export default async function PortalDashboardPage() {
                 >
                   <div className="flex-1">
                     <div className="mb-2 flex items-center gap-3">
-                      <span className="font-medium">حجز #{booking.bookingNumber}</span>
+                      <span className="font-medium">{t('ar', 'portal.bookingHash').replace('{number}', booking.bookingNumber)}</span>
                       {getStatusBadge(booking.status)}
                     </div>
                     <div className="space-y-1 text-sm text-muted-foreground">
                       <div>
-                        من {formatDate(booking.startDate)} إلى {formatDate(booking.endDate)}
+                        {t('ar', 'portal.fromTo').replace('{from}', formatDate(booking.startDate)).replace('{to}', formatDate(booking.endDate))}
                       </div>
                       <div>{formatCurrency(booking.totalAmount.toNumber())}</div>
                     </div>
@@ -238,7 +239,7 @@ export default async function PortalDashboardPage() {
                   <div className="flex items-center gap-2">
                     <Link href={`/portal/bookings/${booking.id}`}>
                       <Button variant="outline" size="sm">
-                        عرض التفاصيل
+                        {t('ar', 'portal.viewDetails')}
                       </Button>
                     </Link>
                   </div>
@@ -252,26 +253,26 @@ export default async function PortalDashboardPage() {
       {/* Quick Actions */}
       <Card>
         <CardHeader>
-          <CardTitle>إجراءات سريعة</CardTitle>
+          <CardTitle>{t('ar', 'portal.quickActions')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <Link href="/portal/bookings">
               <Button variant="outline" className="w-full justify-start">
                 <Calendar className="ml-2 h-4 w-4" />
-                عرض جميع الحجوزات
+                {t('ar', 'portal.viewAllBookings')}
               </Button>
             </Link>
             <Link href="/portal/contracts">
               <Button variant="outline" className="w-full justify-start">
                 <FileText className="ml-2 h-4 w-4" />
-                العقود
+                {t('ar', 'portal.contracts')}
               </Button>
             </Link>
             <Link href="/portal/invoices">
               <Button variant="outline" className="w-full justify-start">
                 <Receipt className="ml-2 h-4 w-4" />
-                الفواتير
+                {t('ar', 'portal.invoices')}
               </Button>
             </Link>
           </div>

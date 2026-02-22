@@ -8,10 +8,12 @@ import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { useLocale } from '@/hooks/use-locale'
 
 function VerifyContent() {
   const searchParams = useSearchParams()
   const token = searchParams?.get('token')
+  const { t: i18n } = useLocale()
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
 
   useEffect(() => {
@@ -28,30 +30,29 @@ function VerifyContent() {
   }, [token])
 
   if (status === 'loading') {
-    return <p className="text-muted-foreground">Verifying your email…</p>
+    return <p className="text-muted-foreground">{i18n('auth.verifyingEmail')}</p>
   }
   if (status === 'success') {
     return (
       <>
-        <h1 className="mb-4 text-2xl font-bold">Email verified</h1>
+        <h1 className="mb-4 text-2xl font-bold">{i18n('auth.emailVerified')}</h1>
         <p className="mb-6 text-muted-foreground">
-          Your email has been verified. You can now sign in.
+          {i18n('auth.emailVerifiedDesc')}
         </p>
         <Button asChild>
-          <Link href="/login">Sign in</Link>
+          <Link href="/login">{i18n('auth.signIn')}</Link>
         </Button>
       </>
     )
   }
   return (
     <>
-      <h1 className="mb-4 text-2xl font-bold">Verification failed</h1>
+      <h1 className="mb-4 text-2xl font-bold">{i18n('auth.verificationFailed')}</h1>
       <p className="mb-6 text-muted-foreground">
-        The link may be invalid or expired. Request a new one from your account settings or contact
-        support.
+        {i18n('auth.verificationFailedDesc')}
       </p>
       <Button asChild variant="outline">
-        <Link href="/login">Back to login</Link>
+        <Link href="/login">{i18n('auth.backToLogin')}</Link>
       </Button>
     </>
   )

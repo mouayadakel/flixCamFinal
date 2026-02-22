@@ -16,6 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import { Loader2, RefreshCw } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import Link from 'next/link'
@@ -27,10 +29,65 @@ interface ProductRow {
   gap: string
 }
 
+interface DraftRow {
+  id: string
+  productId: string
+  type: string
+  createdAt: string
+  product: { id: string; sku: string | null; translations: Array<{ name: string }> }
+}
+
 export default function ContentReviewPage() {
   const [products, setProducts] = useState<ProductRow[]>([])
   const [loading, setLoading] = useState(true)
   const [regenerating, setRegenerating] = useState<string | null>(null)
+  const [drafts, setDrafts] = useState<DraftRow[]>([])
+  const [draftsLoading, setDraftsLoading] = useState(true)
+  const [actingDraftId, setActingDraftId] = useState<string | null>(null)
+
+  const loadDrafts = async () => {
+    setDraftsLoading(true)
+    try {
+      const res = await fetch('/api/admin/ai/drafts')
+      if (!res.ok) return
+      const json = await res.json()
+      setDrafts(json.drafts ?? [])
+    } finally {
+      setDraftsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadDrafts()
+  }, [])
+
+  const handleApproveDraft = async (draftId: string) => {
+    setActingDraftId(draftId)
+    try {
+      const res = await fetch(`/api/admin/ai/drafts/${draftId}/approve`, { method: 'POST' })
+      if (!res.ok) throw new Error('Approve failed')
+      toast({ title: 'Draft applied' })
+      loadDrafts()
+    } catch (e) {
+      toast({ title: 'Failed to apply', variant: 'destructive' })
+    } finally {
+      setActingDraftId(null)
+    }
+  }
+
+  const handleRejectDraft = async (draftId: string) => {
+    setActingDraftId(draftId)
+    try {
+      const res = await fetch(`/api/admin/ai/drafts/${draftId}/reject`, { method: 'POST' })
+      if (!res.ok) throw new Error('Reject failed')
+      toast({ title: 'Draft rejected' })
+      loadDrafts()
+    } catch (e) {
+      toast({ title: 'Failed to reject', variant: 'destructive' })
+    } finally {
+      setActingDraftId(null)
+    }
+  }
 
   const loadProducts = async () => {
     setLoading(true)
@@ -50,6 +107,8 @@ export default function ContentReviewPage() {
     loadProducts()
   }, [])
 
+  const [previewBeforeApply, setPreviewBeforeApply] = useState(true)
+
   const handleRegenerate = async (productId: string) => {
     setRegenerating(productId)
     try {
@@ -60,6 +119,7 @@ export default function ContentReviewPage() {
           productIds: [productId],
           types: ['text', 'spec'],
           trigger: 'manual',
+          previewMode: previewBeforeApply,
         }),
       })
       if (!res.ok) throw new Error('Trigger failed')
@@ -77,13 +137,95 @@ export default function ContentReviewPage() {
         <h1 className="text-2xl font-bold">Content Review</h1>
         <p className="text-muted-foreground">Review and regenerate AI-generated content for products with gaps.</p>
       </div>
+
       <Card>
-        <CardHeader>
-          <CardTitle>Products with content gaps</CardTitle>
-          <Button variant="outline" size="sm" onClick={loadProducts} disabled={loading}>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>AI suggestions pending review</CardTitle>
+          <Button variant="outline" size="sm" onClick={loadDrafts} disabled={draftsLoading}>
             <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
           </Button>
+        </CardHeader>
+        <CardContent>
+          {draftsLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : drafts.length === 0 ? (
+            <p className="py-6 text-center text-muted-foreground">No pending suggestions. Run backfill with &quot;Preview before applying&quot; to create drafts.</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Product</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableCell className="text-right">Actions</TableCell>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {drafts.map((d) => (
+                  <TableRow key={d.id}>
+                    <TableCell>
+                      <Link href={`/admin/inventory/products/${d.productId}/review`} className="text-primary hover:underline">
+                        {d.product?.translations?.[0]?.name ?? d.product?.sku ?? d.productId}
+                      </Link>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{d.type}</Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {new Date(d.createdAt).toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-green-600"
+                        onClick={() => handleApproveDraft(d.id)}
+                        disabled={actingDraftId === d.id}
+                      >
+                        {actingDraftId === d.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Approve'}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-600"
+                        onClick={() => handleRejectDraft(d.id)}
+                        disabled={actingDraftId === d.id}
+                      >
+                        Reject
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <CardTitle>Products with content gaps</CardTitle>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="preview-mode"
+                  checked={previewBeforeApply}
+                  onCheckedChange={(v) => setPreviewBeforeApply(v === true)}
+                />
+                <Label htmlFor="preview-mode" className="text-sm font-normal cursor-pointer">
+                  Preview before applying (create drafts)
+                </Label>
+              </div>
+              <Button variant="outline" size="sm" onClick={loadProducts} disabled={loading}>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Refresh
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? (

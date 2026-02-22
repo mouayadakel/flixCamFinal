@@ -22,10 +22,11 @@ const SPEC_PATTERNS: Record<string, RegExp[]> = {
 type ProductWithRelations = Awaited<
   ReturnType<
     typeof prisma.product.findUnique<{
+      where: { id: string }
       include: { translations: true; category: true; brand: true }
     }>
   >
->
+> | null
 
 function extractByRules(
   text: string,
@@ -62,7 +63,7 @@ export async function inferMissingSpecs(product: ProductWithRelations): Promise<
   }
   const categoryName = product.category?.name ?? 'Cameras'
   const expected = getExpectedSpecs(categoryName)
-  const firstTranslation = product.translations.find((t) => t.locale === 'en') ?? product.translations[0]
+  const firstTranslation = product.translations.find((t: { locale: string }) => t.locale === 'en') ?? product.translations[0]
   const existingSpecs = (firstTranslation?.specifications as Record<string, unknown>) ?? {}
   const missingKeys = expected.filter((k) => {
     const v = existingSpecs[k]
@@ -92,7 +93,7 @@ export async function inferMissingSpecs(product: ProductWithRelations): Promise<
       const apiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_GENERATIVE_AI_API_KEY
       if (apiKey) {
         const genAI = new GoogleGenerativeAI(apiKey)
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
         const prompt = `You are a cinema equipment specifications expert. Infer the missing specification values.
 
 Product: ${firstTranslation?.name ?? product.sku}

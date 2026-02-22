@@ -15,11 +15,15 @@ let limiters: {
   authenticated: Ratelimit | null
   checkout: Ratelimit | null
   payment: Ratelimit | null
+  auth: Ratelimit | null
+  ai: Ratelimit | null
 } = {
   public: null,
   authenticated: null,
   checkout: null,
   payment: null,
+  auth: null,
+  ai: null,
 }
 
 function getRedis(): Redis | null {
@@ -42,6 +46,7 @@ function getLimiters() {
   if (!r) return limiters
 
   if (!limiters.public) {
+    const authLimit = config.rateLimit.auth.attemptsPer15Min
     limiters = {
       public: new Ratelimit({
         redis: r,
@@ -63,12 +68,22 @@ function getLimiters() {
         limiter: Ratelimit.slidingWindow(5, '5 m'),
         analytics: true,
       }),
+      auth: new Ratelimit({
+        redis: r,
+        limiter: Ratelimit.slidingWindow(authLimit, '15 m'),
+        analytics: true,
+      }),
+      ai: new Ratelimit({
+        redis: r,
+        limiter: Ratelimit.slidingWindow(60, '1 m'),
+        analytics: true,
+      }),
     }
   }
   return limiters
 }
 
-export type RateLimitTierName = 'public' | 'authenticated' | 'checkout' | 'payment'
+export type RateLimitTierName = 'public' | 'authenticated' | 'checkout' | 'payment' | 'auth' | 'ai'
 
 export interface UpstashRateLimitResult {
   allowed: boolean
@@ -97,4 +112,27 @@ export async function checkRateLimitUpstash(
     remaining: remaining ?? 0,
     reset: reset ?? Date.now() + 60000,
   }
+}
+
+/**
+ * For AI routes: returns a 429 Response if over limit, otherwise null.
+ * Call after auth; use identifier = session.user.id.
+ */
+export async function aiRateLimitResponse(
+  request: Request,
+  identifier: string
+): Promise<Response | null> {
+  const result = await checkRateLimitUpstash(request, 'ai', identifier)
+  if (result.allowed) return null
+  const retryAfter = Math.ceil((result.reset - Date.now()) / 1000)
+  return new Response(
+    JSON.stringify({ error: 'Too many requests', code: 'RATE_LIMITED' }),
+    {
+      status: 429,
+      headers: {
+        'Content-Type': 'application/json',
+        'Retry-After': String(Math.max(1, retryAfter)),
+      },
+    }
+  )
 }

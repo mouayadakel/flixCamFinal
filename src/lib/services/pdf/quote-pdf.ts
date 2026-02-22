@@ -1,13 +1,17 @@
 /**
  * @file quote-pdf.ts
- * @description PDF template for quotes
+ * @description PDF template for quotes. FLIXCAM: light mode, charcoal text, green accent.
  * @module lib/services/pdf
- * @author Engineering Team
- * @created 2026-01-28
  */
 
 import { jsPDF } from 'jspdf'
 import type { Quote, QuoteEquipmentItem } from '@/lib/types/quote.types'
+import { theme } from '@/config/theme'
+
+function hexToRgb(hex: string): [number, number, number] {
+  const n = hex.replace('#', '')
+  return [parseInt(n.slice(0, 2), 16), parseInt(n.slice(2, 4), 16), parseInt(n.slice(4, 6), 16)]
+}
 
 export interface QuotePdfOptions {
   locale?: 'ar' | 'en'
@@ -44,8 +48,28 @@ export function generateQuotePdf(quote: Quote, options: QuotePdfOptions = {}): B
   const margin = 20
   let y = 20
   const pageWidth = doc.internal.pageSize.getWidth()
+  const [rCharcoal, gCharcoal, bCharcoal] = hexToRgb(theme.colors.textOnLight)
+  const [rGreen, gGreen, bGreen] = hexToRgb(theme.invoiceSettings.primaryAccent)
+
+  doc.setTextColor(rCharcoal, gCharcoal, bCharcoal)
+  doc.setFontSize(14)
+  doc.setFont('helvetica', 'bold')
+  doc.text(theme.brandName, margin, y)
+  y += 5
+  if (theme.invoiceSettings.showTagline) {
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'normal')
+    doc.text(theme.industry, margin, y)
+    y += 6
+  }
+  y += 4
+  doc.setDrawColor(rGreen, gGreen, bGreen)
+  doc.setLineWidth(0.5)
+  doc.line(margin, y, pageWidth - margin, y)
+  y += 10
 
   doc.setFontSize(18)
+  doc.setFont('helvetica', 'bold')
   doc.text(locale === 'ar' ? 'عرض سعر' : 'Quote', margin, y)
   y += 12
 
@@ -110,11 +134,16 @@ export function generateQuotePdf(quote: Quote, options: QuotePdfOptions = {}): B
     y
   )
   y += 6
+  doc.setDrawColor(rGreen, gGreen, bGreen)
+  doc.setLineWidth(0.4)
+  doc.line(pageWidth - margin - 50, y - 2, pageWidth - margin, y - 2)
+  doc.setTextColor(rGreen, gGreen, bGreen)
   doc.text(
     `${locale === 'ar' ? 'الإجمالي' : 'Total'}: ${formatAmount(quote.totalAmount, locale)}`,
     pageWidth - margin - 50,
     y
   )
+  doc.setTextColor(rCharcoal, gCharcoal, bCharcoal)
   if (quote.depositAmount && quote.depositAmount > 0) {
     y += 6
     doc.text(

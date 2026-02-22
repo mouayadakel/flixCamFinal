@@ -6,6 +6,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -307,7 +308,13 @@ export default function HeroBannerDetailPage() {
                     </Button>
                   </div>
                   <div className="relative h-14 w-24 flex-shrink-0 overflow-hidden rounded bg-muted">
-                    <img src={slide.imageUrl} alt="" className="h-full w-full object-cover" />
+                    <Image
+                      src={slide.imageUrl}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="96px"
+                    />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-medium">{slide.titleAr || slide.titleEn}</div>

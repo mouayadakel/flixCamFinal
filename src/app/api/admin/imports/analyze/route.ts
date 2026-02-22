@@ -7,7 +7,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { rateLimitAPI } from '@/lib/utils/rate-limit'
-import * as XLSX from 'xlsx'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,6 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer())
+    const XLSX = await import('xlsx')
     const wb = XLSX.read(buffer, { type: 'buffer' })
 
     const analysis = {

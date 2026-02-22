@@ -6,8 +6,8 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
-import { scanAndQueue } from '@/lib/services/catalog-scanner.service'
+import { hasAIPermission } from '@/lib/auth/permissions'
+import { aiRateLimitResponse } from '@/lib/utils/rate-limit-upstash'
 import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
@@ -20,6 +20,7 @@ const bodySchema = z.object({
   maxProducts: z.number().int().min(1).optional(),
   dryRun: z.boolean().optional().default(false),
   trigger: z.enum(['manual', 'scheduled', 'event', 'import']).default('manual'),
+  previewMode: z.boolean().optional().default(false),
 })
 
 export async function POST(request: NextRequest) {
@@ -27,9 +28,11 @@ export async function POST(request: NextRequest) {
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!(await hasPermission(session.user.id, PERMISSIONS.AI_USE))) {
+  if (!(await hasAIPermission(session.user.id, 'run'))) {
     return NextResponse.json({ error: 'Forbidden - ai.use required' }, { status: 403 })
   }
+  const rateLimitRes = await aiRateLimitResponse(request, session.user.id)
+  if (rateLimitRes) return rateLimitRes
 
   try {
     const body = await request.json().catch(() => ({}))
@@ -40,9 +43,18 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+    const { scanAndQueue } = await import('@/lib/services/catalog-scanner.service')
     const { jobId, report } = await scanAndQueue({
       ...parsed.data,
       triggeredBy: session.user.id,
+    })
+    const { logAiAudit } = await import('@/lib/services/ai-audit.service')
+    await logAiAudit({
+      userId: session.user.id,
+      action: 'backfill.trigger',
+      resourceType: 'AiJob',
+      resourceId: jobId ?? undefined,
+      metadata: { totalProducts: report.totalProducts, productsQueued: report.products?.length ?? 0 },
     })
     return NextResponse.json({
       data: {

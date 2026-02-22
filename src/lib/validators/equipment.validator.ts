@@ -17,6 +17,7 @@ export const equipmentTranslationSchema = z.object({
     .max(200, { message: 'Name is too long' }),
   description: z.string().max(5000, { message: 'Description is too long' }).optional(),
   shortDescription: z.string().max(500, { message: 'Short description is too long' }).optional(),
+  longDescription: z.string().max(5000, { message: 'Long description is too long' }).optional(),
   seoTitle: z.string().max(200, { message: 'SEO title is too long' }).optional(),
   seoDescription: z.string().max(500, { message: 'SEO description is too long' }).optional(),
   seoKeywords: z.string().max(500, { message: 'SEO keywords is too long' }).optional(),
@@ -27,6 +28,7 @@ const baseEquipmentSchema = z.object({
   sku: z.string().min(1, { message: 'SKU is required' }).max(100, { message: 'SKU is too long' }),
   model: z.string().max(200, { message: 'Model name is too long' }).optional(),
   categoryId: z.string().min(1, { message: 'Category is required' }),
+  subCategoryId: z.string().optional(),
   brandId: z.string().optional(),
   condition: equipmentConditionSchema.optional(),
   quantityTotal: z.number().int().min(1, { message: 'Quantity must be at least 1' }).optional(),
@@ -38,6 +40,7 @@ const baseEquipmentSchema = z.object({
   dailyPrice: z.number().min(0, { message: 'Daily price must be positive' }),
   weeklyPrice: z.number().min(0, { message: 'Weekly price must be positive' }).optional(),
   monthlyPrice: z.number().min(0, { message: 'Monthly price must be positive' }).optional(),
+  depositAmount: z.number().min(0, { message: 'Deposit must be positive' }).optional(),
   featured: z.boolean().optional(),
   isActive: z.boolean().optional(),
   warehouseLocation: z.string().max(200, { message: 'Warehouse location is too long' }).optional(),
@@ -71,6 +74,7 @@ const baseEquipmentSchema = z.object({
     .array(z.string().min(1, { message: 'Equipment ID cannot be empty' }))
     .optional(),
   // Box contents and buffer time
+  tags: z.string().max(1000, { message: 'Tags is too long' }).optional(),
   boxContents: z.string().max(2000, { message: 'Box contents is too long' }).optional(),
   bufferTime: z.number().int().min(0, { message: 'Buffer time cannot be negative' }).optional(),
   bufferTimeUnit: z.enum(['hours', 'days']).optional(),

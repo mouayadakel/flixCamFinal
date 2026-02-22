@@ -217,6 +217,12 @@ export const PERMISSIONS = {
   COUPON_DELETE: 'coupon.delete',
 
   // ========================================
+  // CMS MANAGEMENT
+  // ========================================
+  CMS_STUDIO_READ: 'cms.studio.read',
+  CMS_STUDIO_UPDATE: 'cms.studio.update',
+
+  // ========================================
   // SETTINGS MANAGEMENT
   // ========================================
   SETTINGS_READ: 'settings.read',
@@ -234,8 +240,12 @@ export const PERMISSIONS = {
   USER_ASSIGN_ROLE: 'user.assign_role',
 
   // ========================================
-  // AI (legacy - kept for compatibility)
+  // AI (granular dashboard + legacy)
   // ========================================
+  AI_VIEW: 'ai.view',
+  AI_RUN: 'ai.run',
+  AI_REVIEW: 'ai.review',
+  AI_CONFIGURE: 'ai.configure',
   AI_USE: 'ai.use',
   AI_RISK_ASSESSMENT: 'ai.risk_assessment',
   AI_KIT_BUILDER: 'ai.kit_builder',
@@ -340,6 +350,9 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
     PERMISSIONS.USER_UPDATE,
     PERMISSIONS.USER_DELETE,
     PERMISSIONS.USER_ASSIGN_ROLE,
+    PERMISSIONS.AI_VIEW,
+    PERMISSIONS.AI_RUN,
+    PERMISSIONS.AI_REVIEW,
     PERMISSIONS.AI_USE,
     PERMISSIONS.AI_RISK_ASSESSMENT,
     PERMISSIONS.AI_KIT_BUILDER,
@@ -353,6 +366,8 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
     PERMISSIONS.VENDOR_SUSPEND,
     PERMISSIONS.VENDOR_MANAGE_PAYOUTS,
     PERMISSIONS.VENDOR_TOGGLE_VISIBILITY,
+    PERMISSIONS.IMPORT_CREATE,
+    PERMISSIONS.IMPORT_READ,
   ],
   staff: [
     PERMISSIONS.DASHBOARD_READ,
@@ -373,6 +388,7 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
     PERMISSIONS.MAINTENANCE_READ,
     PERMISSIONS.MAINTENANCE_UPDATE,
     PERMISSIONS.REPORTS_READ,
+    PERMISSIONS.AI_VIEW,
     PERMISSIONS.AI_USE,
     PERMISSIONS.AI_RISK_ASSESSMENT,
     PERMISSIONS.AI_KIT_BUILDER,
@@ -415,6 +431,16 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
     PERMISSIONS.INVOICE_READ,
     PERMISSIONS.CONTRACT_READ,
     PERMISSIONS.CONTRACT_SIGN,
+  ],
+  vendor: [
+    PERMISSIONS.VENDOR_READ,
+    PERMISSIONS.VENDOR_UPDATE,
+    PERMISSIONS.EQUIPMENT_READ,
+    PERMISSIONS.EQUIPMENT_CREATE,
+    PERMISSIONS.EQUIPMENT_UPDATE,
+    PERMISSIONS.BOOKING_READ,
+    PERMISSIONS.PAYMENT_READ,
+    PERMISSIONS.DASHBOARD_READ,
   ],
 }
 
@@ -475,6 +501,7 @@ export async function hasPermission(userId: string, permission: string): Promise
 
     const roleMapping: Record<string, string> = {
       ADMIN: 'admin',
+      VENDOR: 'vendor',
       WAREHOUSE_MANAGER: 'warehouse',
       TECHNICIAN: 'technician',
       SALES_MANAGER: 'staff',
@@ -532,6 +559,7 @@ export async function getUserPermissions(userId: string): Promise<string[]> {
 
     const roleMapping: Record<string, string> = {
       ADMIN: 'admin',
+      VENDOR: 'vendor',
       WAREHOUSE_MANAGER: 'warehouse',
       TECHNICIAN: 'technician',
       SALES_MANAGER: 'staff',
@@ -554,6 +582,23 @@ export async function getUserPermissions(userId: string): Promise<string[]> {
     console.error('Error getting user permissions:', error)
     return []
   }
+}
+
+/**
+ * AI dashboard granular permission check.
+ * Returns true if user has the requested scope or legacy AI_USE.
+ */
+export async function hasAIPermission(
+  userId: string,
+  scope: 'view' | 'run' | 'review' | 'configure'
+): Promise<boolean> {
+  const map = {
+    view: [PERMISSIONS.AI_VIEW, PERMISSIONS.AI_USE],
+    run: [PERMISSIONS.AI_RUN, PERMISSIONS.AI_USE],
+    review: [PERMISSIONS.AI_REVIEW, PERMISSIONS.AI_USE],
+    configure: [PERMISSIONS.AI_CONFIGURE, PERMISSIONS.AI_USE],
+  }
+  return hasAnyPermission(userId, map[scope])
 }
 
 /**

@@ -31,7 +31,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { useToast } from '@/hooks/use-toast'
-import { PolicyFormDialog, type PolicyItemForEdit } from './_components/policy-form-dialog'
+import { PolicyFormDialog, type PolicyItemForEdit } from '@/components/shared/policy-form-dialog'
 
 interface PolicyListItem {
   id: string

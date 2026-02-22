@@ -68,7 +68,7 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
       if (!res.ok) {
         toast({
           title: t('common.error'),
-          description: json.error ?? 'Failed to send code',
+          description: json.error ?? t('checkout.failedSendCode'),
           variant: 'destructive',
         })
         return
@@ -76,7 +76,7 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
       setPhoneValue(data.phone)
       otpForm.setValue('phone', data.phone)
       setOtpSent(true)
-      toast({ title: t('checkout.sendingOtp'), description: 'تم إرسال الرمز' })
+      toast({ title: t('checkout.otpSentTitle'), description: t('checkout.otpSentTitle') })
     } finally {
       setSendOtpLoading(false)
     }
@@ -94,7 +94,7 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
       if (!res.ok) {
         toast({
           title: t('common.error'),
-          description: json.error ?? 'Verification failed',
+          description: json.error ?? t('checkout.verificationFailed'),
           variant: 'destructive',
         })
         return
@@ -102,12 +102,12 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
       const { oneTimeToken } = json
       const result = await signIn('phone-otp', { oneTimeToken, redirect: false })
       if (result?.error) {
-        toast({ title: t('common.error'), description: 'تسجيل الدخول فشل', variant: 'destructive' })
+        toast({ title: t('common.error'), description: t('checkout.loginFailed'), variant: 'destructive' })
         return
       }
       if (result?.ok) {
         await syncCart()
-        toast({ title: 'تم التحقق', description: 'جاري المتابعة...' })
+        toast({ title: t('checkout.verifiedTitle'), description: t('checkout.continuing') })
         onSuccess()
       }
     } finally {
@@ -127,7 +127,7 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
       if (!res.ok) {
         toast({
           title: t('common.error'),
-          description: json.error ?? 'Registration failed',
+          description: json.error ?? t('checkout.registrationFailed'),
           variant: 'destructive',
         })
         return
@@ -138,12 +138,12 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
         redirect: false,
       })
       if (result?.error) {
-        toast({ title: t('common.error'), description: 'تسجيل الدخول فشل', variant: 'destructive' })
+        toast({ title: t('common.error'), description: t('checkout.loginFailed'), variant: 'destructive' })
         return
       }
       if (result?.ok) {
         await syncCart()
-        toast({ title: 'تم إنشاء الحساب', description: 'جاري المتابعة...' })
+        toast({ title: t('checkout.accountCreated'), description: t('checkout.continuing') })
         onSuccess()
       }
     } finally {
@@ -165,10 +165,11 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
                 <Label htmlFor="phone">{t('checkout.phonePlaceholder')}</Label>
                 <Input
                   id="phone"
+                  type="tel"
                   dir="ltr"
                   placeholder="05XXXXXXXX"
                   {...phoneForm.register('phone')}
-                  className="mt-1"
+                  className="mt-1 h-12 text-base"
                 />
                 {phoneForm.formState.errors.phone && (
                   <p className="mt-1 text-sm text-destructive">
@@ -184,13 +185,13 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
           ) : (
             <form onSubmit={otpForm.handleSubmit(handleVerifyOtp)} className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                تم إرسال رمز إلى {phoneValue}
+                {t('checkout.otpSentTo').replace('{phone}', phoneValue)}
                 <button
                   type="button"
                   className="ms-2 text-primary underline"
                   onClick={() => setOtpSent(false)}
                 >
-                  تغيير
+                  {t('checkout.changePhone')}
                 </button>
               </p>
               <input type="hidden" {...otpForm.register('phone')} />
@@ -198,11 +199,14 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
                 <Label htmlFor="otp">{t('checkout.otpPlaceholder')}</Label>
                 <Input
                   id="otp"
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
                   dir="ltr"
                   placeholder="000000"
                   maxLength={6}
                   {...otpForm.register('code')}
-                  className="mt-1"
+                  className="mt-1 h-12 text-base"
                 />
                 {otpForm.formState.errors.code && (
                   <p className="mt-1 text-sm text-destructive">
@@ -226,7 +230,7 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
                 type="email"
                 dir="ltr"
                 {...registerForm.register('email')}
-                className="mt-1"
+                className="mt-1 h-12 text-base"
               />
               {registerForm.formState.errors.email && (
                 <p className="mt-1 text-sm text-destructive">
@@ -240,7 +244,7 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
                 id="password"
                 type="password"
                 {...registerForm.register('password')}
-                className="mt-1"
+                className="mt-1 h-12 text-base"
               />
               {registerForm.formState.errors.password && (
                 <p className="mt-1 text-sm text-destructive">
@@ -250,7 +254,7 @@ export function CheckoutStepContact({ onSuccess }: CheckoutStepContactProps) {
             </div>
             <div>
               <Label htmlFor="name">{t('checkout.namePlaceholder')}</Label>
-              <Input id="name" {...registerForm.register('name')} className="mt-1" />
+              <Input id="name" {...registerForm.register('name')} className="mt-1 h-12 text-base" />
             </div>
             <Button type="submit" className="w-full" disabled={registerLoading}>
               {registerLoading ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : null}

@@ -7,6 +7,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getPublicFeatureFlags } from '@/lib/utils/public-feature-flags'
 import { PublicLayoutClient } from '@/components/public/public-layout-client'
+import { generateAlternatesMetadata } from '@/lib/seo/hreflang'
 
 const BASE_URL = process.env.NEXTAUTH_URL || process.env.APP_URL || 'https://flixcam.rent'
 
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
   },
   description:
     'احجز معدات تصوير سينمائي واستوديوهات في الرياض. كاميرات، إضاءة، صوت، واستوديوهات احترافية.',
+  alternates: generateAlternatesMetadata('/'),
   openGraph: {
     title: 'FlixCam.rent – تأجير معدات سينمائية واستوديوهات',
     description: 'احجز معدات تصوير واستوديوهات في الرياض.',

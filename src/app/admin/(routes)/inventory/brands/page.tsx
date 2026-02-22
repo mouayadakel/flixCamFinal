@@ -6,7 +6,8 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import Image from 'next/image'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { Plus, Edit, Trash2, Search, Tag, RefreshCw, ExternalLink } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -76,11 +77,7 @@ export default function BrandsPage() {
   })
   const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() => {
-    loadBrands()
-  }, [])
-
-  const loadBrands = async () => {
+  const loadBrands = useCallback(async () => {
     setLoading(true)
     try {
       const response = await fetch('/api/brands')
@@ -96,7 +93,11 @@ export default function BrandsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [toast])
+
+  useEffect(() => {
+    loadBrands()
+  }, [loadBrands])
 
   const handleCreate = async () => {
     if (!formData.name.trim()) {
@@ -364,9 +365,11 @@ export default function BrandsPage() {
                     <TableRow key={brand.id}>
                       <TableCell>
                         {brand.logoUrl ? (
-                          <img
+                          <Image
                             src={brand.logoUrl}
                             alt={brand.name}
+                            width={32}
+                            height={32}
                             className="h-8 w-8 object-contain"
                           />
                         ) : (

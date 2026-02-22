@@ -7,6 +7,7 @@ import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { PortalProfileForm } from '@/components/features/portal/portal-profile-form'
+import { t } from '@/lib/i18n/translate'
 
 export default async function PortalProfilePage() {
   const session = await auth()
@@ -18,15 +19,15 @@ export default async function PortalProfilePage() {
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">الملف الشخصي</h1>
-        <p className="mt-2 text-muted-foreground">تحديث بياناتك الشخصية</p>
+        <h1 className="text-3xl font-bold">{t('ar', 'portal.profile')}</h1>
+        <p className="mt-2 text-muted-foreground">{t('ar', 'portal.profileDesc')}</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>البيانات الشخصية</CardTitle>
+          <CardTitle>{t('ar', 'portal.personalInfo')}</CardTitle>
           <CardDescription>
-            الاسم، البريد الإلكتروني، ورقم الهاتف. البريد لا يمكن تغييره من هنا.
+            {t('ar', 'portal.personalInfoDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -36,12 +37,12 @@ export default async function PortalProfilePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>المصادقة الثنائية (2FA)</CardTitle>
-          <CardDescription>تفعيل المصادقة الثنائية يزيد أمان حسابك. (قريباً)</CardDescription>
+          <CardTitle>{t('ar', 'portal.twoFA')}</CardTitle>
+          <CardDescription>{t('ar', 'portal.twoFADesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            هذه الميزة قيد التطوير. يمكنك تفعيلها لاحقاً من هذه الصفحة.
+            {t('ar', 'portal.twoFAComingSoon')}
           </p>
         </CardContent>
       </Card>

@@ -129,7 +129,7 @@ export default function NotificationTemplatesPage() {
       const data = await res.json()
       setTemplates(data.templates ?? [])
     } catch {
-      toast({ title: 'Error', description: 'Failed to load templates', variant: 'destructive' })
+      toast({ title: 'خطأ', description: 'فشل تحميل القوالب', variant: 'destructive' })
     } finally {
       setLoading(false)
     }
@@ -173,8 +173,8 @@ export default function NotificationTemplatesPage() {
   const handleSave = async () => {
     if (!form.trigger || !form.channel || !form.bodyText.trim()) {
       toast({
-        title: 'Validation',
-        description: 'Name, trigger, channel and body are required',
+        title: 'تحقق',
+        description: 'الاسم والمشغّل والقناة والنص مطلوبة',
         variant: 'destructive',
       })
       return
@@ -200,7 +200,7 @@ export default function NotificationTemplatesPage() {
           body: JSON.stringify(payload),
         })
         if (!res.ok) throw new Error('Failed to update')
-        toast({ title: 'Success', description: 'Template updated' })
+        toast({ title: 'تم', description: 'تم تحديث القالب' })
       } else {
         const res = await fetch('/api/notification-templates', {
           method: 'POST',
@@ -208,12 +208,12 @@ export default function NotificationTemplatesPage() {
           body: JSON.stringify(payload),
         })
         if (!res.ok) throw new Error('Failed to create')
-        toast({ title: 'Success', description: 'Template created' })
+        toast({ title: 'تم', description: 'تم إنشاء القالب' })
       }
       setDialogOpen(false)
       loadTemplates()
     } catch {
-      toast({ title: 'Error', description: 'Failed to save template', variant: 'destructive' })
+      toast({ title: 'خطأ', description: 'فشل حفظ القالب', variant: 'destructive' })
     } finally {
       setSaving(false)
     }
@@ -225,11 +225,11 @@ export default function NotificationTemplatesPage() {
     try {
       const res = await fetch(`/api/notification-templates/${deleteId}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Failed to delete')
-      toast({ title: 'Success', description: 'Template deleted' })
+      toast({ title: 'تم', description: 'تم حذف القالب' })
       setDeleteId(null)
       loadTemplates()
     } catch {
-      toast({ title: 'Error', description: 'Failed to delete template', variant: 'destructive' })
+      toast({ title: 'خطأ', description: 'فشل حذف القالب', variant: 'destructive' })
     } finally {
       setDeleting(false)
     }
@@ -287,45 +287,45 @@ export default function NotificationTemplatesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="flex items-center gap-3 text-3xl font-bold">
             <Mail className="h-8 w-8" />
-            Notification Templates
+            قوالب الإشعارات
           </h1>
           <p className="mt-1 text-muted-foreground">
-            Email, SMS, and in-app message templates with variables (e.g. {`{{customerName}}`})
+            قوالب البريد والرسائل النصية وإشعارات التطبيق مع متغيرات (مثل {`{{customerName}}`})
           </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={loadTemplates}>
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Refresh
+            <RefreshCw className="ml-2 h-4 w-4" />
+            تحديث
           </Button>
           <Button onClick={openCreate}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Template
+            <Plus className="ml-2 h-4 w-4" />
+            إضافة قالب
           </Button>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Templates</CardTitle>
+          <CardTitle>القوالب</CardTitle>
           <CardDescription>
-            Filter by trigger and channel. Use Handlebars-style variables in body:{' '}
-            {`{{customerName}}`}, {`{{bookingId}}`}, {`{{totalAmount}}`}.
+            فلتر حسب المشغّل والقناة. استخدم متغيرات في النص:{' '}
+            {`{{customerName}}`}، {`{{bookingId}}`}، {`{{totalAmount}}`}.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-4 flex gap-4">
             <Select value={triggerFilter} onValueChange={setTriggerFilter}>
               <SelectTrigger className="w-[220px]">
-                <SelectValue placeholder="Trigger" />
+                <SelectValue placeholder="المشغّل" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All triggers</SelectItem>
+                <SelectItem value="all">كل المشغّلات</SelectItem>
                 {TRIGGERS.map((t) => (
                   <SelectItem key={t} value={t}>
                     {t}
@@ -335,10 +335,10 @@ export default function NotificationTemplatesPage() {
             </Select>
             <Select value={channelFilter} onValueChange={setChannelFilter}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Channel" />
+                <SelectValue placeholder="القناة" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All channels</SelectItem>
+                <SelectItem value="all">كل القنوات</SelectItem>
                 {CHANNELS.map((c) => (
                   <SelectItem key={c} value={c}>
                     {c}
@@ -351,12 +351,12 @@ export default function NotificationTemplatesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Trigger</TableHead>
-                  <TableHead>Channel</TableHead>
-                  <TableHead>Language</TableHead>
-                  <TableHead>Active</TableHead>
-                  <TableHead className="w-[140px]">Actions</TableHead>
+                  <TableHead>الاسم</TableHead>
+                  <TableHead>المشغّل</TableHead>
+                  <TableHead>القناة</TableHead>
+                  <TableHead>اللغة</TableHead>
+                  <TableHead>الحالة</TableHead>
+                  <TableHead className="w-[140px]">إجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -369,7 +369,7 @@ export default function NotificationTemplatesPage() {
                 ) : templates.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
-                      No templates found
+                      لا توجد قوالب
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -385,9 +385,9 @@ export default function NotificationTemplatesPage() {
                       <TableCell>{t.language}</TableCell>
                       <TableCell>
                         {t.isActive ? (
-                          <Badge className="bg-green-100 text-green-800">On</Badge>
+                          <Badge className="bg-green-100 text-green-800">مفعّل</Badge>
                         ) : (
-                          <Badge variant="secondary">Off</Badge>
+                          <Badge variant="secondary">معطّل</Badge>
                         )}
                       </TableCell>
                       <TableCell>
@@ -412,24 +412,24 @@ export default function NotificationTemplatesPage() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingId ? 'Edit Template' : 'New Template'}</DialogTitle>
+            <DialogTitle>{editingId ? 'تعديل القالب' : 'قالب جديد'}</DialogTitle>
             <DialogDescription>
-              Subject is used for email. Body supports variables like {`{{customerName}}`},{' '}
+              الموضوع يستخدم للبريد. النص يدعم متغيرات مثل {`{{customerName}}`}،{' '}
               {`{{bookingId}}`}.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">Name</label>
+                <label className="text-sm font-medium">الاسم</label>
                 <Input
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  placeholder="Template name"
+                  placeholder="اسم القالب"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Slug (unique per language)</label>
+                <label className="text-sm font-medium">المعرّف (فريد لكل لغة)</label>
                 <Input
                   value={form.slug}
                   onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
@@ -439,13 +439,13 @@ export default function NotificationTemplatesPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">Trigger</label>
+                <label className="text-sm font-medium">المشغّل</label>
                 <Select
                   value={form.trigger}
                   onValueChange={(v) => setForm((f) => ({ ...f, trigger: v }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select trigger" />
+                    <SelectValue placeholder="اختر المشغّل" />
                   </SelectTrigger>
                   <SelectContent>
                     {TRIGGERS.map((t) => (
@@ -457,13 +457,13 @@ export default function NotificationTemplatesPage() {
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium">Channel</label>
+                <label className="text-sm font-medium">القناة</label>
                 <Select
                   value={form.channel}
                   onValueChange={(v) => setForm((f) => ({ ...f, channel: v }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select channel" />
+                    <SelectValue placeholder="اختر القناة" />
                   </SelectTrigger>
                   <SelectContent>
                     {CHANNELS.map((c) => (
@@ -476,7 +476,7 @@ export default function NotificationTemplatesPage() {
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium">Subject (email)</label>
+              <label className="text-sm font-medium">الموضوع (للبريد)</label>
               <Input
                 value={form.subject}
                 onChange={(e) => setForm((f) => ({ ...f, subject: e.target.value }))}
@@ -484,7 +484,7 @@ export default function NotificationTemplatesPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Body (text)</label>
+              <label className="text-sm font-medium">النص</label>
               <Textarea
                 value={form.bodyText}
                 onChange={(e) => setForm((f) => ({ ...f, bodyText: e.target.value }))}
@@ -498,18 +498,18 @@ export default function NotificationTemplatesPage() {
                 checked={form.isActive}
                 onCheckedChange={(v) => setForm((f) => ({ ...f, isActive: v }))}
               />
-              <span className="text-sm">Active</span>
+              <span className="text-sm">مفعّل</span>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={handlePreview}>
-              <Eye className="mr-2 h-4 w-4" /> Preview
+              <Eye className="ml-2 h-4 w-4" /> معاينة
             </Button>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
-              Cancel
+              إلغاء
             </Button>
             <Button onClick={handleSave} disabled={saving}>
-              {saving ? 'Saving...' : 'Save'}
+              {saving ? 'جاري الحفظ...' : 'حفظ'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -518,14 +518,14 @@ export default function NotificationTemplatesPage() {
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
         <DialogContent className="max-w-xl">
           <DialogHeader>
-            <DialogTitle>Preview</DialogTitle>
-            <DialogDescription>Rendered with sample data</DialogDescription>
+            <DialogTitle>معاينة</DialogTitle>
+            <DialogDescription>تم العرض ببيانات تجريبية</DialogDescription>
           </DialogHeader>
           {previewResult && (
             <div className="space-y-2 text-sm">
               {previewResult.subject != null && (
                 <p>
-                  <strong>Subject:</strong> {previewResult.subject}
+                  <strong>الموضوع:</strong> {previewResult.subject}
                 </p>
               )}
               <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded bg-muted p-3">
@@ -539,17 +539,17 @@ export default function NotificationTemplatesPage() {
       <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete template?</AlertDialogTitle>
-            <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
+            <AlertDialogTitle>حذف القالب؟</AlertDialogTitle>
+            <AlertDialogDescription>لا يمكن التراجع عن هذا الإجراء.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={deleting}
               className="bg-destructive text-destructive-foreground"
             >
-              {deleting ? 'Deleting...' : 'Delete'}
+              {deleting ? 'جاري الحذف...' : 'حذف'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

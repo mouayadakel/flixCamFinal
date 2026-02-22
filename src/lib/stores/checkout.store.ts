@@ -39,8 +39,8 @@ export interface CheckoutAddons {
   deliveryFee?: number
 }
 
-/** 1 = Dates, 2 = Availability, 3 = Add-ons, 4 = Payment, 5 = Confirm */
-export type CheckoutStepIndex = 1 | 2 | 3 | 4 | 5
+/** 1 = Dates, 2 = Availability, 3 = Add-ons, 4 = Review, 5 = Payment, 6 = Confirm */
+export type CheckoutStepIndex = 1 | 2 | 3 | 4 | 5 | 6
 
 interface CheckoutState {
   details: CheckoutDetails | null

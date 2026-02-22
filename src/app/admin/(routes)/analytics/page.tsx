@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import {
   BarChart3,
@@ -18,6 +18,9 @@ import {
   Building2,
   RefreshCw,
   ExternalLink,
+  Download,
+  Repeat,
+  UserPlus,
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -34,6 +37,9 @@ import {
   Line,
   BarChart,
   Bar,
+  PieChart,
+  Pie,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -41,6 +47,15 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatCurrency } from '@/lib/utils/format.utils'
@@ -71,6 +86,43 @@ interface TrendsData {
   revenueByPeriod: Array<{ period: string; revenue: number; bookings: number }>
 }
 
+interface BookingAnalytics {
+  days: number
+  totalBookings: number
+  totalRevenue: number
+  avgBookingValue: number
+  byStatus: Array<{ status: string; count: number }>
+  byCategory: Array<{ category: string; count: number; revenue: number }>
+  daily: Array<{ date: string; count: number; revenue: number }>
+}
+
+interface CustomerInsights {
+  days: number
+  totalRegistered: number
+  activeInPeriod: number
+  repeatCustomers: number
+  repeatRate: number
+  topCustomers: Array<{
+    customerId: string
+    name: string
+    email: string
+    totalSpend: number
+    bookingCount: number
+  }>
+  acquisition: Array<{ month: string; count: number }>
+}
+
+const STATUS_LABELS: Record<string, string> = {
+  PENDING: 'معلق',
+  CONFIRMED: 'مؤكد',
+  ACTIVE: 'نشط',
+  COMPLETED: 'مكتمل',
+  CANCELLED: 'ملغي',
+  OVERDUE: 'متأخر',
+}
+
+const PIE_COLORS = ['#1F87E8', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#6366F1']
+
 interface UtilizationData {
   periodDays: number
   equipment: {
@@ -98,11 +150,15 @@ export default function AnalyticsPage() {
   const [executive, setExecutive] = useState<ExecutiveStats | null>(null)
   const [trends, setTrends] = useState<TrendsData | null>(null)
   const [utilization, setUtilization] = useState<UtilizationData | null>(null)
+  const [bookingAnalytics, setBookingAnalytics] = useState<BookingAnalytics | null>(null)
+  const [customerInsights, setCustomerInsights] = useState<CustomerInsights | null>(null)
   const [loading, setLoading] = useState(true)
   const [trendsDays, setTrendsDays] = useState('30')
   const [utilDays, setUtilDays] = useState('30')
+  const [bookingDays, setBookingDays] = useState('30')
+  const [customerDays, setCustomerDays] = useState('90')
 
-  const loadExecutive = async () => {
+  const loadExecutive = useCallback(async () => {
     try {
       const res = await fetch('/api/analytics/executive')
       if (!res.ok) throw new Error('Failed to load')
@@ -115,9 +171,9 @@ export default function AnalyticsPage() {
         variant: 'destructive',
       })
     }
-  }
+  }, [toast])
 
-  const loadTrends = async () => {
+  const loadTrends = useCallback(async () => {
     try {
       const res = await fetch(`/api/analytics/trends?days=${trendsDays}&period=daily`)
       if (!res.ok) throw new Error('Failed to load')
@@ -126,9 +182,9 @@ export default function AnalyticsPage() {
     } catch {
       toast({ title: 'Error', description: 'Failed to load trends', variant: 'destructive' })
     }
-  }
+  }, [trendsDays, toast])
 
-  const loadUtilization = async () => {
+  const loadUtilization = useCallback(async () => {
     try {
       const res = await fetch(`/api/analytics/utilization?days=${utilDays}`)
       if (!res.ok) throw new Error('Failed to load')
@@ -137,28 +193,62 @@ export default function AnalyticsPage() {
     } catch {
       toast({ title: 'Error', description: 'Failed to load utilization', variant: 'destructive' })
     }
-  }
+  }, [utilDays, toast])
+
+  const loadBookingAnalytics = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/analytics/bookings?days=${bookingDays}`)
+      if (res.ok) setBookingAnalytics(await res.json())
+    } catch { /* non-critical */ }
+  }, [bookingDays])
+
+  const loadCustomerInsights = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/analytics/customers?days=${customerDays}`)
+      if (res.ok) setCustomerInsights(await res.json())
+    } catch { /* non-critical */ }
+  }, [customerDays])
 
   useEffect(() => {
     const run = async () => {
       setLoading(true)
-      await Promise.all([loadExecutive(), loadTrends(), loadUtilization()])
+      await Promise.all([loadExecutive(), loadTrends(), loadUtilization(), loadBookingAnalytics(), loadCustomerInsights()])
       setLoading(false)
     }
     run()
-  }, [])
+  }, [loadExecutive, loadTrends, loadUtilization, loadBookingAnalytics, loadCustomerInsights])
 
   useEffect(() => {
     if (!loading) loadTrends()
-  }, [trendsDays])
+  }, [trendsDays, loading, loadTrends])
 
   useEffect(() => {
     if (!loading) loadUtilization()
-  }, [utilDays])
+  }, [utilDays, loading, loadUtilization])
+
+  useEffect(() => {
+    if (!loading) loadBookingAnalytics()
+  }, [bookingDays, loading, loadBookingAnalytics])
+
+  useEffect(() => {
+    if (!loading) loadCustomerInsights()
+  }, [customerDays, loading, loadCustomerInsights])
 
   const handleRefresh = () => {
     setLoading(true)
-    Promise.all([loadExecutive(), loadTrends(), loadUtilization()]).finally(() => setLoading(false))
+    Promise.all([loadExecutive(), loadTrends(), loadUtilization(), loadBookingAnalytics(), loadCustomerInsights()]).finally(() => setLoading(false))
+  }
+
+  const exportCsv = (filename: string, headers: string[], rows: string[][]) => {
+    const bom = '\uFEFF'
+    const csv = bom + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   if (loading && !executive) {
@@ -257,6 +347,8 @@ export default function AnalyticsPage() {
       <Tabs defaultValue="trends" className="space-y-4">
         <TabsList>
           <TabsTrigger value="trends">الاتجاهات والإيرادات</TabsTrigger>
+          <TabsTrigger value="bookings">تحليل الحجوزات</TabsTrigger>
+          <TabsTrigger value="customers">رؤى العملاء</TabsTrigger>
           <TabsTrigger value="utilization">الإشغال</TabsTrigger>
         </TabsList>
 
@@ -445,6 +537,280 @@ export default function AnalyticsPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Bookings Analytics Tab */}
+        <TabsContent value="bookings" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Select value={bookingDays} onValueChange={setBookingDays}>
+              <SelectTrigger className="w-[120px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7">7 أيام</SelectItem>
+                <SelectItem value="30">30 يوم</SelectItem>
+                <SelectItem value="90">90 يوم</SelectItem>
+              </SelectContent>
+            </Select>
+            {bookingAnalytics && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const ba = bookingAnalytics
+                  exportCsv(
+                    `bookings-analytics-${bookingDays}d.csv`,
+                    ['التاريخ', 'عدد الحجوزات', 'الإيرادات'],
+                    ba.daily.map((d) => [d.date, String(d.count), String(d.revenue)])
+                  )
+                }}
+              >
+                <Download className="ml-2 h-4 w-4" />
+                تصدير CSV
+              </Button>
+            )}
+          </div>
+
+          {bookingAnalytics && (
+            <>
+              {/* KPI cards */}
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium">إجمالي الحجوزات</CardTitle>
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold">{bookingAnalytics.totalBookings}</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium">إجمالي الإيرادات</CardTitle>
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold">{formatCurrency(bookingAnalytics.totalRevenue)}</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium">متوسط قيمة الحجز</CardTitle>
+                    <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold">{formatCurrency(bookingAnalytics.avgBookingValue)}</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                {/* Status Pie */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>توزيع حسب الحالة</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {bookingAnalytics.byStatus.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={280}>
+                        <PieChart>
+                          <Pie
+                            data={bookingAnalytics.byStatus.map((s) => ({ ...s, label: STATUS_LABELS[s.status] ?? s.status }))}
+                            dataKey="count"
+                            nameKey="label"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={100}
+                            label={({ label, count }) => `${label}: ${count}`}
+                          >
+                            {bookingAnalytics.byStatus.map((_, i) => (
+                              <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(v, name) => [v, name]} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <p className="py-8 text-center text-muted-foreground">لا توجد بيانات</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Category Bar */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>توزيع حسب الفئة</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {bookingAnalytics.byCategory.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={280}>
+                        <BarChart data={bookingAnalytics.byCategory.slice(0, 8)}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="category" tick={{ fontSize: 11 }} />
+                          <YAxis />
+                          <Tooltip
+                            formatter={(v, name) => [
+                              name === 'revenue' ? formatCurrency(Number(v)) : v,
+                              name === 'revenue' ? 'الإيرادات' : 'عدد الحجوزات',
+                            ]}
+                          />
+                          <Legend />
+                          <Bar dataKey="count" fill="#1F87E8" name="الحجوزات" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="revenue" fill="#10B981" name="الإيرادات" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <p className="py-8 text-center text-muted-foreground">لا توجد بيانات</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </>
+          )}
+        </TabsContent>
+
+        {/* Customer Insights Tab */}
+        <TabsContent value="customers" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Select value={customerDays} onValueChange={setCustomerDays}>
+              <SelectTrigger className="w-[120px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="30">30 يوم</SelectItem>
+                <SelectItem value="90">90 يوم</SelectItem>
+                <SelectItem value="180">180 يوم</SelectItem>
+              </SelectContent>
+            </Select>
+            {customerInsights && customerInsights.topCustomers.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const ci = customerInsights
+                  exportCsv(
+                    `top-customers-${customerDays}d.csv`,
+                    ['الاسم', 'البريد', 'عدد الحجوزات', 'إجمالي الإنفاق'],
+                    ci.topCustomers.map((c) => [c.name, c.email, String(c.bookingCount), String(c.totalSpend)])
+                  )
+                }}
+              >
+                <Download className="ml-2 h-4 w-4" />
+                تصدير CSV
+              </Button>
+            )}
+          </div>
+
+          {customerInsights && (
+            <>
+              {/* KPI cards */}
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium">إجمالي المسجلين</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold">{customerInsights.totalRegistered}</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium">نشط في الفترة</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold">{customerInsights.activeInPeriod}</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium">عملاء متكررون</CardTitle>
+                    <Repeat className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold">{customerInsights.repeatCustomers}</p>
+                    <p className="text-xs text-muted-foreground">نسبة التكرار: {customerInsights.repeatRate}%</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium">معدل الاكتساب</CardTitle>
+                    <UserPlus className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold">
+                      {customerInsights.acquisition.length > 0
+                        ? customerInsights.acquisition[customerInsights.acquisition.length - 1].count
+                        : 0}
+                    </p>
+                    <p className="text-xs text-muted-foreground">مستخدم جديد هذا الشهر</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                {/* Top Customers Table */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>أفضل العملاء حسب الإنفاق</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {customerInsights.topCustomers.length > 0 ? (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>#</TableHead>
+                            <TableHead>الاسم</TableHead>
+                            <TableHead>الحجوزات</TableHead>
+                            <TableHead>إجمالي الإنفاق</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {customerInsights.topCustomers.slice(0, 10).map((c, i) => (
+                            <TableRow key={c.customerId}>
+                              <TableCell className="font-medium">{i + 1}</TableCell>
+                              <TableCell>
+                                <div>{c.name}</div>
+                                <div className="text-xs text-muted-foreground" dir="ltr">{c.email}</div>
+                              </TableCell>
+                              <TableCell>{c.bookingCount}</TableCell>
+                              <TableCell className="font-medium">{formatCurrency(c.totalSpend)}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    ) : (
+                      <p className="py-8 text-center text-muted-foreground">لا توجد بيانات</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Acquisition Trend */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>اتجاه اكتساب العملاء</CardTitle>
+                    <CardDescription>عدد المستخدمين الجدد شهرياً</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {customerInsights.acquisition.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={280}>
+                        <BarChart data={customerInsights.acquisition}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                          <YAxis />
+                          <Tooltip formatter={(v) => [v, 'مستخدم جديد']} />
+                          <Bar dataKey="count" fill="#8B5CF6" name="مستخدمين جدد" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <p className="py-8 text-center text-muted-foreground">لا توجد بيانات</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </>
+          )}
         </TabsContent>
       </Tabs>
     </div>

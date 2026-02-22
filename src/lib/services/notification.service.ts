@@ -160,20 +160,51 @@ export class NotificationService {
   }
 
   /**
-   * Send WhatsApp notification
+   * Send WhatsApp notification via Meta Cloud API
    */
   private static async sendWhatsApp(input: SendNotificationInput) {
-    // TODO: Implement WhatsApp sending via Cloud API
-    // This should use the configured WhatsApp API key
-    const whatsappApiKey = process.env.WHATSAPP_API_KEY
+    const accessToken = process.env.WHATSAPP_ACCESS_TOKEN
+    const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID
 
-    if (!whatsappApiKey) {
-      // WhatsApp API key not configured - silently skip
-      return
+    if (!accessToken || !phoneNumberId) return
+
+    // Resolve user phone number
+    if (!input.userId) return
+    const user = await prisma.user.findUnique({
+      where: { id: input.userId },
+      select: { phone: true },
+    })
+    if (!user?.phone) return
+
+    // Normalize phone (remove spaces/dashes, ensure country code)
+    let phone = user.phone.replace(/[\s\-()]/g, '')
+    if (phone.startsWith('0')) phone = '966' + phone.slice(1)
+    if (!phone.startsWith('+') && !phone.startsWith('966')) phone = '966' + phone
+
+    try {
+      const res = await fetch(
+        `https://graph.facebook.com/v18.0/${phoneNumberId}/messages`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'text',
+            text: { body: `${input.title}\n\n${input.message}` },
+          }),
+        }
+      )
+      if (!res.ok) {
+        const err = await res.text().catch(() => 'unknown')
+        console.error('[WhatsApp] send failed:', res.status, err)
+      }
+    } catch (e) {
+      console.error('[WhatsApp] send error:', e)
     }
-
-    // Placeholder - implement actual WhatsApp API call
-    // WhatsApp notification will be sent when WhatsApp service is implemented
   }
 
   /**

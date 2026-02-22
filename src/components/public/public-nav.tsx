@@ -25,6 +25,10 @@ const NAV_LINKS = [
   { href: '/packages', key: 'nav.packages' },
   { href: '/build-your-kit', key: 'nav.buildKit' },
   { href: '/how-it-works', key: 'nav.howItWorks' },
+  { href: '/faq', key: 'nav.faq' },
+  { href: '/policies', key: 'nav.policies' },
+  { href: '/about', key: 'nav.about' },
+  { href: '/contact', key: 'nav.contact' },
   { href: '/support', key: 'nav.support' },
 ] as const
 

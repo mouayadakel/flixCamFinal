@@ -8,9 +8,9 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { Truck, Plus, Calendar, MapPin, Phone, User } from 'lucide-react'
+import { Truck, Plus, Calendar, MapPin, Phone, User, RefreshCw, AlertTriangle } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -73,6 +73,25 @@ export default function DeliveryPage() {
   const [deliveries, setDeliveries] = useState<Delivery[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'pending' | 'scheduled' | 'in_transit'>('all')
+
+  const summary = useMemo(() => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    return {
+      pending: deliveries.filter((d) => d.status === 'pending').length,
+      scheduled: deliveries.filter((d) => d.status === 'scheduled').length,
+      inTransit: deliveries.filter((d) => d.status === 'in_transit').length,
+      today: deliveries.filter((d) => {
+        const date = new Date(d.scheduledDate)
+        return date >= today && date < tomorrow
+      }).length,
+      noDriver: deliveries.filter(
+        (d) => !d.driver && (d.status === 'pending' || d.status === 'scheduled')
+      ).length,
+    }
+  }, [deliveries])
 
   useEffect(() => {
     loadDeliveries()
@@ -140,12 +159,55 @@ export default function DeliveryPage() {
           <h1 className="text-3xl font-bold">إدارة التوصيلات</h1>
           <p className="mt-2 text-muted-foreground">جدولة ومتابعة توصيل المعدات</p>
         </div>
-        <Link href="/admin/ops/delivery/schedule">
-          <Button>
-            <Plus className="ml-2 h-4 w-4" />
-            جدولة توصيل
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={loadDeliveries} disabled={loading}>
+            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            تحديث
           </Button>
-        </Link>
+          <Link href="/admin/ops/delivery/schedule">
+            <Button>
+              <Plus className="ml-2 h-4 w-4" />
+              جدولة توصيل
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* KPI Summary */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+        <Card>
+          <CardContent className="pb-3 pt-4">
+            <p className="text-sm text-muted-foreground">قيد الانتظار</p>
+            <p className={`text-2xl font-bold ${summary.pending > 0 ? 'text-amber-600' : ''}`}>{summary.pending}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pb-3 pt-4">
+            <p className="text-sm text-muted-foreground">مجدولة</p>
+            <p className="text-2xl font-bold text-blue-600">{summary.scheduled}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pb-3 pt-4">
+            <p className="text-sm text-muted-foreground">قيد التوصيل</p>
+            <p className="text-2xl font-bold text-green-600">{summary.inTransit}</p>
+          </CardContent>
+        </Card>
+        <Card className={summary.today > 0 ? 'border-primary/50' : ''}>
+          <CardContent className="pb-3 pt-4">
+            <p className="text-sm text-muted-foreground">اليوم</p>
+            <p className={`text-2xl font-bold ${summary.today > 0 ? 'text-primary' : ''}`}>{summary.today}</p>
+          </CardContent>
+        </Card>
+        <Card className={summary.noDriver > 0 ? 'border-red-300' : ''}>
+          <CardContent className="pb-3 pt-4">
+            <div className="flex items-center gap-1">
+              {summary.noDriver > 0 && <AlertTriangle className="h-3 w-3 text-red-500" />}
+              <p className="text-sm text-muted-foreground">بدون سائق</p>
+            </div>
+            <p className={`text-2xl font-bold ${summary.noDriver > 0 ? 'text-red-600' : ''}`}>{summary.noDriver}</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Filters */}
@@ -256,7 +318,10 @@ export default function DeliveryPage() {
                           {delivery.driver.name || delivery.driver.email}
                         </span>
                       ) : (
-                        <span className="text-sm text-muted-foreground">غير محدد</span>
+                        <div className="flex items-center gap-1">
+                          <AlertTriangle className="h-3 w-3 text-amber-500" />
+                          <span className="text-sm text-amber-600">غير محدد</span>
+                        </div>
                       )}
                     </TableCell>
                     <TableCell>

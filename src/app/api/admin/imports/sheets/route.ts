@@ -7,9 +7,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { rateLimitAPI } from '@/lib/utils/rate-limit'
-import * as XLSX from 'xlsx'
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 60 // Allow up to 1 min for large file parsing
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
 const MAX_ROWS = 5000
@@ -45,20 +45,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate MIME type
+    // Validate MIME type (browsers sometimes send empty type for .xlsx)
     const allowedMimeTypes = [
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
       'application/vnd.ms-excel', // .xls
+      'application/csv',
       'text/csv', // .csv
       'text/tab-separated-values', // .tsv
     ]
+    const ext = file.name?.toLowerCase().match(/\.[^.]+$/)?.[0] ?? ''
+    const allowedByExt = ['.xlsx', '.xls', '.csv', '.tsv'].includes(ext)
+    const allowedByType = file.type && allowedMimeTypes.includes(file.type)
 
-    if (!allowedMimeTypes.includes(file.type)) {
-      return NextResponse.json({ error: 'Unsupported file type' }, { status: 400 })
+    if (!allowedByType && !allowedByExt) {
+      return NextResponse.json(
+        { error: 'Unsupported file type. Use .xlsx, .xls, .csv or .tsv' },
+        { status: 400 }
+      )
     }
 
-    // Parse file
     const buffer = Buffer.from(await file.arrayBuffer())
+    const XLSX = await import('xlsx')
     const wb = XLSX.read(buffer, { type: 'buffer' })
 
     if (wb.SheetNames.length === 0) {

@@ -11,6 +11,7 @@ import Image from 'next/image'
 import { useLocale } from '@/hooks/use-locale'
 import { isExternalImageUrl } from '@/lib/utils/image.utils'
 import { PublicContainer } from '@/components/public/public-container'
+import { ArrowRight } from 'lucide-react'
 
 interface BrandItem {
   id: string
@@ -71,7 +72,7 @@ export function HomeTopBrands() {
                   {brand.logo && !failedLogoIds.has(brand.id) ? (
                     <Image
                       src={brand.logo}
-                      alt=""
+                      alt={`${brand.name} logo`}
                       fill
                       className="object-contain p-1"
                       sizes="56px"
@@ -92,6 +93,17 @@ export function HomeTopBrands() {
                 </p>
               </Link>
             ))}
+          </div>
+        )}
+        {!loading && brands.length > 0 && (
+          <div className="mt-8 text-center">
+            <Link
+              href="/equipment?view=brands"
+              className="inline-flex items-center gap-1 font-semibold text-brand-primary transition-colors hover:text-brand-primary-hover"
+            >
+              {t('home.viewAllBrands')}
+              <ArrowRight className="ms-1 h-4 w-4" />
+            </Link>
           </div>
         )}
       </PublicContainer>

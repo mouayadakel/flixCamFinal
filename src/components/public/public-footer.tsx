@@ -16,7 +16,6 @@ import { Input } from '@/components/ui/input'
 import {
   Mail,
   Phone,
-  MapPin,
   ArrowRight,
   Instagram,
   MessageCircle,
@@ -35,6 +34,8 @@ interface PublicFooterProps {
 }
 
 const ABOUT_LINKS = [
+  { href: '/about', key: 'nav.about' },
+  { href: '/contact', key: 'nav.contact' },
   { href: '/how-it-works', key: 'nav.howItWorks' },
   { href: '/support', key: 'nav.support' },
   { href: '/faq', key: 'nav.faq' },
@@ -72,11 +73,11 @@ export function PublicFooter({ hiddenRoutes }: PublicFooterProps = {}) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="h-12 flex-1 rounded-xl border-white/10 bg-white/10 text-white placeholder:text-white/40 focus-visible:ring-brand-primary/30"
+                className="h-12 flex-1 rounded-[4px] border-white/10 bg-white/10 text-white placeholder:text-white/40 focus-visible:ring-brand-primary/30"
               />
               <Button
                 type="submit"
-                className="h-12 rounded-xl bg-brand-primary px-6 font-semibold shadow-md transition-all hover:bg-brand-primary-hover hover:shadow-lg"
+                className="h-12 rounded-[4px] bg-brand-primary px-6 font-semibold shadow-md transition-all hover:bg-brand-primary-hover hover:shadow-lg"
               >
                 <ArrowRight className="h-4 w-4" />
               </Button>
@@ -88,16 +89,22 @@ export function PublicFooter({ hiddenRoutes }: PublicFooterProps = {}) {
       {/* Main footer grid */}
       <PublicContainer>
         <div className="grid grid-cols-1 gap-10 py-14 md:grid-cols-2 lg:grid-cols-4 lg:gap-12">
-          {/* Col 1: Brand + Contact */}
+          {/* Col 1: Simplified logo + tagline (Podcast Studio & Equipment Rental) */}
           <div className="lg:col-span-1">
             <Link
               href="/"
-              className="inline-block text-xl font-bold text-inverse-heading transition-colors hover:text-brand-primary"
+              className="inline-flex flex-col gap-1 transition-opacity hover:opacity-90"
+              aria-label={siteConfig.brandName}
             >
-              {siteConfig.brandName}
+              <span
+                className="block h-8 w-[120px] shrink-0 bg-no-repeat bg-[length:200%_100%] bg-[position:100%_0]"
+                style={{ backgroundImage: `url(${siteConfig.logoInverted})` }}
+                aria-hidden
+              />
+              <span className="sr-only">{siteConfig.brandName}</span>
             </Link>
             <p className="mt-3 text-sm leading-relaxed text-inverse-body/80">
-              {t('home.heroSubtitle')}
+              {t('footer.tagline')}
             </p>
             <div className="mt-6 space-y-3">
               <a
@@ -172,7 +179,7 @@ export function PublicFooter({ hiddenRoutes }: PublicFooterProps = {}) {
                 href={siteConfig.contact.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-inverse-body transition-all hover:-translate-y-0.5 hover:bg-brand-primary hover:text-white hover:shadow-lg hover:shadow-brand-primary/20"
+                className="flex h-10 w-10 items-center justify-center rounded-[4px] bg-white/5 text-inverse-body transition-all hover:-translate-y-0.5 hover:bg-brand-primary hover:text-white hover:shadow-lg hover:shadow-brand-primary/20"
                 aria-label="Instagram"
               >
                 <Instagram className="h-4 w-4" />
@@ -181,7 +188,7 @@ export function PublicFooter({ hiddenRoutes }: PublicFooterProps = {}) {
                 href={getWhatsAppUrl({ number: siteConfig.contact.whatsappNumber })}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-inverse-body transition-all hover:-translate-y-0.5 hover:bg-brand-secondary-accent hover:text-white hover:shadow-lg hover:shadow-brand-secondary-accent/20"
+                className="flex h-10 w-10 items-center justify-center rounded-[4px] bg-white/5 text-inverse-body transition-all hover:-translate-y-0.5 hover:bg-brand-secondary-accent hover:text-white hover:shadow-lg hover:shadow-brand-secondary-accent/20"
                 aria-label="WhatsApp"
               >
                 <MessageCircle className="h-4 w-4" />

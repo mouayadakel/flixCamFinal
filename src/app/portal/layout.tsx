@@ -9,6 +9,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { PortalSidebar } from '@/components/layouts/portal-sidebar'
+import { PortalMobileNav } from '@/components/layouts/portal-mobile-nav'
 import { LogOut } from 'lucide-react'
 
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
@@ -20,14 +21,16 @@ export default async function PortalLayout({ children }: { children: React.React
 
   return (
     <div className="flex min-h-screen bg-surface-light" dir="rtl">
-      <PortalSidebar />
-      <div className="flex flex-1 flex-col">
-        <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-border-light bg-white px-6">
-          <Link href="/portal/dashboard" className="text-lg font-bold text-brand-primary">
+      <aside className="hidden lg:block">
+        <PortalSidebar />
+      </aside>
+      <div className="flex flex-1 flex-col min-w-0">
+        <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-border-light bg-white px-4 lg:px-6">
+          <Link href="/portal/dashboard" className="text-lg font-bold text-brand-primary truncate">
             FlixCam.rent
           </Link>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-text-muted">
+          <div className="flex items-center gap-2 lg:gap-4 shrink-0">
+            <span className="hidden text-sm text-text-muted sm:inline truncate max-w-[120px] lg:max-w-none">
               {session.user?.name || session.user?.email}
             </span>
             <form
@@ -37,15 +40,16 @@ export default async function PortalLayout({ children }: { children: React.React
                 redirect('/login')
               }}
             >
-              <Button type="submit" variant="ghost" size="sm">
+              <Button type="submit" variant="ghost" size="sm" className="min-h-[44px] min-w-[44px] lg:min-h-0 lg:min-w-0">
                 <LogOut className="ml-2 h-4 w-4" />
-                تسجيل الخروج
+                <span className="hidden lg:inline">تسجيل الخروج</span>
               </Button>
             </form>
           </div>
         </header>
-        <main className="flex-1 px-6 py-8">{children}</main>
+        <main className="flex-1 px-4 py-6 pb-24 lg:px-6 lg:py-8 lg:pb-8">{children}</main>
       </div>
+      <PortalMobileNav />
     </div>
   )
 }

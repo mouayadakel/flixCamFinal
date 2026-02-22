@@ -4,8 +4,8 @@
  * @module app/api/cron/backfill
  */
 
+import crypto from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
-import { scanAndQueue } from '@/lib/services/catalog-scanner.service'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -18,13 +18,19 @@ export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET
   const authHeader = request.headers.get('authorization')
   const cronSecret = request.headers.get('x-cron-secret')
-  const provided = cronSecret ?? (authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null)
+  const provided = cronSecret ?? (authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : null)
 
-  if (!secret || provided !== secret) {
+  if (!secret || !provided) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const secretBuf = Buffer.from(secret, 'utf8')
+  const providedBuf = Buffer.from(provided, 'utf8')
+  if (secretBuf.length !== providedBuf.length || !crypto.timingSafeEqual(secretBuf, providedBuf)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
+    const { scanAndQueue } = await import('@/lib/services/catalog-scanner.service')
     const { jobId, report } = await scanAndQueue({
       types: ['text', 'photo', 'spec'],
       trigger: 'scheduled',

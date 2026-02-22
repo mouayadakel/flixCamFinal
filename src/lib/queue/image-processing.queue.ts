@@ -9,32 +9,37 @@ import { getRedisClient } from './redis.client'
 
 export const IMAGE_PROCESSING_QUEUE_NAME = 'image-processing'
 
-/**
- * Image processing queue
- */
-export const imageProcessingQueue = new Queue(IMAGE_PROCESSING_QUEUE_NAME, {
-  connection: getRedisClient(),
-  defaultJobOptions: {
-    attempts: 3,
-    backoff: {
-      type: 'exponential',
-      delay: 3000,
-    },
-    removeOnComplete: {
-      age: 24 * 3600,
-      count: 500,
-    },
-    removeOnFail: {
-      age: 7 * 24 * 3600,
-    },
-  },
-})
+let _imageProcessingQueue: Queue | null = null
+
+/** Lazily create the image processing queue so Redis is not contacted at import time. */
+function getImageProcessingQueue(): Queue {
+  if (!_imageProcessingQueue) {
+    _imageProcessingQueue = new Queue(IMAGE_PROCESSING_QUEUE_NAME, {
+      connection: getRedisClient(),
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 3000,
+        },
+        removeOnComplete: {
+          age: 24 * 3600,
+          count: 500,
+        },
+        removeOnFail: {
+          age: 7 * 24 * 3600,
+        },
+      },
+    })
+  }
+  return _imageProcessingQueue
+}
 
 /**
  * Add image processing job to queue
  */
 export async function addImageProcessingJob(importJobId: string, productIds: string[]) {
-  return await imageProcessingQueue.add(
+  return await getImageProcessingQueue().add(
     'process-images',
     {
       importJobId,

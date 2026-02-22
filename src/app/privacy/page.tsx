@@ -5,8 +5,10 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'سياسة الخصوصية | FlixCam.rent',
-  description: 'سياسة الخصوصية وحماية البيانات - FlixCam.rent',
+  title: 'سياسة الخصوصية | Privacy Policy | FlixCam.rent',
+  description:
+    'سياسة الخصوصية وحماية البيانات - FlixCam.rent. متوافق مع PDPL ونظام حماية البيانات الشخصية.',
+  keywords: ['سياسة الخصوصية', 'privacy policy', 'حماية البيانات', 'PDPL', 'FlixCam'],
 }
 
 export default function PrivacyPage() {

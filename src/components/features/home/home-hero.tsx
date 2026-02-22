@@ -15,9 +15,10 @@ import { HeroCarousel } from '@/components/features/home/hero-carousel'
 import { PublicSearch } from '@/components/public/public-search'
 import type { HeroBannerPublic } from '@/lib/services/hero-banner.service'
 
-const HERO_IMAGE_URL = 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80'
+const DEFAULT_HERO_IMAGE_URL = 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80'
 
-export function HomeHero({ banner }: { banner?: HeroBannerPublic | null }) {
+export function HomeHero({ banner, heroImageUrl }: { banner?: HeroBannerPublic | null; heroImageUrl?: string | null }) {
+  const resolvedHeroImage = heroImageUrl || DEFAULT_HERO_IMAGE_URL
   const { t } = useLocale()
 
   if (banner?.slides?.length) {
@@ -41,6 +42,15 @@ export function HomeHero({ banner }: { banner?: HeroBannerPublic | null }) {
       <div className="absolute -bottom-32 -start-32 h-80 w-80 rounded-full bg-black/10 blur-3xl" />
 
       <PublicContainer>
+        {/* Search bar – left corner at golden ratio (38.2% from top) */}
+        <div className="absolute left-0 right-0 top-[38.2%] z-10">
+          <PublicContainer>
+            <div className="w-full max-w-md animate-fade-in opacity-0 [animation-delay:0.2s]">
+              <PublicSearch />
+            </div>
+          </PublicContainer>
+        </div>
+
         <div className="relative flex min-h-[400px] flex-col items-center gap-10 py-16 md:min-h-[440px] md:flex-row md:items-center md:gap-16 lg:py-20">
           {/* Text block – left on md+, first on small */}
           <div className="flex-1 animate-fade-in text-center opacity-0 md:text-start">
@@ -48,7 +58,7 @@ export function HomeHero({ banner }: { banner?: HeroBannerPublic | null }) {
               <span className="h-1.5 w-1.5 animate-pulse-subtle rounded-full bg-brand-secondary-accent" />
               {t('home.heroSubtitle')}
             </div>
-            <h1 className="text-hero-title text-white md:text-[44px] lg:text-[52px]">
+            <h1 className="text-[28px] font-extrabold leading-tight text-white min-[640px]:text-hero-title md:text-[44px] lg:text-[52px]">
               {t('home.heroTitle')}
             </h1>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-white/75 md:text-lg">
@@ -56,19 +66,11 @@ export function HomeHero({ banner }: { banner?: HeroBannerPublic | null }) {
             </p>
 
             <div
-              className="mt-6 w-full max-w-xl animate-fade-in opacity-0 md:mx-0 md:max-w-xl"
-              style={{ animationDelay: '0.2s' }}
-            >
-              <PublicSearch />
-            </div>
-
-            <div
-              className="mt-8 flex animate-fade-in flex-wrap items-center justify-center gap-3 opacity-0 md:justify-start"
-              style={{ animationDelay: '0.4s' }}
+              className="mt-8 flex animate-fade-in flex-wrap items-center justify-center gap-3 opacity-0 [animation-delay:0.4s] md:justify-start"
             >
               <Button
                 size="lg"
-                className="rounded-xl bg-white px-8 font-semibold text-brand-primary shadow-lg transition-all hover:bg-white/90 hover:shadow-xl active:scale-[0.98]"
+                className="w-full min-h-[44px] rounded-[4px] bg-white px-8 font-semibold text-[#1A1A1A] shadow-lg transition-all hover:bg-white/90 hover:shadow-xl active:scale-95 sm:w-auto"
                 asChild
               >
                 <Link href="/equipment">
@@ -79,7 +81,7 @@ export function HomeHero({ banner }: { banner?: HeroBannerPublic | null }) {
               <Button
                 size="lg"
                 variant="outline"
-                className="rounded-xl border-white/30 px-8 font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
+                className="rounded-[4px] border-white/30 px-8 font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
                 asChild
               >
                 <Link href="/studios">{t('home.exploreStudios')}</Link>
@@ -89,13 +91,12 @@ export function HomeHero({ banner }: { banner?: HeroBannerPublic | null }) {
 
           {/* Image – right on md+, with modern treatment */}
           <div
-            className="relative w-full flex-shrink-0 animate-slide-in-right opacity-0 md:w-[45%] lg:w-[420px]"
-            style={{ animationDelay: '0.3s' }}
+            className="relative w-full flex-shrink-0 animate-slide-in-right opacity-0 [animation-delay:0.3s] md:w-[45%] lg:w-[420px]"
           >
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/10 md:aspect-[16/10]">
               <Image
-                src={HERO_IMAGE_URL}
-                alt=""
+                src={resolvedHeroImage}
+                alt="FlixCam — تأجير المعدات السينمائية واستوديوهات التصوير الاحترافي"
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 45vw"

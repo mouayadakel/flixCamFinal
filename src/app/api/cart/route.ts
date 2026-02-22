@@ -7,6 +7,17 @@ import { auth } from '@/lib/auth'
 import { CartService } from '@/lib/services/cart.service'
 import { getCartSessionId, setCartSessionCookie } from '@/lib/cart-session'
 import { checkRateLimitUpstash } from '@/lib/utils/rate-limit-upstash'
+import { prisma } from '@/lib/db/prisma'
+
+/** Resolve cart userId: only use session user.id if that user exists in DB (avoids FK violation). */
+async function resolveCartUserId(userId: string | undefined | null): Promise<string | null> {
+  if (!userId) return null
+  const user = await prisma.user.findUnique({
+    where: { id: userId, deletedAt: null },
+    select: { id: true },
+  })
+  return user?.id ?? null
+}
 
 export async function GET(request: NextRequest) {
   const rate = await checkRateLimitUpstash(request, 'checkout')
@@ -16,9 +27,10 @@ export async function GET(request: NextRequest) {
 
   const session = await auth()
   const sessionId = getCartSessionId(request.headers.get('cookie') ?? null)
+  const userId = await resolveCartUserId(session?.user?.id ?? null)
 
   try {
-    const cart = await CartService.getOrCreateCart(session?.user?.id ?? null, sessionId)
+    const cart = await CartService.getOrCreateCart(userId, sessionId)
     const res = NextResponse.json(cart)
     if (!session?.user?.id && !sessionId && cart.sessionId) {
       res.headers.set('Set-Cookie', setCartSessionCookie(cart.sessionId))
@@ -63,8 +75,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'itemType required' }, { status: 400 })
   }
 
+  const userId = await resolveCartUserId(session?.user?.id ?? null)
+
   try {
-    const cart = await CartService.getOrCreateCart(session?.user?.id ?? null, sessionId)
+    const cart = await CartService.getOrCreateCart(userId, sessionId)
 
     await CartService.addItem(cart.id, {
       itemType: body.itemType,
@@ -78,10 +92,7 @@ export async function POST(request: NextRequest) {
       dailyRate: body.dailyRate,
     })
 
-    const updated = await CartService.getOrCreateCart(
-      session?.user?.id ?? null,
-      cart.sessionId ?? sessionId
-    )
+    const updated = await CartService.getOrCreateCart(userId, cart.sessionId ?? sessionId)
     const res = NextResponse.json(updated)
     if (!session?.user?.id && !sessionId && updated.sessionId) {
       res.headers.set('Set-Cookie', setCartSessionCookie(updated.sessionId))

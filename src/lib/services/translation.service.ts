@@ -161,6 +161,7 @@ export class TranslationService {
       name?: string
       description?: string
       shortDescription?: string
+      longDescription?: string
       seoTitle?: string
       seoDescription?: string
       seoKeywords?: string
@@ -172,20 +173,23 @@ export class TranslationService {
       if (t.name) {
         result.push({ field: 'name', language: t.locale, value: t.name })
       }
-      if (t.description) {
-        result.push({ field: 'description', language: t.locale, value: t.description })
-      }
+      // Save shortDescription to both field names for cross-system compatibility
       if (t.shortDescription) {
-        result.push({ field: 'short_description', language: t.locale, value: t.shortDescription })
+        result.push({ field: 'shortDescription', language: t.locale, value: t.shortDescription })
+      }
+      // Save longDescription: accept both 'description' (form) and 'longDescription' (import/AI)
+      const longDesc = t.longDescription || t.description
+      if (longDesc) {
+        result.push({ field: 'longDescription', language: t.locale, value: longDesc })
       }
       if (t.seoTitle) {
-        result.push({ field: 'seo_title', language: t.locale, value: t.seoTitle })
+        result.push({ field: 'seoTitle', language: t.locale, value: t.seoTitle })
       }
       if (t.seoDescription) {
-        result.push({ field: 'seo_description', language: t.locale, value: t.seoDescription })
+        result.push({ field: 'seoDescription', language: t.locale, value: t.seoDescription })
       }
       if (t.seoKeywords) {
-        result.push({ field: 'seo_keywords', language: t.locale, value: t.seoKeywords })
+        result.push({ field: 'seoKeywords', language: t.locale, value: t.seoKeywords })
       }
     })
 
@@ -212,9 +216,9 @@ export function setCachedTranslation(key: string, value: string): void {
   translationCache.set(key, value)
   try {
     const redis = getRedisClient()
-    redis.setex(TRANSLATION_CACHE_PREFIX + key, CACHE_TTL_SEC, value).catch(() => {})
-  } catch {
-    // ignore
+    redis.setex(TRANSLATION_CACHE_PREFIX + key, CACHE_TTL_SEC, value).catch((err) => console.error('[translation] cache set failed', err))
+  } catch (err) {
+    console.error('[translation] Redis setex failed', err)
   }
 }
 
@@ -263,7 +267,7 @@ export async function translateText(
     const geminiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_GENERATIVE_AI_API_KEY
     if (geminiKey) {
       const genAI = new GoogleGenerativeAI(geminiKey)
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
       const result = await model.generateContent([systemPrompt, userPrompt].join('\n\n'))
       const content = result.response.text().trim()
       if (content) {

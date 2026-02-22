@@ -32,6 +32,8 @@ interface AISuggestion {
     longDescription?: string
     category?: string
     brand?: string
+    sheetName?: string
+    excelRowNumber?: number
   }
   aiSuggestions: {
     translations: {
@@ -46,6 +48,14 @@ interface AISuggestion {
       metaDescription: string
       metaKeywords: string
     }
+    seoByLocale?: {
+      ar?: { metaTitle: string; metaDescription: string; metaKeywords: string }
+      zh?: { metaTitle: string; metaDescription: string; metaKeywords: string }
+    }
+    specifications?: Record<string, unknown>
+    boxContents?: string
+    tags?: string
+    confidence?: number
     cost?: number
   }
 }
@@ -112,9 +122,13 @@ export function AIPreviewDialog({
       )
       setApproved(allIndices)
     } catch (error: any) {
+      const msg = error.message || 'Unknown error'
+      const isMissingKey = /api key|API key|no api key|GEMINI|OPENAI/i.test(msg)
       toast({
         title: 'Failed to generate AI preview',
-        description: error.message,
+        description: isMissingKey
+          ? 'Add GEMINI_API_KEY or OPENAI_API_KEY to .env and set AI_PROVIDER (gemini or openai).'
+          : msg,
         variant: 'destructive',
       })
     } finally {
@@ -150,17 +164,73 @@ export function AIPreviewDialog({
             },
           },
         }
-      } else {
+      }
+      if (field === 'boxContents') {
+        return { ...prev, [index]: { ...current, boxContents: value } }
+      }
+      if (field === 'tags') {
+        return { ...prev, [index]: { ...current, tags: value } }
+      }
+      if (field === 'specifications') {
+        try {
+          const parsed = value.trim() ? JSON.parse(value) : {}
+          return { ...prev, [index]: { ...current, specifications: parsed } }
+        } catch {
+          return prev
+        }
+      }
+
+      if (field.startsWith('seo_ar_')) {
+        const key = field.replace('seo_ar_', '')
+        const existing = (current as any).seoByLocale || suggestions[index]?.aiSuggestions.seoByLocale
         return {
           ...prev,
           [index]: {
             ...current,
-            seo: {
-              ...(current.seo || suggestions[index]?.aiSuggestions.seo),
-              [field]: value,
+            seoByLocale: {
+              ...(existing || {}),
+              ar: {
+                ...(existing?.ar || suggestions[index]?.aiSuggestions.seoByLocale?.ar || {
+                  metaTitle: '',
+                  metaDescription: '',
+                  metaKeywords: '',
+                }),
+                [key]: value,
+              },
             },
           },
         }
+      }
+      if (field.startsWith('seo_zh_')) {
+        const key = field.replace('seo_zh_', '')
+        const existing = (current as any).seoByLocale || suggestions[index]?.aiSuggestions.seoByLocale
+        return {
+          ...prev,
+          [index]: {
+            ...current,
+            seoByLocale: {
+              ...(existing || {}),
+              zh: {
+                ...(existing?.zh || suggestions[index]?.aiSuggestions.seoByLocale?.zh || {
+                  metaTitle: '',
+                  metaDescription: '',
+                  metaKeywords: '',
+                }),
+                [key]: value,
+              },
+            },
+          },
+        }
+      }
+      return {
+        ...prev,
+        [index]: {
+          ...current,
+          seo: {
+            ...(current.seo || suggestions[index]?.aiSuggestions.seo),
+            [field]: value,
+          },
+        },
       }
     })
   }
@@ -179,6 +249,11 @@ export function AIPreviewDialog({
             ...edit,
             translations: edit.translations || suggestion.aiSuggestions.translations,
             seo: edit.seo || suggestion.aiSuggestions.seo,
+            seoByLocale: (edit as any).seoByLocale ?? suggestion.aiSuggestions.seoByLocale,
+            specifications: edit.specifications ?? suggestion.aiSuggestions.specifications,
+            boxContents: edit.boxContents ?? suggestion.aiSuggestions.boxContents,
+            tags: (edit as any).tags ?? suggestion.aiSuggestions.tags,
+            confidence: suggestion.aiSuggestions.confidence,
           },
         }
       })
@@ -206,8 +281,8 @@ export function AIPreviewDialog({
             AI Preview - Review Suggestions
           </DialogTitle>
           <DialogDescription>
-            Review and edit AI-generated translations and SEO suggestions before applying them to
-            your import.
+            Review and edit AI-generated translations, SEO, specifications, and box contents before
+            applying them to your import.
           </DialogDescription>
         </DialogHeader>
 
@@ -249,6 +324,12 @@ export function AIPreviewDialog({
                       ...edit,
                       translations: edit.translations || suggestion.aiSuggestions.translations,
                       seo: edit.seo || suggestion.aiSuggestions.seo,
+                      seoByLocale: (edit as any).seoByLocale || suggestion.aiSuggestions.seoByLocale,
+                      specifications:
+                        edit.specifications ?? suggestion.aiSuggestions.specifications ?? {},
+                      boxContents:
+                        edit.boxContents ?? suggestion.aiSuggestions.boxContents ?? '',
+                      tags: (edit as any).tags ?? suggestion.aiSuggestions.tags ?? '',
                     }
                   : suggestion.aiSuggestions
 
@@ -265,6 +346,11 @@ export function AIPreviewDialog({
                         <p className="text-sm text-muted-foreground">
                           {suggestion.original.category} • {suggestion.original.brand}
                         </p>
+                        {typeof finalSuggestion.confidence === 'number' && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            Confidence: {finalSuggestion.confidence}%
+                          </p>
+                        )}
                       </div>
                       <Button
                         variant={isApproved ? 'default' : 'outline'}
@@ -288,22 +374,24 @@ export function AIPreviewDialog({
                     <Tabs defaultValue="seo" className="w-full">
                       <TabsList>
                         <TabsTrigger value="seo">SEO</TabsTrigger>
+                        <TabsTrigger value="specs">Specs & Box</TabsTrigger>
                         <TabsTrigger value="ar">Arabic</TabsTrigger>
                         <TabsTrigger value="zh">Chinese</TabsTrigger>
+                        <TabsTrigger value="tags">Tags</TabsTrigger>
                       </TabsList>
 
                       <TabsContent value="seo" className="mt-3 space-y-3">
                         <div>
                           <Label>Meta Title</Label>
                           <Input
-                            value={finalSuggestion.seo.metaTitle}
+                            value={finalSuggestion.seo?.metaTitle ?? ''}
                             onChange={(e) => handleEdit(idx, 'metaTitle', e.target.value)}
                           />
                         </div>
                         <div>
                           <Label>Meta Description</Label>
                           <Textarea
-                            value={finalSuggestion.seo.metaDescription}
+                            value={finalSuggestion.seo?.metaDescription ?? ''}
                             onChange={(e) => handleEdit(idx, 'metaDescription', e.target.value)}
                             rows={3}
                           />
@@ -311,8 +399,45 @@ export function AIPreviewDialog({
                         <div>
                           <Label>Meta Keywords</Label>
                           <Input
-                            value={finalSuggestion.seo.metaKeywords}
+                            value={finalSuggestion.seo?.metaKeywords ?? ''}
                             onChange={(e) => handleEdit(idx, 'metaKeywords', e.target.value)}
+                          />
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="tags" className="mt-3 space-y-3">
+                        <div>
+                          <Label>Tags (comma-separated)</Label>
+                          <Input
+                            value={(finalSuggestion.tags as string) ?? ''}
+                            onChange={(e) => handleEdit(idx, 'tags', e.target.value)}
+                            placeholder="cinema, 4k, wedding, documentary"
+                          />
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="specs" className="mt-3 space-y-3">
+                        <div>
+                          <Label>Box Contents</Label>
+                          <Textarea
+                            value={finalSuggestion.boxContents ?? ''}
+                            onChange={(e) => handleEdit(idx, 'boxContents', e.target.value)}
+                            rows={4}
+                            placeholder="What's included in the box..."
+                          />
+                        </div>
+                        <div>
+                          <Label>Specifications (JSON)</Label>
+                          <Textarea
+                            value={JSON.stringify(
+                              finalSuggestion.specifications ?? {},
+                              null,
+                              2
+                            )}
+                            onChange={(e) => handleEdit(idx, 'specifications', e.target.value)}
+                            rows={8}
+                            className="font-mono text-xs"
+                            placeholder="{}"
                           />
                         </div>
                       </TabsContent>
@@ -347,6 +472,34 @@ export function AIPreviewDialog({
                                 rows={4}
                               />
                             </div>
+
+                            {finalSuggestion.seoByLocale?.ar && (
+                              <>
+                                <div className="border-t pt-3" />
+                                <div>
+                                  <Label>SEO Title (Arabic)</Label>
+                                  <Input
+                                    value={finalSuggestion.seoByLocale.ar.metaTitle}
+                                    onChange={(e) => handleEdit(idx, 'seo_ar_metaTitle', e.target.value)}
+                                  />
+                                </div>
+                                <div>
+                                  <Label>SEO Description (Arabic)</Label>
+                                  <Textarea
+                                    value={finalSuggestion.seoByLocale.ar.metaDescription}
+                                    onChange={(e) => handleEdit(idx, 'seo_ar_metaDescription', e.target.value)}
+                                    rows={3}
+                                  />
+                                </div>
+                                <div>
+                                  <Label>SEO Keywords (Arabic)</Label>
+                                  <Input
+                                    value={finalSuggestion.seoByLocale.ar.metaKeywords}
+                                    onChange={(e) => handleEdit(idx, 'seo_ar_metaKeywords', e.target.value)}
+                                  />
+                                </div>
+                              </>
+                            )}
                           </>
                         )}
                       </TabsContent>
@@ -381,6 +534,34 @@ export function AIPreviewDialog({
                                 rows={4}
                               />
                             </div>
+
+                            {finalSuggestion.seoByLocale?.zh && (
+                              <>
+                                <div className="border-t pt-3" />
+                                <div>
+                                  <Label>SEO Title (Chinese)</Label>
+                                  <Input
+                                    value={finalSuggestion.seoByLocale.zh.metaTitle}
+                                    onChange={(e) => handleEdit(idx, 'seo_zh_metaTitle', e.target.value)}
+                                  />
+                                </div>
+                                <div>
+                                  <Label>SEO Description (Chinese)</Label>
+                                  <Textarea
+                                    value={finalSuggestion.seoByLocale.zh.metaDescription}
+                                    onChange={(e) => handleEdit(idx, 'seo_zh_metaDescription', e.target.value)}
+                                    rows={3}
+                                  />
+                                </div>
+                                <div>
+                                  <Label>SEO Keywords (Chinese)</Label>
+                                  <Input
+                                    value={finalSuggestion.seoByLocale.zh.metaKeywords}
+                                    onChange={(e) => handleEdit(idx, 'seo_zh_metaKeywords', e.target.value)}
+                                  />
+                                </div>
+                              </>
+                            )}
                           </>
                         )}
                       </TabsContent>
@@ -393,7 +574,13 @@ export function AIPreviewDialog({
         )}
 
         <DialogFooter>
-          <Button variant="outline" onClick={onSkip}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              onSkip()
+              onOpenChange(false)
+            }}
+          >
             Skip AI Preview
           </Button>
           <Button onClick={handleApply} disabled={loading || approved.size === 0}>

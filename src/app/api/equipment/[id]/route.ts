@@ -6,7 +6,39 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
 import { EquipmentService } from '@/lib/services/equipment.service'
+import { updateEquipmentSchema } from '@/lib/validators/equipment.validator'
+
+function coerceEquipmentBody(body: Record<string, unknown>) {
+  const out: Record<string, unknown> = { ...body }
+  const numberFields = [
+    'quantityTotal',
+    'quantityAvailable',
+    'dailyPrice',
+    'weeklyPrice',
+    'monthlyPrice',
+    'bufferTime',
+  ]
+  for (const key of numberFields) {
+    const v = out[key]
+    if (typeof v === 'string' && v.trim() !== '') {
+      const n = Number(v)
+      out[key] = Number.isNaN(n) ? v : n
+    }
+  }
+
+  const booleanFields = ['featured', 'isActive']
+  for (const key of booleanFields) {
+    const v = out[key]
+    if (typeof v === 'string') {
+      if (v === 'true') out[key] = true
+      if (v === 'false') out[key] = false
+    }
+  }
+
+  return out
+}
 
 /**
  * GET /api/equipment/[id] - Get equipment by ID
@@ -15,8 +47,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   try {
     const session = await auth()
 
-    if (!session) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    if (!(await hasPermission(session.user.id, PERMISSIONS.EQUIPMENT_READ))) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const equipment = await EquipmentService.getEquipmentById(params.id)
@@ -42,11 +78,24 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await request.json()
+    if (!(await hasPermission(session.user.id, PERMISSIONS.EQUIPMENT_UPDATE))) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const bodyRaw = (await request.json()) as Record<string, unknown>
+    const body = coerceEquipmentBody(bodyRaw)
     const { featured: _featured, ...rest } = body
+
+    const parsed = updateEquipmentSchema.safeParse({ id: params.id, ...rest })
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      )
+    }
+
     const equipment = await EquipmentService.updateEquipment({
-      id: params.id,
-      ...rest,
+      ...parsed.data,
       updatedBy: session.user.id,
     })
 
@@ -69,6 +118,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     if (!session || !session.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    if (!(await hasPermission(session.user.id, PERMISSIONS.EQUIPMENT_DELETE))) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     await EquipmentService.deleteEquipment(params.id, session.user.id)

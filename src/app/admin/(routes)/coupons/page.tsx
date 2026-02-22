@@ -8,9 +8,10 @@
 
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import Link from 'next/link'
-import { Plus, Eye, Tag, Calendar, Users } from 'lucide-react'
+import { Plus, Eye, Tag, Calendar, Users, Copy, AlertTriangle, RefreshCw } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -76,11 +77,7 @@ export default function CouponsPage() {
 
   const types: Array<CouponType | 'all'> = ['all', 'percent', 'fixed']
 
-  useEffect(() => {
-    loadCoupons()
-  }, [statusFilter, typeFilter, searchQuery])
-
-  const loadCoupons = async () => {
+  const loadCoupons = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
@@ -106,11 +103,36 @@ export default function CouponsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [statusFilter, typeFilter, searchQuery, toast])
+
+  useEffect(() => {
+    loadCoupons()
+  }, [loadCoupons])
 
   const filteredCoupons = useMemo(() => {
     return coupons
   }, [coupons])
+
+  const summary = useMemo(() => {
+    const now = new Date()
+    return {
+      active: coupons.filter((c) => c.status === 'active').length,
+      scheduled: coupons.filter((c) => c.status === 'scheduled').length,
+      expired: coupons.filter((c) => c.status === 'expired').length,
+      expiringSoon: coupons.filter(
+        (c) =>
+          c.status === 'active' &&
+          new Date(c.validUntil) > now &&
+          (new Date(c.validUntil).getTime() - now.getTime()) / 86400000 <= 7
+      ).length,
+      totalUsage: coupons.reduce((s, c) => s + c.usageCount, 0),
+    }
+  }, [coupons])
+
+  const copyCode = (code: string) => {
+    navigator.clipboard.writeText(code)
+    toast({ title: 'تم النسخ', description: `تم نسخ الرمز: ${code}` })
+  }
 
   const getStatusLabel = (status: CouponStatus) => {
     return STATUS_LABELS[status]?.ar || status
@@ -142,12 +164,55 @@ export default function CouponsPage() {
           <h1 className="text-3xl font-bold">الكوبونات</h1>
           <p className="mt-2 text-muted-foreground">إدارة كوبونات الخصم والعروض</p>
         </div>
-        <Button asChild>
-          <Link href="/admin/coupons/new">
-            <Plus className="ml-2 h-4 w-4" />
-            كوبون جديد
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={loadCoupons} disabled={loading}>
+            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            تحديث
+          </Button>
+          <Button asChild>
+            <Link href="/admin/coupons/new">
+              <Plus className="ml-2 h-4 w-4" />
+              كوبون جديد
+            </Link>
+          </Button>
+        </div>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+        <Card className="cursor-pointer hover:border-primary/50" onClick={() => setStatusFilter('active')}>
+          <CardContent className="pb-3 pt-4">
+            <p className="text-sm text-muted-foreground">نشط</p>
+            <p className="text-2xl font-bold text-green-600">{summary.active}</p>
+          </CardContent>
+        </Card>
+        <Card className="cursor-pointer hover:border-primary/50" onClick={() => setStatusFilter('scheduled')}>
+          <CardContent className="pb-3 pt-4">
+            <p className="text-sm text-muted-foreground">مجدول</p>
+            <p className="text-2xl font-bold text-blue-600">{summary.scheduled}</p>
+          </CardContent>
+        </Card>
+        <Card className="cursor-pointer hover:border-primary/50" onClick={() => setStatusFilter('expired')}>
+          <CardContent className="pb-3 pt-4">
+            <p className="text-sm text-muted-foreground">منتهي</p>
+            <p className="text-2xl font-bold">{summary.expired}</p>
+          </CardContent>
+        </Card>
+        <Card className={summary.expiringSoon > 0 ? 'border-amber-300' : ''}>
+          <CardContent className="pb-3 pt-4">
+            <div className="flex items-center gap-1">
+              <AlertTriangle className="h-3 w-3 text-amber-500" />
+              <p className="text-sm text-muted-foreground">تنتهي خلال 7 أيام</p>
+            </div>
+            <p className={`text-2xl font-bold ${summary.expiringSoon > 0 ? 'text-amber-600' : ''}`}>{summary.expiringSoon}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pb-3 pt-4">
+            <p className="text-sm text-muted-foreground">إجمالي الاستخدام</p>
+            <p className="text-2xl font-bold">{summary.totalUsage}</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Filters */}
@@ -222,7 +287,14 @@ export default function CouponsPage() {
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
                       <Tag className="h-4 w-4 text-muted-foreground" />
-                      {coupon.code}
+                      <span className="font-mono">{coupon.code}</span>
+                      <button
+                        onClick={() => copyCode(coupon.code)}
+                        className="text-muted-foreground hover:text-foreground"
+                        title="نسخ الرمز"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </button>
                     </div>
                   </TableCell>
                   <TableCell>{getTypeLabel(coupon.type)}</TableCell>
@@ -240,19 +312,44 @@ export default function CouponsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      {coupon.usageCount}
-                      {coupon.usageLimit && ` / ${coupon.usageLimit}`}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Users className="h-3 w-3 text-muted-foreground" />
+                        <span>{coupon.usageCount}{coupon.usageLimit ? ` / ${coupon.usageLimit}` : ''}</span>
+                      </div>
+                      {coupon.usageLimit && coupon.usageLimit > 0 && (
+                        <div className="h-1.5 w-24 overflow-hidden rounded-full bg-muted">
+                          <div
+                            className="h-full rounded-full bg-primary transition-all"
+                            style={{ width: `${Math.min(100, (coupon.usageCount / coupon.usageLimit) * 100)}%` }}
+                          />
+                        </div>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span className={isExpired(coupon) ? 'text-destructive' : ''}>
-                        {formatDate(coupon.validUntil)}
-                      </span>
-                    </div>
+                    {(() => {
+                      const now = new Date()
+                      const expiry = new Date(coupon.validUntil)
+                      const daysLeft = Math.ceil((expiry.getTime() - now.getTime()) / 86400000)
+                      const expired = expiry < now
+                      const expiringSoon = !expired && daysLeft <= 7
+                      return (
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3 text-muted-foreground" />
+                          {expired ? (
+                            <span className="text-destructive">{formatDate(coupon.validUntil)}</span>
+                          ) : expiringSoon ? (
+                            <>
+                              <span className="text-amber-600">{formatDate(coupon.validUntil)}</span>
+                              <span className="text-xs text-amber-500">({daysLeft}د)</span>
+                            </>
+                          ) : (
+                            <span>{formatDate(coupon.validUntil)}</span>
+                          )}
+                        </div>
+                      )
+                    })()}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">

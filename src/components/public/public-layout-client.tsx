@@ -13,6 +13,7 @@ import { AuthModal } from '@/components/auth/auth-modal'
 import { PublicHeader } from '@/components/public/public-header'
 import { PublicFooter } from '@/components/public/public-footer'
 import { WhatsAppCta } from '@/components/public/whatsapp-cta'
+import { MobileNavBar } from '@/components/mobile/mobile-nav-bar'
 
 interface PublicLayoutClientProps {
   children: ReactNode
@@ -31,14 +32,15 @@ export function PublicLayoutClient({ children, flags }: PublicLayoutClientProps)
   return (
     <AuthModalProvider>
       <PublicHeader hiddenRoutes={hiddenRoutes} />
-      {/* Top padding compensates for removed category bar so content vertical position feels like before */}
+      {/* Top padding compensates for removed category bar; bottom padding for mobile nav bar */}
       <main
         id="main-content"
-        className="flex min-h-[calc(100vh-theme(spacing.14)-1px)] flex-col pt-4 md:pt-10"
+        className="flex min-h-[calc(100vh-theme(spacing.14)-1px)] flex-col pt-4 pb-[64px] md:pt-10 lg:pb-0"
       >
         {children}
       </main>
       <PublicFooter hiddenRoutes={hiddenRoutes} />
+      <MobileNavBar />
       {flags.enableWhatsAppCta && <WhatsAppCta />}
       <AuthModal />
     </AuthModalProvider>

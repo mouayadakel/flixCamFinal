@@ -8,9 +8,10 @@
 
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import Link from 'next/link'
-import { Eye, FileText, CheckCircle, XCircle, Download } from 'lucide-react'
+import { Eye, FileText, CheckCircle, XCircle, Download, PenTool, Clock, AlertTriangle } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -82,11 +83,7 @@ export default function ContractsPage() {
     'cancelled',
   ]
 
-  useEffect(() => {
-    loadContracts()
-  }, [statusFilter, signedFilter, page, pageSize, dateFrom, dateTo])
-
-  const loadContracts = async () => {
+  const loadContracts = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
@@ -115,10 +112,20 @@ export default function ContractsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [statusFilter, signedFilter, page, pageSize, dateFrom, dateTo, toast])
+
+  useEffect(() => {
+    loadContracts()
+  }, [loadContracts])
 
   const filteredContracts = useMemo(() => {
     return contracts
+  }, [contracts])
+
+  const statusSummary = useMemo(() => {
+    const counts: Record<string, number> = { draft: 0, pending_signature: 0, signed: 0, expired: 0, cancelled: 0 }
+    for (const c of contracts) counts[c.status] = (counts[c.status] || 0) + 1
+    return counts
   }, [contracts])
 
   const getStatusLabel = (status: ContractStatus) => {
@@ -166,6 +173,55 @@ export default function ContractsPage() {
           <Download className="ml-2 h-4 w-4" />
           تصدير CSV
         </Button>
+      </div>
+
+      {/* Status Summary */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+        <Card className="cursor-pointer hover:border-primary/50" onClick={() => setStatusFilter('draft')}>
+          <CardContent className="pt-4 pb-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">مسودة</p>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <p className="text-2xl font-bold">{statusSummary.draft}</p>
+          </CardContent>
+        </Card>
+        <Card className="cursor-pointer hover:border-primary/50" onClick={() => setStatusFilter('pending_signature')}>
+          <CardContent className="pt-4 pb-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">بانتظار التوقيع</p>
+              <PenTool className="h-4 w-4 text-amber-500" />
+            </div>
+            <p className={`text-2xl font-bold ${statusSummary.pending_signature > 0 ? 'text-amber-600' : ''}`}>{statusSummary.pending_signature}</p>
+          </CardContent>
+        </Card>
+        <Card className="cursor-pointer hover:border-primary/50" onClick={() => setStatusFilter('signed')}>
+          <CardContent className="pt-4 pb-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">موقّع</p>
+              <CheckCircle className="h-4 w-4 text-green-500" />
+            </div>
+            <p className="text-2xl font-bold text-green-600">{statusSummary.signed}</p>
+          </CardContent>
+        </Card>
+        <Card className="cursor-pointer hover:border-primary/50" onClick={() => setStatusFilter('expired')}>
+          <CardContent className="pt-4 pb-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">منتهي</p>
+              <Clock className="h-4 w-4 text-red-400" />
+            </div>
+            <p className={`text-2xl font-bold ${statusSummary.expired > 0 ? 'text-red-600' : ''}`}>{statusSummary.expired}</p>
+          </CardContent>
+        </Card>
+        <Card className="cursor-pointer hover:border-primary/50" onClick={() => setStatusFilter('cancelled')}>
+          <CardContent className="pt-4 pb-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">ملغي</p>
+              <XCircle className="h-4 w-4 text-gray-400" />
+            </div>
+            <p className="text-2xl font-bold">{statusSummary.cancelled}</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Filters */}
