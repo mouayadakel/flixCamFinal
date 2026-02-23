@@ -588,9 +588,19 @@ export class BookingService {
     const clientRoles = ['DATA_ENTRY'] as const
     const isClientRole =
       !user ||
-      !['ADMIN', 'WAREHOUSE_MANAGER', 'TECHNICIAN', 'SALES_MANAGER', 'ACCOUNTANT',
-        'CUSTOMER_SERVICE', 'MARKETING_MANAGER', 'RISK_MANAGER', 'APPROVAL_AGENT',
-        'AUDITOR', 'AI_OPERATOR'].includes(user.role)
+      ![
+        'ADMIN',
+        'WAREHOUSE_MANAGER',
+        'TECHNICIAN',
+        'SALES_MANAGER',
+        'ACCOUNTANT',
+        'CUSTOMER_SERVICE',
+        'MARKETING_MANAGER',
+        'RISK_MANAGER',
+        'APPROVAL_AGENT',
+        'AUDITOR',
+        'AI_OPERATOR',
+      ].includes(user.role)
 
     const whereClause: Record<string, unknown> = {
       id,
@@ -731,9 +741,21 @@ export class BookingService {
       where: { id: userId },
       select: { role: true },
     })
-    const isStaff = user && ['ADMIN', 'WAREHOUSE_MANAGER', 'TECHNICIAN', 'SALES_MANAGER',
-      'ACCOUNTANT', 'CUSTOMER_SERVICE', 'MARKETING_MANAGER', 'RISK_MANAGER',
-      'APPROVAL_AGENT', 'AUDITOR', 'AI_OPERATOR'].includes(user.role)
+    const isStaff =
+      user &&
+      [
+        'ADMIN',
+        'WAREHOUSE_MANAGER',
+        'TECHNICIAN',
+        'SALES_MANAGER',
+        'ACCOUNTANT',
+        'CUSTOMER_SERVICE',
+        'MARKETING_MANAGER',
+        'RISK_MANAGER',
+        'APPROVAL_AGENT',
+        'AUDITOR',
+        'AI_OPERATOR',
+      ].includes(user.role)
 
     const where: any = {
       deletedAt: null,
@@ -835,9 +857,21 @@ export class BookingService {
       where: { id: userId },
       select: { role: true },
     })
-    const isStaff = user && ['ADMIN', 'WAREHOUSE_MANAGER', 'TECHNICIAN', 'SALES_MANAGER',
-      'ACCOUNTANT', 'CUSTOMER_SERVICE', 'MARKETING_MANAGER', 'RISK_MANAGER',
-      'APPROVAL_AGENT', 'AUDITOR', 'AI_OPERATOR'].includes(user.role)
+    const isStaff =
+      user &&
+      [
+        'ADMIN',
+        'WAREHOUSE_MANAGER',
+        'TECHNICIAN',
+        'SALES_MANAGER',
+        'ACCOUNTANT',
+        'CUSTOMER_SERVICE',
+        'MARKETING_MANAGER',
+        'RISK_MANAGER',
+        'APPROVAL_AGENT',
+        'AUDITOR',
+        'AI_OPERATOR',
+      ].includes(user.role)
 
     const whereClause: Record<string, unknown> = {
       id: bookingId,

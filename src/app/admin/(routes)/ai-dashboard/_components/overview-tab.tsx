@@ -375,7 +375,9 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
         }
         if (jobId) {
           setActiveJobId(jobId)
-          setFillAllProgress((prev) => prev ?? { status: 'running', progress: 0, processed: 0, total: 0, errors: 0 })
+          setFillAllProgress(
+            (prev) => prev ?? { status: 'running', progress: 0, processed: 0, total: 0, errors: 0 }
+          )
         }
         const runCancelAndRetry = async () => {
           const cancelRes = await fetch('/api/admin/ai/backfill/cancel', { method: 'POST' })
@@ -410,7 +412,10 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
               total: retryData.queued ?? 0,
               errors: 0,
             })
-            toast({ title: 'تم', description: `تم إلغاء المهمة السابقة وبدء مهمة جديدة (${retryData.queued ?? 0} منتج)` })
+            toast({
+              title: 'تم',
+              description: `تم إلغاء المهمة السابقة وبدء مهمة جديدة (${retryData.queued ?? 0} منتج)`,
+            })
           } else if (retryRes.status === 409) {
             toast({
               title: 'مهمة قيد التشغيل',
@@ -427,23 +432,24 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
         }
         toast({
           title: 'مهمة قيد التشغيل',
-          description: 'مهمة ذكاء اصطناعي قيد التشغيل بالفعل. انتظر حتى تنتهي أو ألغِها وابدأ مهمة جديدة.',
+          description:
+            'مهمة ذكاء اصطناعي قيد التشغيل بالفعل. انتظر حتى تنتهي أو ألغِها وابدأ مهمة جديدة.',
           action: (
             <div className="flex flex-wrap gap-1.5">
               <ToastAction
                 altText="عرض المهمة الحالية"
                 onClick={() => {
                   setTimeout(() => {
-                    fillAllProgressCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                    fillAllProgressCardRef.current?.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'center',
+                    })
                   }, 100)
                 }}
               >
                 عرض المهمة الحالية
               </ToastAction>
-              <ToastAction
-                altText="إلغاء وبدء جديدة"
-                onClick={() => runCancelAndRetry()}
-              >
+              <ToastAction altText="إلغاء وبدء جديدة" onClick={() => runCancelAndRetry()}>
                 إلغاء وبدء جديدة
               </ToastAction>
             </div>
@@ -471,18 +477,14 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
     } catch (e) {
       setIsFillAllRunning(false)
       const message = e instanceof Error ? e.message : 'فشل تشغيل الملء'
-      const isAlreadyRunning =
-        typeof message === 'string' && message.includes('قيد التشغيل')
+      const isAlreadyRunning = typeof message === 'string' && message.includes('قيد التشغيل')
       toast({
         title: 'خطأ',
         description: message,
         variant: 'destructive',
         ...(isAlreadyRunning && {
           action: (
-            <ToastAction
-              altText="عرض سجل المهام"
-              onClick={() => onSwitchTab('analytics')}
-            >
+            <ToastAction altText="عرض سجل المهام" onClick={() => onSwitchTab('analytics')}>
               عرض المهمة الحالية
             </ToastAction>
           ),

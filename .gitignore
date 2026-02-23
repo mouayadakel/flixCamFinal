@@ -12,9 +12,6 @@ node_modules/
 /build
 dist/
 
-# Production
-/build
-
 # Misc
 .DS_Store
 *.pem
@@ -24,12 +21,17 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Local env files
+# Local env files (all env files EXCEPT .env.example)
 .env
-.env*.local
+.env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
+.env.staging
+.env*.local
 
 # Vercel
 .vercel
@@ -60,3 +62,18 @@ logs
 tmp/
 temp/
 *.tmp
+
+# Local file storage (uploads)
+storage/
+uploads/
+
+# Sentry
+.sentryclirc
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# Turbo
+.turbo/

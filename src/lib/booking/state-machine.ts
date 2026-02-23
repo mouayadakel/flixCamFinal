@@ -257,7 +257,10 @@ async function checkConditions(
           where: { id: booking.customerId },
           select: { status: true },
         })
-        if (customerBlacklist?.status === 'blacklisted' || customerBlacklist?.status === 'suspended') {
+        if (
+          customerBlacklist?.status === 'blacklisted' ||
+          customerBlacklist?.status === 'suspended'
+        ) {
           return { valid: false, failedCondition: condition }
         }
         break

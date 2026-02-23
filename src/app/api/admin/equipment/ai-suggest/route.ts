@@ -17,10 +17,7 @@ import {
   generateTags,
 } from '@/lib/services/ai-autofill.service'
 import { generateMasterFill } from '@/lib/services/ai-content-generation.service'
-import {
-  convertFlatToStructured,
-  flattenStructuredSpecs,
-} from '@/lib/utils/specifications.utils'
+import { convertFlatToStructured, flattenStructuredSpecs } from '@/lib/utils/specifications.utils'
 import { isStructuredSpecifications } from '@/lib/types/specifications.types'
 import { resolveTemplateName } from '@/lib/ai/spec-templates'
 

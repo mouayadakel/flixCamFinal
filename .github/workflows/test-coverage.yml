@@ -17,6 +17,22 @@ jobs:
   test-coverage:
     name: Test with coverage
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,12 +51,18 @@ jobs:
         env:
           DATABASE_URL: 'postgresql://ci:ci@localhost:5432/ci?schema=public'
 
+      - name: Run migrations
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: 'postgresql://ci:ci@localhost:5432/ci?schema=public'
+
       - name: Run tests with coverage
         run: npm run test:coverage -- --passWithNoTests
         env:
           DATABASE_URL: 'postgresql://ci:ci@localhost:5432/ci?schema=public'
           NEXTAUTH_SECRET: 'ci-secret-minimum-32-characters-long'
           NEXTAUTH_URL: 'http://localhost:3000'
+          ENCRYPTION_KEY: 'ci-encryption-key-32-chars-long!'
 
       - name: Upload coverage (optional)
         uses: actions/upload-artifact@v4

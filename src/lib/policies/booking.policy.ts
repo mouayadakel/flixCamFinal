@@ -9,9 +9,17 @@ import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
 import type { BookingState } from '@/lib/types/booking.types'
 
 const STAFF_ROLES = [
-  'ADMIN', 'WAREHOUSE_MANAGER', 'TECHNICIAN', 'SALES_MANAGER',
-  'ACCOUNTANT', 'CUSTOMER_SERVICE', 'MARKETING_MANAGER',
-  'RISK_MANAGER', 'APPROVAL_AGENT', 'AUDITOR', 'AI_OPERATOR',
+  'ADMIN',
+  'WAREHOUSE_MANAGER',
+  'TECHNICIAN',
+  'SALES_MANAGER',
+  'ACCOUNTANT',
+  'CUSTOMER_SERVICE',
+  'MARKETING_MANAGER',
+  'RISK_MANAGER',
+  'APPROVAL_AGENT',
+  'AUDITOR',
+  'AI_OPERATOR',
 ]
 
 export interface PolicyResult {

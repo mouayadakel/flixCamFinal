@@ -69,12 +69,16 @@ export type AISuggestPayload = {
 function ConfidenceBadge({ value }: { value: number | undefined }) {
   if (value == null) return null
   const cls =
-    value >= 90 ? 'bg-green-100 text-green-800 border-green-300'
-      : value >= 70 ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
+    value >= 90
+      ? 'bg-green-100 text-green-800 border-green-300'
+      : value >= 70
+        ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
         : 'bg-orange-100 text-orange-800 border-orange-300'
   const label = value >= 90 ? 'High' : value >= 70 ? 'Med' : 'Low'
   return (
-    <span className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-semibold font-mono ${cls}`}>
+    <span
+      className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 font-mono text-[10px] font-semibold ${cls}`}
+    >
       {value}% {label}
     </span>
   )
@@ -107,7 +111,8 @@ function specValueToDisplayString(value: unknown): string {
   if (value == null) return ''
   if (typeof value === 'string') return value
   if (typeof value === 'number' || typeof value === 'boolean') return String(value)
-  if (Array.isArray(value)) return value.length === 0 ? '' : value.map((v) => specValueToDisplayString(v)).join(', ')
+  if (Array.isArray(value))
+    return value.length === 0 ? '' : value.map((v) => specValueToDisplayString(v)).join(', ')
   if (typeof value === 'object') return JSON.stringify(value).slice(0, 200)
   return String(value)
 }
@@ -127,7 +132,10 @@ function groupSpecsByCategory(specs: Record<string, unknown>): Array<{
 
   if (entries.length === 0) return []
 
-  const groups: Record<string, { label: string; icon: string; entries: Array<{ key: string; label: string; value: string }> }> = {}
+  const groups: Record<
+    string,
+    { label: string; icon: string; entries: Array<{ key: string; label: string; value: string }> }
+  > = {}
 
   const categoryMapping: Record<string, { group: string; icon: string }> = {
     // Sensor & Image
@@ -343,7 +351,11 @@ function SpecGroupCard({
   onEditValue,
   onDeleteSpec,
 }: {
-  group: { label: string; icon: string; entries: Array<{ key: string; label: string; value: string }> }
+  group: {
+    label: string
+    icon: string
+    entries: Array<{ key: string; label: string; value: string }>
+  }
   confidence?: Record<string, number>
   onEditValue: (key: string, value: string) => void
   onDeleteSpec: (key: string) => void
@@ -386,9 +398,7 @@ function SpecGroupCard({
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-muted-foreground">
-                    {entry.label}
-                  </span>
+                  <span className="text-xs font-medium text-muted-foreground">{entry.label}</span>
                   <ConfidenceBadge value={confidence?.[entry.key]} />
                 </div>
                 {editingKey === entry.key ? (
@@ -420,7 +430,7 @@ function SpecGroupCard({
                     </Button>
                   </div>
                 ) : (
-                  <p className="mt-0.5 text-sm font-medium text-foreground leading-snug">
+                  <p className="mt-0.5 text-sm font-medium leading-snug text-foreground">
                     {entry.value}
                   </p>
                 )}
@@ -479,7 +489,11 @@ export function AISuggestPreviewDialog({
   }, [suggestion])
 
   const current = edited ?? suggestion
-  const canApply = current && (current.shortDescription?.trim() || current.longDescription?.trim() || Object.keys(current.specs ?? {}).length > 0)
+  const canApply =
+    current &&
+    (current.shortDescription?.trim() ||
+      current.longDescription?.trim() ||
+      Object.keys(current.specs ?? {}).length > 0)
 
   const specGroups = useMemo(() => {
     if (!current?.specs) return []
@@ -502,13 +516,11 @@ export function AISuggestPreviewDialog({
       .filter((g) => g.entries.length > 0)
   }, [specGroups, specSearch])
 
-  const totalSpecCount = Object.entries(current?.specs ?? {}).filter(
-    ([k, v]) => {
-      if (SPEC_STRUCTURAL_KEYS.has(k)) return false
-      const display = specValueToDisplayString(v)
-      return display.trim() !== '' && display.trim() !== 'unknown' && display !== '[object Object]'
-    }
-  ).length
+  const totalSpecCount = Object.entries(current?.specs ?? {}).filter(([k, v]) => {
+    if (SPEC_STRUCTURAL_KEYS.has(k)) return false
+    const display = specValueToDisplayString(v)
+    return display.trim() !== '' && display.trim() !== 'unknown' && display !== '[object Object]'
+  }).length
 
   const handleApply = () => {
     if (current) {
@@ -518,9 +530,7 @@ export function AISuggestPreviewDialog({
   }
 
   const handleEditSpecValue = (key: string, value: string) => {
-    setEdited((prev) =>
-      prev ? { ...prev, specs: { ...prev.specs, [key]: value } } : null
-    )
+    setEdited((prev) => (prev ? { ...prev, specs: { ...prev.specs, [key]: value } } : null))
   }
 
   const handleDeleteSpec = (key: string) => {
@@ -543,7 +553,8 @@ export function AISuggestPreviewDialog({
             AI-Generated Content
           </DialogTitle>
           <DialogDescription>
-            Review and edit the suggested content, then click Apply to fill the form. No data is saved until you click Save.
+            Review and edit the suggested content, then click Apply to fill the form. No data is
+            saved until you click Save.
           </DialogDescription>
         </DialogHeader>
 
@@ -653,7 +664,9 @@ export function AISuggestPreviewDialog({
                       <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-8 text-center">
                         <Info className="mb-2 h-8 w-8 text-muted-foreground/50" />
                         <p className="text-sm text-muted-foreground">
-                          {specSearch ? 'No specs match your search' : 'No specifications generated'}
+                          {specSearch
+                            ? 'No specs match your search'
+                            : 'No specifications generated'}
                         </p>
                       </div>
                     )}
@@ -723,9 +736,7 @@ export function AISuggestPreviewDialog({
                   <Textarea
                     value={current.boxContents ?? ''}
                     onChange={(e) =>
-                      setEdited((prev) =>
-                        prev ? { ...prev, boxContents: e.target.value } : null
-                      )
+                      setEdited((prev) => (prev ? { ...prev, boxContents: e.target.value } : null))
                     }
                     rows={3}
                     className="resize-none"
@@ -736,11 +747,15 @@ export function AISuggestPreviewDialog({
                 <div className="space-y-2">
                   <Label>Tags (comma-separated)</Label>
                   <Input
-                    value={typeof current.tags === 'string' ? current.tags : (Array.isArray(current.tags) ? (current.tags as string[]).join(', ') : '')}
+                    value={
+                      typeof current.tags === 'string'
+                        ? current.tags
+                        : Array.isArray(current.tags)
+                          ? (current.tags as string[]).join(', ')
+                          : ''
+                    }
                     onChange={(e) =>
-                      setEdited((prev) =>
-                        prev ? { ...prev, tags: e.target.value } : null
-                      )
+                      setEdited((prev) => (prev ? { ...prev, tags: e.target.value } : null))
                     }
                     placeholder="tag1, tag2, tag3"
                   />
@@ -813,7 +828,8 @@ export function AISuggestPreviewDialog({
                   placeholder="id1, id2, id3"
                 />
                 <p className="text-xs text-muted-foreground">
-                  {current.relatedEquipmentIds?.length ?? 0} ID(s) will be applied when you click Apply.
+                  {current.relatedEquipmentIds?.length ?? 0} ID(s) will be applied when you click
+                  Apply.
                 </p>
               </div>
             </TabsContent>

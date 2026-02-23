@@ -201,7 +201,12 @@ export async function generateSEO(context: SEOContext, provider?: SEOProvider): 
 
   // Prefer DB key if present and valid (not masked placeholder); decrypt if encrypted
   let apiKey: string | null = null
-  if (settings?.enabled && settings?.apiKey && settings.apiKey.length >= 10 && !settings.apiKey.startsWith('****')) {
+  if (
+    settings?.enabled &&
+    settings?.apiKey &&
+    settings.apiKey.length >= 10 &&
+    !settings.apiKey.startsWith('****')
+  ) {
     try {
       apiKey = isEncrypted(settings.apiKey) ? decrypt(settings.apiKey) : settings.apiKey
     } catch {
@@ -240,7 +245,12 @@ export async function generateSEOBatch(
   const settings = await getAISettings(effectiveProvider)
 
   let apiKey: string | null = null
-  if (settings?.enabled && settings?.apiKey && settings.apiKey.length >= 10 && !settings.apiKey.startsWith('****')) {
+  if (
+    settings?.enabled &&
+    settings?.apiKey &&
+    settings.apiKey.length >= 10 &&
+    !settings.apiKey.startsWith('****')
+  ) {
     try {
       apiKey = isEncrypted(settings.apiKey) ? decrypt(settings.apiKey) : settings.apiKey
     } catch {
