@@ -621,7 +621,7 @@ export default function AnalyticsPage() {
                             cx="50%"
                             cy="50%"
                             outerRadius={100}
-                            label={({ label, count }) => `${label}: ${count}`}
+                            label={({ name, value }) => `${name}: ${value}`}
                           >
                             {bookingAnalytics.byStatus.map((_, i) => (
                               <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />

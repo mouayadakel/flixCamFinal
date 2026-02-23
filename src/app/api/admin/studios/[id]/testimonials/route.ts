@@ -76,7 +76,15 @@ export async function POST(
     }
     const body = await request.json()
     const data = createStudioTestimonialSchema.parse(body)
-    const testimonial = await StudioTestimonialService.create(id, data, session.user.id)
+    const testimonial = await StudioTestimonialService.create(
+      id,
+      {
+        ...data,
+        role: data.role ?? undefined,
+        avatarUrl: data.avatarUrl ?? undefined,
+      },
+      session.user.id
+    )
     return NextResponse.json(testimonial, { status: 201 })
   } catch (error) {
     if (error instanceof ValidationError) {
