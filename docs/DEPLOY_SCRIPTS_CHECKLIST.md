@@ -7,6 +7,7 @@ Use this list when deploying the project to production (VPS, Hostinger, or any s
 ## 1. Before deploy (local / one-time)
 
 - [ ] Copy `.env.example` to `.env` and set **production** values.
+- [ ] **Before every push:** run `bash prepush.sh` (lint + type-check). If you changed `prisma/schema.prisma`, run `npm run db:migrate` and ensure new `prisma/migrations/*/migration.sql` are in the commit — migrations must be in the repo for CI and `db:deploy` on the server.
 - [ ] Required env vars: `DATABASE_URL`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL` (or `APP_URL`), `CRON_SECRET`.
 - [ ] Optional (as needed): Tap Payments, Resend/SMTP, Supabase, Redis, OpenAI, etc. (see `.env.example`).
 
