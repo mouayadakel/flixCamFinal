@@ -62,6 +62,7 @@ import {
   FileDown,
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import { ToastAction } from '@/components/ui/toast'
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 import {
@@ -175,6 +176,7 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
   const [sortBottomByRevenue, setSortBottomByRevenue] = useState(false)
   const [fillEstimateCount, setFillEstimateCount] = useState<number | null>(null)
   const [fillEstimateLoading, setFillEstimateLoading] = useState(false)
+  const fillAllProgressCardRef = useRef<HTMLDivElement>(null)
 
   const { data: jobStreamData } = useJobStream(activeJobId, {
     onComplete: (d) => {
@@ -222,6 +224,29 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
   useEffect(() => {
     const stored = readLocalStorage(QUALITY_TARGET_STORAGE_KEY, '80')
     setTargetScore(Math.max(0, Math.min(100, Number(stored) || 80)))
+  }, [])
+
+  // On mount: sync with any already-running backfill so "Fill All" state and progress are correct
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/admin/ai/backfill/active')
+      .then((res) => (res.ok ? res.json() : { activeJob: null }))
+      .then((data) => {
+        if (cancelled || !data?.activeJob?.id) return
+        setActiveJobId(data.activeJob.id)
+        setIsFillAllRunning(true)
+        setFillAllProgress({
+          status: 'running',
+          progress: data.activeJob.progress ?? 0,
+          processed: data.activeJob.processed ?? 0,
+          total: data.activeJob.total ?? 0,
+          errors: data.activeJob.failed ?? 0,
+        })
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const fetchAll = useCallback(async () => {
@@ -336,11 +361,99 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
           minQualityScore: minQualityScore > 0 ? minQualityScore : undefined,
         }),
       })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error ?? 'فشل البدء')
+      const data = await res.json().catch(() => ({}))
+      if (res.status === 409) {
+        let jobId = data.activeJobId
+        if (!jobId) {
+          try {
+            const activeRes = await fetch('/api/admin/ai/backfill/active')
+            const activeData = await activeRes.json().catch(() => ({}))
+            jobId = activeData?.activeJob?.id
+          } catch {
+            /* ignore */
+          }
+        }
+        if (jobId) {
+          setActiveJobId(jobId)
+          setFillAllProgress((prev) => prev ?? { status: 'running', progress: 0, processed: 0, total: 0, errors: 0 })
+        }
+        const runCancelAndRetry = async () => {
+          const cancelRes = await fetch('/api/admin/ai/backfill/cancel', { method: 'POST' })
+          const cancelData = await cancelRes.json().catch(() => ({}))
+          if (!cancelData.cancelled) {
+            toast({
+              title: 'تنبيه',
+              description: cancelData.message ?? 'لا توجد مهمة قيد التشغيل أو فشل الإلغاء',
+              variant: 'destructive',
+            })
+            return
+          }
+          setActiveJobId(null)
+          setFillAllProgress(null)
+          const retryRes = await fetch('/api/admin/ai/backfill', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fillAll: true,
+              revenueWeighted,
+              types: fillTypes.length > 0 ? fillTypes : ['text'],
+              minQualityScore: minQualityScore > 0 ? minQualityScore : undefined,
+            }),
+          })
+          const retryData = await retryRes.json().catch(() => ({}))
+          if (retryRes.ok && retryData.jobId) {
+            setActiveJobId(retryData.jobId)
+            setFillAllProgress({
+              status: 'running',
+              progress: 0,
+              processed: 0,
+              total: retryData.queued ?? 0,
+              errors: 0,
+            })
+            toast({ title: 'تم', description: `تم إلغاء المهمة السابقة وبدء مهمة جديدة (${retryData.queued ?? 0} منتج)` })
+          } else if (retryRes.status === 409) {
+            toast({
+              title: 'مهمة قيد التشغيل',
+              description: 'ما زالت هناك مهمة قيد التشغيل. انتظر قليلاً ثم حاول مرة أخرى.',
+              variant: 'destructive',
+            })
+          } else {
+            toast({
+              title: 'خطأ',
+              description: retryData.error ?? 'فشل بدء المهمة الجديدة',
+              variant: 'destructive',
+            })
+          }
+        }
+        toast({
+          title: 'مهمة قيد التشغيل',
+          description: 'مهمة ذكاء اصطناعي قيد التشغيل بالفعل. انتظر حتى تنتهي أو ألغِها وابدأ مهمة جديدة.',
+          action: (
+            <div className="flex flex-wrap gap-1.5">
+              <ToastAction
+                altText="عرض المهمة الحالية"
+                onClick={() => {
+                  setTimeout(() => {
+                    fillAllProgressCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                  }, 100)
+                }}
+              >
+                عرض المهمة الحالية
+              </ToastAction>
+              <ToastAction
+                altText="إلغاء وبدء جديدة"
+                onClick={() => runCancelAndRetry()}
+              >
+                إلغاء وبدء جديدة
+              </ToastAction>
+            </div>
+          ),
+        })
+        return
       }
-      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.error ?? 'فشل البدء')
+      }
       if (data.queued === 0 && data.message) {
         toast({ title: 'تم', description: data.message })
         setIsFillAllRunning(false)
@@ -357,13 +470,26 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
       }
     } catch (e) {
       setIsFillAllRunning(false)
+      const message = e instanceof Error ? e.message : 'فشل تشغيل الملء'
+      const isAlreadyRunning =
+        typeof message === 'string' && message.includes('قيد التشغيل')
       toast({
         title: 'خطأ',
-        description: e instanceof Error ? e.message : 'فشل تشغيل الملء',
+        description: message,
         variant: 'destructive',
+        ...(isAlreadyRunning && {
+          action: (
+            <ToastAction
+              altText="عرض سجل المهام"
+              onClick={() => onSwitchTab('analytics')}
+            >
+              عرض المهمة الحالية
+            </ToastAction>
+          ),
+        }),
       })
     }
-  }, [fetchAll, toast])
+  }, [fetchAll, toast, onSwitchTab, revenueWeighted, fillTypes, minQualityScore])
 
   const handleFillNow = async (productId: string) => {
     setFillingId(productId)
@@ -592,7 +718,7 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
 
       {/* Fill-all job progress */}
       {isFillAllRunning && fillAllProgress && (
-        <Card className="border-blue-200 bg-blue-50/50">
+        <Card ref={fillAllProgressCardRef} className="border-blue-200 bg-blue-50/50">
           <CardContent className="pt-6">
             <div className="space-y-3">
               <div className="flex items-center gap-2">

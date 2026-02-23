@@ -76,8 +76,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Atomic guard: check for active job AND create new job in one transaction
-    // Auto-cleanup stale jobs: PENDING >30min or RUNNING >60min are marked FAILED
-    const STALE_PENDING_MS = 30 * 60 * 1000
+    // Auto-cleanup stale jobs: PENDING >10min or RUNNING >60min are marked FAILED
+    const STALE_PENDING_MS = 10 * 60 * 1000
     const STALE_RUNNING_MS = 60 * 60 * 1000
     const txResult = await prisma.$transaction(async (tx) => {
       const activeJob = await tx.aiJob.findFirst({
