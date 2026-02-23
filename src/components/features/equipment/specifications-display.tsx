@@ -45,6 +45,16 @@ import { isStructuredSpecifications } from '@/lib/types/specifications.types'
 const RESERVED_FLAT_KEYS = ['mode', 'html', 'highlights', 'quickSpecs', 'groups']
 const FLAT_TABLE_COLLAPSE_AFTER = 6
 
+/** Safely coerce spec value to display string (avoids "[object Object]" for objects/arrays). */
+function specValueToString(value: unknown): string {
+  if (value == null) return ''
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+  if (Array.isArray(value)) return value.map((v) => specValueToString(v)).join(', ')
+  if (typeof value === 'object') return JSON.stringify(value).slice(0, 200)
+  return String(value)
+}
+
 // ============================================================================
 // Icon Mapping
 // ============================================================================
@@ -211,6 +221,7 @@ function SpecGroupCard({
 
 function SpecRow({ spec, locale, index }: { spec: SpecItem; locale: 'en' | 'ar'; index: number }) {
   const label = locale === 'ar' && spec.labelAr ? spec.labelAr : spec.label
+  const displayValue = specValueToString(spec.value)
   return (
     <div
       className={cn(
@@ -222,11 +233,11 @@ function SpecRow({ spec, locale, index }: { spec: SpecItem; locale: 'en' | 'ar';
       <span className="min-w-[140px] shrink-0 font-medium text-text-muted">{label}</span>
       <div className="flex min-w-0 flex-1 items-center gap-2">
         {spec.type === 'boolean' ? (
-          <BooleanSpec value={spec.value} />
+          <BooleanSpec value={displayValue} />
         ) : spec.type === 'range' ? (
-          <RangeSpec value={spec.value} rangePercent={spec.rangePercent} />
+          <RangeSpec value={displayValue} rangePercent={spec.rangePercent} />
         ) : spec.type === 'colorTemp' ? (
-          <ColorTempSpec value={spec.value} />
+          <ColorTempSpec value={displayValue} />
         ) : (
           <span
             className={cn(
@@ -234,7 +245,7 @@ function SpecRow({ spec, locale, index }: { spec: SpecItem; locale: 'en' | 'ar';
               spec.highlight && 'font-semibold text-text-heading'
             )}
           >
-            {spec.value}
+            {displayValue}
           </span>
         )}
       </div>

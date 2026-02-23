@@ -17,7 +17,11 @@ import {
   generateTags,
 } from '@/lib/services/ai-autofill.service'
 import { generateMasterFill } from '@/lib/services/ai-content-generation.service'
-import { convertFlatToStructured } from '@/lib/utils/specifications.utils'
+import {
+  convertFlatToStructured,
+  flattenStructuredSpecs,
+} from '@/lib/utils/specifications.utils'
+import { isStructuredSpecifications } from '@/lib/types/specifications.types'
 import { resolveTemplateName } from '@/lib/ai/spec-templates'
 
 export const dynamic = 'force-dynamic'
@@ -113,6 +117,12 @@ export async function POST(request: NextRequest) {
       }),
     ])
 
+    // Normalize existingSpecs to flat key-value only (avoid structural keys like groups/highlights/quickSpecs)
+    const existingFlat =
+      existingSpecs != null && isStructuredSpecifications(existingSpecs)
+        ? flattenStructuredSpecs(existingSpecs)
+        : (existingSpecs ?? {})
+
     // Merge ALL inferred specs — the AI is instructed to always fill every field with creative measurements
     const specsToMerge = (specResult?.specs ?? []).filter((s) => {
       const val = (s as { value: string }).value
@@ -123,7 +133,7 @@ export async function POST(request: NextRequest) {
         String(val).toLowerCase() !== 'n/a'
       )
     })
-    const mergedSpecs = { ...(existingSpecs ?? {}) }
+    const mergedSpecs: Record<string, unknown> = { ...existingFlat }
     for (const s of specsToMerge) {
       const key = (s as { key: string }).key
       const value = (s as { value: string }).value
