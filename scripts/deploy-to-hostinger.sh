@@ -17,7 +17,7 @@ fi
 
 echo "==> Adding safe.directory on server (one-time fix for 'exec request failed on channel 0')..."
 echo "    (If you use password auth, run this once on the server: git config --global --add safe.directory $REPO_PATH)"
-ssh flixcam@hostinger-vps "git config --global --add safe.directory $REPO_PATH" 2>/dev/null || true
+ssh root@76.13.63.81 "git config --global --add safe.directory $REPO_PATH" 2>/dev/null || true
 
 echo "==> Pushing main to $REMOTE (main)..."
 git push "$REMOTE" main:main
