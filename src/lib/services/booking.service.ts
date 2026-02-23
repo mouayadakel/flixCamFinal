@@ -580,11 +580,30 @@ export class BookingService {
       throw new ForbiddenError('You do not have permission to view bookings')
     }
 
+    // Determine if user is a client (non-staff) to scope access
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    })
+    const clientRoles = ['DATA_ENTRY'] as const
+    const isClientRole =
+      !user ||
+      !['ADMIN', 'WAREHOUSE_MANAGER', 'TECHNICIAN', 'SALES_MANAGER', 'ACCOUNTANT',
+        'CUSTOMER_SERVICE', 'MARKETING_MANAGER', 'RISK_MANAGER', 'APPROVAL_AGENT',
+        'AUDITOR', 'AI_OPERATOR'].includes(user.role)
+
+    const whereClause: Record<string, unknown> = {
+      id,
+      deletedAt: null,
+    }
+
+    // Clients can only view their own bookings (IDOR protection)
+    if (isClientRole) {
+      whereClause.customerId = userId
+    }
+
     const booking = await prisma.booking.findFirst({
-      where: {
-        id,
-        deletedAt: null,
-      },
+      where: whereClause,
       include: {
         customer: {
           select: {
@@ -626,6 +645,67 @@ export class BookingService {
   }
 
   /**
+   * Update a draft booking's details (dates, notes, equipment, studio)
+   */
+  static async update(
+    id: string,
+    userId: string,
+    data: {
+      startDate?: Date
+      endDate?: Date
+      notes?: string
+      studioId?: string
+      studioStartTime?: Date
+      studioEndTime?: Date
+    }
+  ) {
+    const canUpdate = await hasPermission(userId, PERMISSIONS.BOOKING_UPDATE)
+    if (!canUpdate) {
+      throw new ForbiddenError('You do not have permission to update bookings')
+    }
+
+    const existing = await prisma.booking.findFirst({
+      where: { id, deletedAt: null },
+    })
+
+    if (!existing) {
+      throw new NotFoundError('Booking', id)
+    }
+
+    if (existing.status !== 'DRAFT') {
+      throw new ValidationError('Only draft bookings can be updated')
+    }
+
+    const updated = await prisma.booking.update({
+      where: { id },
+      data: {
+        ...data,
+        updatedBy: userId,
+      },
+      include: {
+        customer: { select: { id: true, email: true, name: true, phone: true } },
+        studio: true,
+        equipment: { include: { equipment: true } },
+      },
+    })
+
+    await AuditService.log({
+      action: 'booking.updated',
+      userId,
+      resourceType: 'Booking',
+      resourceId: id,
+    })
+
+    await EventBus.emit('booking.updated', {
+      booking: updated,
+      userId,
+      timestamp: new Date(),
+    })
+
+    return updated
+  }
+
+  /**
    * List bookings with filters
    */
   static async list(
@@ -646,11 +726,23 @@ export class BookingService {
       throw new ForbiddenError('You do not have permission to view bookings')
     }
 
+    // Scope client users to their own bookings
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    })
+    const isStaff = user && ['ADMIN', 'WAREHOUSE_MANAGER', 'TECHNICIAN', 'SALES_MANAGER',
+      'ACCOUNTANT', 'CUSTOMER_SERVICE', 'MARKETING_MANAGER', 'RISK_MANAGER',
+      'APPROVAL_AGENT', 'AUDITOR', 'AI_OPERATOR'].includes(user.role)
+
     const where: any = {
       deletedAt: null,
     }
 
-    if (filters.customerId) {
+    // IDOR protection: clients can only list their own bookings
+    if (!isStaff) {
+      where.customerId = userId
+    } else if (filters.customerId) {
       where.customerId = filters.customerId
     }
 
@@ -738,11 +830,25 @@ export class BookingService {
       throw new ForbiddenError('You do not have permission to cancel bookings')
     }
 
+    // Scope by role for IDOR protection
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    })
+    const isStaff = user && ['ADMIN', 'WAREHOUSE_MANAGER', 'TECHNICIAN', 'SALES_MANAGER',
+      'ACCOUNTANT', 'CUSTOMER_SERVICE', 'MARKETING_MANAGER', 'RISK_MANAGER',
+      'APPROVAL_AGENT', 'AUDITOR', 'AI_OPERATOR'].includes(user.role)
+
+    const whereClause: Record<string, unknown> = {
+      id: bookingId,
+      deletedAt: null,
+    }
+    if (!isStaff) {
+      whereClause.customerId = userId
+    }
+
     const booking = await prisma.booking.findFirst({
-      where: {
-        id: bookingId,
-        deletedAt: null,
-      },
+      where: whereClause,
     })
 
     if (!booking) {

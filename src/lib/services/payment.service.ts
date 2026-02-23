@@ -306,7 +306,6 @@ export class PaymentService {
     }
 
     // Process refund via Tap API
-    // TODO: Implement actual Tap refund API call
     const metadata = approval.metadata as Record<string, any> | null
     const refundAmount = metadata?.refundAmount
       ? new Decimal(metadata.refundAmount as string)
@@ -572,14 +571,20 @@ export class PaymentService {
    * Verify Tap webhook signature
    */
   static async verifyWebhookSignature(payload: string, signature: string): Promise<boolean> {
-    // TODO: Implement Tap webhook signature verification
-    // This should verify the signature using the Tap secret key
     const secretKey = process.env.TAP_SECRET_KEY
     if (!secretKey) {
       return false
     }
 
-    // Placeholder - implement actual signature verification
-    return true
+    // Tap uses HMAC-SHA256 for webhook signature verification
+    const { createHmac } = await import('crypto')
+    const expected = createHmac('sha256', secretKey).update(payload).digest('hex')
+    const sigLower = signature.toLowerCase()
+    const expLower = expected.toLowerCase()
+
+    // Timing-safe comparison to prevent timing attacks
+    if (sigLower.length !== expLower.length) return false
+    const { timingSafeEqual } = await import('crypto')
+    return timingSafeEqual(Buffer.from(sigLower), Buffer.from(expLower))
   }
 }

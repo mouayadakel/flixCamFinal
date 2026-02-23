@@ -9,6 +9,7 @@ import { auth } from '@/lib/auth'
 import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
 import { rateLimitAPI } from '@/lib/utils/rate-limit'
 import { prisma } from '@/lib/db/prisma'
+import { encrypt, decrypt, isEncrypted } from '@/lib/utils/encryption'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,11 +36,22 @@ export async function GET(request: NextRequest) {
       orderBy: { provider: 'asc' },
     })
 
-    // Don't expose full API keys - only show last 4 characters
-    const sanitized = settings.map((s) => ({
-      ...s,
-      apiKey: s.apiKey ? `****${s.apiKey.slice(-4)}` : null,
-    }))
+    // Decrypt API keys and show only last 4 characters
+    const sanitized = settings.map((s) => {
+      let lastFour = ''
+      if (s.apiKey) {
+        try {
+          const plainKey = isEncrypted(s.apiKey) ? decrypt(s.apiKey) : s.apiKey
+          lastFour = plainKey.slice(-4)
+        } catch {
+          lastFour = s.apiKey.slice(-4)
+        }
+      }
+      return {
+        ...s,
+        apiKey: s.apiKey ? `****${lastFour}` : null,
+      }
+    })
 
     return NextResponse.json({ settings: sanitized })
   } catch (error: any) {
@@ -100,19 +112,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid API key format' }, { status: 400 })
     }
 
+    // Encrypt the API key before storing
+    const encryptedApiKey = apiKey ? encrypt(apiKey) : undefined
+
     // Update or create settings
     const settings = await prisma.aISettings.upsert({
       where: { provider },
       create: {
         provider,
-        apiKey: apiKey || '',
+        apiKey: encryptedApiKey || '',
         batchSize: batchSize || 50,
         timeout: timeout || 30000,
         fallbackStrategy: fallbackStrategy || 'mark_for_review',
         enabled: enabled !== undefined ? enabled : true,
       },
       update: {
-        ...(apiKey && { apiKey }),
+        ...(encryptedApiKey && { apiKey: encryptedApiKey }),
         ...(batchSize !== undefined && { batchSize }),
         ...(timeout !== undefined && { timeout }),
         ...(fallbackStrategy !== undefined && { fallbackStrategy }),

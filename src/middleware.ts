@@ -44,6 +44,37 @@ const SESSION_COOKIE_NAME =
 
 export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
+
+  // CORS handling for API routes
+  if (pathname.startsWith('/api')) {
+    const origin = req.headers.get('origin')
+    const allowedRaw = process.env.ALLOWED_ORIGINS || ''
+    const allowedOrigins = allowedRaw
+      .split(',')
+      .map((o) => o.trim())
+      .filter(Boolean)
+
+    // Handle preflight OPTIONS
+    if (req.method === 'OPTIONS') {
+      const res = new NextResponse(null, { status: 204 })
+      if (origin && allowedOrigins.includes(origin)) {
+        res.headers.set('Access-Control-Allow-Origin', origin)
+        res.headers.set('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS')
+        res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        res.headers.set('Access-Control-Allow-Credentials', 'true')
+        res.headers.set('Access-Control-Max-Age', '86400')
+      }
+      return res
+    }
+
+    // Set CORS headers on API responses
+    const response = NextResponse.next()
+    if (origin && allowedOrigins.includes(origin)) {
+      response.headers.set('Access-Control-Allow-Origin', origin)
+      response.headers.set('Access-Control-Allow-Credentials', 'true')
+    }
+  }
+
   const token = await getToken({
     req,
     secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,

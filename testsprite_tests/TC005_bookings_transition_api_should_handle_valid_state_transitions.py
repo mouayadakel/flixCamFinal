@@ -3,8 +3,10 @@ from requests.exceptions import RequestException
 
 BASE_URL = "http://localhost:3000"
 
-ADMIN_EMAIL = "admin@flixcam.rent"
-ADMIN_PASSWORD = "admin"
+import os
+
+ADMIN_EMAIL = os.environ.get("TEST_ADMIN_EMAIL", "admin@flixcam.rent")
+ADMIN_PASSWORD = os.environ.get("TEST_ADMIN_PASSWORD", "admin")
 
 def test_bookings_transition_api_should_handle_valid_state_transitions():
     session = requests.Session()

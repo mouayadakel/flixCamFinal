@@ -9,6 +9,7 @@ import { NotFoundError } from '@/lib/errors'
 jest.mock('@/lib/db/prisma', () => ({
   prisma: {
     equipment: { findFirst: jest.fn() },
+    translation: { findMany: jest.fn().mockResolvedValue([]) },
     $transaction: jest.fn((cb: (tx: any) => Promise<void>) => cb(mockTx)),
   },
 }))
@@ -19,6 +20,7 @@ const mockTx = {
   },
   productTranslation: {
     upsert: jest.fn().mockResolvedValue({}),
+    findUnique: jest.fn().mockResolvedValue(null),
   },
 }
 
@@ -56,7 +58,7 @@ describe('product-equipment-sync.service', () => {
       expect(prisma.$transaction).not.toHaveBeenCalled()
     })
 
-    it('pads galleryImages to at least 3 when equipment has 0 media', async () => {
+    it('uses only real gallery images when equipment has 0 media', async () => {
       mockFindFirst.mockResolvedValue({
         id: 'eq-1',
         deletedAt: null,
@@ -74,11 +76,10 @@ describe('product-equipment-sync.service', () => {
       const upsertCall = mockTx.product.upsert.mock.calls[0][0]
       const galleryImages = upsertCall.create.galleryImages as string[]
       expect(Array.isArray(galleryImages)).toBe(true)
-      expect(galleryImages.length).toBeGreaterThanOrEqual(3)
-      expect(upsertCall.update.galleryImages).toEqual(upsertCall.create.galleryImages)
+      expect(galleryImages.length).toBe(0)
     })
 
-    it('pads galleryImages to at least 3 when equipment has 1 media', async () => {
+    it('uses only real gallery images when equipment has 1 media', async () => {
       mockFindFirst.mockResolvedValue({
         id: 'eq-1',
         deletedAt: null,
@@ -95,10 +96,10 @@ describe('product-equipment-sync.service', () => {
       expect(mockTx.product.upsert).toHaveBeenCalledTimes(1)
       const upsertCall = mockTx.product.upsert.mock.calls[0][0]
       const galleryImages = upsertCall.create.galleryImages as string[]
-      expect(galleryImages.length).toBeGreaterThanOrEqual(3)
+      expect(galleryImages.length).toBe(1)
     })
 
-    it('does not pad galleryImages when equipment has 4 media', async () => {
+    it('preserves all gallery images when equipment has 4 media', async () => {
       mockFindFirst.mockResolvedValue({
         id: 'eq-1',
         deletedAt: null,

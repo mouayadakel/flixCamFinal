@@ -8,6 +8,7 @@ import { prisma } from '@/lib/db/prisma'
 import OpenAI from 'openai'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { buildMasterFillPrompt, parseMasterFillOutput } from '@/lib/prompts/master-fill'
+import { decrypt, isEncrypted } from '@/lib/utils/encryption'
 import type {
   MasterFillInput,
   MasterFillOutput,
@@ -31,8 +32,16 @@ export async function generateWithLLM(
   maxTokens: number = 1000
 ): Promise<string | object> {
   const settings = await getSettings(provider)
+  let dbKey: string | null = null
+  if (settings?.apiKey && settings.apiKey.length >= 10 && !settings.apiKey.startsWith('****')) {
+    try {
+      dbKey = isEncrypted(settings.apiKey) ? decrypt(settings.apiKey) : settings.apiKey
+    } catch {
+      dbKey = null
+    }
+  }
   const apiKey =
-    settings?.apiKey ??
+    dbKey ??
     (provider === 'gemini'
       ? (process.env.GEMINI_API_KEY ?? process.env.GOOGLE_GENERATIVE_AI_API_KEY)
       : process.env.OPENAI_API_KEY)
@@ -97,8 +106,16 @@ export async function generateMasterFill(
 ): Promise<MasterFillOutput | null> {
   const prompt = buildMasterFillPrompt(input)
   const settings = await getSettings(provider)
+  let dbKey2: string | null = null
+  if (settings?.apiKey && settings.apiKey.length >= 10 && !settings.apiKey.startsWith('****')) {
+    try {
+      dbKey2 = isEncrypted(settings.apiKey) ? decrypt(settings.apiKey) : settings.apiKey
+    } catch {
+      dbKey2 = null
+    }
+  }
   const apiKey =
-    settings?.apiKey ??
+    dbKey2 ??
     (provider === 'gemini'
       ? (process.env.GEMINI_API_KEY ?? process.env.GOOGLE_GENERATIVE_AI_API_KEY)
       : process.env.OPENAI_API_KEY)

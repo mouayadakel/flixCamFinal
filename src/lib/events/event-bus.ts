@@ -12,6 +12,7 @@ import { NotificationChannel } from '@prisma/client'
 
 export type EventName =
   | 'booking.created'
+  | 'booking.updated'
   | 'booking.confirmed'
   | 'booking.cancelled'
   | 'booking.risk_check'
@@ -62,6 +63,7 @@ export type EventName =
 
 export interface EventPayload {
   'booking.created': { booking: any; userId: string }
+  'booking.updated': { booking: any; userId: string; timestamp: Date }
   'booking.confirmed': { booking: any; userId: string }
   'booking.cancelled': { booking: any; userId: string }
   'booking.risk_check': { booking: any; userId: string }

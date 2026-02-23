@@ -8,8 +8,10 @@ SESSION = requests.Session()
 
 # Helper to sign in and get auth cookie/session
 # Adjust credentials as needed
-ADMIN_EMAIL = "admin@flixcam.rent"
-ADMIN_PASSWORD = "admin"
+import os
+
+ADMIN_EMAIL = os.environ.get("TEST_ADMIN_EMAIL", "admin@flixcam.rent")
+ADMIN_PASSWORD = os.environ.get("TEST_ADMIN_PASSWORD", "admin")
 
 def signin():
     payload = {"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD}

@@ -5,7 +5,14 @@
  */
 
 import { prisma } from '@/lib/db/prisma'
+import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
 import type { BookingState } from '@/lib/types/booking.types'
+
+const STAFF_ROLES = [
+  'ADMIN', 'WAREHOUSE_MANAGER', 'TECHNICIAN', 'SALES_MANAGER',
+  'ACCOUNTANT', 'CUSTOMER_SERVICE', 'MARKETING_MANAGER',
+  'RISK_MANAGER', 'APPROVAL_AGENT', 'AUDITOR', 'AI_OPERATOR',
+]
 
 export interface PolicyResult {
   allowed: boolean
@@ -17,14 +24,18 @@ export class BookingPolicy {
    * Check if user can create a booking
    */
   static async canCreate(userId: string): Promise<PolicyResult> {
-    // TODO: Add permission check
-    // For now, allow if user exists
     const user = await prisma.user.findUnique({
       where: { id: userId },
+      select: { id: true, role: true, deletedAt: true },
     })
 
-    if (!user) {
+    if (!user || user.deletedAt) {
       return { allowed: false, reason: 'المستخدم غير موجود' }
+    }
+
+    const hasPerm = await hasPermission(userId, PERMISSIONS.BOOKING_CREATE)
+    if (!hasPerm) {
+      return { allowed: false, reason: 'ليس لديك صلاحية إنشاء حجز' }
     }
 
     return { allowed: true }
@@ -36,7 +47,7 @@ export class BookingPolicy {
   static async canView(userId: string, bookingId: string): Promise<PolicyResult> {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
-      include: { customer: true },
+      select: { id: true, customerId: true },
     })
 
     if (!booking) {
@@ -45,6 +56,7 @@ export class BookingPolicy {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
+      select: { id: true, role: true },
     })
 
     if (!user) {
@@ -56,9 +68,13 @@ export class BookingPolicy {
       return { allowed: true }
     }
 
-    // Staff/admin can view all bookings
-    // TODO: Add role-based permission check
-    return { allowed: true }
+    // Staff roles with booking.read can view any booking
+    if (STAFF_ROLES.includes(user.role)) {
+      const hasPerm = await hasPermission(userId, PERMISSIONS.BOOKING_READ)
+      if (hasPerm) return { allowed: true }
+    }
+
+    return { allowed: false, reason: 'ليس لديك صلاحية عرض هذا الحجز' }
   }
 
   /**
@@ -71,19 +87,38 @@ export class BookingPolicy {
   ): Promise<PolicyResult> {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
+      select: { id: true, status: true, customerId: true },
     })
 
     if (!booking) {
       return { allowed: false, reason: 'الحجز غير موجود' }
     }
 
-    // Cannot update closed or cancelled bookings
     if (booking.status === 'CLOSED' || booking.status === 'CANCELLED') {
       return { allowed: false, reason: 'لا يمكن تعديل حجز مغلق أو ملغي' }
     }
 
-    // TODO: Add role-based permission check
-    return { allowed: true }
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    })
+
+    if (!user) {
+      return { allowed: false, reason: 'المستخدم غير موجود' }
+    }
+
+    // Staff with booking.update permission
+    if (STAFF_ROLES.includes(user.role)) {
+      const hasPerm = await hasPermission(userId, PERMISSIONS.BOOKING_UPDATE)
+      if (hasPerm) return { allowed: true }
+    }
+
+    // Customer can only update their own draft bookings
+    if (booking.customerId === userId && booking.status === 'DRAFT') {
+      return { allowed: true }
+    }
+
+    return { allowed: false, reason: 'ليس لديك صلاحية تعديل هذا الحجز' }
   }
 
   /**
@@ -92,13 +127,13 @@ export class BookingPolicy {
   static async canDelete(userId: string, bookingId: string): Promise<PolicyResult> {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
+      select: { id: true, status: true, customerId: true },
     })
 
     if (!booking) {
       return { allowed: false, reason: 'الحجز غير موجود' }
     }
 
-    // Only allow delete for draft bookings
     if (booking.status !== 'DRAFT') {
       return {
         allowed: false,
@@ -106,8 +141,27 @@ export class BookingPolicy {
       }
     }
 
-    // TODO: Add role-based permission check (admin only)
-    return { allowed: true }
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    })
+
+    if (!user) {
+      return { allowed: false, reason: 'المستخدم غير موجود' }
+    }
+
+    // Staff with booking.delete permission
+    if (STAFF_ROLES.includes(user.role)) {
+      const hasPerm = await hasPermission(userId, PERMISSIONS.BOOKING_DELETE)
+      if (hasPerm) return { allowed: true }
+    }
+
+    // Customer can delete their own draft bookings
+    if (booking.customerId === userId) {
+      return { allowed: true }
+    }
+
+    return { allowed: false, reason: 'ليس لديك صلاحية حذف هذا الحجز' }
   }
 
   /**
@@ -120,18 +174,22 @@ export class BookingPolicy {
   ): Promise<PolicyResult> {
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
+      select: { id: true, status: true },
     })
 
     if (!booking) {
       return { allowed: false, reason: 'الحجز غير موجود' }
     }
 
-    // Cannot transition from final states
     if (booking.status === 'CLOSED' || booking.status === 'CANCELLED') {
       return { allowed: false, reason: 'لا يمكن تغيير حالة حجز مغلق أو ملغي' }
     }
 
-    // TODO: Add role-based permission check based on transition
+    const hasPerm = await hasPermission(userId, PERMISSIONS.BOOKING_TRANSITION)
+    if (!hasPerm) {
+      return { allowed: false, reason: 'ليس لديك صلاحية تغيير حالة الحجز' }
+    }
+
     return { allowed: true }
   }
 }

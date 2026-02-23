@@ -34,8 +34,8 @@ const nextConfig = {
       bodySizeLimit: '50mb', // Allow Excel/CSV uploads up to 50MB
     },
   },
-  eslint: { ignoreDuringBuilds: true },
-  typescript: { ignoreBuildErrors: true },
+  eslint: { ignoreDuringBuilds: false },
+  typescript: { ignoreBuildErrors: false },
   images: {
     remotePatterns: [
       { protocol: 'http', hostname: 'localhost', pathname: '/**' },

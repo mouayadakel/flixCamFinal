@@ -20,7 +20,12 @@ jest.mock('@/lib/db/prisma', () => ({
   },
 }))
 
-jest.mock('../translation.service', () => ({ TranslationService: { upsert: jest.fn() } }))
+jest.mock('../translation.service', () => ({
+  TranslationService: {
+    upsert: jest.fn(),
+    getTranslationsByLocale: jest.fn().mockResolvedValue(null),
+  },
+}))
 jest.mock('../media.service', () => ({ MediaService: { create: jest.fn() } }))
 
 const mockPrisma = prisma as jest.Mocked<typeof prisma>
@@ -60,10 +65,11 @@ describe('EquipmentService', () => {
   })
 
   describe('getEquipmentById', () => {
-    it('returns null when equipment not found', async () => {
+    it('throws when equipment not found', async () => {
       ;(mockPrisma.equipment.findFirst as jest.Mock).mockResolvedValue(null)
-      const result = await EquipmentService.getEquipmentById('non-existent')
-      expect(result).toBeNull()
+      await expect(EquipmentService.getEquipmentById('non-existent')).rejects.toThrow(
+        'Equipment not found'
+      )
     })
   })
 })

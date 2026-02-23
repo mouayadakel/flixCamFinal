@@ -8,6 +8,7 @@
 import OpenAI from 'openai'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { prisma } from '@/lib/db/prisma'
+import { decrypt, isEncrypted } from '@/lib/utils/encryption'
 
 export type SEOProvider = 'openai' | 'gemini'
 
@@ -198,14 +199,15 @@ export async function generateSEO(context: SEOContext, provider?: SEOProvider): 
   const effectiveProvider = provider || ((process.env.AI_PROVIDER || 'openai') as SEOProvider)
   const settings = await getAISettings(effectiveProvider)
 
-  // Prefer DB key if present and valid (not masked placeholder)
-  let apiKey: string | null =
-    settings?.enabled &&
-    settings?.apiKey &&
-    settings.apiKey.length >= 10 &&
-    !settings.apiKey.startsWith('****')
-      ? settings.apiKey
-      : null
+  // Prefer DB key if present and valid (not masked placeholder); decrypt if encrypted
+  let apiKey: string | null = null
+  if (settings?.enabled && settings?.apiKey && settings.apiKey.length >= 10 && !settings.apiKey.startsWith('****')) {
+    try {
+      apiKey = isEncrypted(settings.apiKey) ? decrypt(settings.apiKey) : settings.apiKey
+    } catch {
+      apiKey = null
+    }
+  }
   if (!apiKey) {
     apiKey = getApiKeyFromEnv(effectiveProvider)
   }
@@ -237,13 +239,14 @@ export async function generateSEOBatch(
   const effectiveProvider = provider || ((process.env.AI_PROVIDER || 'openai') as SEOProvider)
   const settings = await getAISettings(effectiveProvider)
 
-  let apiKey: string | null =
-    settings?.enabled &&
-    settings?.apiKey &&
-    settings.apiKey.length >= 10 &&
-    !settings.apiKey.startsWith('****')
-      ? settings.apiKey
-      : null
+  let apiKey: string | null = null
+  if (settings?.enabled && settings?.apiKey && settings.apiKey.length >= 10 && !settings.apiKey.startsWith('****')) {
+    try {
+      apiKey = isEncrypted(settings.apiKey) ? decrypt(settings.apiKey) : settings.apiKey
+    } catch {
+      apiKey = null
+    }
+  }
   if (!apiKey) {
     apiKey = getApiKeyFromEnv(effectiveProvider)
   }

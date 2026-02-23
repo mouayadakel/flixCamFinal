@@ -63,11 +63,10 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       return NextResponse.json(booking)
     }
 
-    // Regular update
+    // Regular update (only for draft bookings)
     const validated = updateBookingSchema.parse(body)
-    // TODO: Implement update method in BookingService
-    // For now, return not implemented
-    return NextResponse.json({ error: 'تحديث الحجز غير متاح حالياً' }, { status: 501 })
+    const booking = await BookingService.update(params.id, session.user.id, validated)
+    return NextResponse.json(booking)
   } catch (error) {
     console.error('Error updating booking:', error)
 

@@ -5,8 +5,10 @@ ADMIN_BASE = f"{BASE_URL}/admin"
 AUTH_SIGNIN = f"{BASE_URL}/api/auth/signin"
 PAYMENTS_ENDPOINT = f"{ADMIN_BASE}/api/payments"
 
-EMAIL = "admin@flixcam.rent"
-PASSWORD = "admin"
+import os
+
+EMAIL = os.environ.get("TEST_ADMIN_EMAIL", "admin@flixcam.rent")
+PASSWORD = os.environ.get("TEST_ADMIN_PASSWORD", "admin")
 
 def test_payments_api_should_list_payments_and_process_refunds():
     session = requests.Session()
