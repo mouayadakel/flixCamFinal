@@ -8,16 +8,16 @@
 
 ## Required Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `NEXTAUTH_SECRET` | Yes | 32+ char secret for auth |
-| `NEXTAUTH_URL` | Yes | App URL (e.g. `https://flixcam.rent`) |
-| `APP_URL` | Yes | Same as NEXTAUTH_URL |
-| `CRON_SECRET` | Yes | Secret for cron endpoints |
-| `NEXT_PUBLIC_APP_URL` | Yes | Public-facing URL |
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anon key |
+| Variable                        | Required | Description                           |
+| ------------------------------- | -------- | ------------------------------------- |
+| `DATABASE_URL`                  | Yes      | PostgreSQL connection string          |
+| `NEXTAUTH_SECRET`               | Yes      | 32+ char secret for auth              |
+| `NEXTAUTH_URL`                  | Yes      | App URL (e.g. `https://flixcam.rent`) |
+| `APP_URL`                       | Yes      | Same as NEXTAUTH_URL                  |
+| `CRON_SECRET`                   | Yes      | Secret for cron endpoints             |
+| `NEXT_PUBLIC_APP_URL`           | Yes      | Public-facing URL                     |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Yes      | Supabase project URL                  |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes      | Supabase anon key                     |
 
 ## Deploy Steps (VPS / Server)
 
@@ -80,14 +80,14 @@ curl http://localhost:3000/api/health
 
 ## Database Scripts Reference
 
-| Script | Purpose | When to use |
-|--------|---------|-------------|
-| `npm run db:deploy` | Apply pending migrations | Every deploy |
-| `npm run db:generate` | Generate Prisma client | After schema changes |
-| `npm run db:seed` | Seed initial data | First deploy only |
+| Script                 | Purpose                     | When to use                        |
+| ---------------------- | --------------------------- | ---------------------------------- |
+| `npm run db:deploy`    | Apply pending migrations    | Every deploy                       |
+| `npm run db:generate`  | Generate Prisma client      | After schema changes               |
+| `npm run db:seed`      | Seed initial data           | First deploy only                  |
 | `npm run db:seed:rbac` | Seed RBAC roles/permissions | First deploy or after role changes |
-| `npm run db:status` | Check migration status | Debugging |
-| `npm run db:validate` | Validate schema + format | Before push |
+| `npm run db:status`    | Check migration status      | Debugging                          |
+| `npm run db:validate`  | Validate schema + format    | Before push                        |
 
 ## Pre-push Checklist
 
@@ -126,6 +126,7 @@ npx prisma migrate diff --from-migrations prisma/migrations --to-schema-datamode
 ## CI/CD
 
 GitHub Actions CI (`.github/workflows/ci.yml`) automatically runs on push to `main`:
+
 1. Spins up fresh PostgreSQL
 2. Runs `prisma migrate deploy` (validates all migrations work on fresh DB)
 3. Runs lint, type-check, tests, and build

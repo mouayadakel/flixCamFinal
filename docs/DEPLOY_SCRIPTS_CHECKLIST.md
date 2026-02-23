@@ -17,11 +17,11 @@ Use this list when deploying the project to production (VPS, Hostinger, or any s
 
 Pick **one** of these (run from your **local** machine, project root):
 
-| Script | Use case |
-|--------|----------|
-| `./push-to-vps.sh` | Sync project to VPS via **rsync** (no `.next`/node_modules; run build on server). |
-| `./scripts/deploy-to-hostinger.sh` | Deploy via **git push** to Hostinger (bare repo). |
-| `./scripts/deploy-hostinger-sftp.sh` | Deploy via **tar over SSH** (SFTP-style) to Hostinger. |
+| Script                               | Use case                                                                          |
+| ------------------------------------ | --------------------------------------------------------------------------------- |
+| `./push-to-vps.sh`                   | Sync project to VPS via **rsync** (no `.next`/node_modules; run build on server). |
+| `./scripts/deploy-to-hostinger.sh`   | Deploy via **git push** to Hostinger (bare repo).                                 |
+| `./scripts/deploy-hostinger-sftp.sh` | Deploy via **tar over SSH** (SFTP-style) to Hostinger.                            |
 
 After sync, **SSH into the server** and run the steps below in the app directory.
 
@@ -35,7 +35,7 @@ After sync, **SSH into the server** and run the steps below in the app directory
 npm ci
 ```
 
-*(Use `npm ci` for reproducible installs; or `npm install` if you prefer.)*
+_(Use `npm ci` for reproducible installs; or `npm install` if you prefer.)_
 
 ### 3.2 Generate Prisma client
 
@@ -49,7 +49,7 @@ npm run db:generate
 npm run db:deploy
 ```
 
-*This runs `prisma migrate deploy` — applies all pending migrations. Use this in production (not `db:migrate`, which is for dev).*
+_This runs `prisma migrate deploy` — applies all pending migrations. Use this in production (not `db:migrate`, which is for dev)._
 
 ### 3.4 Seed database (first deploy or when you need initial data)
 
@@ -59,7 +59,7 @@ npm run db:deploy
 npm run deploy:db
 ```
 
-*Runs `prisma migrate deploy` then `tsx prisma/seed.ts`.*
+_Runs `prisma migrate deploy` then `tsx prisma/seed.ts`._
 
 **Option B — Seed only (if you already ran `db:deploy`):**
 
@@ -87,7 +87,7 @@ npm run build
 npm run start
 ```
 
-*In production you’ll usually run this via a process manager (e.g. PM2 or systemd). Example service file: `scripts/flixcam.service.example`.*
+_In production you’ll usually run this via a process manager (e.g. PM2 or systemd). Example service file: `scripts/flixcam.service.example`._
 
 ---
 
@@ -118,13 +118,13 @@ npm run start
 
 ## 6. Scripts you do **not** run for a normal deploy
 
-| Script | Purpose — when to use |
-|--------|------------------------|
-| `npm run db:migrate` | **Dev only** — creates new migrations; use `db:deploy` in production. |
-| `npm run db:push` | Dev/prototyping — pushes schema without migration files. |
-| `npm run worker:import` | Background import worker — run separately if you use import jobs. |
-| `npm run worker:all` | All background workers — run separately if needed. |
-| `npm run migrate:specs` | One-off migration for equipment specs — run only when required. |
+| Script                     | Purpose — when to use                                                 |
+| -------------------------- | --------------------------------------------------------------------- |
+| `npm run db:migrate`       | **Dev only** — creates new migrations; use `db:deploy` in production. |
+| `npm run db:push`          | Dev/prototyping — pushes schema without migration files.              |
+| `npm run worker:import`    | Background import worker — run separately if you use import jobs.     |
+| `npm run worker:all`       | All background workers — run separately if needed.                    |
+| `npm run migrate:specs`    | One-off migration for equipment specs — run only when required.       |
 | `npm run deploy:hostinger` | Pushes code via git to Hostinger; does not build or run DB on server. |
 
 ---
@@ -137,7 +137,7 @@ For a **full local setup** (Postgres via Docker, migrate dev, seed, build):
 ./scripts/full-setup-and-build.sh
 ```
 
-*Uses `prisma migrate dev` — do **not** use this script on production; use the server steps above.*
+_Uses `prisma migrate dev` — do **not** use this script on production; use the server steps above._
 
 ---
 
@@ -158,7 +158,7 @@ npx prisma migrate resolve --rolled-back 20260221095309_add_locale_fields
 
 Then run `npm run db:deploy` again (or re-run CI). See: [Prisma migrate resolve](https://pris.ly/d/migrate-resolve).
 
-*Commit reference: "fix: use DROP INDEX IF EXISTS in locale migration to fix P3018 deploy failure"*
+_Commit reference: "fix: use DROP INDEX IF EXISTS in locale migration to fix P3018 deploy failure"_
 
 ---
 

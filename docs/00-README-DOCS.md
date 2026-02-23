@@ -6,17 +6,17 @@
 
 ## 📍 هيكل المجلدات (أماكن الملفات الصحيحة)
 
-| المجلد | الغرض |
-|--------|--------|
-| **docs/** | التوثيق الأساسي (PRD، هندسة، أمان، إلخ) |
-| **docs/planning/** | **الخطة الرئيسية** — خطط المشروع، سبرنتات، تقديرات، ملفات PDF/DOCX |
-| **docs/audits/** | تقارير التدقيق والتحليل |
-| **docs/phases/** | تقارير إكمال المراحل (PHASE0–PHASE17) |
-| **docs/setup/** | إعداد البيئة، قاعدة البيانات، Redis، Supabase |
-| **docs/reports/** | تقارير الحالة، الاختبارات، التحسينات |
-| **docs/features/** | توثيق الميزات (مثل multi-language) |
-| **docs/public-website/** | مواصفات الموقع العام والواجهة |
-| **docs/admin/** | توثيق لوحة التحكم والصلاحيات |
+| المجلد                   | الغرض                                                              |
+| ------------------------ | ------------------------------------------------------------------ |
+| **docs/**                | التوثيق الأساسي (PRD، هندسة، أمان، إلخ)                            |
+| **docs/planning/**       | **الخطة الرئيسية** — خطط المشروع، سبرنتات، تقديرات، ملفات PDF/DOCX |
+| **docs/audits/**         | تقارير التدقيق والتحليل                                            |
+| **docs/phases/**         | تقارير إكمال المراحل (PHASE0–PHASE17)                              |
+| **docs/setup/**          | إعداد البيئة، قاعدة البيانات، Redis، Supabase                      |
+| **docs/reports/**        | تقارير الحالة، الاختبارات، التحسينات                               |
+| **docs/features/**       | توثيق الميزات (مثل multi-language)                                 |
+| **docs/public-website/** | مواصفات الموقع العام والواجهة                                      |
+| **docs/admin/**          | توثيق لوحة التحكم والصلاحيات                                       |
 
 ---
 
@@ -38,7 +38,7 @@
 
 كل الخطط التالية تتبع الخطة الرئيسية:
 
-- **ADMIN_PANEL_*** — خطط لوحة التحكم والإنتاج
+- **ADMIN*PANEL*\*** — خطط لوحة التحكم والإنتاج
 - **MILESTONES.md**, **SPRINTS.md**, **RISKS.md**, **ESTIMATES.md**
 - **FLIXCAM_CURSOR_EXECUTION_PROMPT.md**, **IMPROVEMENT_BLUEPRINT.md**, **NEXT_IMPROVEMENTS.md**
 - **FlixCam_AI_Strategy.pdf**, **Enterprise_Sidebar_Sitemap_Complete.docx**
@@ -55,15 +55,15 @@
 ## Phases (`docs/phases/`)
 
 - **PHASE0_COMPLETE.md** … **PHASE17_COMPLETE.md**
-- **PHASE*_TEST_*.md**, **PHASE_COMPLETION_REPORT.md**
+- **PHASE**TEST**.md**, **PHASE_COMPLETION_REPORT.md**
 
 ---
 
 ## Setup (`docs/setup/`)
 
 - **DATABASE_SETUP.md**, **INSTALL_POSTGRES.md**
-- **QUICK_START.md**, **README_SETUP.md**, **SETUP_*.md**
-- **REDIS_SETUP.md**, **SUPABASE_SETUP*.md**, **PROJECT_LOCATION.md**
+- **QUICK_START.md**, **README_SETUP.md**, **SETUP\_\*.md**
+- **REDIS_SETUP.md**, **SUPABASE_SETUP\*.md**, **PROJECT_LOCATION.md**
 
 ---
 
@@ -77,7 +77,7 @@
 
 ## Features (`docs/features/`)
 
-- **multi-language/** — كل ملفات MULTI_LANGUAGE_*.md
+- **multi-language/** — كل ملفات MULTI*LANGUAGE*\*.md
 
 ---
 

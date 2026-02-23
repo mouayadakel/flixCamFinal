@@ -37,18 +37,10 @@ function MobileNavBar() {
         'pb-[env(safe-area-inset-bottom)]'
       )}
     >
-      <div
-        className={cn(
-          'flex h-16 items-center justify-around',
-          'rtl:flex-row-reverse'
-        )}
-      >
+      <div className={cn('flex h-16 items-center justify-around', 'rtl:flex-row-reverse')}>
         {NAV_ITEMS.map(({ href, label, icon: Icon, showBadge }) => {
           const p = pathname ?? ''
-          const isActive =
-            href === '/'
-              ? p === '/'
-              : p === href || p.startsWith(href + '/')
+          const isActive = href === '/' ? p === '/' : p === href || p.startsWith(href + '/')
           const count = showBadge ? cartCount : 0
           return (
             <Link
@@ -62,10 +54,7 @@ function MobileNavBar() {
               aria-label={label}
             >
               <span className="relative inline-block">
-                <Icon
-                  className={cn('h-6 w-6', isActive && 'text-primary')}
-                  aria-hidden
-                />
+                <Icon className={cn('h-6 w-6', isActive && 'text-primary')} aria-hidden />
                 {showBadge && count > 0 && (
                   <span
                     className="absolute -end-2 -top-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-medium text-destructive-foreground"
