@@ -107,9 +107,11 @@ export function AuthModal() {
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    mode: 'onTouched',
   })
   const registerForm = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
+    mode: 'onTouched',
   })
 
   const handleOpenChange = (open: boolean) => {
@@ -231,7 +233,7 @@ export function AuthModal() {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
-        overlayClassName="bg-black/50 backdrop-blur-md"
+        overlayClassName="bg-black/60"
         className="max-w-[400px] gap-0 rounded-public-card border-border-light bg-white p-8 shadow-modal sm:rounded-lg"
         aria-describedby={undefined}
       >

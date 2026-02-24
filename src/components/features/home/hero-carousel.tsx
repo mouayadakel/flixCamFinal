@@ -182,6 +182,11 @@ export function HeroCarousel({
       aria-roledescription="carousel"
       aria-label="Hero Banner"
     >
+      {/* Soft top fade so header–hero junction isn’t abrupt */}
+      <div
+        className="pointer-events-none absolute left-0 right-0 top-0 z-[3] h-28 bg-gradient-to-b from-black/50 to-transparent"
+        aria-hidden
+      />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.1)_0%,_transparent_60%)]" />
       <div className="absolute -end-24 -top-24 h-96 w-96 rounded-full bg-white/5 blur-3xl" />
       <div className="absolute -bottom-32 -start-32 h-80 w-80 rounded-full bg-black/10 blur-3xl" />

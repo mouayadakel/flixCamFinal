@@ -43,6 +43,11 @@ export function HomeHero({
 
   return (
     <section className="relative overflow-hidden bg-hero-gradient">
+      {/* Soft top fade so header–hero junction isn’t abrupt */}
+      <div
+        className="pointer-events-none absolute left-0 right-0 top-0 z-10 h-28 bg-gradient-to-b from-black/50 to-transparent"
+        aria-hidden
+      />
       {/* Decorative background elements */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.1)_0%,_transparent_60%)]" />
       <div className="absolute -end-24 -top-24 h-96 w-96 rounded-full bg-white/5 blur-3xl" />

@@ -8,7 +8,10 @@ import { ProductStatus, ProductType, TranslationLocale, InventoryItemStatus } fr
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const rateLimit = rateLimitAPI(request)
   if (!rateLimit.allowed) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
 
@@ -16,8 +19,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
+    const { id } = await params
     const product = await prisma.product.findFirst({
-      where: { id: params.id, deletedAt: null },
+      where: { id, deletedAt: null },
       include: {
         translations: true,
         inventoryItems: true,
@@ -33,7 +37,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const rateLimit = rateLimitAPI(request)
   if (!rateLimit.allowed) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
 
@@ -41,9 +48,10 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
+    const { id } = await params
     const body = await request.json()
 
-    const product = await ProductCatalogService.update(params.id, {
+    const product = await ProductCatalogService.update(id, {
       status: body.status as ProductStatus | undefined,
       productType: body.productType as ProductType | undefined,
       sku: body.sku ?? undefined,
@@ -100,7 +108,10 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const rateLimit = rateLimitAPI(request)
   if (!rateLimit.allowed) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
 
@@ -108,8 +119,9 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
+    const { id } = await params
     await prisma.product.update({
-      where: { id: params.id },
+      where: { id },
       data: { deletedAt: new Date(), deletedBy: session.user.id },
     })
     return NextResponse.json({ success: true })

@@ -73,7 +73,10 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
         'sticky top-0 z-50 w-full font-header-nav transition-[box-shadow,background-color] duration-300',
         'border-b border-white/[0.06] bg-header-surface/95 text-white backdrop-blur-md',
         'min-h-[72px]',
-        scrolled && 'border-white/[0.08] bg-header-surface shadow-header-scrolled'
+        // Soft shadow so header–hero junction isn’t a hard line (stronger when scrolled)
+        scrolled
+          ? 'border-white/[0.08] bg-header-surface shadow-header-scrolled'
+          : 'shadow-[0_4px_12px_-2px_rgba(0,0,0,0.25)]'
       )}
     >
       <div className="overflow-x-auto">
