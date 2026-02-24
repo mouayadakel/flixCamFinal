@@ -10,9 +10,10 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useSession, signOut } from 'next-auth/react'
 import { useLocale } from '@/hooks/use-locale'
 import { useAuthModalOptional } from '@/components/auth/auth-modal-provider'
-import { Search, ChevronDown } from 'lucide-react'
+import { Search, ChevronDown, User, LogOut, LayoutDashboard } from 'lucide-react'
 import { PublicContainer } from './public-container'
 import { LanguageSwitcher } from './language-switcher'
 import { PublicSearch } from './public-search'
@@ -20,6 +21,14 @@ import { MiniCart } from './mini-cart'
 import { MobileNav } from './mobile-nav'
 import { NotificationBell } from './notification-bell'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Dialog,
   DialogContent,
@@ -47,12 +56,21 @@ interface PublicHeaderProps {
   hiddenRoutes?: Set<string>
 }
 
+function getDashboardUrl(role: string | undefined): string {
+  const r = role?.toUpperCase()
+  if (r === 'DATA_ENTRY') return '/portal/dashboard'
+  if (r === 'VENDOR') return '/vendor/dashboard'
+  return '/admin/dashboard'
+}
+
 export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
   const { t } = useLocale()
   const pathname = usePathname()
+  const { data: session, status } = useSession()
   const authModal = useAuthModalOptional()
   const [scrolled, setScrolled] = useState(false)
   const [logoError, setLogoError] = useState(false)
+  const isAuthenticated = status === 'authenticated' && !!session?.user
 
   const mainLinks = hiddenRoutes?.size
     ? MAIN_LINKS.filter(({ href }) => !hiddenRoutes.has(href))
@@ -73,22 +91,18 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
         'sticky top-0 z-50 w-full font-header-nav transition-[box-shadow,background-color] duration-300',
         'border-b border-white/[0.06] bg-header-surface/95 text-white backdrop-blur-md',
         'min-h-[72px]',
-        // Soft shadow so header–hero junction isn’t a hard line (stronger when scrolled)
-        scrolled
-          ? 'border-white/[0.08] bg-header-surface shadow-header-scrolled'
-          : 'shadow-[0_4px_12px_-2px_rgba(0,0,0,0.25)]'
+        scrolled && 'border-white/[0.08] bg-header-surface shadow-header-scrolled'
       )}
     >
-      <div className="overflow-x-auto">
-        <PublicContainer>
-          <nav
-            className="flex min-h-[72px] min-w-max items-center justify-between gap-6 py-3 md:gap-8"
-            aria-label="Main navigation"
-          >
+      <PublicContainer>
+        <nav
+          className="flex min-h-[72px] items-center justify-between gap-4 py-3 md:gap-6"
+          aria-label="Main navigation"
+        >
             {/* Logo: first in DOM so RTL puts it on the right; order-last in LTR so it stays on the right */}
             <Link
               href="/"
-              className="group order-last flex shrink-0 flex-col items-end rounded-sm pe-4 text-end transition-opacity hover:opacity-90 focus:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-header-surface sm:pe-6 md:pe-8 rtl:order-first rtl:items-start rtl:pe-0 rtl:ps-4 rtl:text-start rtl:sm:ps-6 rtl:md:ps-8"
+              className="group order-last flex shrink-0 flex-col items-end rounded-sm text-end transition-opacity hover:opacity-90 focus:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-header-surface rtl:order-first rtl:items-start rtl:text-start"
               aria-label={siteConfig.brandName}
             >
               <span
@@ -121,7 +135,7 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
             </Link>
 
             {/* Nav + CTAs block */}
-            <div className="flex flex-1 items-center justify-end gap-5 lg:gap-10">
+            <div className="flex flex-1 items-center justify-between gap-4 lg:gap-8">
               {/* Desktop nav links */}
               <ul className="hidden items-center gap-7 lg:flex">
                 {mainLinks.map(({ href, key }) => {
@@ -207,7 +221,52 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
                   <NotificationBell />
                   <MiniCart />
                   <span className="mx-1 h-5 w-px bg-white/20" aria-hidden />
-                  {authModal ? (
+                  {isAuthenticated ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-9 gap-2 font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                        >
+                          <User className="h-4 w-4" />
+                          <span className="max-w-[120px] truncate">
+                            {session.user.name || session.user.email}
+                          </span>
+                          <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="start"
+                        className="w-48 border-white/10 bg-header-dropdown text-white"
+                      >
+                        <DropdownMenuLabel className="text-xs text-white/50">
+                          {session.user.email}
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-white/10" />
+                        <DropdownMenuItem asChild className="cursor-pointer text-white/90 focus:bg-white/10 focus:text-white">
+                          <Link href={getDashboardUrl(session.user.role as string | undefined)}>
+                            <LayoutDashboard className="me-2 h-4 w-4" />
+                            {t('nav.dashboard')}
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild className="cursor-pointer text-white/90 focus:bg-white/10 focus:text-white">
+                          <Link href="/portal/dashboard">
+                            <User className="me-2 h-4 w-4" />
+                            {t('nav.account')}
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-white/10" />
+                        <DropdownMenuItem
+                          onClick={() => signOut({ callbackUrl: '/' })}
+                          className="cursor-pointer text-white/90 focus:bg-white/10 focus:text-white"
+                        >
+                          <LogOut className="me-2 h-4 w-4" />
+                          {t('nav.signOut')}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : authModal ? (
                     <>
                       <Button
                         variant="ghost"
@@ -233,14 +292,14 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
                         asChild
                         className="hidden h-9 font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white sm:inline-flex"
                       >
-                        <Link href="/login">{t('nav.login')}</Link>
+                        <Link href={`/login${pathname ? `?callbackUrl=${encodeURIComponent(pathname)}` : ''}`}>{t('nav.login')}</Link>
                       </Button>
                       <Button
                         size="sm"
                         asChild
                         className="h-9 rounded-lg bg-brand-primary px-5 font-semibold text-[#1A1A1A] transition-colors hover:bg-brand-primary-hover"
                       >
-                        <Link href="/register">{t('nav.register')}</Link>
+                        <Link href={`/register${pathname ? `?callbackUrl=${encodeURIComponent(pathname)}` : ''}`}>{t('nav.register')}</Link>
                       </Button>
                     </>
                   )}
@@ -254,7 +313,6 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
             </div>
           </nav>
         </PublicContainer>
-      </div>
     </header>
   )
 }

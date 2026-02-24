@@ -97,6 +97,22 @@ export default function LoginPage() {
           callbackUrl && callbackUrl.startsWith('/') && !callbackUrl.startsWith('//')
             ? callbackUrl
             : null
+
+        if (!destination) {
+          const referrer = typeof document !== 'undefined' ? document.referrer : ''
+          const isSameOrigin =
+            referrer &&
+            typeof window !== 'undefined' &&
+            referrer.startsWith(window.location.origin)
+          if (isSameOrigin) {
+            const referrerPath = new URL(referrer).pathname
+            const authPages = ['/login', '/register', '/forgot-password', '/reset-password']
+            if (!authPages.includes(referrerPath)) {
+              destination = referrerPath
+            }
+          }
+        }
+
         if (!destination) {
           const session = await getSession()
           const role = session?.user?.role as string | undefined

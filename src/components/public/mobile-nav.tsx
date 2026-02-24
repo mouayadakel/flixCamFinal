@@ -6,7 +6,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Menu, MessageCircle } from 'lucide-react'
+import { Menu, MessageCircle, User, LogOut, LayoutDashboard } from 'lucide-react'
+import { useSession, signOut } from 'next-auth/react'
 import { useAuthModal } from '@/components/auth/auth-modal-provider'
 import { Button } from '@/components/ui/button'
 import {
@@ -27,10 +28,19 @@ interface MobileNavProps {
   hiddenRoutes?: Set<string>
 }
 
+function getDashboardUrl(role: string | undefined): string {
+  const r = role?.toUpperCase()
+  if (r === 'DATA_ENTRY') return '/portal/dashboard'
+  if (r === 'VENDOR') return '/vendor/dashboard'
+  return '/admin/dashboard'
+}
+
 export function MobileNav({ hiddenRoutes }: MobileNavProps) {
   const [open, setOpen] = useState(false)
   const { t } = useLocale()
+  const { data: session, status } = useSession()
   const { openAuthModal } = useAuthModal()
+  const isAuthenticated = status === 'authenticated' && !!session?.user
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -63,27 +73,53 @@ export function MobileNav({ hiddenRoutes }: MobileNavProps) {
             <LanguageSwitcher />
             <MiniCart />
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => {
-                setOpen(false)
-                openAuthModal('login')
-              }}
-            >
-              {t('nav.login')}
-            </Button>
-            <Button
-              className="flex-1"
-              onClick={() => {
-                setOpen(false)
-                openAuthModal('register')
-              }}
-            >
-              {t('nav.register')}
-            </Button>
-          </div>
+          {isAuthenticated ? (
+            <div className="flex flex-col gap-2 border-t pt-4">
+              <div className="flex items-center gap-2 px-1 text-sm text-muted-foreground">
+                <User className="h-4 w-4" />
+                <span className="truncate">{session.user.name || session.user.email}</span>
+              </div>
+              <Button variant="outline" className="justify-start gap-2" asChild>
+                <Link href={getDashboardUrl(session.user.role as string | undefined)} onClick={() => setOpen(false)}>
+                  <LayoutDashboard className="h-4 w-4" />
+                  {t('nav.dashboard')}
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                className="justify-start gap-2 text-destructive hover:text-destructive"
+                onClick={() => {
+                  setOpen(false)
+                  signOut({ callbackUrl: '/' })
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+                {t('nav.signOut')}
+              </Button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setOpen(false)
+                  openAuthModal('login')
+                }}
+              >
+                {t('nav.login')}
+              </Button>
+              <Button
+                className="flex-1"
+                onClick={() => {
+                  setOpen(false)
+                  openAuthModal('register')
+                }}
+              >
+                {t('nav.register')}
+              </Button>
+            </div>
+          )}
           <a
             href={`https://wa.me/${siteConfig.contact.whatsappNumber}`}
             target="_blank"

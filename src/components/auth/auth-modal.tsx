@@ -8,7 +8,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { signIn, getSession } from 'next-auth/react'
+import { signIn } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
@@ -28,8 +28,6 @@ import {
 } from '@/lib/validators/auth.validator'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-const CLIENT_ROLE = 'DATA_ENTRY'
 
 const translations = {
   ar: {
@@ -107,29 +105,18 @@ export function AuthModal() {
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    mode: 'onTouched',
   })
   const registerForm = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
-    mode: 'onTouched',
   })
 
   const handleOpenChange = (open: boolean) => {
     if (!open) closeAuthModal()
   }
 
-  const redirectByRole = async () => {
+  const handlePostLogin = async () => {
     closeAuthModal()
-    await router.refresh()
-    const session = await getSession()
-    const role = session?.user?.role as string | undefined
-    const destination =
-      role === CLIENT_ROLE
-        ? '/portal/dashboard'
-        : role === 'VENDOR'
-          ? '/vendor/dashboard'
-          : '/admin/dashboard'
-    router.push(destination)
+    router.refresh()
   }
 
   const onLoginSubmit = async (data: LoginFormData) => {
@@ -152,7 +139,7 @@ export function AuthModal() {
           title: isRtl ? 'تم تسجيل الدخول بنجاح' : 'Signed in successfully',
           description: isRtl ? 'جاري التوجيه...' : 'Redirecting...',
         })
-        await redirectByRole()
+        await handlePostLogin()
       }
     } catch (err) {
       console.error('Login error:', err)
@@ -221,7 +208,7 @@ export function AuthModal() {
         title: isRtl ? 'تم إنشاء الحساب' : 'Account created',
         description: isRtl ? 'جاري التوجيه...' : 'Redirecting...',
       })
-      await redirectByRole()
+      await handlePostLogin()
     } catch (err) {
       console.error('Register error:', err)
       toast({ title: t.error, variant: 'destructive' })
@@ -233,7 +220,7 @@ export function AuthModal() {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
-        overlayClassName="bg-black/60"
+        overlayClassName="bg-black/50 backdrop-blur-md"
         className="max-w-[400px] gap-0 rounded-public-card border-border-light bg-white p-8 shadow-modal sm:rounded-lg"
         aria-describedby={undefined}
       >
