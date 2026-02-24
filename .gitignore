@@ -77,3 +77,13 @@ uploads/
 
 # Turbo
 .turbo/
+
+# VPS server files (not project code)
+.bash_history
+.gitconfig
+.bash_logout
+.bash_profile
+.bashrc
+
+# VPS deployment directory (production build + runtime, not source)
+public_html/FlixCam_Main/FlixCam_Main/
