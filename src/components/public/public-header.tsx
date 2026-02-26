@@ -7,8 +7,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import { useLocale } from '@/hooks/use-locale'
@@ -64,12 +64,11 @@ function getDashboardUrl(role: string | undefined): string {
 }
 
 export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
-  const { t } = useLocale()
+  const { t, dir } = useLocale()
   const pathname = usePathname()
   const { data: session, status } = useSession()
   const authModal = useAuthModalOptional()
   const [scrolled, setScrolled] = useState(false)
-  const [logoError, setLogoError] = useState(false)
   const isAuthenticated = status === 'authenticated' && !!session?.user
 
   const mainLinks = hiddenRoutes?.size
@@ -96,47 +95,28 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
     >
       <PublicContainer>
         <nav
-          className="flex min-h-[72px] items-center justify-between gap-4 py-3 md:gap-6"
+          dir={dir}
+          className="flex min-h-[72px] flex-wrap items-center justify-between gap-4 py-3 md:gap-6"
           aria-label="Main navigation"
         >
-            {/* Logo: first in DOM so RTL puts it on the right; order-last in LTR so it stays on the right */}
+            {/* Logo – start (left in LTR, right in RTL) */}
             <Link
               href="/"
-              className="group order-last flex shrink-0 flex-col items-end rounded-sm text-end transition-opacity hover:opacity-90 focus:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-header-surface rtl:order-first rtl:items-start rtl:text-start"
+              className="flex shrink-0 items-center transition-opacity hover:opacity-90 focus:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-header-surface"
               aria-label={siteConfig.brandName}
             >
-              <span
-                className="header-logo-bg relative flex h-9 w-[120px] shrink-0 items-center justify-end bg-[length:200%_100%] bg-[position:100%_0] bg-no-repeat md:h-10 md:w-[130px] rtl:justify-start"
-                style={{
-                  ['--header-logo-url' as string]: logoError
-                    ? 'none'
-                    : `url(${siteConfig.logoInverted})`,
-                }}
-              >
-                {!logoError && (
-                  <Image
-                    src={siteConfig.logoInverted}
-                    alt=""
-                    width={120}
-                    height={40}
-                    className="absolute inset-0 h-0 w-0 overflow-hidden opacity-0"
-                    onError={() => setLogoError(true)}
-                  />
-                )}
-                {logoError ? (
-                  <span className="text-lg font-bold tracking-tight text-white">
-                    {siteConfig.brandName}
-                  </span>
-                ) : null}
-              </span>
-              <span className="mt-0.5 hidden text-[10px] font-medium uppercase tracking-widest text-white/40 md:block">
-                {siteConfig.tagline}
-              </span>
+              <Image
+                src="/images/flixcam-logo.png"
+                alt={siteConfig.brandName}
+                width={180}
+                height={56}
+                className="h-12 w-auto object-contain md:h-14"
+                priority
+              />
             </Link>
 
-            {/* Nav + CTAs block */}
-            <div className="flex flex-1 items-center justify-between gap-4 lg:gap-8">
-              {/* Desktop nav links */}
+            {/* Center: navigation links */}
+            <div className="flex flex-1 basis-0 items-center justify-center">
               <ul className="hidden items-center gap-7 lg:flex">
                 {mainLinks.map(({ href, key }) => {
                   const isActive =
@@ -176,7 +156,7 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
                       aria-hidden
                     />
                   </span>
-                  <div className="invisible absolute right-0 top-full z-50 mt-1.5 w-44 rounded-xl border border-white/10 bg-header-dropdown py-1.5 opacity-0 shadow-xl transition-[opacity,visibility] duration-200 group-focus-within/dd:visible group-focus-within/dd:opacity-100 group-hover/dd:visible group-hover/dd:opacity-100">
+                  <div className="invisible absolute start-0 top-full z-50 mt-1.5 w-44 rounded-xl border border-white/10 bg-header-dropdown py-1.5 opacity-0 shadow-xl transition-[opacity,visibility] duration-200 group-focus-within/dd:visible group-focus-within/dd:opacity-100 group-hover/dd:visible group-hover/dd:opacity-100">
                     {moreLinks.map(({ href, key }) => (
                       <Link
                         key={href}
@@ -189,8 +169,10 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
                   </div>
                 </li>
               </ul>
+            </div>
 
-              {/* CTA group: search (mobile), language, notification, cart, auth */}
+            {/* CTAs – end (right in LTR, left in RTL): Cart, Account, Language */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="md:hidden">
                   <Dialog>
@@ -217,9 +199,8 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
                   </Dialog>
                 </div>
                 <div className="hidden items-center gap-2 lg:flex">
-                  <LanguageSwitcher />
-                  <NotificationBell />
                   <MiniCart />
+                  <NotificationBell />
                   <span className="mx-1 h-5 w-px bg-white/20" aria-hidden />
                   {isAuthenticated ? (
                     <DropdownMenu>
@@ -303,6 +284,8 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
                       </Button>
                     </>
                   )}
+                  <span className="mx-1 h-5 w-px bg-white/20" aria-hidden />
+                  <LanguageSwitcher />
                 </div>
                 <div className="flex items-center gap-1 lg:hidden">
                   <NotificationBell />
