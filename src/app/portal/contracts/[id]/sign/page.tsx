@@ -18,6 +18,21 @@ import SignatureCanvas from 'react-signature-canvas'
 import { toast } from '@/hooks/use-toast'
 import { FileText, X, Check } from 'lucide-react'
 import Link from 'next/link'
+import DOMPurify from 'dompurify'
+
+const ALLOWED_CONTRACT_TAGS = [
+  'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li',
+  'strong', 'em', 'u', 'br', 'table', 'thead', 'tbody', 'tr', 'td', 'th',
+  'span', 'div', 'blockquote',
+]
+
+function sanitizeContractHtml(html: string): string {
+  if (typeof window === 'undefined') return ''
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ALLOWED_CONTRACT_TAGS,
+    ALLOWED_ATTR: ['class', 'style', 'align'],
+  })
+}
 
 interface ContractSignPageProps {
   params: Promise<{ id: string }>
@@ -141,7 +156,7 @@ export default function ContractSignPage({ params }: ContractSignPageProps) {
               <p className="text-sm text-muted-foreground">جاري تحميل العقد...</p>
             ) : contractContent ? (
               <div
-                dangerouslySetInnerHTML={{ __html: contractContent }}
+                dangerouslySetInnerHTML={{ __html: sanitizeContractHtml(contractContent) }}
                 className="prose prose-sm max-w-none"
               />
             ) : (
@@ -170,7 +185,7 @@ export default function ContractSignPage({ params }: ContractSignPageProps) {
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={handleClear} size="sm">
-              <X className="ml-2 h-4 w-4" />
+              <X className="ms-2 h-4 w-4" />
               مسح التوقيع
             </Button>
           </div>
@@ -207,7 +222,7 @@ export default function ContractSignPage({ params }: ContractSignPageProps) {
             'جاري التوقيع...'
           ) : (
             <>
-              <Check className="ml-2 h-4 w-4" />
+              <Check className="ms-2 h-4 w-4" />
               تأكيد التوقيع
             </>
           )}

@@ -128,7 +128,7 @@ export function CmsStudioBlackoutTab({ studioId, onRefresh }: BlackoutTabProps) 
           <DialogTrigger asChild>
             <Button onClick={() => setForm({ startDate: '', endDate: '', reason: '' })}>
               <Plus className="h-4 w-4" />
-              <span className="mr-2">إضافة</span>
+              <span className="me-2">إضافة</span>
             </Button>
           </DialogTrigger>
           <DialogContent className="max-h-[90vh] overflow-y-auto" dir="rtl">

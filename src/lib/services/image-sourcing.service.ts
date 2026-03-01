@@ -1,7 +1,9 @@
 /**
  * @file image-sourcing.service.ts
- * @description Three-source image pipeline for product backfill: brand assets → DALL-E → Pexels.
- * Brand and Pexels are auto-approved; DALL-E images are uploaded with pendingReview for admin review.
+ * @description Five-source image pipeline for product backfill:
+ * brand assets → Unsplash → Pexels → Google Custom Search → DALL-E (last resort).
+ * Brand assets and stock photos are auto-approved; DALL-E images need admin review.
+ * All non-brand images are validated with Gemini Vision (score >= 0.7 required).
  * @module lib/services
  */
 
@@ -13,7 +15,6 @@ import type { SourcedImage, ImageSourceType } from '@/lib/types/backfill.types'
 import { processImageFromUrl, uploadBufferToCloudinary } from './image-processing.service'
 
 const RELEVANCE_MIN_SCORE = 0.7
-
 const PRODUCTS_FOLDER = 'products'
 
 export type ProductForSourcing = {
@@ -29,7 +30,7 @@ const BRAND_ASSETS_BASE = join(process.cwd(), 'public', 'assets', 'brands')
 const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp']
 
 /**
- * 1) Brand assets (auto-approve): Check /assets/brands/{brandName}/ for SKU-matching images, upload to Cloudinary.
+ * 1) Brand assets (auto-approve): Check /assets/brands/{brandName}/ for SKU-matching images.
  */
 export async function tryBrandAssets(
   product: ProductForSourcing,
@@ -49,7 +50,9 @@ export async function tryBrandAssets(
     return base === sku || base.toLowerCase() === sku.toLowerCase()
   })
   if (matches.length === 0) {
-    const byExt = files.filter((f) => IMAGE_EXTENSIONS.some((ext) => f.toLowerCase().endsWith(ext)))
+    const byExt = files.filter((f) =>
+      IMAGE_EXTENSIONS.some((ext) => f.toLowerCase().endsWith(ext))
+    )
     if (byExt.length > 0) {
       matches.push(...byExt.slice(0, targetCount))
     }
@@ -81,7 +84,248 @@ export async function tryBrandAssets(
 }
 
 /**
- * 2) AI generation via DALL-E (needs review): Generate angle variants, upload to Cloudinary as pending review.
+ * 2) Unsplash API (auto-approve): High-quality, commercial-use photos.
+ */
+export async function tryUnsplash(
+  product: ProductForSourcing,
+  needed: number,
+  searchQueries?: string[]
+): Promise<SourcedImage[]> {
+  const results: SourcedImage[] = []
+  const apiKey = process.env.UNSPLASH_ACCESS_KEY
+  if (!apiKey) {
+    console.warn('[ImageSourcing] UNSPLASH_ACCESS_KEY not configured — skipping Unsplash')
+    return results
+  }
+  if (needed < 1) return results
+
+  const name = product.translations.find((t) => t.locale === 'en')?.name ?? product.name
+  const queries = searchQueries?.length
+    ? searchQueries.slice(0, 3)
+    : [`${name} ${product.category?.name ?? ''}`.trim()]
+
+  for (const query of queries) {
+    if (results.length >= needed) break
+    try {
+      const url = new URL('https://api.unsplash.com/search/photos')
+      url.searchParams.set('query', query.slice(0, 100))
+      url.searchParams.set('per_page', String(Math.min(needed - results.length, 5)))
+      url.searchParams.set('orientation', 'landscape')
+
+      const res = await fetch(url.toString(), {
+        headers: { Authorization: `Client-ID ${apiKey}` },
+        signal: AbortSignal.timeout(10000),
+      })
+      if (!res.ok) continue
+
+      const data = (await res.json()) as {
+        results?: Array<{
+          urls?: { regular?: string; full?: string }
+          width?: number
+          height?: number
+        }>
+      }
+
+      for (const photo of data.results ?? []) {
+        if (results.length >= needed) break
+        const imageUrl = photo.urls?.regular || photo.urls?.full
+        if (!imageUrl) continue
+        if ((photo.width ?? 0) < 800) continue
+
+        try {
+          const uploaded = await processImageFromUrl(imageUrl, PRODUCTS_FOLDER)
+          if (uploaded.success && uploaded.url) {
+            results.push({
+              url: uploaded.url,
+              source: 'unsplash' as ImageSourceType,
+              approved: true,
+              pendingReview: false,
+              cloudinaryUrl: uploaded.url,
+              cloudinaryPublicId: uploaded.publicId,
+              width: uploaded.width ?? photo.width,
+              height: uploaded.height ?? photo.height,
+              attribution: 'Unsplash',
+            })
+          }
+        } catch {
+          // Skip failed upload
+        }
+      }
+    } catch {
+      // Unsplash request failed for this query
+    }
+  }
+  return results
+}
+
+/**
+ * 3) Pexels API (auto-approve): Stock photos.
+ */
+export async function tryPexels(
+  product: ProductForSourcing,
+  needed: number,
+  searchQueries?: string[]
+): Promise<SourcedImage[]> {
+  const results: SourcedImage[] = []
+  const apiKey = process.env.PEXELS_API_KEY
+  if (!apiKey) {
+    console.warn('[ImageSourcing] PEXELS_API_KEY not configured — skipping Pexels')
+    return results
+  }
+  if (needed < 1) return results
+
+  const name = product.translations.find((t) => t.locale === 'en')?.name ?? product.name
+  const queries = searchQueries?.length
+    ? searchQueries.slice(0, 3)
+    : [`${name} ${product.category?.name ?? ''}`.trim()]
+
+  for (const query of queries) {
+    if (results.length >= needed) break
+    const q = query.slice(0, 100)
+    if (!q) continue
+
+    try {
+      let photos: Array<{ src?: { original?: string } }> = []
+      try {
+        const { createClient } = await import('pexels')
+        const client = createClient(apiKey)
+        const response = await client.photos.search({
+          query: q,
+          per_page: Math.min(needed - results.length, 5),
+        })
+        if ('photos' in response && Array.isArray(response.photos)) {
+          photos = response.photos
+        }
+      } catch {
+        const res = await fetch(
+          `https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=${Math.min(needed - results.length, 5)}`,
+          { headers: { Authorization: apiKey }, signal: AbortSignal.timeout(10000) }
+        )
+        if (res.ok) {
+          const data = (await res.json()) as {
+            photos?: Array<{ src?: { original?: string } }>
+          }
+          photos = data.photos ?? []
+        }
+      }
+
+      for (const photo of photos) {
+        if (results.length >= needed) break
+        const originalUrl = photo.src?.original
+        if (!originalUrl) continue
+        try {
+          const uploaded = await processImageFromUrl(originalUrl, PRODUCTS_FOLDER)
+          if (uploaded.success && uploaded.url) {
+            results.push({
+              url: uploaded.url,
+              source: 'pexels' as ImageSourceType,
+              approved: true,
+              pendingReview: false,
+              cloudinaryUrl: uploaded.url,
+              cloudinaryPublicId: uploaded.publicId,
+              width: uploaded.width,
+              height: uploaded.height,
+              attribution: 'Pexels',
+            })
+          }
+        } catch {
+          // Skip failed upload
+        }
+      }
+    } catch {
+      // Pexels request failed for this query
+    }
+  }
+  return results
+}
+
+/**
+ * 4) Google Custom Search Images (auto-approve): Most accurate for specific products.
+ */
+export async function tryGoogleCSE(
+  product: ProductForSourcing,
+  needed: number,
+  searchQueries?: string[]
+): Promise<SourcedImage[]> {
+  const results: SourcedImage[] = []
+  const apiKey = process.env.GOOGLE_CUSTOM_SEARCH_API_KEY
+  const engineId = process.env.GOOGLE_SEARCH_ENGINE_ID
+  if (!apiKey || !engineId) {
+    console.warn('[ImageSourcing] GOOGLE_CUSTOM_SEARCH_API_KEY or GOOGLE_SEARCH_ENGINE_ID not configured — skipping Google CSE')
+    return results
+  }
+  if (needed < 1) return results
+
+  const name = product.translations.find((t) => t.locale === 'en')?.name ?? product.name
+  const queries = searchQueries?.length
+    ? searchQueries.slice(0, 3)
+    : [`${name} product photo`]
+
+  for (const query of queries) {
+    if (results.length >= needed) break
+    try {
+      const url = new URL('https://www.googleapis.com/customsearch/v1')
+      url.searchParams.set('key', apiKey)
+      url.searchParams.set('cx', engineId)
+      url.searchParams.set('searchType', 'image')
+      url.searchParams.set('q', query.slice(0, 150))
+      url.searchParams.set('imgSize', 'large')
+      url.searchParams.set('imgType', 'photo')
+      url.searchParams.set('num', String(Math.min(needed - results.length, 5)))
+      url.searchParams.set('safe', 'active')
+
+      const res = await fetch(url.toString(), {
+        signal: AbortSignal.timeout(10000),
+      })
+      if (!res.ok) continue
+
+      const data = (await res.json()) as {
+        items?: Array<{
+          link?: string
+          mime?: string
+          image?: { width?: number; height?: number }
+        }>
+      }
+
+      for (const item of data.items ?? []) {
+        if (results.length >= needed) break
+        const imageUrl = item.link
+        if (!imageUrl) continue
+
+        const mime = item.mime ?? ''
+        if (!mime.startsWith('image/')) continue
+
+        const width = item.image?.width ?? 0
+        if (width < 800) continue
+
+        try {
+          const uploaded = await processImageFromUrl(imageUrl, PRODUCTS_FOLDER)
+          if (uploaded.success && uploaded.url) {
+            results.push({
+              url: uploaded.url,
+              source: 'google' as ImageSourceType,
+              approved: true,
+              pendingReview: false,
+              cloudinaryUrl: uploaded.url,
+              cloudinaryPublicId: uploaded.publicId,
+              width: uploaded.width ?? width,
+              height: uploaded.height ?? item.image?.height,
+              attribution: 'Google Images',
+            })
+          }
+        } catch {
+          // Skip failed upload
+        }
+      }
+    } catch {
+      // Google CSE request failed for this query
+    }
+  }
+  return results
+}
+
+/**
+ * 5) AI generation via DALL-E (last resort, needs review): Generate product photos.
  */
 export async function tryDallE(
   product: ProductForSourcing,
@@ -136,71 +380,6 @@ export async function tryDallE(
 }
 
 /**
- * 3) Stock photos via Pexels (auto-approve): Search with product name + category, download and upload.
- * Uses official Pexels client when available, else fetch.
- */
-export async function tryPexels(
-  product: ProductForSourcing,
-  needed: number
-): Promise<SourcedImage[]> {
-  const results: SourcedImage[] = []
-  const apiKey = process.env.PEXELS_API_KEY
-  if (!apiKey || needed < 1) return results
-
-  const name = product.translations.find((t) => t.locale === 'en')?.name ?? product.name
-  const category = product.category?.name ?? ''
-  const query = [name, category].filter(Boolean).join(' ').slice(0, 100)
-  if (!query) return results
-
-  let photos: Array<{ src?: { original?: string } }> = []
-  try {
-    try {
-      const { createClient } = await import('pexels')
-      const client = createClient(apiKey)
-      const response = await client.photos.search({ query, per_page: Math.min(needed, 5) })
-      if ('photos' in response && Array.isArray(response.photos)) {
-        photos = response.photos
-      }
-    } catch {
-      const res = await fetch(
-        `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${Math.min(needed, 5)}`,
-        { headers: { Authorization: apiKey } }
-      )
-      if (res.ok) {
-        const data = (await res.json()) as { photos?: Array<{ src?: { original?: string } }> }
-        photos = data.photos ?? []
-      }
-    }
-    for (const photo of photos) {
-      if (results.length >= needed) break
-      const originalUrl = photo.src?.original
-      if (!originalUrl) continue
-      try {
-        const uploaded = await processImageFromUrl(originalUrl, PRODUCTS_FOLDER)
-        if (uploaded.success && uploaded.url) {
-          results.push({
-            url: uploaded.url,
-            source: 'pexels' as ImageSourceType,
-            approved: true,
-            pendingReview: false,
-            cloudinaryUrl: uploaded.url,
-            cloudinaryPublicId: uploaded.publicId,
-            width: uploaded.width,
-            height: uploaded.height,
-            attribution: 'Pexels',
-          })
-        }
-      } catch {
-        // Skip failed upload
-      }
-    }
-  } catch {
-    // Pexels request failed
-  }
-  return results
-}
-
-/**
  * Validate image relevance using Gemini Vision. Returns score 0-1 and short description.
  * Used to auto-reject images below RELEVANCE_MIN_SCORE (0.7).
  */
@@ -248,21 +427,36 @@ Rate how relevant and suitable this image is as a product photo (0.0 = not relev
 
 /**
  * Source images for a product until targetCount is reached.
- * Pipeline: brand assets → DALL-E → Pexels. Images from DALL-E/Pexels are validated with Gemini Vision; score < 0.7 are rejected.
+ * Pipeline: brand assets → Unsplash → Pexels → Google CSE → DALL-E (last resort).
+ * Non-brand images are validated with Gemini Vision; score < 0.7 are rejected.
+ *
+ * @param searchQueries - AI-generated search queries for this specific product
  */
 export async function sourceImages(
   product: ProductForSourcing,
-  targetCount: number = 4
+  targetCount: number = 5,
+  searchQueries?: string[]
 ): Promise<SourcedImage[]> {
   const results: SourcedImage[] = []
+
+  const hasAnyApiKey =
+    !!process.env.UNSPLASH_ACCESS_KEY ||
+    !!process.env.PEXELS_API_KEY ||
+    (!!process.env.GOOGLE_CUSTOM_SEARCH_API_KEY && !!process.env.GOOGLE_SEARCH_ENGINE_ID)
+
+  if (!hasAnyApiKey) {
+    console.warn(
+      '[ImageSourcing] No image API keys configured (UNSPLASH_ACCESS_KEY, PEXELS_API_KEY, or GOOGLE_CUSTOM_SEARCH_API_KEY). Photo auto-fill will not work. Add at least one key to .env'
+    )
+  }
 
   const fromBrand = await tryBrandAssets(product, targetCount)
   results.push(...fromBrand)
   if (results.length >= targetCount) return results.slice(0, targetCount)
 
-  const neededDalle = targetCount - results.length
-  const fromDalleRaw = await tryDallE(product, neededDalle)
-  for (const img of fromDalleRaw) {
+  const neededUnsplash = targetCount - results.length
+  const fromUnsplashRaw = await tryUnsplash(product, neededUnsplash, searchQueries)
+  for (const img of fromUnsplashRaw) {
     const { score } = await validateImageRelevance(img.url, product)
     if (score >= RELEVANCE_MIN_SCORE) {
       results.push({ ...img, qualityScore: score })
@@ -271,12 +465,36 @@ export async function sourceImages(
   }
 
   const neededPexels = targetCount - results.length
-  const fromPexelsRaw = await tryPexels(product, neededPexels)
+  const fromPexelsRaw = await tryPexels(product, neededPexels, searchQueries)
   for (const img of fromPexelsRaw) {
     const { score } = await validateImageRelevance(img.url, product)
     if (score >= RELEVANCE_MIN_SCORE) {
       results.push({ ...img, qualityScore: score })
       if (results.length >= targetCount) return results.slice(0, targetCount)
+    }
+  }
+
+  const neededGoogle = targetCount - results.length
+  if (neededGoogle > 0) {
+    const fromGoogleRaw = await tryGoogleCSE(product, neededGoogle, searchQueries)
+    for (const img of fromGoogleRaw) {
+      const { score } = await validateImageRelevance(img.url, product)
+      if (score >= RELEVANCE_MIN_SCORE) {
+        results.push({ ...img, qualityScore: score })
+        if (results.length >= targetCount) return results.slice(0, targetCount)
+      }
+    }
+  }
+
+  const neededDalle = targetCount - results.length
+  if (neededDalle > 0) {
+    const fromDalleRaw = await tryDallE(product, neededDalle)
+    for (const img of fromDalleRaw) {
+      const { score } = await validateImageRelevance(img.url, product)
+      if (score >= RELEVANCE_MIN_SCORE) {
+        results.push({ ...img, qualityScore: score })
+        if (results.length >= targetCount) return results.slice(0, targetCount)
+      }
     }
   }
 

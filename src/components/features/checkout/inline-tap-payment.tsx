@@ -86,10 +86,12 @@ export function InlineTapPayment({
         return
       }
       if (data.redirectUrl) {
+        useCheckoutStore.getState().clearCheckout()
         window.location.href = data.redirectUrl
         return
       }
       if (data.bookingId) {
+        useCheckoutStore.getState().clearCheckout()
         window.location.href = `/booking/confirmation/${data.bookingId}`
         return
       }
@@ -112,7 +114,7 @@ export function InlineTapPayment({
       >
         {loading ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="me-2 h-4 w-4 animate-spin" />
             {t('checkout.processing')}
           </>
         ) : (

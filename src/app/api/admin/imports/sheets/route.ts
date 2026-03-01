@@ -65,21 +65,16 @@ export async function POST(request: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer())
-    const XLSX = await import('xlsx')
-    const wb = XLSX.read(buffer, { type: 'buffer' })
+    const { parseSpreadsheetBuffer } = await import('@/lib/utils/excel-parser')
+    const wb = await parseSpreadsheetBuffer(buffer, file.name)
 
-    if (wb.SheetNames.length === 0) {
+    if (wb.sheetNames.length === 0) {
       return NextResponse.json({ error: 'File contains no sheets' }, { status: 400 })
     }
 
     // Extract metadata for each sheet
-    const sheetsMetadata = wb.SheetNames.map((sheetName) => {
-      const sheet = wb.Sheets[sheetName]
-      if (!sheet) {
-        return null
-      }
-
-      const data = XLSX.utils.sheet_to_json<Record<string, any>>(sheet, { defval: null })
+    const sheetsMetadata = wb.sheetNames.map((sheetName) => {
+      const data = wb.getSheetData(sheetName) as Record<string, any>[]
       const rowCount = data.length
 
       // Get column names (from first row)
@@ -114,7 +109,7 @@ export async function POST(request: NextRequest) {
         previewRows,
         exceedsMaxRows: false,
       }
-    }).filter((sheet) => sheet !== null)
+    })
 
     // Check total rows across all sheets
     const totalRows = sheetsMetadata.reduce((sum, sheet) => sum + (sheet?.rowCount || 0), 0)
@@ -132,7 +127,7 @@ export async function POST(request: NextRequest) {
       filename: file.name,
       fileSize: file.size,
       mimeType: file.type,
-      totalSheets: wb.SheetNames.length,
+      totalSheets: wb.sheetNames.length,
       totalRows,
       sheets: sheetsMetadata,
     })

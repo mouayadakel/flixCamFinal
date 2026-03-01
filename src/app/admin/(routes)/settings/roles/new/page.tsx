@@ -188,7 +188,7 @@ export default function NewRolePage() {
 
         <div className="flex gap-2">
           <Button type="submit" disabled={submitting}>
-            {submitting ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
+            {submitting ? <Loader2 className="ms-2 h-4 w-4 animate-spin" /> : null}
             حفظ
           </Button>
           <Button type="button" variant="outline" asChild>

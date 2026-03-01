@@ -215,7 +215,7 @@ export function SpecificationsAuditDialog() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button variant="outline" type="button" aria-label="فحص اكتمال المواصفات">
-            <ClipboardCheck className="ml-2 h-4 w-4" />
+            <ClipboardCheck className="ms-2 h-4 w-4" />
             فحص اكتمال المواصفات
           </Button>
         </DialogTrigger>
@@ -303,7 +303,7 @@ export function SpecificationsAuditDialog() {
                       disabled={loading}
                       aria-label="إعادة الفحص"
                     >
-                      <RefreshCw className="ml-1 h-4 w-4" />
+                      <RefreshCw className="ms-1 h-4 w-4" />
                       إعادة الفحص
                     </Button>
                     {flatItems.length > 0 && (
@@ -314,7 +314,7 @@ export function SpecificationsAuditDialog() {
                         disabled={convertLoading || selectedIds.size === 0}
                         aria-label="تحويل المحددة"
                       >
-                        {convertLoading ? <Loader2 className="ml-1 h-4 w-4 animate-spin" /> : null}
+                        {convertLoading ? <Loader2 className="ms-1 h-4 w-4 animate-spin" /> : null}
                         تحويل المحددة ({selectedIds.size})
                       </Button>
                     )}
@@ -347,7 +347,7 @@ export function SpecificationsAuditDialog() {
                             <TableHead>الموديل</TableHead>
                             <TableHead>الفئة</TableHead>
                             <TableHead>المشكلات</TableHead>
-                            <TableHead className="text-left">إجراء</TableHead>
+                            <TableHead className="text-start">إجراء</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -422,7 +422,7 @@ export function SpecificationsAuditDialog() {
           <AlertDialogFooter>
             <AlertDialogCancel>إلغاء</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmConvert} disabled={convertLoading}>
-              {convertLoading ? <Loader2 className="ml-1 h-4 w-4 animate-spin" /> : null}
+              {convertLoading ? <Loader2 className="ms-1 h-4 w-4 animate-spin" /> : null}
               تأكيد التحويل
             </AlertDialogAction>
           </AlertDialogFooter>

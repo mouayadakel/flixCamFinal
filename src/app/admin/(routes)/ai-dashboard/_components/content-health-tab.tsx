@@ -309,7 +309,7 @@ export function ContentHealthTab() {
           variant="outline"
           className="w-full sm:w-auto"
         >
-          {isScanning && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+          {isScanning && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
           فحص الكل
         </Button>
         <Button onClick={handleFillAll} disabled={isRunning} className="w-full gap-2 sm:w-auto">
@@ -323,7 +323,7 @@ export function ContentHealthTab() {
           variant="secondary"
           className="w-full sm:w-auto"
         >
-          {isRunning && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+          {isRunning && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
           ملء المحدد ({displayedCount})
         </Button>
         {scannedAt && (
@@ -331,7 +331,7 @@ export function ContentHealthTab() {
             آخر فحص: {getRelativeTime(scannedAt)}
           </span>
         )}
-        <div className="flex items-center gap-2 sm:mr-auto">
+        <div className="flex items-center gap-2 sm:me-auto">
           <Switch id="auto-refresh" checked={autoRefresh} onCheckedChange={setAutoRefresh} />
           <Label htmlFor="auto-refresh" className="cursor-pointer text-sm">
             تحديث تلقائي
@@ -347,7 +347,7 @@ export function ContentHealthTab() {
               <div className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span className="text-sm">جاري المعالجة...</span>
-                <span className="mr-auto text-sm">
+                <span className="me-auto text-sm">
                   {jobProgress.processed} / {jobProgress.total} ({jobProgress.progress}%)
                 </span>
               </div>
@@ -359,12 +359,12 @@ export function ContentHealthTab() {
 
       {/* Product search */}
       <div className="relative max-w-sm">
-        <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="ابحث عن منتج..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pr-10"
+          className="pe-10"
         />
       </div>
 
@@ -410,7 +410,7 @@ export function ContentHealthTab() {
                   <TableHead>الجودة</TableHead>
                   <TableHead>المنتج</TableHead>
                   <TableHead className="hidden sm:table-cell">الناقص</TableHead>
-                  <TableHead className="text-left">إجراء</TableHead>
+                  <TableHead className="text-start">إجراء</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -458,14 +458,14 @@ export function ContentHealthTab() {
                         ))}
                       </div>
                     </TableCell>
-                    <TableCell className="text-left">
+                    <TableCell className="text-start">
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => handleFillOne(p.id)}
                         disabled={isRunning || fillingRowId === p.id}
                       >
-                        {fillingRowId === p.id && <Loader2 className="ml-1 h-4 w-4 animate-spin" />}
+                        {fillingRowId === p.id && <Loader2 className="ms-1 h-4 w-4 animate-spin" />}
                         {fillingRowId === p.id ? 'جاري...' : 'ملء'}
                       </Button>
                     </TableCell>

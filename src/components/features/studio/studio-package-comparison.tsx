@@ -99,7 +99,7 @@ export function StudioPackageComparison({
                       className={`relative p-4 text-center ${isSelected ? 'bg-primary-50/30' : ''}`}
                     >
                       {isRecommended && (
-                        <span className="absolute -top-0.5 left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-0.5 whitespace-nowrap rounded-b-lg bg-primary px-3 py-0.5 text-[10px] font-bold text-white">
+                        <span className="absolute -top-0.5 start-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-0.5 whitespace-nowrap rounded-b-lg bg-primary px-3 py-0.5 text-[10px] font-bold text-white">
                           <Sparkles className="h-2.5 w-2.5" />
                           {pkg.badgeText || t('studios.mostPopular')}
                         </span>

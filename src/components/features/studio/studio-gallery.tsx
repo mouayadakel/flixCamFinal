@@ -202,7 +202,7 @@ export function StudioGallery({ studio }: StudioGalleryProps) {
               priority
             />
           </div>
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-4 py-1.5 text-sm text-white backdrop-blur-sm">
+          <div className="absolute bottom-6 start-1/2 -translate-x-1/2 rounded-full bg-white/10 px-4 py-1.5 text-sm text-white backdrop-blur-sm">
             {lightboxIndex + 1} / {media.length}
           </div>
         </div>

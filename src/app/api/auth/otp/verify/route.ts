@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     const email = existingEmail
       ? `phone_${phone}_${Date.now()}@${GUEST_EMAIL_DOMAIN}`
       : placeholderEmail
-    const passwordHash = await bcrypt.hash(randomBytes(32).toString('hex'), 10)
+    const passwordHash = await bcrypt.hash(randomBytes(32).toString('hex'), 12)
     user = await prisma.user.create({
       data: {
         email,

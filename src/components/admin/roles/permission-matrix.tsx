@@ -99,12 +99,12 @@ export function PermissionMatrix({
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div className="relative max-w-sm flex-1">
-          <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="البحث في الصلاحيات..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pr-9"
+            className="pe-9"
           />
         </div>
         <Badge variant="secondary">
@@ -156,7 +156,7 @@ export function PermissionMatrix({
                     مسح
                   </button>
                 </div>
-                <div className="grid gap-2 pr-6">
+                <div className="grid gap-2 pe-6">
                   {cat.permissions.map((perm) => (
                     <div
                       key={perm.id}

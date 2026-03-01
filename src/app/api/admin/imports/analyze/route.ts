@@ -34,13 +34,13 @@ export async function POST(request: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer())
-    const XLSX = await import('xlsx')
-    const wb = XLSX.read(buffer, { type: 'buffer' })
+    const { parseSpreadsheetBuffer } = await import('@/lib/utils/excel-parser')
+    const wb = await parseSpreadsheetBuffer(buffer, file.name)
 
     const analysis = {
       sheets: [] as any[],
       summary: {
-        totalSheets: wb.SheetNames.length,
+        totalSheets: wb.sheetNames.length,
         totalRows: 0,
         missingFields: [] as string[],
         aiFillableFields: [] as string[],
@@ -49,11 +49,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Analyze each sheet
-    for (const sheetName of wb.SheetNames) {
-      const sheet = wb.Sheets[sheetName]
-      if (!sheet) continue
-
-      const data = XLSX.utils.sheet_to_json<Record<string, any>>(sheet, { defval: null })
+    for (const sheetName of wb.sheetNames) {
+      const data = wb.getSheetData(sheetName) as Record<string, any>[]
       const columns = data.length > 0 ? Object.keys(data[0]) : []
 
       // Check for common field names

@@ -251,7 +251,7 @@ export function BookingActions({
               onClick={() => setChangeOpen(true)}
               className="justify-start"
             >
-              <Edit3 className="ml-2 h-4 w-4" />
+              <Edit3 className="ms-2 h-4 w-4" />
               طلب تعديل
             </Button>
             <Button
@@ -266,7 +266,7 @@ export function BookingActions({
               }}
               className="justify-start"
             >
-              <CalendarPlus className="ml-2 h-4 w-4" />
+              <CalendarPlus className="ms-2 h-4 w-4" />
               طلب تمديد
             </Button>
           </>
@@ -281,7 +281,7 @@ export function BookingActions({
             title={!canCancel ? cancelNotAllowedMessage : undefined}
             disabled={!canCancel}
           >
-            <XCircle className="ml-2 h-4 w-4" />
+            <XCircle className="ms-2 h-4 w-4" />
             إلغاء الحجز
           </Button>
         )}
@@ -293,7 +293,7 @@ export function BookingActions({
             onClick={() => setDamageOpen(true)}
             className="justify-start"
           >
-            <AlertTriangle className="ml-2 h-4 w-4" />
+            <AlertTriangle className="ms-2 h-4 w-4" />
             الإبلاغ عن ضرر
           </Button>
         )}

@@ -125,11 +125,11 @@ export function ImageUpload({
       <Tabs value={uploadMethod} onValueChange={(v) => setUploadMethod(v as 'file' | 'url')}>
         <TabsList>
           <TabsTrigger value="url">
-            <LinkIcon className="ml-2 h-4 w-4" />
+            <LinkIcon className="ms-2 h-4 w-4" />
             رابط URL
           </TabsTrigger>
           <TabsTrigger value="file">
-            <Upload className="ml-2 h-4 w-4" />
+            <Upload className="ms-2 h-4 w-4" />
             رفع ملف
           </TabsTrigger>
         </TabsList>
@@ -176,12 +176,12 @@ export function ImageUpload({
                 <>جاري الرفع...</>
               ) : !equipmentId ? (
                 <>
-                  <Upload className="ml-2 h-4 w-4 opacity-50" />
+                  <Upload className="ms-2 h-4 w-4 opacity-50" />
                   غير متاح (استخدم URL)
                 </>
               ) : (
                 <>
-                  <Upload className="ml-2 h-4 w-4" />
+                  <Upload className="ms-2 h-4 w-4" />
                   اختر صورة
                 </>
               )}
@@ -204,7 +204,7 @@ export function ImageUpload({
             type="button"
             variant="destructive"
             size="sm"
-            className="absolute left-2 top-2"
+            className="absolute start-2 top-2"
             onClick={handleDelete}
           >
             <X className="h-4 w-4" />

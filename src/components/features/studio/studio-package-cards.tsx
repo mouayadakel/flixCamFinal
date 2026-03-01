@@ -227,7 +227,7 @@ function PackageCard({ pkg, isSelected, isRecommended, onSelect, index }: Packag
 
       {/* Recommended badge */}
       {isRecommended && (
-        <span className="absolute -top-3 left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-full bg-gradient-to-r from-primary to-primary/80 px-4 py-1 text-xs font-bold text-white shadow-sm">
+        <span className="absolute -top-3 start-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-full bg-gradient-to-r from-primary to-primary/80 px-4 py-1 text-xs font-bold text-white shadow-sm">
           <Sparkles className="h-3 w-3" />
           {badgeLabel}
         </span>

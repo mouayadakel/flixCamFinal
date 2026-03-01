@@ -172,7 +172,7 @@ export function KitEquipmentCard({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 shrink-0 rounded-r-none"
+                  className="h-8 w-8 shrink-0 rounded-e-none"
                   onClick={() => onQtyChange(Math.max(1, selectedQty - 1))}
                   aria-label={t('kit.remove')}
                 >
@@ -188,7 +188,7 @@ export function KitEquipmentCard({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 shrink-0 rounded-l-none"
+                  className="h-8 w-8 shrink-0 rounded-s-none"
                   onClick={() => onQtyChange(selectedQty + 1)}
                   aria-label={t('kit.add')}
                 >

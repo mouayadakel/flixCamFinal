@@ -32,7 +32,7 @@ function MobileNavBar() {
       role="navigation"
       aria-label="Main navigation"
       className={cn(
-        'fixed bottom-0 left-0 right-0 z-50 lg:hidden',
+        'fixed bottom-0 start-0 end-0 z-50 lg:hidden',
         'border-t border-border bg-white/90 backdrop-blur-md',
         'pb-[env(safe-area-inset-bottom)]'
       )}

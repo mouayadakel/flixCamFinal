@@ -283,7 +283,7 @@ export function VendorEquipmentForm({
 
       <div className="flex gap-4">
         <Button type="submit" disabled={loading}>
-          {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+          {loading && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
           إرسال للمراجعة
         </Button>
         <Button type="button" variant="outline" onClick={() => router.push('/vendor/equipment')}>

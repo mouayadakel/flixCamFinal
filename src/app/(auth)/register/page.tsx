@@ -14,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { registerFormSchema, type RegisterFormData } from '@/lib/validators/auth.validator'
@@ -208,9 +209,8 @@ export default function RegisterPage() {
 
           <div className="space-y-2">
             <Label htmlFor="password">{t.password}</Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               autoComplete="new-password"
               disabled={isLoading}
               className={errors.password ? 'border-error-500 focus-visible:ring-error-500' : ''}
@@ -225,9 +225,8 @@ export default function RegisterPage() {
 
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">{t.confirmPassword}</Label>
-            <Input
+            <PasswordInput
               id="confirmPassword"
-              type="password"
               autoComplete="new-password"
               disabled={isLoading}
               className={
@@ -245,7 +244,7 @@ export default function RegisterPage() {
           <Button type="submit" className="w-full" disabled={isLoading} aria-label={t.submit}>
             {isLoading ? (
               <>
-                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                 {t.loading}
               </>
             ) : (

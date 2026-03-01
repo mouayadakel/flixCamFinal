@@ -14,7 +14,7 @@ export function CompareBar() {
   if (items.length < 2) return null
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border-light bg-white shadow-lg px-4 py-3">
+    <div className="fixed bottom-0 start-0 end-0 z-50 border-t border-border-light bg-white shadow-lg px-4 py-3">
       <div className="mx-auto flex max-w-7xl items-center gap-4">
         <div className="flex flex-1 items-center gap-3 overflow-x-auto">
           {items.map((item) => (

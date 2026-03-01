@@ -50,7 +50,7 @@ export default async function VendorLayout({ children }: { children: React.React
               }}
             >
               <Button type="submit" variant="ghost" size="sm">
-                <LogOut className="ml-2 h-4 w-4" />
+                <LogOut className="ms-2 h-4 w-4" />
                 تسجيل الخروج
               </Button>
             </form>

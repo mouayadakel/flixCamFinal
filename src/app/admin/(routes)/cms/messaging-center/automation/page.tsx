@@ -133,7 +133,7 @@ export default function AutomationRulesPage() {
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/admin/cms/messaging-center">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             مركز الرسائل
           </Link>
         </Button>
@@ -149,7 +149,7 @@ export default function AutomationRulesPage() {
           </div>
         </div>
         <Button onClick={handleCreate}>
-          <Plus className="ml-2 h-4 w-4" />
+          <Plus className="ms-2 h-4 w-4" />
           إضافة قاعدة جديدة
         </Button>
       </div>
@@ -168,7 +168,7 @@ export default function AutomationRulesPage() {
             <div className="flex flex-col items-center justify-center gap-4 py-12">
               <p className="text-muted-foreground">لا توجد قواعد.</p>
               <Button onClick={handleCreate}>
-                <Plus className="ml-2 h-4 w-4" />
+                <Plus className="ms-2 h-4 w-4" />
                 إضافة قاعدة جديدة
               </Button>
             </div>
@@ -213,14 +213,14 @@ export default function AutomationRulesPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleEdit(r.id)}>
-                          <Pencil className="ml-2 h-4 w-4" />
+                          <Pencil className="ms-2 h-4 w-4" />
                           تعديل
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
                           onClick={() => setDeleteRuleId(r.id)}
                         >
-                          <Trash2 className="ml-2 h-4 w-4" />
+                          <Trash2 className="ms-2 h-4 w-4" />
                           حذف
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -255,7 +255,7 @@ export default function AutomationRulesPage() {
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleting ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
+              {deleting ? <Loader2 className="ms-2 h-4 w-4 animate-spin" /> : null}
               حذف
             </AlertDialogAction>
           </AlertDialogFooter>

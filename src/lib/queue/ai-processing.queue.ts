@@ -36,13 +36,33 @@ function getAIProcessingQueue(): Queue {
 }
 
 /**
- * Add AI processing job to queue
+ * Check if any worker is actively consuming the AI processing queue.
+ * Returns false if no workers are connected (meaning jobs would sit idle).
+ */
+export async function hasActiveWorkers(): Promise<boolean> {
+  try {
+    const queue = getAIProcessingQueue()
+    const workers = await queue.getWorkers()
+    return workers.length > 0
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Add AI processing job to queue.
+ * Throws if no workers are connected so callers can fall back to synchronous processing.
  */
 export async function addAIProcessingJob(
   importJobId: string,
   productIds: string[],
   provider?: 'openai' | 'gemini'
 ) {
+  const workersActive = await hasActiveWorkers()
+  if (!workersActive) {
+    throw new Error('No AI processing workers connected — falling back to synchronous processing')
+  }
+
   return await getAIProcessingQueue().add(
     'process-ai',
     {

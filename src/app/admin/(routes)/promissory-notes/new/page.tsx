@@ -135,7 +135,7 @@ export default function NewPromissoryNotePage() {
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/admin/promissory-notes">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             العودة للقائمة
           </Link>
         </Button>
@@ -273,7 +273,7 @@ export default function NewPromissoryNotePage() {
         </Card>
 
         <Button type="submit" disabled={saving}>
-          <Save className="ml-2 h-4 w-4" />
+          <Save className="ms-2 h-4 w-4" />
           {saving ? 'جاري الحفظ...' : 'إنشاء سند الأمر'}
         </Button>
       </form>

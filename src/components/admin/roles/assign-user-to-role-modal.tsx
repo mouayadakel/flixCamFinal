@@ -173,7 +173,7 @@ export function AssignUserToRoleModal({
               إلغاء
             </Button>
             <Button type="submit" disabled={submitting || availableUsers.length === 0}>
-              {submitting ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
+              {submitting ? <Loader2 className="ms-2 h-4 w-4 animate-spin" /> : null}
               ربط
             </Button>
           </DialogFooter>

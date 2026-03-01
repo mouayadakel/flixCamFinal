@@ -1,6 +1,7 @@
 /**
  * @file ai-processing.worker.ts
- * @description BullMQ worker for AI processing (translations, SEO)
+ * @description BullMQ worker for AI processing (translations, SEO, specs, photos).
+ * Integrates master fill, photo sourcing, and post-fill validation.
  * @module lib/queue
  */
 
@@ -16,8 +17,18 @@ import {
   inferMissingSpecs,
   type ProductForSpecInference,
 } from '@/lib/services/ai-spec-parser.service'
+import {
+  sourceImages,
+  type ProductForSourcing,
+} from '@/lib/services/image-sourcing.service'
 
 export const AI_PROCESSING_QUEUE_NAME = 'ai-processing'
+
+function normalizeKeywords(value: string | string[] | undefined): string {
+  if (!value) return ''
+  if (Array.isArray(value)) return value.join(', ')
+  return value
+}
 
 /**
  * Create AI processing worker
@@ -35,7 +46,6 @@ export function createAIProcessingWorker() {
       await job.updateProgress(0)
 
       try {
-        // Create or update AI processing job
         let aiJob = await prisma.aIProcessingJob.findFirst({
           where: { importJobId },
         })
@@ -45,7 +55,7 @@ export function createAIProcessingWorker() {
             data: {
               importJobId,
               status: 'processing',
-              provider: provider || 'openai',
+              provider: provider || 'gemini',
               totalItems: productIds.length,
               processedItems: 0,
               failedItems: 0,
@@ -54,7 +64,6 @@ export function createAIProcessingWorker() {
           })
         }
 
-        // Update import job status
         await prisma.importJob.update({
           where: { id: importJobId },
           data: { aiProcessingStatus: 'processing' },
@@ -64,12 +73,10 @@ export function createAIProcessingWorker() {
         let failed = 0
         let totalCost = 0
 
-        // Process each product
         for (let i = 0; i < productIds.length; i++) {
           const productId = productIds[i]
 
           try {
-            // Get product with translations
             const product = await prisma.product.findUnique({
               where: { id: productId },
               include: {
@@ -84,7 +91,6 @@ export function createAIProcessingWorker() {
               continue
             }
 
-            // Get existing translation data
             const existingTranslations = product.translations.map((t) => ({
               locale: t.locale,
               name: t.name,
@@ -96,17 +102,12 @@ export function createAIProcessingWorker() {
               specifications: t.specifications,
             }))
 
-            // Check what's missing
             const enTranslation = existingTranslations.find((t) => t.locale === 'en')
             const arTranslation = existingTranslations.find((t) => t.locale === 'ar')
             const zhTranslation = existingTranslations.find((t) => t.locale === 'zh')
 
-            const needsSEO = !enTranslation?.seoTitle || !enTranslation?.seoDescription
-            const needsArTranslation = !arTranslation
-            const needsZhTranslation = !zhTranslation
-
             // ═══════════════════════════════════════════════
-            // PHASE 1: Auto-infer missing specs with creative measurement rules
+            // PHASE 1: Auto-infer missing specs
             // ═══════════════════════════════════════════════
             try {
               const existingSpecs = (enTranslation?.specifications as Record<string, unknown>) ?? {}
@@ -131,7 +132,6 @@ export function createAIProcessingWorker() {
                 for (const s of specResult.specs) {
                   const key = (s as { key: string }).key
                   const value = (s as { value: string }).value
-                  // Only fill missing/empty specs — never overwrite existing values
                   if (
                     key &&
                     value &&
@@ -144,7 +144,6 @@ export function createAIProcessingWorker() {
                   }
                 }
 
-                // Write enriched specs back to ALL locale translations
                 for (const translation of product.translations) {
                   await prisma.productTranslation.updateMany({
                     where: { productId, locale: translation.locale },
@@ -154,7 +153,7 @@ export function createAIProcessingWorker() {
 
                 if (specResult.cost) totalCost += specResult.cost
                 console.info(
-                  `[AI Worker] Product ${productId}: inferred ${specResult.specs.length} specs (${specResult.autoSaved} auto, ${specResult.suggestions} suggested)`
+                  `[AI Worker] Product ${productId}: inferred ${specResult.specs.length} specs`
                 )
               }
             } catch (specErr) {
@@ -162,13 +161,14 @@ export function createAIProcessingWorker() {
                 `[AI Worker] Spec inference failed for product ${productId}:`,
                 specErr instanceof Error ? specErr.message : String(specErr)
               )
-              // Non-fatal: continue with translations/SEO
             }
 
             // ═══════════════════════════════════════════════
-            // PHASE 2: Master-fill — descriptions, SEO, translations (EN/AR/ZH), box contents, tags
-            // Uses the high-quality master prompt with creative measurement rules
+            // PHASE 2: Master-fill — descriptions, SEO, translations, specs, tags, photo queries
             // ═══════════════════════════════════════════════
+            const needsSEO = !enTranslation?.seoTitle || !enTranslation?.seoDescription
+            const needsArTranslation = !arTranslation
+            const needsZhTranslation = !zhTranslation
             const needsContent =
               needsSEO ||
               needsArTranslation ||
@@ -178,29 +178,33 @@ export function createAIProcessingWorker() {
               !product.boxContents ||
               !product.tags
 
+            let photoSearchQueries: string[] = []
+
             if (needsContent) {
               try {
                 const enrichedSpecs =
                   (enTranslation?.specifications as Record<string, unknown>) ?? {}
                 const masterResult = await generateMasterFill(
-                  (provider || 'openai') as ContentProvider,
+                  (provider || 'gemini') as ContentProvider,
                   {
                     name: enTranslation?.name || product.sku || '',
                     brand: product.brand?.name || 'Unknown',
                     category: product.category?.name || 'Equipment',
                     specifications: Object.keys(enrichedSpecs).length > 0 ? enrichedSpecs : null,
                     existingDescription: enTranslation?.longDescription || null,
+                    box_contents: product.boxContents,
+                    price_daily: product.priceDaily ? Number(product.priceDaily) : null,
                   }
                 )
 
                 if (masterResult) {
-                  // Helper: use AI value only if current value is empty/missing
+                  photoSearchQueries = masterResult.photo_search_queries ?? []
+
                   const orExisting = (
                     current: string | undefined | null,
                     aiValue: string | undefined
                   ) => (current && current.trim() !== '' ? current : aiValue || '')
 
-                  // Update English translation
                   await prisma.productTranslation.upsert({
                     where: { productId_locale: { productId, locale: 'en' } },
                     create: {
@@ -211,7 +215,8 @@ export function createAIProcessingWorker() {
                       longDescription: masterResult.long_desc_en || '',
                       seoTitle: masterResult.seo_title_en || '',
                       seoDescription: masterResult.seo_desc_en || '',
-                      seoKeywords: masterResult.seo_keywords_en || '',
+                      seoKeywords: normalizeKeywords(masterResult.seo_keywords_en) || '',
+                      specifications: (masterResult.specifications ?? {}) as any,
                     },
                     update: {
                       shortDescription: orExisting(
@@ -229,12 +234,12 @@ export function createAIProcessingWorker() {
                       ),
                       seoKeywords: orExisting(
                         enTranslation?.seoKeywords,
-                        masterResult.seo_keywords_en
+                        normalizeKeywords(masterResult.seo_keywords_en)
                       ),
+                      specifications: masterResult.specifications ? (masterResult.specifications as any) : undefined,
                     },
                   })
 
-                  // Update/create Arabic translation
                   await prisma.productTranslation.upsert({
                     where: { productId_locale: { productId, locale: 'ar' } },
                     create: {
@@ -245,13 +250,10 @@ export function createAIProcessingWorker() {
                       longDescription: masterResult.long_desc_ar || '',
                       seoTitle: masterResult.seo_title_ar || '',
                       seoDescription: masterResult.seo_desc_ar || '',
-                      seoKeywords: masterResult.seo_keywords_ar || '',
+                      seoKeywords: normalizeKeywords(masterResult.seo_keywords_ar) || '',
                     },
                     update: {
-                      name: orExisting(
-                        arTranslation?.name as string | undefined,
-                        masterResult.name_ar
-                      ),
+                      name: orExisting(arTranslation?.name as string | undefined, masterResult.name_ar),
                       shortDescription: orExisting(
                         arTranslation?.shortDescription as string | undefined,
                         masterResult.short_desc_ar
@@ -270,12 +272,11 @@ export function createAIProcessingWorker() {
                       ),
                       seoKeywords: orExisting(
                         arTranslation?.seoKeywords as string | undefined,
-                        masterResult.seo_keywords_ar
+                        normalizeKeywords(masterResult.seo_keywords_ar)
                       ),
                     },
                   })
 
-                  // Update/create Chinese translation
                   await prisma.productTranslation.upsert({
                     where: { productId_locale: { productId, locale: 'zh' } },
                     create: {
@@ -286,13 +287,10 @@ export function createAIProcessingWorker() {
                       longDescription: masterResult.long_desc_zh || '',
                       seoTitle: masterResult.seo_title_zh || '',
                       seoDescription: masterResult.seo_desc_zh || '',
-                      seoKeywords: masterResult.seo_keywords_zh || '',
+                      seoKeywords: normalizeKeywords(masterResult.seo_keywords_zh) || '',
                     },
                     update: {
-                      name: orExisting(
-                        zhTranslation?.name as string | undefined,
-                        masterResult.name_zh
-                      ),
+                      name: orExisting(zhTranslation?.name as string | undefined, masterResult.name_zh),
                       shortDescription: orExisting(
                         zhTranslation?.shortDescription as string | undefined,
                         masterResult.short_desc_zh
@@ -311,28 +309,32 @@ export function createAIProcessingWorker() {
                       ),
                       seoKeywords: orExisting(
                         zhTranslation?.seoKeywords as string | undefined,
-                        masterResult.seo_keywords_zh
+                        normalizeKeywords(masterResult.seo_keywords_zh)
                       ),
                     },
                   })
 
-                  // Update boxContents and tags on Product if AI generated them and they're missing
-                  const productUpdates: Record<string, unknown> = {}
+                  const productUpdates: Record<string, unknown> = {
+                    lastAiRunAt: new Date(),
+                    aiRunCount: { increment: 1 },
+                    needsAiReview: masterResult._needs_review ?? false,
+                  }
                   if (!product.boxContents && masterResult.box_contents) {
                     productUpdates.boxContents = masterResult.box_contents
                   }
-                  if (!product.tags && masterResult.tags) {
-                    productUpdates.tags = masterResult.tags
+                  const tagStr = Array.isArray(masterResult.tags)
+                    ? masterResult.tags.join(', ')
+                    : masterResult.tags
+                  if (!product.tags && tagStr) {
+                    productUpdates.tags = tagStr
                   }
-                  if (Object.keys(productUpdates).length > 0) {
-                    await prisma.product.update({
-                      where: { id: productId },
-                      data: productUpdates,
-                    })
-                  }
+                  await prisma.product.update({
+                    where: { id: productId },
+                    data: productUpdates as any,
+                  })
 
                   console.info(
-                    `[AI Worker] Product ${productId}: master-fill generated all 18 fields (EN/AR/ZH)${masterResult.box_contents ? ' + box contents' : ''}${masterResult.tags ? ' + tags' : ''}`
+                    `[AI Worker] Product ${productId}: master-fill complete`
                   )
                 }
               } catch (masterErr) {
@@ -343,22 +345,77 @@ export function createAIProcessingWorker() {
               }
             }
 
-            // Always sync to equipment after AI enrichment
-            await syncProductToEquipment(productId)
+            // ═══════════════════════════════════════════════
+            // PHASE 3: Photo sourcing with AI-generated search queries
+            // ═══════════════════════════════════════════════
+            const needsPhotos =
+              !product.featuredImage || product.featuredImage === '/images/placeholder.jpg'
 
+            if (needsPhotos) {
+              try {
+                const productName = enTranslation?.name || product.sku || ''
+                const sourcingProduct: ProductForSourcing = {
+                  id: productId,
+                  name: productName,
+                  sku: product.sku,
+                  category: product.category ? { name: product.category.name } : null,
+                  brand: product.brand ? { name: product.brand.name } : null,
+                  translations: product.translations.map((t) => ({
+                    locale: t.locale,
+                    name: t.name,
+                    longDescription: t.longDescription,
+                  })),
+                }
+
+                const defaultQueries = [
+                  `${productName} product photo`,
+                  `${productName} professional equipment`,
+                ]
+                const queries = photoSearchQueries.length > 0
+                  ? photoSearchQueries
+                  : defaultQueries
+
+                const photos = await sourceImages(sourcingProduct, 5, queries)
+
+                if (photos.length > 0) {
+                  const featuredUrl = photos[0].cloudinaryUrl || photos[0].url
+                  const galleryUrls = photos.slice(1).map((p) => p.cloudinaryUrl || p.url)
+
+                  await prisma.product.update({
+                    where: { id: productId },
+                    data: {
+                      featuredImage: featuredUrl,
+                      galleryImages: galleryUrls.length > 0 ? galleryUrls : undefined,
+                      photoStatus: 'sourced',
+                    },
+                  })
+
+                  console.info(
+                    `[AI Worker] Product ${productId}: sourced ${photos.length} photos`
+                  )
+                } else {
+                  await prisma.product.update({
+                    where: { id: productId },
+                    data: { photoStatus: 'not_found' },
+                  })
+                }
+              } catch (photoErr) {
+                console.warn(
+                  `[AI Worker] Photo sourcing failed for product ${productId}:`,
+                  photoErr instanceof Error ? photoErr.message : String(photoErr)
+                )
+              }
+            }
+
+            await syncProductToEquipment(productId)
             processed++
-          } catch (error: any) {
+          } catch (error) {
             console.error(`AI processing failed for product ${productId}:`, error)
             failed++
-
-            // Mark product for review (could add a "needsReview" field to Product model)
-            // For now, we'll just log the error
           }
 
-          // Update progress
           await job.updateProgress(Math.round(((i + 1) / productIds.length) * 100))
 
-          // Update AI job progress
           await prisma.aIProcessingJob.update({
             where: { id: aiJob.id },
             data: {
@@ -369,7 +426,6 @@ export function createAIProcessingWorker() {
           })
         }
 
-        // Mark AI job as complete
         await prisma.aIProcessingJob.update({
           where: { id: aiJob.id },
           data: {
@@ -381,7 +437,6 @@ export function createAIProcessingWorker() {
           },
         })
 
-        // Update import job status
         await prisma.importJob.update({
           where: { id: importJobId },
           data: { aiProcessingStatus: 'completed' },
@@ -399,7 +454,6 @@ export function createAIProcessingWorker() {
       } catch (error: any) {
         console.error(`AI processing job ${importJobId} failed:`, error)
 
-        // Mark AI job as failed
         await prisma.aIProcessingJob.updateMany({
           where: { importJobId },
           data: {
@@ -408,7 +462,6 @@ export function createAIProcessingWorker() {
           },
         })
 
-        // Update import job status
         await prisma.importJob.update({
           where: { id: importJobId },
           data: { aiProcessingStatus: 'failed' },
@@ -419,7 +472,7 @@ export function createAIProcessingWorker() {
     },
     {
       connection: getRedisClient(),
-      concurrency: 2, // Process 2 AI jobs concurrently
+      concurrency: 2,
       limiter: {
         max: 5,
         duration: 1000,
@@ -428,7 +481,7 @@ export function createAIProcessingWorker() {
   )
 
   worker.on('completed', (job) => {
-    console.log(`AI processing job ${job.id} completed`)
+    console.info(`AI processing job ${job.id} completed`)
   })
 
   worker.on('failed', (job, err) => {
@@ -442,7 +495,6 @@ export function createAIProcessingWorker() {
   return worker
 }
 
-// Create worker instance (singleton)
 let aiWorkerInstance: Worker | null = null
 
 /**

@@ -293,12 +293,12 @@ export default function AnalyticsPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleRefresh} disabled={loading}>
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`me-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
           <Button variant="outline" asChild>
             <Link href="/admin/finance/reports">
-              <ExternalLink className="mr-2 h-4 w-4" />
+              <ExternalLink className="me-2 h-4 w-4" />
               التقارير المالية
             </Link>
           </Button>
@@ -581,7 +581,7 @@ export default function AnalyticsPage() {
                   )
                 }}
               >
-                <Download className="ml-2 h-4 w-4" />
+                <Download className="ms-2 h-4 w-4" />
                 تصدير CSV
               </Button>
             )}
@@ -733,7 +733,7 @@ export default function AnalyticsPage() {
                   )
                 }}
               >
-                <Download className="ml-2 h-4 w-4" />
+                <Download className="ms-2 h-4 w-4" />
                 تصدير CSV
               </Button>
             )}

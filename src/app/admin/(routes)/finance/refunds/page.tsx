@@ -73,7 +73,7 @@ export default function FinanceRefundsPage() {
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/admin/finance">
-              <ArrowLeft className="ml-1 h-4 w-4" />
+              <ArrowLeft className="ms-1 h-4 w-4" />
               المالية
             </Link>
           </Button>
@@ -86,7 +86,7 @@ export default function FinanceRefundsPage() {
           </div>
         </div>
         <Button variant="outline" onClick={load} disabled={loading}>
-          <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`ms-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           تحديث
         </Button>
       </div>
@@ -136,7 +136,7 @@ export default function FinanceRefundsPage() {
               <TableHead>سبب الاسترداد</TableHead>
               <TableHead>الحالة</TableHead>
               <TableHead>التاريخ</TableHead>
-              <TableHead className="text-right">إجراءات</TableHead>
+              <TableHead className="text-end">إجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -184,10 +184,10 @@ export default function FinanceRefundsPage() {
                   <TableCell className="text-sm text-muted-foreground">
                     {formatDate(row.updatedAt)}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     <Button variant="ghost" size="sm" asChild>
                       <Link href={`/admin/payments/${row.id}`}>
-                        <Eye className="ml-1 h-4 w-4" />
+                        <Eye className="ms-1 h-4 w-4" />
                         عرض
                       </Link>
                     </Button>

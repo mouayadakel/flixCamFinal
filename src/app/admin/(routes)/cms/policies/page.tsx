@@ -155,12 +155,12 @@ export default function CmsPoliciesPage() {
           <Button variant="outline" asChild>
             <Link href="/policies" target="_blank" rel="noopener noreferrer">
               <ExternalLink className="h-4 w-4" />
-              <span className="mr-2">عرض الصفحة العامة</span>
+              <span className="me-2">عرض الصفحة العامة</span>
             </Link>
           </Button>
           <Button onClick={openAdd}>
             <Plus className="h-4 w-4" />
-            <span className="mr-2">إضافة سياسة</span>
+            <span className="me-2">إضافة سياسة</span>
           </Button>
         </div>
       </div>

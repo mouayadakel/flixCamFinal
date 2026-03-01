@@ -167,7 +167,7 @@ function RangeSpec({ value, rangePercent = 70 }: { value: string; rangePercent?:
           style={{ width: `${rangePercent}%` }}
         />
       </div>
-      <span className="min-w-[100px] shrink-0 text-right text-sm font-medium text-text-heading">
+      <span className="min-w-[100px] shrink-0 text-end text-sm font-medium text-text-heading">
         {value}
       </span>
     </div>
@@ -178,7 +178,7 @@ function ColorTempSpec({ value }: { value: string }) {
   return (
     <div className="flex flex-1 items-center gap-3">
       <div className="h-2 flex-1 overflow-hidden rounded-full bg-gradient-to-r from-orange-500 via-yellow-200 to-blue-500" />
-      <span className="min-w-[120px] shrink-0 text-right text-sm font-medium text-text-heading">
+      <span className="min-w-[120px] shrink-0 text-end text-sm font-medium text-text-heading">
         {value}
       </span>
     </div>
@@ -226,7 +226,7 @@ function SpecRow({ spec, locale, index }: { spec: SpecItem; locale: 'en' | 'ar';
     <div
       className={cn(
         'flex items-center gap-4 px-5 py-3.5 text-sm transition-colors hover:bg-surface-light/30',
-        spec.highlight && 'border-l-2 border-l-brand-primary/40 bg-brand-primary/[0.03]',
+        spec.highlight && 'border-s-2 border-s-brand-primary/40 bg-brand-primary/[0.03]',
         !spec.highlight && index % 2 !== 0 && 'bg-surface-light/20'
       )}
     >

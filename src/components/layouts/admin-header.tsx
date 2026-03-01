@@ -70,8 +70,8 @@ export function AdminHeader() {
 
       {/* Search - hidden on smallest screens to give room to logo + actions */}
       <div className="relative hidden max-w-md flex-1 sm:block md:max-w-sm">
-        <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-        <Input placeholder="بحث..." className="pr-10" dir="rtl" />
+        <Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+        <Input placeholder="بحث..." className="pe-10" dir="rtl" />
       </div>
 
       {/* Right Side - Language, Notifications & User Menu */}

@@ -35,6 +35,14 @@
   .header-logo-bg {
     background-image: var(--header-logo-url, none);
   }
+
+  /* Footer CMS: social icon hover (color from --footer-social-hover) */
+  .footer-social-hover-bg:hover {
+    background-color: var(--footer-social-hover, hsl(var(--primary))) !important;
+  }
+  .footer-social-hover-glow:hover {
+    box-shadow: 0 0 20px var(--footer-social-hover, hsl(var(--primary)));
+  }
 }
 
 @layer base {

@@ -52,3 +52,24 @@ export function trackStudioEvent(
     console.debug('[studio-analytics]', eventName, params)
   }
 }
+
+/**
+ * Track blog events via GA4.
+ */
+export function trackBlogEvent(
+  eventName: 'blog_view' | 'blog_share' | 'blog_reaction' | 'blog_newsletter_signup',
+  params: Record<string, string | number | boolean | null>
+): void {
+  if (typeof window === 'undefined') return
+  const gtag = (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag
+  if (gtag && GA4_MEASUREMENT_ID) {
+    gtag('event', eventName, {
+      event_category: 'Blog',
+      ...params,
+    })
+  }
+  if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
+    console.debug('[blog-analytics]', eventName, params)
+  }
+}

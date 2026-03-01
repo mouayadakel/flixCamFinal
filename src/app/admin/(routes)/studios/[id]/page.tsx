@@ -72,7 +72,7 @@ export default function StudioDetailPage() {
       <div className="space-y-6">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/admin/studios">
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="me-2 h-4 w-4" />
             Back to Studios
           </Link>
         </Button>
@@ -90,13 +90,13 @@ export default function StudioDetailPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/admin/studios">
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="me-2 h-4 w-4" />
             Back to Studios
           </Link>
         </Button>
         <Button asChild>
           <Link href={`/admin/studios/${id}/edit`}>
-            <Edit className="mr-2 h-4 w-4" />
+            <Edit className="me-2 h-4 w-4" />
             Edit
           </Link>
         </Button>

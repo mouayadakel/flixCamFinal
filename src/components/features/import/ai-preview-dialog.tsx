@@ -293,7 +293,7 @@ export function AIPreviewDialog({
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin" />
-            <span className="ml-3">Generating AI suggestions...</span>
+            <span className="ms-3">Generating AI suggestions...</span>
           </div>
         ) : suggestions.length === 0 ? (
           <div className="py-12 text-center text-muted-foreground">No suggestions generated</div>
@@ -363,12 +363,12 @@ export function AIPreviewDialog({
                       >
                         {isApproved ? (
                           <>
-                            <Check className="mr-1 h-4 w-4" />
+                            <Check className="me-1 h-4 w-4" />
                             Approved
                           </>
                         ) : (
                           <>
-                            <X className="mr-1 h-4 w-4" />
+                            <X className="me-1 h-4 w-4" />
                             Approve
                           </>
                         )}

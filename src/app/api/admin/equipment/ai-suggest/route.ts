@@ -179,8 +179,8 @@ export async function POST(request: NextRequest) {
       longDescription: masterResult?.long_desc_en ? (dynamicConfidence.longDescription ?? 82) : 0,
       seoTitle: masterResult?.seo_title_en ? (dynamicConfidence.seoTitle ?? 90) : 0,
       seoDescription: masterResult?.seo_desc_en ? (dynamicConfidence.seoDescription ?? 88) : 0,
-      boxContents: masterResult?.box_contents?.trim() ? (dynamicConfidence.boxContents ?? 78) : 0,
-      tags: masterResult?.tags?.trim() ? (dynamicConfidence.tags ?? 80) : 0,
+      boxContents: (typeof masterResult?.box_contents === 'string' && masterResult.box_contents.trim()) ? (dynamicConfidence.boxContents ?? 78) : 0,
+      tags: masterResult?.tags ? (dynamicConfidence.tags ?? 80) : 0,
       ...specConfidences,
     }
 
@@ -245,8 +245,16 @@ export async function POST(request: NextRequest) {
             metaKeywords: masterResult.seo_keywords_en,
           }
         : { metaTitle: name, metaDescription: existingShortDescription ?? name, metaKeywords: '' },
-      boxContents: masterResult?.box_contents?.trim() || undefined,
-      tags: masterResult?.tags?.trim() || undefined,
+      boxContents: typeof masterResult?.box_contents === 'string'
+        ? masterResult.box_contents.trim() || undefined
+        : Array.isArray(masterResult?.box_contents)
+          ? masterResult.box_contents.join(', ')
+          : undefined,
+      tags: typeof masterResult?.tags === 'string'
+        ? masterResult.tags.trim() || undefined
+        : Array.isArray(masterResult?.tags)
+          ? masterResult.tags.join(', ')
+          : undefined,
       relatedEquipmentIds: relatedEquipment.map((e) => e.id),
       confidence,
       // Full multilingual translations for auto-fill across all 3 locales

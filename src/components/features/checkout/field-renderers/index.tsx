@@ -7,6 +7,7 @@
 
 import type React from 'react'
 import { useState, useRef } from 'react'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -40,6 +41,7 @@ interface BaseFieldProps {
   value: unknown
   onChange: (key: string, value: unknown) => void
   disabled?: boolean
+  error?: string
 }
 
 function useLabel(field: CheckoutFormFieldConfig): string {
@@ -55,7 +57,7 @@ function usePlaceholder(field: CheckoutFormFieldConfig): string {
   return ph ?? ''
 }
 
-export function TextField({ field, value, onChange }: BaseFieldProps) {
+export function TextField({ field, value, onChange, error }: BaseFieldProps) {
   const label = useLabel(field)
   const placeholder = usePlaceholder(field)
   return (
@@ -69,12 +71,14 @@ export function TextField({ field, value, onChange }: BaseFieldProps) {
         value={(value as string) ?? ''}
         onChange={(e) => onChange(field.fieldKey, e.target.value)}
         placeholder={placeholder}
+        className={error ? 'border-destructive' : undefined}
       />
+      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
     </div>
   )
 }
 
-export function NumberField({ field, value, onChange }: BaseFieldProps) {
+export function NumberField({ field, value, onChange, error }: BaseFieldProps) {
   const label = useLabel(field)
   const placeholder = usePlaceholder(field)
   return (
@@ -88,12 +92,14 @@ export function NumberField({ field, value, onChange }: BaseFieldProps) {
         value={(value as number) ?? ''}
         onChange={(e) => onChange(field.fieldKey, e.target.valueAsNumber)}
         placeholder={placeholder}
+        className={error ? 'border-destructive' : undefined}
       />
+      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
     </div>
   )
 }
 
-export function PhoneField({ field, value, onChange }: BaseFieldProps) {
+export function PhoneField({ field, value, onChange, error }: BaseFieldProps) {
   const label = useLabel(field)
   const placeholder = usePlaceholder(field)
   return (
@@ -107,12 +113,14 @@ export function PhoneField({ field, value, onChange }: BaseFieldProps) {
         value={(value as string) ?? ''}
         onChange={(e) => onChange(field.fieldKey, e.target.value)}
         placeholder={placeholder}
+        className={error ? 'border-destructive' : undefined}
       />
+      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
     </div>
   )
 }
 
-export function EmailField({ field, value, onChange }: BaseFieldProps) {
+export function EmailField({ field, value, onChange, error }: BaseFieldProps) {
   const label = useLabel(field)
   const placeholder = usePlaceholder(field)
   return (
@@ -126,28 +134,33 @@ export function EmailField({ field, value, onChange }: BaseFieldProps) {
         value={(value as string) ?? ''}
         onChange={(e) => onChange(field.fieldKey, e.target.value)}
         placeholder={placeholder}
+        className={error ? 'border-destructive' : undefined}
       />
+      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
     </div>
   )
 }
 
-export function CheckboxField({ field, value, onChange }: BaseFieldProps) {
+export function CheckboxField({ field, value, onChange, error }: BaseFieldProps) {
   const label = useLabel(field)
   return (
-    <div className="flex items-center gap-2">
-      <Checkbox
-        checked={!!value}
-        onCheckedChange={(v) => onChange(field.fieldKey, !!v)}
-      />
-      <Label className="font-normal">
-        {label}
-        {field.isRequired && ' *'}
-      </Label>
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <Checkbox
+          checked={!!value}
+          onCheckedChange={(v) => onChange(field.fieldKey, !!v)}
+        />
+        <Label className="font-normal">
+          {label}
+          {field.isRequired && ' *'}
+        </Label>
+      </div>
+      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
     </div>
   )
 }
 
-export function TextareaField({ field, value, onChange }: BaseFieldProps) {
+export function TextareaField({ field, value, onChange, error }: BaseFieldProps) {
   const label = useLabel(field)
   const placeholder = usePlaceholder(field)
   return (
@@ -161,12 +174,14 @@ export function TextareaField({ field, value, onChange }: BaseFieldProps) {
         onChange={(e) => onChange(field.fieldKey, e.target.value)}
         placeholder={placeholder}
         rows={3}
+        className={error ? 'border-destructive' : undefined}
       />
+      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
     </div>
   )
 }
 
-export function DropdownField({ field, value, onChange }: BaseFieldProps) {
+export function DropdownField({ field, value, onChange, error }: BaseFieldProps) {
   const label = useLabel(field)
   const options = field.options ?? []
   const locale = useLocale()
@@ -181,7 +196,7 @@ export function DropdownField({ field, value, onChange }: BaseFieldProps) {
         value={(value as string) ?? ''}
         onValueChange={(v) => onChange(field.fieldKey, v)}
       >
-        <SelectTrigger>
+        <SelectTrigger className={error ? 'border-destructive' : undefined}>
           <SelectValue placeholder="Select..." />
         </SelectTrigger>
         <SelectContent>
@@ -192,11 +207,12 @@ export function DropdownField({ field, value, onChange }: BaseFieldProps) {
           ))}
         </SelectContent>
       </Select>
+      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
     </div>
   )
 }
 
-export function RadioField({ field, value, onChange }: BaseFieldProps) {
+export function RadioField({ field, value, onChange, error }: BaseFieldProps) {
   const label = useLabel(field)
   const options = field.options ?? []
   const locale = useLocale()
@@ -228,18 +244,29 @@ export function RadioField({ field, value, onChange }: BaseFieldProps) {
           </label>
         ))}
       </div>
+      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
     </div>
   )
 }
 
-export function FileField({ field, value, onChange }: BaseFieldProps) {
+function getPreviewUrl(val: string): string {
+  if (!val || typeof val !== 'string') return ''
+  if (val.startsWith('http://') || val.startsWith('https://')) return val
+  return `/api/checkout/serve-photo?id=${encodeURIComponent(val)}`
+}
+
+export function FileField({ field, value, onChange, error }: BaseFieldProps) {
   const label = useLabel(field)
   const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const previewUrl = value && typeof value === 'string' ? getPreviewUrl(value) : ''
+
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
     setUploading(true)
+    setUploadError(null)
     try {
       const form = new FormData()
       form.append('file', file)
@@ -252,12 +279,21 @@ export function FileField({ field, value, onChange }: BaseFieldProps) {
         throw new Error(data.error || 'Upload failed')
       }
       const data = await res.json()
-      onChange(field.fieldKey, data.url)
+      onChange(field.fieldKey, data.url ?? data.fileId)
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Upload failed')
     } finally {
       setUploading(false)
       if (inputRef.current) inputRef.current.value = ''
     }
   }
+
+  const handleChange = () => {
+    onChange(field.fieldKey, '')
+    setUploadError(null)
+    inputRef.current?.click()
+  }
+
   return (
     <div className="space-y-2">
       <Label>
@@ -267,20 +303,46 @@ export function FileField({ field, value, onChange }: BaseFieldProps) {
       <Input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png"
         onChange={handleFile}
         disabled={uploading}
+        className="hidden"
       />
-      {(value || uploading) && (
-        <p className="text-xs text-muted-foreground">
-          {uploading ? 'Uploading...' : typeof value === 'string' ? 'Uploaded' : 'File selected'}
-        </p>
+      {previewUrl && !uploading ? (
+        <div className="flex items-center gap-3">
+          <img
+            src={previewUrl}
+            alt="Preview"
+            className="h-20 w-20 rounded object-cover border"
+          />
+          <Button type="button" variant="outline" size="sm" onClick={handleChange}>
+            Change
+          </Button>
+        </div>
+      ) : (
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+        >
+          {uploading ? (
+            <>
+              <span className="me-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              Uploading...
+            </>
+          ) : (
+            'Upload ID photo'
+          )}
+        </Button>
       )}
+      {uploadError && <p className="text-sm text-destructive mt-1">{uploadError}</p>}
+      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
     </div>
   )
 }
 
-export function DateField({ field, value, onChange }: BaseFieldProps) {
+export function DateField({ field, value, onChange, error }: BaseFieldProps) {
   const label = useLabel(field)
   const v = value as string | Date | undefined
   const str = v ? ((v as unknown) instanceof Date ? (v as Date).toISOString().slice(0, 10) : String(v).slice(0, 10)) : ''
@@ -294,12 +356,14 @@ export function DateField({ field, value, onChange }: BaseFieldProps) {
         type="date"
         value={str}
         onChange={(e) => onChange(field.fieldKey, e.target.value)}
+        className={error ? 'border-destructive' : undefined}
       />
+      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
     </div>
   )
 }
 
-export function MapField({ field, value, onChange }: BaseFieldProps) {
+export function MapField({ field, value, onChange, error }: BaseFieldProps) {
   const label = useLabel(field)
   const mapValue =
     value && typeof value === 'object' && !Array.isArray(value)
@@ -314,11 +378,12 @@ export function MapField({ field, value, onChange }: BaseFieldProps) {
         onChange={(v) => onChange(field.fieldKey, v)}
         apiKey={typeof process !== 'undefined' ? (process.env as any).NEXT_PUBLIC_GOOGLE_MAPS_API_KEY : null}
       />
+      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
     </div>
   )
 }
 
-export function SignatureField({ field, value, onChange }: BaseFieldProps) {
+export function SignatureField({ field, value, onChange, error }: BaseFieldProps) {
   const label = useLabel(field)
   return (
     <div className="space-y-2">
@@ -329,11 +394,12 @@ export function SignatureField({ field, value, onChange }: BaseFieldProps) {
       <div className="rounded-md border border-dashed bg-muted/30 p-4 text-center text-sm text-muted-foreground">
         Signature pad (optional integration). Value: {value ? 'Signed' : '—'}
       </div>
+      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
     </div>
   )
 }
 
-export function MultiSelectField({ field, value, onChange }: BaseFieldProps) {
+export function MultiSelectField({ field, value, onChange, error }: BaseFieldProps) {
   const label = useLabel(field)
   const options = field.options ?? []
   const current = (value as string[]) ?? []
@@ -362,6 +428,7 @@ export function MultiSelectField({ field, value, onChange }: BaseFieldProps) {
           </div>
         ))}
       </div>
+      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
     </div>
   )
 }
@@ -386,7 +453,8 @@ export function renderField(
   field: CheckoutFormFieldConfig,
   value: unknown,
   onChange: (key: string, value: unknown) => void,
-  disabled?: boolean
+  disabled?: boolean,
+  error?: string
 ): React.ReactNode {
   const Comp = RENDERERS[field.fieldType] ?? TextField
   return (
@@ -396,6 +464,7 @@ export function renderField(
       value={value}
       onChange={onChange}
       disabled={disabled}
+      error={error}
     />
   )
 }

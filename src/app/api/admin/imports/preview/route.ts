@@ -117,19 +117,13 @@ export async function POST(request: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer())
-    const XLSX = await import('xlsx')
-    const wb = XLSX.read(buffer, { type: 'buffer' })
+    const { parseSpreadsheetBuffer } = await import('@/lib/utils/excel-parser')
+    const wb = await parseSpreadsheetBuffer(buffer, file.name)
 
     const sheets: SheetPreview[] = []
 
-    for (const sheetName of wb.SheetNames) {
-      const sheet = wb.Sheets[sheetName]
-      if (!sheet) continue
-
-      const data = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
-        defval: null,
-        raw: false,
-      })
+    for (const sheetName of wb.sheetNames) {
+      const data = wb.getSheetData(sheetName)
 
       if (data.length === 0) continue
 

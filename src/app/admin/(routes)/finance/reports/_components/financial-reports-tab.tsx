@@ -210,7 +210,7 @@ export default function FinancialReportsTab() {
               <option value="pdf">PDF</option>
             </select>
             <Button onClick={handleExport} disabled={exporting}>
-              <Download className="ml-2 h-4 w-4" />
+              <Download className="ms-2 h-4 w-4" />
               {exporting ? 'جاري التصدير...' : 'تصدير التقرير'}
             </Button>
           </>
@@ -269,7 +269,7 @@ export default function FinancialReportsTab() {
             </div>
             <div className="flex items-end">
               <Button onClick={generateReport} className="w-full" disabled={loading}>
-                <BarChart3 className="ml-2 h-4 w-4" />
+                <BarChart3 className="ms-2 h-4 w-4" />
                 {loading ? 'جاري الإنشاء...' : 'إنشاء التقرير'}
               </Button>
             </div>

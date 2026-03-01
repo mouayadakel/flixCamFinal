@@ -96,7 +96,7 @@ export default function MessagingTemplatesPage() {
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/admin/cms/messaging-center">
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ms-2 h-4 w-4" />
               مركز الرسائل
             </Link>
           </Button>
@@ -161,7 +161,7 @@ export default function MessagingTemplatesPage() {
 
       <Button asChild>
         <Link href="/admin/settings/notification-templates">
-          <FileText className="ml-2 h-4 w-4" />
+          <FileText className="ms-2 h-4 w-4" />
           فتح محرر القوالب الكامل
         </Link>
       </Button>

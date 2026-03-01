@@ -278,7 +278,7 @@ export default function ActionCenterPage() {
           <p className="mt-1 text-muted-foreground">إدارة جميع الإجراءات والتنبيهات المعلقة</p>
         </div>
         <Button variant="outline" onClick={handleRefresh} disabled={refreshing}>
-          <RefreshCw className={`ml-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`ms-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
           تحديث
         </Button>
       </div>
@@ -292,7 +292,7 @@ export default function ActionCenterPage() {
         <TabsContent value="actions" className="mt-0 space-y-6">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
-        <Card className="border-l-4 border-l-red-500">
+        <Card className="border-s-4 border-s-red-500">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
@@ -304,7 +304,7 @@ export default function ActionCenterPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-orange-500">
+        <Card className="border-s-4 border-s-orange-500">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
@@ -316,7 +316,7 @@ export default function ActionCenterPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-yellow-500">
+        <Card className="border-s-4 border-s-yellow-500">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
@@ -328,7 +328,7 @@ export default function ActionCenterPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-blue-500">
+        <Card className="border-s-4 border-s-blue-500">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
@@ -340,7 +340,7 @@ export default function ActionCenterPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-gray-500">
+        <Card className="border-s-4 border-s-gray-500">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
@@ -424,7 +424,7 @@ export default function ActionCenterPage() {
                           <Link href={action.actionUrl}>
                             <Button size="sm">
                               {action.actionLabel}
-                              <ArrowRight className="mr-2 h-4 w-4" />
+                              <ArrowRight className="me-2 h-4 w-4" />
                             </Button>
                           </Link>
                         </div>

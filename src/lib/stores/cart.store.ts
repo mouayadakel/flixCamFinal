@@ -19,6 +19,18 @@ export interface CartItem {
   dailyRate: number | null
   subtotal: number
   isAvailable: boolean
+  /** Equipment display name (model or sku) for EQUIPMENT items */
+  equipmentName?: string | null
+  /** Equipment slug for link to detail page */
+  equipmentSlug?: string | null
+  /** Kit display name for KIT/PACKAGE items */
+  kitName?: string | null
+  /** Category name for display/filtering */
+  categoryName?: string | null
+  /** Thumbnail URL for equipment/studio */
+  imageUrl?: string | null
+  /** Rental days (from startDate/endDate); 1 if no dates */
+  days?: number
 }
 
 export interface CartState {

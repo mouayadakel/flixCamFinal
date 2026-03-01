@@ -7,7 +7,7 @@ const securityHeaders = [
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-XSS-Protection', value: '1; mode=block' },
-  { key: 'Referrer-Policy', value: 'origin-when-cross-origin' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   {
     key: 'Content-Security-Policy',
     value: [
@@ -47,6 +47,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'placehold.co', pathname: '/**' },
       { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
       { protocol: 'https', hostname: 'cdn.shopify.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'd1ncau8tqf99kp.cloudfront.net', pathname: '/**' },
     ],
   },
   async headers() {
@@ -97,6 +98,11 @@ const nextConfig = {
       { source: '/admin/cms/policies', destination: '/admin/cms?tab=policies', permanent: false },
       { source: '/admin/cms/featured', destination: '/admin/cms?tab=featured', permanent: false },
       { source: '/admin/cms/checkout-form', destination: '/admin/cms?tab=checkout-form', permanent: false },
+    ]
+  },
+  async rewrites() {
+    return [
+      { source: '/blog/feed.xml', destination: '/blog/rss.xml' },
     ]
   },
 }

@@ -189,12 +189,12 @@ export default function FinancePage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={loadData}>
-            <RefreshCw className="ml-2 h-4 w-4" />
+            <RefreshCw className="ms-2 h-4 w-4" />
             تحديث
           </Button>
           <Button asChild>
             <Link href="/admin/invoices/new">
-              <Plus className="ml-2 h-4 w-4" />
+              <Plus className="ms-2 h-4 w-4" />
               فاتورة جديدة
             </Link>
           </Button>
@@ -333,7 +333,7 @@ export default function FinancePage() {
                         <TableCell>
                           <Link href={`/admin/invoices/${invoice.id}`}>
                             <Button size="sm" variant="ghost">
-                              <Eye className="ml-1 h-4 w-4" />
+                              <Eye className="ms-1 h-4 w-4" />
                               عرض
                             </Button>
                           </Link>
@@ -411,7 +411,7 @@ export default function FinancePage() {
                         <TableCell>
                           <Link href={`/admin/payments/${payment.id}`}>
                             <Button size="sm" variant="ghost">
-                              <Eye className="ml-1 h-4 w-4" />
+                              <Eye className="ms-1 h-4 w-4" />
                               عرض
                             </Button>
                           </Link>
@@ -441,7 +441,7 @@ export default function FinancePage() {
                   <TableHead>مبلغ العربون</TableHead>
                   <TableHead>حالة العربون</TableHead>
                   <TableHead>التاريخ</TableHead>
-                  <TableHead className="text-right">إجراءات</TableHead>
+                  <TableHead className="text-end">إجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -479,10 +479,10 @@ export default function FinancePage() {
                       <TableCell className="text-sm text-muted-foreground">
                         {row.paidDate ? formatDate(row.paidDate) : '—'}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-end">
                         <Button variant="ghost" size="sm" asChild>
                           <Link href={`/admin/bookings/${row.id}`}>
-                            <Eye className="ml-1 h-4 w-4" />
+                            <Eye className="ms-1 h-4 w-4" />
                             عرض
                           </Link>
                         </Button>
@@ -512,7 +512,7 @@ export default function FinancePage() {
                   <TableHead>مبلغ الاسترداد</TableHead>
                   <TableHead>الحالة</TableHead>
                   <TableHead>التاريخ</TableHead>
-                  <TableHead className="text-right">إجراءات</TableHead>
+                  <TableHead className="text-end">إجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -553,10 +553,10 @@ export default function FinancePage() {
                       <TableCell className="text-sm text-muted-foreground">
                         {formatDate(row.updatedAt)}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-end">
                         <Button variant="ghost" size="sm" asChild>
                           <Link href={`/admin/payments/${row.id}`}>
-                            <Eye className="ml-1 h-4 w-4" />
+                            <Eye className="ms-1 h-4 w-4" />
                             عرض
                           </Link>
                         </Button>

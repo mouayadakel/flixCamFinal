@@ -1,5 +1,6 @@
 /**
- * POST /api/checkout/upload-document – Upload ID or other checkout document; returns public URL.
+ * POST /api/checkout/upload-document – Upload ID or other checkout document.
+ * Stores in private storage; returns fileId for use with serve-photo.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -8,9 +9,9 @@ import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
 
-const MAX_SIZE = 5 * 1024 * 1024 // 5MB
+const MAX_SIZE = 10 * 1024 * 1024 // 10MB
 const ALLOWED = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
-const UPLOAD_DIR = join(process.cwd(), 'public', 'uploads', 'checkout')
+const UPLOAD_DIR = join(process.cwd(), 'storage', 'uploads', 'checkout')
 
 export async function POST(request: NextRequest) {
   const session = await auth()
@@ -47,7 +48,5 @@ export async function POST(request: NextRequest) {
   const buffer = Buffer.from(await file.arrayBuffer())
   await writeFile(filepath, buffer)
 
-  const baseUrl = process.env.NEXTAUTH_URL || process.env.APP_URL || ''
-  const url = `${baseUrl}/uploads/checkout/${filename}`
-  return NextResponse.json({ url })
+  return NextResponse.json({ fileId: filename })
 }

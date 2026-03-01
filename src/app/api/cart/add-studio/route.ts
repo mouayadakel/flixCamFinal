@@ -8,6 +8,7 @@ import { prisma } from '@/lib/db/prisma'
 import { CartService } from '@/lib/services/cart.service'
 import { getCartSessionId, setCartSessionCookie } from '@/lib/cart-session'
 import { checkRateLimitUpstash } from '@/lib/utils/rate-limit-upstash'
+import { logger } from '@/lib/logger'
 import { z } from 'zod'
 
 const bodySchema = z.object({
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
     }
     return res
   } catch (e) {
-    console.error('Cart add-studio error:', e)
+    logger.error('Cart add-studio error', { error: e instanceof Error ? e.message : String(e) })
     return NextResponse.json(
       { error: e instanceof Error ? e.message : 'Failed to add to cart' },
       { status: 400 }

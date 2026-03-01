@@ -357,20 +357,20 @@ export default function ClientDetailPage() {
         <div className="flex gap-2">
           <Button variant="outline" asChild>
             <Link href="/admin/clients">
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ms-2 h-4 w-4" />
               العودة
             </Link>
           </Button>
           <Button variant="outline" asChild>
             <Link href={`/admin/clients/${client.id}/edit`}>
-              <Edit className="ml-2 h-4 w-4" />
+              <Edit className="ms-2 h-4 w-4" />
               تعديل
             </Link>
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" disabled={deleting}>
-                <Trash2 className="ml-2 h-4 w-4" />
+                <Trash2 className="ms-2 h-4 w-4" />
                 حذف
               </Button>
             </AlertDialogTrigger>
@@ -649,7 +649,7 @@ export default function ClientDetailPage() {
                         variant="outline"
                         onClick={() => handleVerificationStatusChange('VERIFIED')}
                       >
-                        <CheckCircle className="mr-1 h-4 w-4" /> اعتماد
+                        <CheckCircle className="me-1 h-4 w-4" /> اعتماد
                       </Button>
                     )}
                     {verification.verificationStatus !== 'REJECTED' && (
@@ -658,7 +658,7 @@ export default function ClientDetailPage() {
                         variant="outline"
                         onClick={() => handleVerificationStatusChange('REJECTED')}
                       >
-                        <ShieldX className="mr-1 h-4 w-4" /> رفض
+                        <ShieldX className="me-1 h-4 w-4" /> رفض
                       </Button>
                     )}
                   </div>
@@ -791,19 +791,19 @@ export default function ClientDetailPage() {
               <div className="flex flex-wrap gap-2">
                 {client.status !== 'active' && (
                   <Button onClick={() => handleStatusChange('active')}>
-                    <CheckCircle className="ml-2 h-4 w-4" />
+                    <CheckCircle className="ms-2 h-4 w-4" />
                     تفعيل العميل
                   </Button>
                 )}
                 {client.status !== 'suspended' && (
                   <Button variant="outline" onClick={() => handleStatusChange('suspended')}>
-                    <AlertCircle className="ml-2 h-4 w-4" />
+                    <AlertCircle className="ms-2 h-4 w-4" />
                     تعليق العميل
                   </Button>
                 )}
                 {client.status !== 'inactive' && (
                   <Button variant="outline" onClick={() => handleStatusChange('inactive')}>
-                    <Clock className="ml-2 h-4 w-4" />
+                    <Clock className="ms-2 h-4 w-4" />
                     إلغاء التفعيل
                   </Button>
                 )}
@@ -814,13 +814,13 @@ export default function ClientDetailPage() {
                 <div className="flex flex-wrap gap-2">
                   <Button variant="outline" asChild>
                     <Link href={`/admin/bookings/new?customerId=${client.id}`}>
-                      <Calendar className="ml-2 h-4 w-4" />
+                      <Calendar className="ms-2 h-4 w-4" />
                       إنشاء حجز
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
                     <Link href={`/admin/quotes/new?customerId=${client.id}`}>
-                      <FileText className="ml-2 h-4 w-4" />
+                      <FileText className="ms-2 h-4 w-4" />
                       إنشاء عرض سعر
                     </Link>
                   </Button>

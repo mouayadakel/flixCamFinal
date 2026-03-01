@@ -219,7 +219,8 @@ export async function processImportJob(
         const categoryId = payload.categoryId
 
         // Resolve fields via column mapper (SYNONYM_MAP handles all aliases)
-        const name = resolveField(r, 'name', columnMappings) ?? r['*'] ?? ''
+        const nameRaw = resolveField(r, 'name', columnMappings) ?? r['*'] ?? ''
+        const name = typeof nameRaw === 'string' ? nameRaw : String(nameRaw ?? '').trim()
         if (!name) throw new Error('Name is required')
 
         const brandName = resolveField(r, 'brand', columnMappings) ?? 'Unknown'
@@ -231,7 +232,7 @@ export async function processImportJob(
         const quantity = quantityRaw != null && quantityRaw >= 0 ? quantityRaw : 0
         const weekly = num(resolveField(r, 'weekly_price', columnMappings))
         const monthly = num(resolveField(r, 'monthly_price', columnMappings))
-        const deposit = num(resolveField(r, 'deposit', columnMappings))
+        const deposit = safePrice(num(resolveField(r, 'deposit', columnMappings)))
 
         // New mapped fields
         const conditionRaw = resolveField(r, 'condition', columnMappings)
@@ -253,10 +254,8 @@ export async function processImportJob(
         const subCategoryFromExcel = resolveField(r, 'sub_category', columnMappings) ?? null
 
         const priceDaily = safePrice(daily) ?? 0
-        const priceWeekly =
-          safePrice(weekly) ?? (priceDaily > 0 ? priceDaily * WEEKLY_FACTOR : null)
-        const priceMonthly =
-          safePrice(monthly) ?? (priceDaily > 0 ? priceDaily * MONTHLY_FACTOR : null)
+        const priceWeekly = safePrice(weekly) ?? (priceDaily > 0 ? safePrice(priceDaily * WEEKLY_FACTOR) ?? null : null)
+        const priceMonthly = safePrice(monthly) ?? (priceDaily > 0 ? safePrice(priceDaily * MONTHLY_FACTOR) ?? null : null)
         const status = priceDaily > 0 ? ProductStatus.ACTIVE : ProductStatus.DRAFT
 
         const featuredImageRaw =
@@ -273,7 +272,22 @@ export async function processImportJob(
 
         // SKU and barcode are distinct: do not use barcode as SKU
         let sku = resolveField(r, 'sku', columnMappings) ?? null
-        const barcodeValue = resolveField(r, 'barcode', columnMappings) ?? null
+        const barcodeValue =
+          resolveField(r, 'barcode', columnMappings) ??
+          r['Barcode'] ??
+          r['barcode'] ??
+          (() => {
+            const barcodeKeys = ['Barcode', 'barcode', 'UPC', 'upc', 'EAN', 'ean', 'GTIN', 'gtin']
+            for (const k of barcodeKeys) {
+              const v = r[k]
+              if (v != null && String(v).trim()) return v
+            }
+            for (const [key, val] of Object.entries(r)) {
+              if (key?.toLowerCase().includes('barcode') && val != null && String(val).trim())
+                return val
+            }
+            return null
+          })()
         if (!sku) {
           const cat = await prisma.category.findUnique({
             where: { id: payload.categoryId },
@@ -429,11 +443,18 @@ export async function processImportJob(
 
         // Box contents: curated DB → Excel row → AI suggestion
         let boxContentsValue = resolveField(r, 'box_contents', columnMappings) ?? null
+        if (boxContentsValue != null && typeof boxContentsValue !== 'string') {
+          boxContentsValue = Array.isArray(boxContentsValue)
+            ? boxContentsValue.join(', ')
+            : String(boxContentsValue)
+        }
         if (!boxContentsValue && curatedMatch?.boxContents?.length) {
           boxContentsValue = curatedMatch.boxContents.join(', ')
         }
-        if (!boxContentsValue && suggestion?.boxContents?.trim()) {
-          boxContentsValue = suggestion.boxContents
+        const suggestionBox = suggestion?.boxContents
+        if (!boxContentsValue && suggestionBox != null) {
+          const s = typeof suggestionBox === 'string' ? suggestionBox : String(suggestionBox)
+          if (s.trim()) boxContentsValue = s
         }
 
         const effectiveTags =
@@ -473,18 +494,102 @@ export async function processImportJob(
             seoKeywords: t.seoKeywords ?? '',
           })),
           inventoryItems:
-            barcodeValue && String(barcodeValue).trim()
+            barcodeTrimmed
               ? [
                   {
                     serialNumber: skuForCreate ?? `import-${row.rowNumber}`,
-                    barcode: String(barcodeValue).trim(),
+                    barcode: barcodeTrimmed,
                   },
                 ]
               : [],
           createdBy: job.createdBy || 'system',
         })
 
-        let product
+        const updatedBy = job.createdBy || 'system'
+        const baseUpdatePayload = {
+          status,
+          brandId,
+          categoryId,
+          subCategoryId: payload.subCategoryId || subCategoryFromExcel || null,
+          priceDaily,
+          priceWeekly,
+          priceMonthly,
+          depositAmount: deposit,
+          quantity,
+          bufferTime: bufferTimeInHours,
+          boxContents: boxContentsValue,
+          featuredImage,
+          galleryImages,
+          videoUrl,
+          relatedProducts: relatedProducts.length ? relatedProducts : null,
+          tags: effectiveTags,
+          translations: translations.map((t) => ({
+            locale: t.locale,
+            name: t.name,
+            shortDescription: t.shortDescription ?? '',
+            longDescription: t.longDescription ?? '',
+            specifications: specifications ?? undefined,
+            seoTitle: t.seoTitle ?? '',
+            seoDescription: t.seoDescription ?? '',
+            seoKeywords: t.seoKeywords ?? '',
+          })),
+          updatedBy,
+        }
+
+        let product: { id: string }
+
+        // Root fix: if barcode already exists, update the existing product instead of failing
+        const barcodeRaw =
+          barcodeValue != null && barcodeValue !== ''
+            ? typeof barcodeValue === 'number'
+              ? String(Math.floor(barcodeValue))
+              : String(barcodeValue)
+            : ''
+        const barcodeTrimmed = barcodeRaw.trim() || null
+        if (barcodeTrimmed) {
+          let existingItem = await prisma.inventoryItem.findFirst({
+            where: { barcode: barcodeTrimmed, deletedAt: null },
+            select: { id: true, parentProductId: true, deletedAt: true },
+          })
+          if (!existingItem) {
+            existingItem = await prisma.inventoryItem.findFirst({
+              where: { barcode: barcodeTrimmed },
+              select: { id: true, parentProductId: true, deletedAt: true },
+            })
+          }
+          if (existingItem) {
+            const parentProduct = await prisma.product.findUnique({
+              where: { id: existingItem.parentProductId },
+              select: { id: true, deletedAt: true },
+            })
+            if (parentProduct?.deletedAt) {
+              await prisma.product.update({
+                where: { id: parentProduct.id },
+                data: { deletedAt: null, deletedBy: null },
+              })
+              console.info(
+                `[Import] Row ${row.rowNumber}: restored soft-deleted product ${parentProduct.id}`
+              )
+            }
+            product = await ProductCatalogService.update(existingItem.parentProductId, baseUpdatePayload)
+            if (existingItem.deletedAt) {
+              await prisma.inventoryItem.update({
+                where: { id: existingItem.id },
+                data: { deletedAt: null, deletedBy: null },
+              })
+            }
+            batchProductIds.push(product.id)
+            await ImportService.markRow(jobId, row.rowNumber, ImportRowStatus.SUCCESS, {
+              productId: product.id,
+            })
+            batchSuccess++
+            console.info(
+              `[Import] Row ${row.rowNumber}: barcode "${barcodeTrimmed}" exists → updated product ${product.id}`
+            )
+            continue
+          }
+        }
+
         try {
           product = await ProductCatalogService.create(createPayload(sku))
         } catch (createErr) {
@@ -506,12 +611,57 @@ export async function processImportJob(
             console.info(
               `[Import] Row ${row.rowNumber}: duplicate SKU "${sku}" (in DB) replaced with ${fallbackSku}`
             )
+          } else if (
+            createErr instanceof ValidationError &&
+            createErr.message.includes('Barcode already exists') &&
+            barcodeTrimmed
+          ) {
+            const existingItem = await prisma.inventoryItem.findFirst({
+              where: { barcode: barcodeTrimmed },
+              select: { id: true, parentProductId: true, deletedAt: true },
+            })
+            if (existingItem) {
+              const parentProd = await prisma.product.findUnique({
+                where: { id: existingItem.parentProductId },
+                select: { id: true, deletedAt: true },
+              })
+              if (parentProd?.deletedAt) {
+                await prisma.product.update({
+                  where: { id: parentProd.id },
+                  data: { deletedAt: null, deletedBy: null },
+                })
+              }
+              product = await ProductCatalogService.update(
+                existingItem.parentProductId,
+                baseUpdatePayload
+              )
+              if (existingItem.deletedAt) {
+                await prisma.inventoryItem.update({
+                  where: { id: existingItem.id },
+                  data: { deletedAt: null, deletedBy: null },
+                })
+              }
+              console.info(
+                `[Import] Row ${row.rowNumber}: caught "Barcode already exists" → updated product ${product.id}`
+              )
+            } else {
+              throw createErr
+            }
           } else {
             throw createErr
           }
         }
 
         batchProductIds.push(product.id)
+
+        // Queue AI fill for this product; fallback to direct sync if queue unavailable
+        try {
+          const { addAIProcessingJob } = await import('@/lib/queue/ai-processing.queue')
+          await addAIProcessingJob(jobId, [product.id])
+          console.info(`[Import] Row ${row.rowNumber}: queued AI fill for product ${product.id}`)
+        } catch {
+          console.info(`[Import] Row ${row.rowNumber}: AI queue unavailable, will run AI fill after batch sync`)
+        }
 
         await ImportService.markRow(jobId, row.rowNumber, ImportRowStatus.SUCCESS, {
           productId: product.id,
@@ -563,71 +713,85 @@ export async function processImportJob(
       )
     }
 
-    // Synchronous fallback: if AI queue failed (Redis down), run spec inference inline
-    // so specs are ALWAYS filled regardless of infrastructure
+    // Synchronous fallback: if AI queue failed (Redis down), run AI fill inline
     if (!aiQueueSucceeded) {
       console.info(
-        `[Import] Running synchronous AI spec inference for ${productIds.length} products...`
+        `[Import] Running synchronous AI fill for ${productIds.length} products (queue unavailable)...`
       )
-      const { inferMissingSpecs } = await import('@/lib/services/ai-spec-parser.service')
+
+      // Try full master fill first, fall back to spec inference only
       for (const pid of productIds) {
         try {
-          const product = await prisma.product.findUnique({
-            where: { id: pid },
-            include: { translations: true, category: true, brand: true },
-          })
-          if (!product) continue
+          const { runMasterFill } = await import('@/lib/services/ai-master-fill.service')
+          const result = await runMasterFill(pid)
+          console.info(
+            `[Import] AI master fill for ${pid}: ${result.fieldsGenerated} fields, ${result.photosFound} photos, score=${result.score}`
+          )
+        } catch (masterErr) {
+          console.warn(
+            `[Import] Master fill failed for ${pid}, falling back to spec inference:`,
+            masterErr instanceof Error ? masterErr.message : String(masterErr)
+          )
 
-          const enTrans = product.translations.find((t) => t.locale === 'en')
-          const specProductLike = {
-            id: pid,
-            sku: product.sku,
-            category: product.category ?? { name: 'Equipment' },
-            brand: product.brand ?? { name: 'Unknown' },
-            boxContents: product.boxContents,
-            translations: product.translations.map((t) => ({
-              locale: t.locale,
-              name: t.name,
-              shortDescription: t.shortDescription,
-              longDescription: t.longDescription,
-              specifications: t.specifications,
-            })),
-          }
+          try {
+            const { inferMissingSpecs } = await import('@/lib/services/ai-spec-parser.service')
+            const product = await prisma.product.findUnique({
+              where: { id: pid },
+              include: { translations: true, category: true, brand: true },
+            })
+            if (!product) continue
 
-          const specResult = await inferMissingSpecs(specProductLike)
-          if (specResult.specs.length > 0) {
-            const existingSpecs = (enTrans?.specifications as Record<string, unknown>) ?? {}
-            const merged = { ...existingSpecs }
-            for (const s of specResult.specs) {
-              const key = (s as { key: string }).key
-              const value = (s as { value: string }).value
-              if (
-                key &&
-                value &&
-                String(value).trim() !== '' &&
-                String(value).toLowerCase() !== 'unknown' &&
-                String(value).toLowerCase() !== 'n/a' &&
-                (merged[key] == null || String(merged[key]).trim() === '')
-              ) {
-                merged[key] = value
+            const enTrans = product.translations.find((t) => t.locale === 'en')
+            const specProductLike = {
+              id: pid,
+              sku: product.sku,
+              category: product.category ?? { name: 'Equipment' },
+              brand: product.brand ?? { name: 'Unknown' },
+              boxContents: product.boxContents,
+              translations: product.translations.map((t) => ({
+                locale: t.locale,
+                name: t.name,
+                shortDescription: t.shortDescription,
+                longDescription: t.longDescription,
+                specifications: t.specifications,
+              })),
+            }
+
+            const specResult = await inferMissingSpecs(specProductLike)
+            if (specResult.specs.length > 0) {
+              const existingSpecs = (enTrans?.specifications as Record<string, unknown>) ?? {}
+              const merged = { ...existingSpecs }
+              for (const s of specResult.specs) {
+                const key = (s as { key: string }).key
+                const value = (s as { value: string }).value
+                if (
+                  key &&
+                  value &&
+                  String(value).trim() !== '' &&
+                  String(value).toLowerCase() !== 'unknown' &&
+                  String(value).toLowerCase() !== 'n/a' &&
+                  (merged[key] == null || String(merged[key]).trim() === '')
+                ) {
+                  merged[key] = value
+                }
               }
+              for (const t of product.translations) {
+                await prisma.productTranslation.updateMany({
+                  where: { productId: pid, locale: t.locale },
+                  data: { specifications: merged as any },
+                })
+              }
+              await syncProductToEquipment(pid)
+              console.info(
+                `[Import] Spec inference for "${enTrans?.name}": ${specResult.specs.length} specs inferred`
+              )
             }
-            for (const t of product.translations) {
-              await prisma.productTranslation.updateMany({
-                where: { productId: pid, locale: t.locale },
-                data: { specifications: merged as any },
-              })
-            }
-            await syncProductToEquipment(pid)
-            console.info(
-              `[Import] Sync spec inference for "${enTrans?.name}": ${specResult.specs.length} specs inferred`
+          } catch (specErr) {
+            console.warn(
+              `[Import] Spec inference also failed for ${pid}:`,
+              specErr instanceof Error ? specErr.message : String(specErr)
             )
           }
-        } catch (specErr) {
-          console.warn(
-            `[Import] Sync spec inference failed for product ${pid}:`,
-            specErr instanceof Error ? specErr.message : String(specErr)
-          )
         }
       }
     }

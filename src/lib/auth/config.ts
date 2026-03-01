@@ -6,9 +6,19 @@
 
 import type { NextAuthConfig } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import GoogleProvider from 'next-auth/providers/google'
 
 export const authConfig: NextAuthConfig = {
   providers: [
+    ...(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET
+      ? [
+          GoogleProvider({
+            clientId: process.env.AUTH_GOOGLE_ID,
+            clientSecret: process.env.AUTH_GOOGLE_SECRET,
+            allowDangerousEmailAccountLinking: false,
+          }),
+        ]
+      : []),
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -82,10 +92,34 @@ export const authConfig: NextAuthConfig = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ account, profile }) {
+      if (account?.provider === 'google' && profile?.email) {
+        const { prisma } = await import('@/lib/db/prisma')
+        const dbUser = await prisma.user.findUnique({
+          where: { email: profile.email as string },
+        })
+        if (!dbUser || dbUser.deletedAt || dbUser.status !== 'active') {
+          return false
+        }
+      }
+      return true
+    },
+    async jwt({ token, user, account }) {
       if (user) {
-        token.id = user.id
-        token.role = (user as any).role
+        const fromCredentials = (user as { id?: string; role?: string }).id
+        if (fromCredentials) {
+          token.id = user.id as string
+          token.role = (user as { role?: string }).role as string
+        } else if (account?.provider === 'google' && (user as { email?: string }).email) {
+          const { prisma } = await import('@/lib/db/prisma')
+          const dbUser = await prisma.user.findUnique({
+            where: { email: (user as { email: string }).email },
+          })
+          if (dbUser) {
+            token.id = dbUser.id
+            token.role = dbUser.role
+          }
+        }
       }
       return token
     },

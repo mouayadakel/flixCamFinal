@@ -266,20 +266,20 @@ export default async function PortalBookingDetailPage({
             {booking.contracts.length > 0 && (
               <Link href={`/portal/contracts/${booking.contracts[0].id}`}>
                 <Button variant="outline" className="w-full justify-start">
-                  <FileText className="ml-2 h-4 w-4" />
+                  <FileText className="ms-2 h-4 w-4" />
                   {t('ar', 'portal.viewContract')}
                 </Button>
               </Link>
             )}
             {booking.status === 'PAYMENT_PENDING' && (
               <Button variant="default" className="w-full justify-start">
-                <Receipt className="ml-2 h-4 w-4" />
+                <Receipt className="ms-2 h-4 w-4" />
                 {t('ar', 'portal.payNow')}
               </Button>
             )}
             <Link href="/portal/invoices">
               <Button variant="outline" className="w-full justify-start">
-                <Receipt className="ml-2 h-4 w-4" />
+                <Receipt className="ms-2 h-4 w-4" />
                 {t('ar', 'portal.invoicesSection')}
               </Button>
             </Link>

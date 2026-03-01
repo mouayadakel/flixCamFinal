@@ -90,7 +90,7 @@ export default function PromissoryNoteSettingsPage() {
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/admin/settings">
-            <ArrowLeft className="ml-1 h-4 w-4" />
+            <ArrowLeft className="ms-1 h-4 w-4" />
             الإعدادات
           </Link>
         </Button>
@@ -196,7 +196,7 @@ export default function PromissoryNoteSettingsPage() {
       </Card>
 
       <Button onClick={save} disabled={saving}>
-        <Save className="ml-2 h-4 w-4" />
+        <Save className="ms-2 h-4 w-4" />
         حفظ
       </Button>
     </div>

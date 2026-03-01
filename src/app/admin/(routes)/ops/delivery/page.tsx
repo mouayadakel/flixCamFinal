@@ -179,11 +179,11 @@ export default function DeliveryPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={loadDeliveries} disabled={loading}>
-            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`ms-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
           <Button onClick={() => updateTab('schedule')}>
-            <Calendar className="ml-2 h-4 w-4" />
+            <Calendar className="ms-2 h-4 w-4" />
             جدولة التوصيل
           </Button>
         </div>

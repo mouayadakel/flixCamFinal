@@ -108,12 +108,12 @@ export function ShootTypeBulkEditor({ shootTypes, onUpdated }: ShootTypeBulkEdit
     <Card className="overflow-hidden">
       <div className="flex flex-wrap items-center gap-4 border-b bg-muted/30 p-4">
         <div className="relative min-w-[200px] flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search equipment..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="ps-9"
           />
         </div>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
@@ -144,7 +144,7 @@ export function ShootTypeBulkEditor({ shootTypes, onUpdated }: ShootTypeBulkEdit
               <TableRow>
                 <TableHead>Equipment</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead className="text-right">Price/day</TableHead>
+                <TableHead className="text-end">Price/day</TableHead>
                 {shootTypes.map((st) => (
                   <TableHead key={st.id} className="min-w-[140px]">
                     {st.name}
@@ -157,7 +157,7 @@ export function ShootTypeBulkEditor({ shootTypes, onUpdated }: ShootTypeBulkEdit
                 <TableRow key={eq.id}>
                   <TableCell className="font-medium">{eq.model ?? eq.sku}</TableCell>
                   <TableCell>{eq.categoryName}</TableCell>
-                  <TableCell className="text-right">{eq.dailyPrice} SAR</TableCell>
+                  <TableCell className="text-end">{eq.dailyPrice} SAR</TableCell>
                   {shootTypes.map((st) => (
                     <TableCell key={st.id} className="space-y-1">
                       <div className="flex items-center gap-2">

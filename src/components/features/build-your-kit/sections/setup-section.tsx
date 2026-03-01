@@ -140,7 +140,7 @@ export function SetupSection({ onSetupComplete }: SetupSectionProps) {
                   </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                <div className="absolute bottom-0 start-0 end-0 p-4 text-white">
                   <h3 className="font-semibold">{st.name}</h3>
                   {st.description && (
                     <p className="mt-1 line-clamp-2 text-sm text-white/90">{st.description}</p>

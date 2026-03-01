@@ -92,7 +92,7 @@ export default function KitsPage() {
         </div>
         <Button asChild>
           <Link href="/admin/inventory/kits/new">
-            <Plus className="ml-2 h-4 w-4" />
+            <Plus className="ms-2 h-4 w-4" />
             حزمة جديدة
           </Link>
         </Button>
@@ -126,7 +126,7 @@ export default function KitsPage() {
               <TableHead>عدد القطع</TableHead>
               <TableHead>الحالة</TableHead>
               <TableHead>تاريخ التحديث</TableHead>
-              <TableHead className="text-right">الإجراءات</TableHead>
+              <TableHead className="text-end">الإجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -189,7 +189,7 @@ export default function KitsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>{formatDate(kit.updatedAt)}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     <Button variant="ghost" size="sm" asChild>
                       <Link href={`/admin/inventory/kits/${kit.id}`}>
                         <Eye className="h-4 w-4" />

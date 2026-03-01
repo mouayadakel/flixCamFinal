@@ -91,7 +91,7 @@ export default function DashboardActivityPage() {
               loadActivity()
             }}
           >
-            <RefreshCw className={`ml-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`ms-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
           <Link

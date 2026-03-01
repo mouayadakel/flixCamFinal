@@ -196,7 +196,7 @@ export default async function VendorDashboardPage() {
           <div className="flex flex-wrap gap-4">
             <Link href="/vendor/equipment/new">
               <Button>
-                <ArrowLeft className="ml-2 h-4 w-4" />
+                <ArrowLeft className="ms-2 h-4 w-4" />
                 {t('ar', 'vendor.addNewEquipment')}
               </Button>
             </Link>

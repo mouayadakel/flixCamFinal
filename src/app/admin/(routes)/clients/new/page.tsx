@@ -108,7 +108,7 @@ export default function NewClientPage() {
         </div>
         <Button variant="outline" asChild>
           <Link href="/admin/clients">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             إلغاء
           </Link>
         </Button>
@@ -268,12 +268,12 @@ export default function NewClientPage() {
           <Button type="submit" disabled={loading}>
             {loading ? (
               <>
-                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                 جاري الحفظ...
               </>
             ) : (
               <>
-                <Plus className="ml-2 h-4 w-4" />
+                <Plus className="ms-2 h-4 w-4" />
                 إنشاء العميل
               </>
             )}

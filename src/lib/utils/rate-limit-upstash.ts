@@ -17,6 +17,7 @@ let limiters: {
   payment: Ratelimit | null
   auth: Ratelimit | null
   ai: Ratelimit | null
+  blogAi: Ratelimit | null
 } = {
   public: null,
   authenticated: null,
@@ -24,6 +25,7 @@ let limiters: {
   payment: null,
   auth: null,
   ai: null,
+  blogAi: null,
 }
 
 function getRedis(): Redis | null {
@@ -78,12 +80,17 @@ function getLimiters() {
         limiter: Ratelimit.slidingWindow(60, '1 m'),
         analytics: true,
       }),
+      blogAi: new Ratelimit({
+        redis: r,
+        limiter: Ratelimit.slidingWindow(20, '1 h'),
+        analytics: true,
+      }),
     }
   }
   return limiters
 }
 
-export type RateLimitTierName = 'public' | 'authenticated' | 'checkout' | 'payment' | 'auth' | 'ai'
+export type RateLimitTierName = 'public' | 'authenticated' | 'checkout' | 'payment' | 'auth' | 'ai' | 'blogAi'
 
 export interface UpstashRateLimitResult {
   allowed: boolean
@@ -123,6 +130,25 @@ export async function aiRateLimitResponse(
   identifier: string
 ): Promise<Response | null> {
   const result = await checkRateLimitUpstash(request, 'ai', identifier)
+  if (result.allowed) return null
+  const retryAfter = Math.ceil((result.reset - Date.now()) / 1000)
+  return new Response(JSON.stringify({ error: 'Too many requests', code: 'RATE_LIMITED' }), {
+    status: 429,
+    headers: {
+      'Content-Type': 'application/json',
+      'Retry-After': String(Math.max(1, retryAfter)),
+    },
+  })
+}
+
+/**
+ * For blog AI routes: 20/hour per user. Returns 429 if over limit.
+ */
+export async function blogAiRateLimitResponse(
+  request: Request,
+  identifier: string
+): Promise<Response | null> {
+  const result = await checkRateLimitUpstash(request, 'blogAi', identifier)
   if (result.allowed) return null
   const retryAfter = Math.ceil((result.reset - Date.now()) / 1000)
   return new Response(JSON.stringify({ error: 'Too many requests', code: 'RATE_LIMITED' }), {

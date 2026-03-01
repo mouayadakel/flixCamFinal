@@ -68,11 +68,11 @@ function getColorForField(value: string): string {
   if (!field) return ''
   switch (field.color) {
     case 'green':
-      return 'border-r-green-500'
+      return 'border-e-green-500'
     case 'yellow':
-      return 'border-r-yellow-500'
+      return 'border-e-yellow-500'
     case 'blue':
-      return 'border-r-blue-500'
+      return 'border-e-blue-500'
     default:
       return ''
   }
@@ -128,7 +128,7 @@ export function ColumnMapper({
                 size="sm"
                 onClick={() => onSaveTemplate('default', mappings)}
               >
-                <Save className="ml-1 h-3 w-3" />
+                <Save className="ms-1 h-3 w-3" />
                 حفظ القالب
               </Button>
             )}
@@ -146,9 +146,9 @@ export function ColumnMapper({
             <div
               key={mapping.sourceHeader}
               className={cn(
-                'grid grid-cols-[1fr_1fr_80px] items-center gap-2 rounded-md border-r-4 px-2 py-1.5',
+                'grid grid-cols-[1fr_1fr_80px] items-center gap-2 rounded-md border-e-4 px-2 py-1.5',
                 getColorForField(mapping.mappedField || 'skip'),
-                !mapping.mappedField && 'border-r-gray-200 bg-muted/30'
+                !mapping.mappedField && 'border-e-gray-200 bg-muted/30'
               )}
             >
               <span className="truncate font-mono text-sm" title={mapping.sourceHeader}>
@@ -203,7 +203,7 @@ export function ColumnMapper({
                       .filter((m) => m.mappedField)
                       .slice(0, 6)
                       .map((m) => (
-                        <th key={m.sourceHeader} className="px-2 py-1 text-right font-medium">
+                        <th key={m.sourceHeader} className="px-2 py-1 text-end font-medium">
                           {SYSTEM_FIELDS.find((f) => f.value === m.mappedField)?.label ||
                             m.mappedField}
                         </th>

@@ -110,7 +110,7 @@ export default function RecurringBookingsPage() {
         <h1 className="text-3xl font-bold">الحجوزات المتكررة</h1>
         <Button asChild>
           <Link href="/admin/recurring-bookings/new">
-            <Plus className="ml-2 h-4 w-4" />
+            <Plus className="ms-2 h-4 w-4" />
             سلسلة جديدة
           </Link>
         </Button>
@@ -155,7 +155,7 @@ export default function RecurringBookingsPage() {
               <TableHead>عدد الحجوزات</TableHead>
               <TableHead>الحالة</TableHead>
               <TableHead>تاريخ الإنشاء</TableHead>
-              <TableHead className="text-right">الإجراءات</TableHead>
+              <TableHead className="text-end">الإجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -217,7 +217,7 @@ export default function RecurringBookingsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>{formatDate(s.createdAt)}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     <Button variant="ghost" size="sm" asChild>
                       <Link href={`/admin/recurring-bookings/${s.id}`}>
                         <Eye className="h-4 w-4" />

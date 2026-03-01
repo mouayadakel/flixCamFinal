@@ -12,6 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { useLocale } from '@/hooks/use-locale'
@@ -108,9 +109,8 @@ function ResetPasswordForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <Label htmlFor="password">{i18n('auth.newPassword')}</Label>
-          <Input
+          <PasswordInput
             id="password"
-            type="password"
             {...register('password')}
             className="mt-1"
             autoComplete="new-password"
@@ -121,9 +121,8 @@ function ResetPasswordForm() {
         </div>
         <div>
           <Label htmlFor="confirmPassword">{i18n('auth.confirmPassword')}</Label>
-          <Input
+          <PasswordInput
             id="confirmPassword"
-            type="password"
             {...register('confirmPassword')}
             className="mt-1"
             autoComplete="new-password"

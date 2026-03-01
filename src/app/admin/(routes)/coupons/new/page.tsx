@@ -138,7 +138,7 @@ export default function NewCouponPage() {
         </div>
         <Button variant="outline" asChild>
           <Link href="/admin/coupons">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             إلغاء
           </Link>
         </Button>
@@ -197,7 +197,7 @@ export default function NewCouponPage() {
                     onChange={(e) => setFormData({ ...formData, value: e.target.value })}
                     placeholder="10"
                   />
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                  <span className="absolute start-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                     {formData.type === 'percent' ? '%' : 'ر.س'}
                   </span>
                 </div>
@@ -321,12 +321,12 @@ export default function NewCouponPage() {
           <Button type="submit" disabled={loading}>
             {loading ? (
               <>
-                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                 جاري الحفظ...
               </>
             ) : (
               <>
-                <Plus className="ml-2 h-4 w-4" />
+                <Plus className="ms-2 h-4 w-4" />
                 إنشاء الكوبون
               </>
             )}

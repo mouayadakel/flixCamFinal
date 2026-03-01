@@ -92,7 +92,7 @@ export default async function PortalDocumentsPage() {
                         c.booking.bookingNumber
                       )}
                     </span>
-                    <span className="mr-2 text-sm text-muted-foreground">
+                    <span className="me-2 text-sm text-muted-foreground">
                       — {formatDate(c.createdAt)}
                       {c.signedAt && ` · ${t('ar', 'portal.signed')} ${formatDate(c.signedAt)}`}
                     </span>
@@ -141,7 +141,7 @@ export default async function PortalDocumentsPage() {
                   >
                     <div>
                       <span className="font-medium">{inv.label}</span>
-                      <span className="mr-2 text-sm text-muted-foreground">
+                      <span className="me-2 text-sm text-muted-foreground">
                         — {formatCurrency(inv.totalAmount.toNumber())}
                         {isPaid ? ` · ${t('ar', 'portal.paid')}` : ''}
                       </span>
@@ -153,7 +153,7 @@ export default async function PortalDocumentsPage() {
                         </Button>
                       </Link>
                       <Button variant="outline" size="sm">
-                        <Download className="ml-1 h-4 w-4" />
+                        <Download className="ms-1 h-4 w-4" />
                         PDF
                       </Button>
                     </div>

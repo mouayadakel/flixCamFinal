@@ -10,6 +10,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -82,9 +83,8 @@ export function ProviderSettingsCard({
 
         <div>
           <Label htmlFor={`${provider}-api-key`}>مفتاح API</Label>
-          <Input
+          <PasswordInput
             id={`${provider}-api-key`}
-            type="password"
             value={localSetting.apiKey}
             onChange={(e) => setLocalSetting({ ...localSetting, apiKey: e.target.value })}
             placeholder={`أدخل مفتاح ${provider === 'openai' ? 'OpenAI' : 'Gemini'}`}

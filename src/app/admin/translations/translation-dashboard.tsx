@@ -250,12 +250,12 @@ export function TranslationDashboard() {
       {/* Filters and Actions */}
       <div className="flex flex-wrap items-center gap-4">
         <div className="relative min-w-[200px] flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search translations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="ps-10"
           />
         </div>
 
@@ -290,7 +290,7 @@ export function TranslationDashboard() {
           size="sm"
           onClick={() => setShowMissingOnly(!showMissingOnly)}
         >
-          <Filter className="mr-2 h-4 w-4" />
+          <Filter className="me-2 h-4 w-4" />
           Missing Only
         </Button>
 
@@ -312,13 +312,13 @@ export function TranslationDashboard() {
           </SelectContent>
         </Select>
 
-        <div className="ml-auto flex gap-2">
+        <div className="ms-auto flex gap-2">
           <Button variant="outline" size="sm" onClick={handleExportCSV}>
-            <Download className="mr-2 h-4 w-4" />
+            <Download className="me-2 h-4 w-4" />
             Export CSV
           </Button>
           <Button variant="outline" size="sm" onClick={handleExportJSON}>
-            <Download className="mr-2 h-4 w-4" />
+            <Download className="me-2 h-4 w-4" />
             Export JSON
           </Button>
         </div>
@@ -338,11 +338,11 @@ export function TranslationDashboard() {
           <table className="w-full">
             <thead className="border-b bg-muted/50">
               <tr>
-                <th className="p-3 text-left text-sm font-medium">Key</th>
-                <th className="p-3 text-left text-sm font-medium">Arabic</th>
-                <th className="p-3 text-left text-sm font-medium">English</th>
-                <th className="p-3 text-left text-sm font-medium">Chinese</th>
-                <th className="p-3 text-left text-sm font-medium">Status</th>
+                <th className="p-3 text-start text-sm font-medium">Key</th>
+                <th className="p-3 text-start text-sm font-medium">Arabic</th>
+                <th className="p-3 text-start text-sm font-medium">English</th>
+                <th className="p-3 text-start text-sm font-medium">Chinese</th>
+                <th className="p-3 text-start text-sm font-medium">Status</th>
               </tr>
             </thead>
             <tbody>

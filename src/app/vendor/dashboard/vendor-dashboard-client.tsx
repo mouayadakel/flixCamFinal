@@ -26,7 +26,7 @@ export function VendorDashboardClient({ monthlyData }: { monthlyData: MonthlyIte
                 style={{ width: `${Math.max(pct, 2)}%` }}
               />
             </div>
-            <span className="w-24 text-right text-sm font-medium">
+            <span className="w-24 text-end text-sm font-medium">
               {new Intl.NumberFormat('ar-SA', {
                 style: 'currency',
                 currency: 'SAR',

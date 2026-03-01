@@ -462,7 +462,7 @@ export default function KitBuilderPage() {
           <p className="mt-1 text-muted-foreground">إنشاء وإدارة حزم المعدات المجمعة</p>
         </div>
         <Button onClick={handleCreateKit}>
-          <Plus className="ml-2 h-4 w-4" />
+          <Plus className="ms-2 h-4 w-4" />
           طقم جديد
         </Button>
       </div>
@@ -471,7 +471,7 @@ export default function KitBuilderPage() {
         <TabsList>
           <TabsTrigger value="kits">الحزم</TabsTrigger>
           <TabsTrigger value="performance">
-            <BarChart3 className="ml-1 h-4 w-4" />
+            <BarChart3 className="ms-1 h-4 w-4" />
             أداء الحزم
           </TabsTrigger>
         </TabsList>
@@ -482,12 +482,12 @@ export default function KitBuilderPage() {
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
                 <div className="relative flex-1">
-                  <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     placeholder="بحث بالاسم..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="pr-10"
+                    className="pe-10"
                   />
                 </div>
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
@@ -521,7 +521,7 @@ export default function KitBuilderPage() {
                 <p className="text-lg font-medium">فشل تحميل البيانات</p>
                 <p className="mb-4 text-sm">{loadError}</p>
                 <Button variant="outline" onClick={() => loadData()}>
-                  <RefreshCw className="ml-2 h-4 w-4" />
+                  <RefreshCw className="ms-2 h-4 w-4" />
                   إعادة المحاولة
                 </Button>
               </CardContent>
@@ -533,7 +533,7 @@ export default function KitBuilderPage() {
                 <p className="text-lg font-medium">لا توجد أطقم</p>
                 <p className="text-sm">ابدأ بإنشاء طقم جديد</p>
                 <Button className="mt-4" onClick={handleCreateKit}>
-                  <Plus className="ml-2 h-4 w-4" />
+                  <Plus className="ms-2 h-4 w-4" />
                   إنشاء طقم
                 </Button>
               </CardContent>
@@ -599,7 +599,7 @@ export default function KitBuilderPage() {
                           className="flex-1"
                           onClick={() => handleEditKit(kit)}
                         >
-                          <Edit className="ml-1 h-4 w-4" />
+                          <Edit className="ms-1 h-4 w-4" />
                           تعديل
                         </Button>
                         <Button size="sm" variant="ghost" onClick={() => handleDuplicateKit(kit)}>
@@ -661,7 +661,7 @@ export default function KitBuilderPage() {
                       <TableRow>
                         <TableHead>الطقم</TableHead>
                         <TableHead className="text-center">مرات الاستخدام</TableHead>
-                        <TableHead className="text-left">السعر اليومي</TableHead>
+                        <TableHead className="text-start">السعر اليومي</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -672,7 +672,7 @@ export default function KitBuilderPage() {
                           <TableRow key={kit.id}>
                             <TableCell className="font-medium">{kit.nameAr || kit.name}</TableCell>
                             <TableCell className="text-center">{kit.usageCount}</TableCell>
-                            <TableCell className="text-left">
+                            <TableCell className="text-start">
                               {formatCurrency(kit.finalDailyRate)}
                             </TableCell>
                           </TableRow>
@@ -829,7 +829,7 @@ export default function KitBuilderPage() {
               <Accordion type="single" collapsible className="mb-4">
                 <AccordionItem value="ai-suggest">
                   <AccordionTrigger className="text-sm">
-                    <Sparkles className="ml-2 h-4 w-4" />
+                    <Sparkles className="ms-2 h-4 w-4" />
                     اقتراح ذكي بالذكاء الاصطناعي
                   </AccordionTrigger>
                   <AccordionContent>
@@ -937,7 +937,7 @@ export default function KitBuilderPage() {
               إلغاء
             </Button>
             <Button onClick={handleSaveKit} disabled={saving}>
-              <Save className="ml-2 h-4 w-4" />
+              <Save className="ms-2 h-4 w-4" />
               {saving ? 'جاري الحفظ...' : 'حفظ الطقم'}
             </Button>
           </DialogFooter>

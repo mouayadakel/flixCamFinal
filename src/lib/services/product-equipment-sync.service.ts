@@ -92,6 +92,15 @@ export async function syncProductToEquipment(productId: string): Promise<void> {
         where: { id: product.id, deletedAt: null },
       })
     }
+    // If Product has barcode and no Equipment found yet, check for soft-deleted Equipment with same barcode (restore it)
+    if (!existing && barcode) {
+      const byBarcode = await tx.equipment.findFirst({
+        where: { barcode },
+      })
+      if (byBarcode) {
+        existing = byBarcode
+      }
+    }
 
     const baseSlug = generateSlug(model)
     const slug = await ensureUniqueSlug(tx, baseSlug, existing?.id)
@@ -111,12 +120,19 @@ export async function syncProductToEquipment(productId: string): Promise<void> {
         ? (JSON.parse(JSON.stringify(customFieldsMerged)) as object)
         : undefined
 
+    const zhTranslation = product.translations.find((t) => t.locale === 'zh')
+    const arTranslation = product.translations.find((t) => t.locale === 'ar')
+
     const equipmentUpdateData: Record<string, unknown> = {
       sku,
       ...(barcode != null && { barcode }),
       slug,
       productId: product.id,
       model,
+      nameEn: enTranslation?.name ?? model,
+      nameZh: zhTranslation?.name ?? null,
+      descriptionEn: enTranslation?.longDescription ?? enTranslation?.shortDescription ?? null,
+      descriptionZh: zhTranslation?.longDescription ?? zhTranslation?.shortDescription ?? null,
       categoryId: product.categoryId,
       brandId: product.brandId,
       dailyPrice: product.priceDaily,
@@ -128,6 +144,7 @@ export async function syncProductToEquipment(productId: string): Promise<void> {
       specSource: specsValue ? 'import' : undefined,
       customFields: customFieldsValue,
       updatedAt: new Date(),
+      ...(existing?.deletedAt && { deletedAt: null, deletedBy: null }),
     }
 
     let equipmentId: string
@@ -146,6 +163,10 @@ export async function syncProductToEquipment(productId: string): Promise<void> {
           slug,
           productId: product.id,
           model,
+          nameEn: enTranslation?.name ?? model,
+          nameZh: zhTranslation?.name ?? undefined,
+          descriptionEn: enTranslation?.longDescription ?? enTranslation?.shortDescription ?? undefined,
+          descriptionZh: zhTranslation?.longDescription ?? zhTranslation?.shortDescription ?? undefined,
           categoryId: product.categoryId,
           brandId: product.brandId,
           dailyPrice: product.priceDaily,

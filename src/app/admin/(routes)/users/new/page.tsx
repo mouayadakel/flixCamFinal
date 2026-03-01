@@ -13,6 +13,7 @@ import { ArrowRight, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -101,7 +102,7 @@ export default function NewUserPage() {
         </div>
         <Button variant="outline" asChild>
           <Link href="/admin/users">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             العودة
           </Link>
         </Button>
@@ -141,9 +142,8 @@ export default function NewUserPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">كلمة المرور (اختياري)</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="8 أحرف على الأقل - اترك فارغاً لإنشاء كلمة عشوائية"
@@ -179,7 +179,7 @@ export default function NewUserPage() {
             </div>
             <div className="flex gap-2 pt-2">
               <Button type="submit" disabled={submitting}>
-                {submitting && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                {submitting && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
                 إنشاء مستخدم
               </Button>
               <Button type="button" variant="outline" asChild>

@@ -251,12 +251,12 @@ export function RelatedEquipmentSelector({
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+        <Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
         <Input
           placeholder="ابحث عن المعدات (SKU، الموديل، الفئة)..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pr-10"
+          className="pe-10"
           dir="rtl"
         />
       </div>
@@ -267,7 +267,7 @@ export function RelatedEquipmentSelector({
           <CollapsibleTrigger asChild>
             <button
               type="button"
-              className="flex w-full items-center justify-between rounded-t-lg border-0 border-b border-neutral-200 bg-neutral-50/80 px-4 py-3 text-right hover:bg-neutral-100/80"
+              className="flex w-full items-center justify-between rounded-t-lg border-0 border-b border-neutral-200 bg-neutral-50/80 px-4 py-3 text-end hover:bg-neutral-100/80"
             >
               <SlidersHorizontal className="h-4 w-4 text-neutral-500" />
               <span className="font-medium text-neutral-800">فلترة: أفضل المعدات ذات الصلة</span>

@@ -221,7 +221,7 @@ export default function PaymentDetailPage() {
           </h1>
           <div className="mt-2 flex items-center gap-2">
             <Badge className={statusConfig.color}>
-              <StatusIcon className="ml-1 h-3 w-3" />
+              <StatusIcon className="ms-1 h-3 w-3" />
               {statusConfig.label}
             </Badge>
             <span className="text-muted-foreground">•</span>
@@ -231,13 +231,13 @@ export default function PaymentDetailPage() {
         <div className="flex gap-2">
           <Button variant="outline" asChild>
             <Link href="/admin/payments">
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ms-2 h-4 w-4" />
               العودة
             </Link>
           </Button>
           {canRefund && (
             <Button variant="destructive" onClick={() => setRefundDialogOpen(true)}>
-              <RotateCcw className="ml-2 h-4 w-4" />
+              <RotateCcw className="ms-2 h-4 w-4" />
               استرداد
             </Button>
           )}

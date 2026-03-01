@@ -232,7 +232,7 @@ export default function NewQuotePage() {
         </div>
         <Button variant="outline" asChild>
           <Link href="/admin/quotes">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             إلغاء
           </Link>
         </Button>
@@ -305,7 +305,7 @@ export default function NewQuotePage() {
                 </SelectContent>
               </Select>
               <Button type="button" onClick={addItem} disabled={!selectedEquipment}>
-                <Plus className="ml-2 h-4 w-4" />
+                <Plus className="ms-2 h-4 w-4" />
                 إضافة
               </Button>
             </div>
@@ -351,7 +351,7 @@ export default function NewQuotePage() {
                         }
                       />
                     </div>
-                    <div className="w-28 text-left">
+                    <div className="w-28 text-start">
                       <p className="text-xs text-muted-foreground">الإجمالي</p>
                       <p className="font-bold">
                         {formatCurrency(item.quantity * item.days * item.unitPrice)}
@@ -369,7 +369,7 @@ export default function NewQuotePage() {
                 ))}
 
                 {/* Totals */}
-                <div className="mr-auto max-w-sm space-y-2 border-t pt-4">
+                <div className="me-auto max-w-sm space-y-2 border-t pt-4">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">المجموع الفرعي</span>
                     <span>{formatCurrency(subtotal)}</span>
@@ -411,12 +411,12 @@ export default function NewQuotePage() {
           <Button type="submit" disabled={loading || items.length === 0}>
             {loading ? (
               <>
-                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                 جاري الحفظ...
               </>
             ) : (
               <>
-                <Plus className="ml-2 h-4 w-4" />
+                <Plus className="ms-2 h-4 w-4" />
                 إنشاء عرض السعر
               </>
             )}

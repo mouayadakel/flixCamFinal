@@ -95,7 +95,7 @@ export default function StudiosPage() {
           </Button>
           <Button asChild>
             <Link href="/admin/studios/new">
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="me-2 h-4 w-4" />
               New Studio
             </Link>
           </Button>
@@ -124,7 +124,7 @@ export default function StudiosPage() {
                 <TableHead>Hourly rate</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Bookings</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-end">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -139,7 +139,7 @@ export default function StudiosPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>{studio._count.bookings}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     <Button variant="ghost" size="sm" asChild>
                       <Link href={`/admin/studios/${studio.id}`} aria-label={`View ${studio.name}`}>
                         <Eye className="h-4 w-4" />

@@ -37,11 +37,35 @@ const baseEquipmentSchema = z.object({
     .int()
     .min(0, { message: 'Available quantity cannot be negative' })
     .optional(),
-  dailyPrice: z.number().min(0, { message: 'Daily price must be positive' }),
-  weeklyPrice: z.number().min(0, { message: 'Weekly price must be positive' }).optional(),
-  monthlyPrice: z.number().min(0, { message: 'Monthly price must be positive' }).optional(),
+  dailyPrice: z.preprocess(
+    (v) =>
+      v === '' || v === undefined || v === null || (typeof v === 'number' && Number.isNaN(v))
+        ? undefined
+        : v,
+    z.number({ required_error: 'السعر اليومي مطلوب' }).min(0, { message: 'Daily price must be positive' })
+  ),
+  weeklyPrice: z.preprocess(
+    (v) =>
+      v === '' || v === undefined || v === null || (typeof v === 'number' && Number.isNaN(v))
+        ? undefined
+        : v,
+    z.number().min(0, { message: 'Weekly price must be positive' }).optional()
+  ),
+  monthlyPrice: z.preprocess(
+    (v) =>
+      v === '' || v === undefined || v === null || (typeof v === 'number' && Number.isNaN(v))
+        ? undefined
+        : v,
+    z.number().min(0, { message: 'Monthly price must be positive' }).optional()
+  ),
   /** سعر الشراء — internal only, for tracking and سند الأمر (not shown to customers) */
-  purchasePrice: z.number().min(0, { message: 'Purchase price cannot be negative' }).optional(),
+  purchasePrice: z.preprocess(
+    (v) =>
+      v === '' || v === undefined || v === null || (typeof v === 'number' && Number.isNaN(v))
+        ? undefined
+        : v,
+    z.number().min(0, { message: 'Purchase price cannot be negative' }).optional()
+  ),
   /** مبلغ التأمين — اختياري. Empty/NaN/null from number input coerced to undefined. */
   depositAmount: z.preprocess(
     (v) =>

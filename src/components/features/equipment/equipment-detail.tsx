@@ -614,7 +614,7 @@ export function EquipmentDetail({ equipment, recommendations }: EquipmentDetailP
         </div>
 
         {/* Mobile: sticky Add to Booking bar (above bottom nav) */}
-        <div className="fixed bottom-20 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-border bg-white/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_12px_rgba(0,0,0,0.08)] lg:hidden">
+        <div className="fixed bottom-20 start-0 end-0 z-40 flex items-center justify-between gap-4 border-t border-border bg-white/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_12px_rgba(0,0,0,0.08)] lg:hidden">
           <div>
             <span className="text-lg font-bold text-brand-primary">
               {equipment.dailyPrice.toLocaleString()} SAR

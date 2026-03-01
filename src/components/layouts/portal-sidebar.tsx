@@ -16,6 +16,7 @@ import {
   FolderOpen,
   Heart,
   User,
+  Users,
   Bell,
   HelpCircle,
   Camera,
@@ -43,6 +44,7 @@ const SECTIONS = [
     title: 'الحساب',
     items: [
       { label: 'المعدات المحفوظة', href: '/portal/saved', icon: Heart },
+      { label: 'المستلمين المحفوظين', href: '/portal/receivers', icon: Users },
       { label: 'الملف الشخصي', href: '/portal/profile', icon: User },
       { label: 'الإشعارات', href: '/portal/notifications', icon: Bell },
       { label: 'الدعم', href: '/support', icon: HelpCircle },

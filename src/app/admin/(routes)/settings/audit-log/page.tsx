@@ -231,14 +231,14 @@ export default function AuditLogPage() {
           <div className="flex gap-2">
             <Button onClick={fetchLogs} disabled={loading}>
               {loading ? (
-                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                <Loader2 className="ms-2 h-4 w-4 animate-spin" />
               ) : (
-                <RefreshCw className="ml-2 h-4 w-4" />
+                <RefreshCw className="ms-2 h-4 w-4" />
               )}
               تطبيق
             </Button>
             <Button variant="outline" onClick={exportCsv} disabled={logs.length === 0}>
-              <Download className="ml-2 h-4 w-4" />
+              <Download className="ms-2 h-4 w-4" />
               تصدير CSV
             </Button>
           </div>

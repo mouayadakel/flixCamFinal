@@ -143,7 +143,7 @@ export default function CmsFaqPage() {
         </div>
         <Button onClick={openAdd}>
           <Plus className="h-4 w-4" />
-          <span className="mr-2">إضافة سؤال</span>
+          <span className="me-2">إضافة سؤال</span>
         </Button>
       </div>
 

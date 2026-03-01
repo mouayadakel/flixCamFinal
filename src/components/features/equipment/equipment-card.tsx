@@ -110,7 +110,7 @@ export function EquipmentCard({ item, layout = 'grid' }: EquipmentCardProps) {
     >
       <div className="relative aspect-[4/3] shrink-0 overflow-hidden bg-surface-light">
         {/* Save button */}
-        <div className="absolute right-3 top-3 z-10">
+        <div className="absolute end-3 top-3 z-10">
           <SaveEquipmentButton equipmentId={item.id} />
         </div>
         {imageFailed ? (

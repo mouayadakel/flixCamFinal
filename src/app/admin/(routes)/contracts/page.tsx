@@ -194,7 +194,7 @@ export default function ContractsPage() {
           onClick={handleExportCSV}
           disabled={filteredContracts.length === 0}
         >
-          <Download className="ml-2 h-4 w-4" />
+          <Download className="ms-2 h-4 w-4" />
           تصدير CSV
         </Button>
       </div>
@@ -386,7 +386,7 @@ export default function ContractsPage() {
                     <div className="flex gap-2">
                       <Link href={`/admin/contracts/${contract.id}`}>
                         <Button size="sm" variant="ghost">
-                          <Eye className="ml-1 h-4 w-4" />
+                          <Eye className="ms-1 h-4 w-4" />
                           عرض
                         </Button>
                       </Link>

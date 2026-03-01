@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -182,12 +183,12 @@ export default function IntegrationsPage() {
                 </div>
                 {getIntegration('payments')?.configured ? (
                   <Badge className="bg-green-100 text-green-800">
-                    <CheckCircle2 className="mr-1 h-3 w-3" />
+                    <CheckCircle2 className="me-1 h-3 w-3" />
                     Connected
                   </Badge>
                 ) : (
                   <Badge className="bg-yellow-100 text-yellow-800">
-                    <XCircle className="mr-1 h-3 w-3" />
+                    <XCircle className="me-1 h-3 w-3" />
                     Not Configured
                   </Badge>
                 )}
@@ -204,9 +205,8 @@ export default function IntegrationsPage() {
               )}
               <div className="space-y-2">
                 <Label htmlFor="tap-secret">Secret Key</Label>
-                <Input
+                <PasswordInput
                   id="tap-secret"
-                  type="password"
                   placeholder="sk_test_..."
                   value={
                     configValues.payments?.secretKey ||
@@ -238,11 +238,11 @@ export default function IntegrationsPage() {
                   onClick={() => handleTestConnection('payments')}
                   disabled={testing.payments || !getIntegration('payments')?.configured}
                 >
-                  {testing.payments && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {testing.payments && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                   Test Connection
                 </Button>
                 <Button onClick={() => handleSaveConfig('payments')} disabled={saving.payments}>
-                  {saving.payments && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {saving.payments && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                   Save Configuration
                 </Button>
               </div>
@@ -267,12 +267,12 @@ export default function IntegrationsPage() {
                 </div>
                 {getIntegration('email')?.configured ? (
                   <Badge className="bg-green-100 text-green-800">
-                    <CheckCircle2 className="mr-1 h-3 w-3" />
+                    <CheckCircle2 className="me-1 h-3 w-3" />
                     Configured
                   </Badge>
                 ) : (
                   <Badge className="bg-yellow-100 text-yellow-800">
-                    <XCircle className="mr-1 h-3 w-3" />
+                    <XCircle className="me-1 h-3 w-3" />
                     Not Configured
                   </Badge>
                 )}
@@ -309,9 +309,8 @@ export default function IntegrationsPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="smtp-password">SMTP Password</Label>
-                <Input
+                <PasswordInput
                   id="smtp-password"
-                  type="password"
                   placeholder="Your SMTP password"
                   value={configValues.email?.password || ''}
                   onChange={(e) => updateConfigValue('email', 'password', e.target.value)}
@@ -333,11 +332,11 @@ export default function IntegrationsPage() {
                   onClick={() => handleTestConnection('email')}
                   disabled={testing.email || !getIntegration('email')?.configured}
                 >
-                  {testing.email && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {testing.email && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                   Test Connection
                 </Button>
                 <Button onClick={() => handleSaveConfig('email')} disabled={saving.email}>
-                  {saving.email && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {saving.email && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                   Save Configuration
                 </Button>
               </div>
@@ -362,12 +361,12 @@ export default function IntegrationsPage() {
                 </div>
                 {getIntegration('whatsapp')?.configured ? (
                   <Badge className="bg-green-100 text-green-800">
-                    <CheckCircle2 className="mr-1 h-3 w-3" />
+                    <CheckCircle2 className="me-1 h-3 w-3" />
                     Configured
                   </Badge>
                 ) : (
                   <Badge className="bg-yellow-100 text-yellow-800">
-                    <XCircle className="mr-1 h-3 w-3" />
+                    <XCircle className="me-1 h-3 w-3" />
                     Not Configured
                   </Badge>
                 )}
@@ -383,9 +382,8 @@ export default function IntegrationsPage() {
               )}
               <div className="space-y-2">
                 <Label htmlFor="whatsapp-api-key">API Key</Label>
-                <Input
+                <PasswordInput
                   id="whatsapp-api-key"
-                  type="password"
                   placeholder="Your WhatsApp API key"
                   value={
                     configValues.whatsapp?.apiKey || getIntegration('whatsapp')?.config.apiKey || ''
@@ -401,11 +399,11 @@ export default function IntegrationsPage() {
                   onClick={() => handleTestConnection('whatsapp')}
                   disabled={testing.whatsapp || !getIntegration('whatsapp')?.configured}
                 >
-                  {testing.whatsapp && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {testing.whatsapp && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                   Test Connection
                 </Button>
                 <Button onClick={() => handleSaveConfig('whatsapp')} disabled={saving.whatsapp}>
-                  {saving.whatsapp && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {saving.whatsapp && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                   Save Configuration
                 </Button>
               </div>
@@ -430,12 +428,12 @@ export default function IntegrationsPage() {
                 </div>
                 {getIntegration('analytics')?.configured ? (
                   <Badge className="bg-green-100 text-green-800">
-                    <CheckCircle2 className="mr-1 h-3 w-3" />
+                    <CheckCircle2 className="me-1 h-3 w-3" />
                     Configured
                   </Badge>
                 ) : (
                   <Badge className="bg-yellow-100 text-yellow-800">
-                    <XCircle className="mr-1 h-3 w-3" />
+                    <XCircle className="me-1 h-3 w-3" />
                     Not Configured
                   </Badge>
                 )}
@@ -496,11 +494,11 @@ export default function IntegrationsPage() {
                   onClick={() => handleTestConnection('analytics')}
                   disabled={testing.analytics}
                 >
-                  {testing.analytics && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {testing.analytics && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                   Test Configuration
                 </Button>
                 <Button onClick={() => handleSaveConfig('analytics')} disabled={saving.analytics}>
-                  {saving.analytics && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {saving.analytics && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                   Save Configuration
                 </Button>
               </div>
@@ -524,7 +522,7 @@ export default function IntegrationsPage() {
                   <CardDescription>Webhook endpoints and API configuration</CardDescription>
                 </div>
                 <Badge className="bg-green-100 text-green-800">
-                  <CheckCircle2 className="mr-1 h-3 w-3" />
+                  <CheckCircle2 className="me-1 h-3 w-3" />
                   Active
                 </Badge>
               </div>
@@ -541,7 +539,7 @@ export default function IntegrationsPage() {
                   onClick={() => handleTestConnection('webhooks')}
                   disabled={testing.webhooks}
                 >
-                  {testing.webhooks && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {testing.webhooks && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                   Test Endpoint
                 </Button>
               </div>

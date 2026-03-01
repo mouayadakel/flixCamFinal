@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { ArrowRight, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useToast } from '@/hooks/use-toast'
@@ -98,8 +99,7 @@ export default function NewVendorPage() {
               </div>
               <div>
                 <Label>كلمة المرور *</Label>
-                <Input
-                  type="password"
+                <PasswordInput
                   value={form.password}
                   onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
                   required
@@ -155,7 +155,7 @@ export default function NewVendorPage() {
             </div>
             <div className="flex gap-4">
               <Button type="submit" disabled={loading}>
-                {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                {loading && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
                 إنشاء المورد
               </Button>
               <Button type="button" variant="outline" onClick={() => router.back()}>

@@ -8,7 +8,7 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-async function main() {
+export async function seedCheckoutForm(): Promise<void> {
   const existing = await prisma.checkoutFormSection.count()
   if (existing > 0) {
     console.log('Checkout form sections already exist. Skip seed.')
@@ -349,6 +349,10 @@ async function main() {
   })
 
   console.log('Checkout form default sections and fields created.')
+}
+
+async function main() {
+  await seedCheckoutForm()
 }
 
 main()

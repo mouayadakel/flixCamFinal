@@ -147,7 +147,7 @@ function SyncCatalogButton({ onSuccess }: { onSuccess: () => void }) {
       disabled={syncing}
       className="mt-2"
     >
-      {syncing ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
+      {syncing ? <Loader2 className="ms-2 h-4 w-4 animate-spin" /> : null}
       إنشاء منتجات من المعدات
     </Button>
   )
@@ -915,7 +915,7 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
                     <TableHead>المنتج</TableHead>
                     <TableHead>النقاط</TableHead>
                     <TableHead className="hidden sm:table-cell">الحقول الناقصة</TableHead>
-                    <TableHead className="text-left">إجراء</TableHead>
+                    <TableHead className="text-start">إجراء</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -953,7 +953,7 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
                             )}
                           </div>
                         </TableCell>
-                        <TableCell className="text-left">
+                        <TableCell className="text-start">
                           <Button
                             size="sm"
                             variant="outline"
@@ -961,9 +961,9 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
                             onClick={() => handleFillNow(p.id)}
                           >
                             {fillingId === p.id ? (
-                              <Loader2 className="ml-1 h-4 w-4 animate-spin" />
+                              <Loader2 className="ms-1 h-4 w-4 animate-spin" />
                             ) : (
-                              <Sparkles className="ml-1 h-4 w-4" />
+                              <Sparkles className="ms-1 h-4 w-4" />
                             )}
                             {fillingId === p.id ? 'جاري...' : 'ملء'}
                           </Button>
@@ -984,7 +984,7 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
           <CardTitle>إجراءات سريعة</CardTitle>
           <CardDescription>
             فحص المحتوى أو تشغيل الملء بالذكاء الاصطناعي
-            {lastUpdated && <span className="mr-2 text-xs">• آخر تحديث: {lastUpdated}</span>}
+            {lastUpdated && <span className="me-2 text-xs">• آخر تحديث: {lastUpdated}</span>}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
@@ -995,9 +995,9 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
             onClick={handleRefresh}
           >
             {isRefreshing ? (
-              <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+              <Loader2 className="ms-2 h-4 w-4 animate-spin" />
             ) : (
-              <RefreshCw className="ml-2 h-4 w-4" />
+              <RefreshCw className="ms-2 h-4 w-4" />
             )}
             تحديث البيانات
           </Button>
@@ -1016,7 +1016,7 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
               })
             }
           >
-            <FileDown className="ml-2 h-4 w-4" />
+            <FileDown className="ms-2 h-4 w-4" />
             تصدير PDF
           </Button>
           <Button
@@ -1024,7 +1024,7 @@ export function OverviewTab({ onSwitchTab }: OverviewTabProps) {
             disabled={isFillAllRunning || !!isOverBudget}
             onClick={() => setShowFillAllDialog(true)}
           >
-            {isFillAllRunning && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+            {isFillAllRunning && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
             ملء الكل بالذكاء الاصطناعي
           </Button>
           <Button

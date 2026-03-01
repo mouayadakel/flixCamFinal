@@ -8,10 +8,12 @@ import { prisma } from '@/lib/db/prisma'
 import { AuditService } from './audit.service'
 import { EquipmentService } from './equipment.service'
 import { StudioService } from './studio.service'
+import { InvoiceService } from './invoice.service'
 import { EventBus } from '@/lib/events/event-bus'
 import { PayoutService } from './payout.service'
 import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
 import { hasPermission, PERMISSIONS } from '@/lib/auth/permissions'
+import { logger } from '@/lib/logger'
 import { type Prisma, BookingStatus } from '@prisma/client'
 import { Decimal } from '@prisma/client/runtime/library'
 
@@ -22,6 +24,7 @@ export interface BookingEquipmentInput {
 
 export interface BookingCreateInput {
   customerId: string
+  cartId?: string
   startDate: Date
   endDate: Date
   equipment: BookingEquipmentInput[]
@@ -200,6 +203,7 @@ export class BookingService {
       data: {
         bookingNumber,
         customerId: input.customerId,
+        cartId: input.cartId ?? undefined,
         status: BookingStatus.DRAFT,
         startDate: input.startDate,
         endDate: input.endDate,
@@ -577,7 +581,7 @@ export class BookingService {
     // Emit events based on status
     if (newStatus === BookingStatus.CONFIRMED) {
       await this.recordPricingRuleApplication(updated).catch((err) => {
-        console.error('[BookingService] Failed to record pricing rule application:', err)
+        logger.error('Failed to record pricing rule application', { error: err instanceof Error ? err.message : String(err) })
       })
       await EventBus.emit('booking.confirmed', {
         booking: updated,
@@ -585,7 +589,14 @@ export class BookingService {
       })
       // Create vendor payouts for equipment with vendors
       await PayoutService.createVendorPayoutsForBooking(bookingId, userId).catch((err) => {
-        console.error('[BookingService] Failed to create vendor payouts:', err)
+        logger.error('Failed to create vendor payouts', { error: err instanceof Error ? err.message : String(err) })
+      })
+      // Auto-generate invoice on confirmation (FIX-015)
+      await InvoiceService.autoGenerateForBooking(bookingId).catch((err) => {
+        logger.error('Failed to auto-generate invoice for confirmed booking', {
+          error: err instanceof Error ? err.message : String(err),
+          bookingId,
+        })
       })
     } else if (newStatus === BookingStatus.CANCELLED) {
       await EventBus.emit('booking.cancelled', {

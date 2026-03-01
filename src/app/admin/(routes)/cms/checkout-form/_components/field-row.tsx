@@ -64,7 +64,7 @@ export function FieldRow({
       <span className="min-w-0 flex-1 truncate" title={`${field.labelEn} / ${field.labelAr}`}>
         {field.labelEn}
         {field.labelAr && field.labelAr !== field.labelEn && (
-          <span className="ml-1 text-muted-foreground">/ {field.labelAr}</span>
+          <span className="ms-1 text-muted-foreground">/ {field.labelAr}</span>
         )}
       </span>
       {field.isRequired && (

@@ -213,12 +213,12 @@ export default function MaintenanceListTab() {
           onClick={handleExportCSV}
           disabled={filteredMaintenance.length === 0}
         >
-          <Download className="ml-2 h-4 w-4" />
+          <Download className="ms-2 h-4 w-4" />
           تصدير CSV
         </Button>
         <Button asChild>
           <Link href="/admin/maintenance/new">
-            <Plus className="ml-2 h-4 w-4" />
+            <Plus className="ms-2 h-4 w-4" />
             طلب صيانة جديد
           </Link>
         </Button>
@@ -363,7 +363,7 @@ export default function MaintenanceListTab() {
                     <div className="text-sm">
                       {formatDate(item.scheduledDate)}
                       {item.status === 'overdue' && (
-                        <span className="ml-1 text-destructive">!</span>
+                        <span className="ms-1 text-destructive">!</span>
                       )}
                     </div>
                   </TableCell>
@@ -377,7 +377,7 @@ export default function MaintenanceListTab() {
                   <TableCell>
                     <Link href={`/admin/maintenance/${item.id}`}>
                       <Button size="sm" variant="ghost">
-                        <Eye className="ml-1 h-4 w-4" />
+                        <Eye className="ms-1 h-4 w-4" />
                         عرض
                       </Button>
                     </Link>

@@ -99,7 +99,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ typ
     }
 
     if (format === 'xlsx') {
-      const buffer = PdfService.generateReportExcelBuffer(
+      const buffer = await PdfService.generateReportExcelBuffer(
         title,
         columns.map((c: any) => ({
           key: typeof c === 'string' ? c : (c.key ?? c.id),

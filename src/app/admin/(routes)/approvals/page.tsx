@@ -241,7 +241,7 @@ export default function ApprovalsPage() {
           <p className="mt-1 text-muted-foreground">إدارة طلبات الموافقة المعلقة</p>
         </div>
         <Button variant="outline" onClick={loadApprovals} disabled={loading}>
-          <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`ms-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           تحديث
         </Button>
       </div>
@@ -369,7 +369,7 @@ export default function ApprovalsPage() {
                                   setActionType('approve')
                                 }}
                               >
-                                <CheckCircle className="ml-1 h-4 w-4" />
+                                <CheckCircle className="ms-1 h-4 w-4" />
                                 موافقة
                               </Button>
                               <Button
@@ -380,7 +380,7 @@ export default function ApprovalsPage() {
                                   setActionType('reject')
                                 }}
                               >
-                                <XCircle className="ml-1 h-4 w-4" />
+                                <XCircle className="ms-1 h-4 w-4" />
                                 رفض
                               </Button>
                             </div>

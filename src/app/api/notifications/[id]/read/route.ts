@@ -1,35 +1,50 @@
 /**
  * @file route.ts
- * @description Mark a single notification as read
- * @module app/api/notifications/[id]/read
+ * @description PATCH endpoint to mark a single notification as read
+ * @module api/notifications/[id]/read
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { NotificationService } from '@/lib/services/notification.service'
-import { handleApiError } from '@/lib/utils/api-helpers'
-import { UnauthorizedError } from '@/lib/errors'
+import { prisma } from '@/lib/db/prisma'
+import { logger } from '@/lib/logger'
 
-interface RouteParams {
-  params: Promise<{ id: string }>
-}
-
-/**
- * PATCH /api/notifications/[id]/read
- */
-export async function PATCH(request: NextRequest, { params }: RouteParams) {
+export async function PATCH(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const session = await auth()
-    if (!session?.user?.id) throw new UnauthorizedError()
-
-    const { id } = await params
-    if (!id) {
-      return NextResponse.json({ error: 'Notification ID required' }, { status: 400 })
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    await NotificationService.markAsRead(id, session.user.id)
+    const { id } = await params
+
+    const notification = await prisma.notification.findUnique({
+      where: { id },
+      select: { id: true, userId: true },
+    })
+
+    if (!notification) {
+      return NextResponse.json({ error: 'Notification not found' }, { status: 404 })
+    }
+
+    if (notification.userId !== session.user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    await prisma.notification.update({
+      where: { id },
+      data: { read: true, readAt: new Date() },
+    })
+
     return NextResponse.json({ success: true })
   } catch (error) {
-    return handleApiError(error)
+    logger.error('Failed to mark notification as read', { error })
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
   }
 }

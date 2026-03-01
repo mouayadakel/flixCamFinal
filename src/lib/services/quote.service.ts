@@ -10,6 +10,7 @@
 import { prisma } from '@/lib/db/prisma'
 import { AuditService } from './audit.service'
 import { BookingService, BookingCreateInput } from './booking.service'
+import { CartService } from './cart.service'
 import { PricingService } from './pricing.service'
 import { EventBus } from '@/lib/events/event-bus'
 import { NotFoundError, ValidationError, ForbiddenError } from '@/lib/errors'
@@ -849,6 +850,176 @@ export class QuoteService {
     } as any)
 
     return this.transformToQuote(updatedQuote)
+  }
+
+  /**
+   * Add quote equipment items to customer's cart.
+   * Caller must be the quote customer.
+   */
+  static async addQuoteToCart(
+    quoteId: string,
+    userId: string,
+    auditContext?: { ipAddress?: string; userAgent?: string }
+  ): Promise<{ cart: Awaited<ReturnType<typeof CartService.getOrCreateCart>> }> {
+    const quote = await prisma.quote.findFirst({
+      where: { id: quoteId, deletedAt: null },
+      include: {
+        equipmentItems: {
+          include: {
+            equipment: { select: { id: true, dailyPrice: true } },
+          },
+        },
+      },
+    })
+
+    if (!quote) {
+      throw new NotFoundError('Quote', quoteId)
+    }
+
+    if (quote.customerId !== userId) {
+      throw new ForbiddenError('You can only add your own quote to cart')
+    }
+
+    if (!['DRAFT', 'SENT', 'ACCEPTED'].includes(quote.status)) {
+      throw new ValidationError('Quote cannot be added to cart in current status')
+    }
+
+    if (quote.validUntil < new Date()) {
+      throw new ValidationError('Quote has expired')
+    }
+
+    const cart = await CartService.getOrCreateCart(userId, null)
+    const days = Math.ceil(
+      (quote.endDate.getTime() - quote.startDate.getTime()) / (1000 * 60 * 60 * 24)
+    )
+    const startStr = quote.startDate.toISOString().slice(0, 10)
+    const endStr = quote.endDate.toISOString().slice(0, 10)
+
+    for (const qe of quote.equipmentItems) {
+      await CartService.addItem(cart.id, {
+        itemType: 'EQUIPMENT',
+        equipmentId: qe.equipmentId,
+        quantity: qe.quantity,
+        startDate: new Date(startStr),
+        endDate: new Date(endStr),
+        dailyRate: Number(qe.equipment?.dailyPrice ?? qe.dailyRate ?? 0),
+      })
+    }
+
+    const updated = await CartService.getOrCreateCart(userId, null)
+
+    await prisma.quote.update({
+      where: { id: quoteId },
+      data: { cartId: cart.id, updatedBy: userId },
+    })
+
+    await AuditService.log({
+      action: 'quote.added_to_cart',
+      userId,
+      resourceType: 'quote',
+      resourceId: quoteId,
+      ipAddress: auditContext?.ipAddress,
+      userAgent: auditContext?.userAgent,
+      metadata: { cartId: cart.id },
+    })
+
+    return { cart: updated }
+  }
+
+  /**
+   * Create quote from cart contents.
+   * Admin-only. Cart must belong to a user.
+   */
+  static async createQuoteFromCart(
+    cartId: string,
+    userId: string,
+    auditContext?: { ipAddress?: string; userAgent?: string }
+  ): Promise<Quote> {
+    const canCreate = await hasPermission(userId, 'quote.create' as any)
+    if (!canCreate) {
+      throw new ForbiddenError('You do not have permission to create quotes')
+    }
+
+    const cart = await prisma.cart.findFirst({
+      where: { id: cartId },
+      include: {
+        items: {
+          include: {
+            equipment: { select: { id: true, dailyPrice: true } },
+            kit: { select: { id: true } },
+          },
+        },
+      },
+    })
+
+    if (!cart) {
+      throw new NotFoundError('Cart', cartId)
+    }
+
+    if (!cart.userId) {
+      throw new ValidationError('Cart must belong to a user to create quote')
+    }
+
+    const equipmentInput: { equipmentId: string; quantity: number }[] = []
+    let startDate: Date | null = null
+    let endDate: Date | null = null
+
+    for (const item of cart.items) {
+      if (item.itemType === 'EQUIPMENT' && item.equipmentId) {
+        const existing = equipmentInput.find((e) => e.equipmentId === item.equipmentId)
+        if (existing) {
+          existing.quantity += item.quantity
+        } else {
+          equipmentInput.push({ equipmentId: item.equipmentId, quantity: item.quantity })
+        }
+        if (item.startDate) startDate = startDate ?? item.startDate
+        if (item.endDate) endDate = endDate ?? item.endDate
+      } else if ((item.itemType === 'KIT' || item.itemType === 'PACKAGE') && item.kitId) {
+        const kitItems = await prisma.kitEquipment.findMany({
+          where: { kitId: item.kitId },
+          include: { equipment: { select: { id: true } } },
+        })
+        for (const ki of kitItems) {
+          const qty = ki.quantity * item.quantity
+          const existing = equipmentInput.find((e) => e.equipmentId === ki.equipmentId)
+          if (existing) {
+            existing.quantity += qty
+          } else {
+            equipmentInput.push({ equipmentId: ki.equipmentId, quantity: qty })
+          }
+        }
+        if (item.startDate) startDate = startDate ?? item.startDate
+        if (item.endDate) endDate = endDate ?? item.endDate
+      }
+    }
+
+    if (equipmentInput.length === 0) {
+      throw new ValidationError('Cart has no equipment items to quote')
+    }
+
+    const s = startDate ?? new Date()
+    const e = endDate ?? new Date(Date.now() + 24 * 60 * 60 * 1000)
+    if (e <= s) {
+      throw new ValidationError('Invalid date range in cart')
+    }
+
+    const quote = await this.create(
+      {
+        customerId: cart.userId,
+        startDate: s,
+        endDate: e,
+        equipment: equipmentInput,
+      },
+      userId,
+      auditContext
+    )
+
+    await prisma.quote.update({
+      where: { id: quote.id },
+      data: { cartId },
+    })
+
+    return quote
   }
 
   /**

@@ -232,12 +232,12 @@ export default async function PortalInvoiceDetailPage({
           <div className="flex items-center gap-4">
             {!isPaid && (
               <Button>
-                <CreditCard className="ml-2 h-4 w-4" />
+                <CreditCard className="ms-2 h-4 w-4" />
                 دفع الآن
               </Button>
             )}
             <Button variant="outline">
-              <Download className="ml-2 h-4 w-4" />
+              <Download className="ms-2 h-4 w-4" />
               تحميل PDF
             </Button>
             <Link href={`/portal/bookings/${invoice.bookingId}`}>

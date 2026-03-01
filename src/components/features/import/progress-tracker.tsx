@@ -139,11 +139,11 @@ export function ProgressTracker({ jobId, onComplete }: ProgressTrackerProps) {
             {progress.status === 'COMPLETED' && products.errors > 0 && (
               <>
                 <Button variant="outline" size="sm" onClick={handleDownloadErrors}>
-                  <Download className="mr-2 h-4 w-4" />
+                  <Download className="me-2 h-4 w-4" />
                   Download Errors
                 </Button>
                 <Button variant="outline" size="sm" onClick={handleRetry}>
-                  <RefreshCw className="mr-2 h-4 w-4" />
+                  <RefreshCw className="me-2 h-4 w-4" />
                   Retry Failed
                 </Button>
               </>
@@ -171,7 +171,7 @@ export function ProgressTracker({ jobId, onComplete }: ProgressTrackerProps) {
             <span>✓ {products.success} success</span>
             {products.errors > 0 && (
               <span className="text-red-600">
-                <XCircle className="mr-1 inline h-3 w-3" />
+                <XCircle className="me-1 inline h-3 w-3" />
                 {products.errors} errors
               </span>
             )}
@@ -193,7 +193,7 @@ export function ProgressTracker({ jobId, onComplete }: ProgressTrackerProps) {
               {ai.cost > 0 && <span>Cost: ${ai.cost.toFixed(4)}</span>}
               {ai.failed > 0 && (
                 <span className="text-red-600">
-                  <XCircle className="mr-1 inline h-3 w-3" />
+                  <XCircle className="me-1 inline h-3 w-3" />
                   {ai.failed} failed
                 </span>
               )}
@@ -217,7 +217,7 @@ export function ProgressTracker({ jobId, onComplete }: ProgressTrackerProps) {
               <span>Status: {images.status}</span>
               {images.failed > 0 && (
                 <span className="text-red-600">
-                  <XCircle className="mr-1 inline h-3 w-3" />
+                  <XCircle className="me-1 inline h-3 w-3" />
                   {images.failed} failed
                 </span>
               )}

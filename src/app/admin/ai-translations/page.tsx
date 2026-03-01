@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -235,11 +236,11 @@ export default function AITranslationsPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => exportTranslations('json')}>
-            <Download className="mr-2 h-4 w-4" />
+            <Download className="me-2 h-4 w-4" />
             Export JSON
           </Button>
           <Button variant="outline" onClick={() => exportTranslations('csv')}>
-            <Download className="mr-2 h-4 w-4" />
+            <Download className="me-2 h-4 w-4" />
             Export CSV
           </Button>
         </div>
@@ -300,9 +301,8 @@ export default function AITranslationsPage() {
 
               <div>
                 <Label htmlFor="api-key">OpenAI API Key</Label>
-                <Input
+                <PasswordInput
                   id="api-key"
-                  type="password"
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
                   placeholder="sk-..."
@@ -333,12 +333,12 @@ export default function AITranslationsPage() {
               >
                 {isGenerating ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="me-2 h-4 w-4 animate-spin" />
                     Starting Translation...
                   </>
                 ) : (
                   <>
-                    <Play className="mr-2 h-4 w-4" />
+                    <Play className="me-2 h-4 w-4" />
                     Start Translation Job
                   </>
                 )}

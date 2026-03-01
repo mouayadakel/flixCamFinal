@@ -233,9 +233,9 @@ export default function RoleDetailPage() {
             <div className="flex gap-2">
               <Button onClick={handleSave} disabled={submitting}>
                 {submitting ? (
-                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                 ) : (
-                  <Save className="ml-2 h-4 w-4" />
+                  <Save className="ms-2 h-4 w-4" />
                 )}
                 حفظ
               </Button>
@@ -286,7 +286,7 @@ export default function RoleDetailPage() {
             </div>
             <Button asChild>
               <Link href={`/admin/settings/roles/${role.id}/users`}>
-                <UserPlus className="ml-2 h-4 w-4" />
+                <UserPlus className="ms-2 h-4 w-4" />
                 ربط مستخدم
               </Link>
             </Button>

@@ -65,14 +65,14 @@ export function ShootTypeCardGrid({ items, onUpdated }: ShootTypeCardGridProps) 
                 </div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+              <div className="absolute bottom-0 start-0 end-0 p-3 text-white">
                 <h3 className="font-semibold">{st.name}</h3>
                 <p className="text-xs text-white/80">
                   {st.categoryCount} categories · {st.recommendationCount} recommendations
                 </p>
               </div>
               {!st.isActive && (
-                <Badge variant="secondary" className="absolute right-2 top-2">
+                <Badge variant="secondary" className="absolute end-2 top-2">
                   Inactive
                 </Badge>
               )}

@@ -113,12 +113,12 @@ export default function RolesPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={loadRoles}>
-            <RefreshCw className="ml-2 h-4 w-4" />
+            <RefreshCw className="ms-2 h-4 w-4" />
             تحديث
           </Button>
           <Button asChild>
             <Link href="/admin/settings/roles/new">
-              <Plus className="ml-2 h-4 w-4" />
+              <Plus className="ms-2 h-4 w-4" />
               دور جديد
             </Link>
           </Button>
@@ -200,7 +200,7 @@ export default function RolesPage() {
                   <TableHead>الصلاحيات</TableHead>
                   <TableHead>المستخدمون</TableHead>
                   <TableHead>النوع</TableHead>
-                  <TableHead className="text-left">الإجراءات</TableHead>
+                  <TableHead className="text-start">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -246,7 +246,7 @@ export default function RolesPage() {
                               href={`/admin/settings/roles/${role.id}/users`}
                               title="ربط مستخدم"
                             >
-                              <UserPlus className="ml-1 h-4 w-4" />
+                              <UserPlus className="ms-1 h-4 w-4" />
                               ربط مستخدم
                             </Link>
                           </Button>
@@ -259,7 +259,7 @@ export default function RolesPage() {
                           <Badge variant="outline">مخصص</Badge>
                         )}
                       </TableCell>
-                      <TableCell className="text-left">
+                      <TableCell className="text-start">
                         <div className="flex gap-2">
                           <Button variant="ghost" size="sm" asChild>
                             <Link href={`/admin/settings/roles/${role.id}`}>

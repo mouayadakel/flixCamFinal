@@ -259,11 +259,11 @@ export default function LiveOpsPage() {
             size="sm"
             onClick={() => setAutoRefresh(!autoRefresh)}
           >
-            <Timer className="ml-1 h-4 w-4" />
+            <Timer className="ms-1 h-4 w-4" />
             {autoRefresh ? 'تحديث تلقائي' : 'تحديث يدوي'}
           </Button>
           <Button variant="outline" onClick={handleRefresh} disabled={loading}>
-            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`ms-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
         </div>
@@ -271,7 +271,7 @@ export default function LiveOpsPage() {
 
       {/* Live Stats */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-        <Card className="border-l-4 border-l-green-500">
+        <Card className="border-s-4 border-s-green-500">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
@@ -283,7 +283,7 @@ export default function LiveOpsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-blue-500">
+        <Card className="border-s-4 border-s-blue-500">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
@@ -295,7 +295,7 @@ export default function LiveOpsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-purple-500">
+        <Card className="border-s-4 border-s-purple-500">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
@@ -307,7 +307,7 @@ export default function LiveOpsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-red-500">
+        <Card className="border-s-4 border-s-red-500">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
@@ -319,7 +319,7 @@ export default function LiveOpsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-orange-500">
+        <Card className="border-s-4 border-s-orange-500">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
@@ -331,7 +331,7 @@ export default function LiveOpsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-gray-500">
+        <Card className="border-s-4 border-s-gray-500">
           <CardContent className="pt-4">
             <div>
               <p className="text-sm text-muted-foreground">نسبة الإشغال</p>
@@ -394,7 +394,7 @@ export default function LiveOpsPage() {
                               </Badge>
                               {booking.isOverdue && (
                                 <Badge variant="destructive">
-                                  <AlertTriangle className="ml-1 h-3 w-3" />
+                                  <AlertTriangle className="ms-1 h-3 w-3" />
                                   متأخر
                                 </Badge>
                               )}
@@ -443,7 +443,7 @@ export default function LiveOpsPage() {
                             </span>
                             <Link href={`/admin/bookings/${booking.id}`}>
                               <Button size="sm" variant="outline">
-                                <Eye className="ml-1 h-4 w-4" />
+                                <Eye className="ms-1 h-4 w-4" />
                                 عرض
                               </Button>
                             </Link>

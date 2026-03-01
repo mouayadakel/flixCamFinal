@@ -42,6 +42,14 @@ export async function PATCH(
     return NextResponse.json({ error: 'Receiver not found' }, { status: 404 })
   }
 
+  const data = parsed.data as { isDefault?: boolean; [k: string]: unknown }
+  if (data.isDefault === true) {
+    await prisma.receiver.updateMany({
+      where: { userId: session.user.id, deletedAt: null },
+      data: { isDefault: false },
+    })
+  }
+
   const receiver = await prisma.receiver.update({
     where: { id },
     data: parsed.data,

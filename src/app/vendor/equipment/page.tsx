@@ -42,7 +42,7 @@ export default async function VendorEquipmentPage() {
         </div>
         <Link href="/vendor/equipment/new">
           <Button>
-            <Plus className="ml-2 h-4 w-4" />
+            <Plus className="ms-2 h-4 w-4" />
             {t('ar', 'vendor.addNewEquipment')}
           </Button>
         </Link>
@@ -116,7 +116,7 @@ export default async function VendorEquipmentPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
-                      <div className="text-right">
+                      <div className="text-end">
                         <div className="font-medium">{formatCurrency(Number(eq.dailyPrice))}</div>
                         <div className="text-xs text-muted-foreground">
                           {t('ar', 'vendor.perDay')}

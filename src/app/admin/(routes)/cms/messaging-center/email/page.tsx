@@ -150,7 +150,7 @@ export default function EmailSettingsPage() {
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/admin/cms/messaging-center">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             مركز الرسائل
           </Link>
         </Button>
@@ -210,7 +210,7 @@ export default function EmailSettingsPage() {
             />
           </div>
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
+            {saving ? <Loader2 className="ms-2 h-4 w-4 animate-spin" /> : null}
             حفظ
           </Button>
         </CardContent>
@@ -230,7 +230,7 @@ export default function EmailSettingsPage() {
             className="max-w-xs"
           />
           <Button onClick={handleTestSend} disabled={testSending}>
-            {testSending ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <Send className="ml-2 h-4 w-4" />}
+            {testSending ? <Loader2 className="ms-2 h-4 w-4 animate-spin" /> : <Send className="ms-2 h-4 w-4" />}
             إرسال تجريبي
           </Button>
         </CardContent>

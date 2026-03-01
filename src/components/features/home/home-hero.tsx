@@ -45,7 +45,7 @@ export function HomeHero({
     <section className="relative overflow-hidden bg-hero-gradient">
       {/* Soft top fade so header–hero junction isn’t abrupt */}
       <div
-        className="pointer-events-none absolute left-0 right-0 top-0 z-10 h-28 bg-gradient-to-b from-black/50 to-transparent"
+        className="pointer-events-none absolute start-0 end-0 top-0 z-10 h-28 bg-gradient-to-b from-black/50 to-transparent"
         aria-hidden
       />
       {/* Decorative background elements */}
@@ -55,7 +55,7 @@ export function HomeHero({
 
       <PublicContainer>
         {/* Search bar – left corner at golden ratio (38.2% from top) */}
-        <div className="absolute left-0 right-0 top-[38.2%] z-10">
+        <div className="absolute start-0 end-0 top-[38.2%] z-10">
           <PublicContainer>
             <div className="w-full max-w-md animate-fade-in opacity-0 [animation-delay:0.2s]">
               <PublicSearch />

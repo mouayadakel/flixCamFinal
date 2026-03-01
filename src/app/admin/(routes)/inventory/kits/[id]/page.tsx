@@ -200,14 +200,14 @@ export default function KitDetailPage() {
             </>
           ) : (
             <Button variant="outline" size="sm" onClick={() => setEditing(true)}>
-              <Pencil className="ml-1 h-4 w-4" />
+              <Pencil className="ms-1 h-4 w-4" />
               تعديل
             </Button>
           )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm">
-                <Trash2 className="ml-1 h-4 w-4" />
+                <Trash2 className="ms-1 h-4 w-4" />
                 حذف
               </Button>
             </AlertDialogTrigger>

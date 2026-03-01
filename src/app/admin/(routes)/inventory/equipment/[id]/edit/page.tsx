@@ -682,8 +682,8 @@ export default function EditEquipmentPage({ params }: { params: Promise<{ id: st
             إلغاء
           </Button>
           <Button size="sm" onClick={handleSubmit(onSubmit as import('react-hook-form').SubmitHandler<UpdateEquipmentFormData>)} disabled={submitting || autoFilling}>
-            {submitting && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
-            <Save className="ml-2 h-4 w-4" />
+            {submitting && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
+            <Save className="ms-2 h-4 w-4" />
             حفظ التغييرات
           </Button>
         </div>
@@ -695,7 +695,7 @@ export default function EditEquipmentPage({ params }: { params: Promise<{ id: st
           <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
           <div>
             <span className="font-medium">جاري إنشاء المحتوى بالذكاء الاصطناعي...</span>
-            <span className="mr-1 text-violet-600">
+            <span className="me-1 text-violet-600">
               الأوصاف والترجمات وSEO والمواصفات لـ 3 لغات
             </span>
           </div>
@@ -706,13 +706,13 @@ export default function EditEquipmentPage({ params }: { params: Promise<{ id: st
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           <div>
             <span className="font-medium">تم ملء {aiFilledCount} حقل بنجاح</span>
-            <span className="mr-1 text-emerald-600">— راجع التبويبات أدناه ثم اضغط حفظ</span>
+            <span className="me-1 text-emerald-600">— راجع التبويبات أدناه ثم اضغط حفظ</span>
           </div>
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="mr-auto text-xs text-emerald-600 hover:text-emerald-800"
+            className="me-auto text-xs text-emerald-600 hover:text-emerald-800"
             onClick={() => setAiFilled(false)}
           >
             إخفاء
@@ -1437,9 +1437,9 @@ export default function EditEquipmentPage({ params }: { params: Promise<{ id: st
               إلغاء
             </Button>
             <Button type="submit" disabled={submitting}>
-              {submitting && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              {submitting && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
               حفظ التغييرات
-              <ArrowRight className="mr-2 h-4 w-4" />
+              <ArrowRight className="me-2 h-4 w-4" />
             </Button>
           </div>
         </form>

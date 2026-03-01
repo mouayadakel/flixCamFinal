@@ -8,6 +8,7 @@ import { CartService } from '@/lib/services/cart.service'
 import { getCartSessionId, setCartSessionCookie } from '@/lib/cart-session'
 import { checkRateLimitUpstash } from '@/lib/utils/rate-limit-upstash'
 import { prisma } from '@/lib/db/prisma'
+import { logger } from '@/lib/logger'
 
 /** Resolve cart userId: only use session user.id if that user exists in DB (avoids FK violation). */
 async function resolveCartUserId(userId: string | undefined | null): Promise<string | null> {
@@ -20,7 +21,12 @@ async function resolveCartUserId(userId: string | undefined | null): Promise<str
 }
 
 export async function GET(request: NextRequest) {
-  const rate = await checkRateLimitUpstash(request, 'checkout')
+  let rate = { allowed: true as boolean }
+  try {
+    rate = await checkRateLimitUpstash(request, 'checkout')
+  } catch {
+    rate = { allowed: true }
+  }
   if (!rate.allowed) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }
@@ -37,7 +43,7 @@ export async function GET(request: NextRequest) {
     }
     return res
   } catch (e) {
-    console.error('Cart GET error:', e)
+    logger.error('Cart GET error', { error: e instanceof Error ? e.message : String(e) })
     return NextResponse.json(
       { error: e instanceof Error ? e.message : 'Failed to get cart' },
       { status: 500 }
@@ -46,7 +52,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const rate = await checkRateLimitUpstash(request, 'checkout')
+  let rate = { allowed: true as boolean }
+  try {
+    rate = await checkRateLimitUpstash(request, 'checkout')
+  } catch {
+    rate = { allowed: true }
+  }
   if (!rate.allowed) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
   }
@@ -99,7 +110,7 @@ export async function POST(request: NextRequest) {
     }
     return res
   } catch (e) {
-    console.error('Cart POST error:', e)
+    logger.error('Cart POST error', { error: e instanceof Error ? e.message : String(e) })
     return NextResponse.json(
       { error: e instanceof Error ? e.message : 'Failed to add to cart' },
       { status: 400 }

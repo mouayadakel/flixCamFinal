@@ -300,11 +300,11 @@ export default function NotificationTemplatesPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={loadTemplates}>
-            <RefreshCw className="ml-2 h-4 w-4" />
+            <RefreshCw className="ms-2 h-4 w-4" />
             تحديث
           </Button>
           <Button onClick={openCreate}>
-            <Plus className="ml-2 h-4 w-4" />
+            <Plus className="ms-2 h-4 w-4" />
             إضافة قالب
           </Button>
         </div>
@@ -502,7 +502,7 @@ export default function NotificationTemplatesPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={handlePreview}>
-              <Eye className="ml-2 h-4 w-4" /> معاينة
+              <Eye className="ms-2 h-4 w-4" /> معاينة
             </Button>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               إلغاء

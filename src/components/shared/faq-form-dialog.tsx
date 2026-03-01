@@ -227,7 +227,7 @@ export function FaqFormDialog({
           </Button>
           <Button onClick={handleSubmit} disabled={saving}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            <span className="mr-2">{isEdit ? 'حفظ' : 'إضافة'}</span>
+            <span className="me-2">{isEdit ? 'حفظ' : 'إضافة'}</span>
           </Button>
         </DialogFooter>
       </DialogContent>

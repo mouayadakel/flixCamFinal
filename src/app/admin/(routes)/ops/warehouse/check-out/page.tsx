@@ -186,7 +186,7 @@ export default function CheckOutPage() {
         </div>
         <Button variant="outline" asChild>
           <Link href="/admin/ops/warehouse">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             العودة
           </Link>
         </Button>
@@ -199,12 +199,12 @@ export default function CheckOutPage() {
             <CardHeader>
               <CardTitle>الحجوزات الجاهزة للإخراج</CardTitle>
               <div className="relative mt-2">
-                <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="بحث..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-12 pr-10 text-base"
+                  className="h-12 pe-10 text-base"
                 />
               </div>
             </CardHeader>
@@ -339,7 +339,7 @@ export default function CheckOutPage() {
                             </p>
                           )}
                         </div>
-                        <div className="text-left">
+                        <div className="text-start">
                           <Badge variant="outline">الكمية: {item.quantity}</Badge>
                         </div>
                         {item.checkedOut && (

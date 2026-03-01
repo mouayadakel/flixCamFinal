@@ -126,7 +126,7 @@ export default function HoldsPage() {
           </p>
         </div>
         <Button variant="outline" onClick={loadHolds} disabled={loading}>
-          <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`ms-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           تحديث
         </Button>
       </div>
@@ -170,7 +170,7 @@ export default function HoldsPage() {
               <TableHead>ينتهي في</TableHead>
               <TableHead>المتبقي</TableHead>
               <TableHead>الحالة</TableHead>
-              <TableHead className="text-right">إجراءات</TableHead>
+              <TableHead className="text-end">إجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -232,7 +232,7 @@ export default function HoldsPage() {
                   <TableCell>
                     <Badge variant="outline">{h.status}</Badge>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     <div className="flex justify-end gap-2">
                       <Button
                         variant="outline"
@@ -240,7 +240,7 @@ export default function HoldsPage() {
                         onClick={() => handleExtend(h.id)}
                         disabled={releasingId === h.id}
                       >
-                        <Plus className="ml-1 h-4 w-4" />
+                        <Plus className="ms-1 h-4 w-4" />
                         تمديد
                       </Button>
                       <Button
@@ -250,7 +250,7 @@ export default function HoldsPage() {
                         disabled={releasingId === h.id}
                         className="text-destructive hover:text-destructive"
                       >
-                        <Unlock className="ml-1 h-4 w-4" />
+                        <Unlock className="ms-1 h-4 w-4" />
                         إلغاء الاحتياط
                       </Button>
                       <Button variant="ghost" size="sm" asChild>

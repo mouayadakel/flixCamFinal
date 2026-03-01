@@ -283,7 +283,7 @@ export function ContextSidebar() {
   }
 
   return (
-    <aside className="hidden w-56 flex-col border-r bg-muted/30 lg:flex">
+    <aside className="hidden w-56 flex-col border-e bg-muted/30 lg:flex">
       <div className="flex h-16 items-center border-b px-4">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           {sectionLabels[contextSection] || contextSection}

@@ -135,7 +135,7 @@ export default function CloneRolePage() {
         </Card>
         <div className="flex gap-2">
           <Button type="submit" disabled={submitting}>
-            {submitting ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
+            {submitting ? <Loader2 className="ms-2 h-4 w-4 animate-spin" /> : null}
             نسخ وإنشاء
           </Button>
           <Button type="button" variant="outline" asChild>

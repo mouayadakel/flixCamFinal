@@ -50,24 +50,24 @@ export function SmartFillDropdown({ onFill, disabled, photoGateLocked }: SmartFi
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem onClick={() => handleFill('all')} disabled={!!loading}>
-          <Sparkles className="ml-2 h-4 w-4" />
+          <Sparkles className="ms-2 h-4 w-4" />
           ملء جميع الحقول الفارغة
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => handleFill('descriptions')} disabled={!!loading}>
-          <FileText className="ml-2 h-4 w-4" />
+          <FileText className="ms-2 h-4 w-4" />
           ملء الأوصاف فقط
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleFill('seo')} disabled={!!loading}>
-          <Search className="ml-2 h-4 w-4" />
+          <Search className="ms-2 h-4 w-4" />
           ملء SEO فقط
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleFill('specs')} disabled={!!loading}>
-          <Package className="ml-2 h-4 w-4" />
+          <Package className="ms-2 h-4 w-4" />
           ملء المواصفات فقط
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleFill('translations')} disabled={!!loading}>
-          <Globe className="ml-2 h-4 w-4" />
+          <Globe className="ms-2 h-4 w-4" />
           ملء الترجمات فقط
         </DropdownMenuItem>
       </DropdownMenuContent>

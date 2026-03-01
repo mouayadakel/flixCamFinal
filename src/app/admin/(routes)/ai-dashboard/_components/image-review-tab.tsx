@@ -324,8 +324,8 @@ export function ImageReviewTab() {
                     onClick={() => handleBulkAction('approve')}
                     className="flex-1 sm:flex-none"
                   >
-                    {bulkActing && <Loader2 className="ml-1 h-4 w-4 animate-spin" />}
-                    <CheckCircle className="ml-1 h-4 w-4" />
+                    {bulkActing && <Loader2 className="ms-1 h-4 w-4 animate-spin" />}
+                    <CheckCircle className="ms-1 h-4 w-4" />
                     موافقة ({selectedIds.size})
                   </Button>
                   <Button
@@ -335,8 +335,8 @@ export function ImageReviewTab() {
                     onClick={() => handleBulkAction('reject')}
                     className="flex-1 sm:flex-none"
                   >
-                    {bulkActing && <Loader2 className="ml-1 h-4 w-4 animate-spin" />}
-                    <XCircle className="ml-1 h-4 w-4" />
+                    {bulkActing && <Loader2 className="ms-1 h-4 w-4 animate-spin" />}
+                    <XCircle className="ms-1 h-4 w-4" />
                     رفض ({selectedIds.size})
                   </Button>
                 </div>
@@ -412,9 +412,9 @@ export function ImageReviewTab() {
                       onClick={() => handleAction(img.id, 'approve')}
                     >
                       {actingId === img.id ? (
-                        <Loader2 className="ml-1 h-4 w-4 animate-spin" />
+                        <Loader2 className="ms-1 h-4 w-4 animate-spin" />
                       ) : (
-                        <CheckCircle className="ml-1 h-4 w-4" />
+                        <CheckCircle className="ms-1 h-4 w-4" />
                       )}
                       <span className="hidden sm:inline">موافقة</span>
                     </Button>
@@ -426,9 +426,9 @@ export function ImageReviewTab() {
                       onClick={() => handleAction(img.id, 'reject')}
                     >
                       {actingId === img.id ? (
-                        <Loader2 className="ml-1 h-4 w-4 animate-spin" />
+                        <Loader2 className="ms-1 h-4 w-4 animate-spin" />
                       ) : (
-                        <XCircle className="ml-1 h-4 w-4" />
+                        <XCircle className="ms-1 h-4 w-4" />
                       )}
                       <span className="hidden sm:inline">رفض</span>
                     </Button>
@@ -501,9 +501,9 @@ export function ImageReviewTab() {
                   onClick={() => handleAction(lightboxImage.id, 'approve')}
                 >
                   {actingId === lightboxImage.id ? (
-                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                   ) : (
-                    <CheckCircle className="ml-2 h-4 w-4" />
+                    <CheckCircle className="ms-2 h-4 w-4" />
                   )}
                   موافقة
                 </Button>
@@ -514,9 +514,9 @@ export function ImageReviewTab() {
                   onClick={() => handleAction(lightboxImage.id, 'reject')}
                 >
                   {actingId === lightboxImage.id ? (
-                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                   ) : (
-                    <XCircle className="ml-2 h-4 w-4" />
+                    <XCircle className="ms-2 h-4 w-4" />
                   )}
                   رفض
                 </Button>

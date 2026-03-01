@@ -144,7 +144,7 @@ export default function ContentReviewPage() {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>AI suggestions pending review</CardTitle>
           <Button variant="outline" size="sm" onClick={loadDrafts} disabled={draftsLoading}>
-            <RefreshCw className="mr-2 h-4 w-4" />
+            <RefreshCw className="me-2 h-4 w-4" />
             Refresh
           </Button>
         </CardHeader>
@@ -165,7 +165,7 @@ export default function ContentReviewPage() {
                   <TableHead>Product</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Created</TableHead>
-                  <TableCell className="text-right">Actions</TableCell>
+                  <TableCell className="text-end">Actions</TableCell>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -185,7 +185,7 @@ export default function ContentReviewPage() {
                     <TableCell className="text-muted-foreground">
                       {new Date(d.createdAt).toLocaleString()}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-end">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -233,7 +233,7 @@ export default function ContentReviewPage() {
                 </Label>
               </div>
               <Button variant="outline" size="sm" onClick={loadProducts} disabled={loading}>
-                <RefreshCw className="mr-2 h-4 w-4" />
+                <RefreshCw className="me-2 h-4 w-4" />
                 Refresh
               </Button>
             </div>
@@ -251,7 +251,7 @@ export default function ContentReviewPage() {
                   <TableHead>Name</TableHead>
                   <TableHead>Quality Score</TableHead>
                   <TableHead>Gaps</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-end">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -275,7 +275,7 @@ export default function ContentReviewPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-muted-foreground">{p.gap || '—'}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-end">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -286,7 +286,7 @@ export default function ContentReviewPage() {
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           <>
-                            <RefreshCw className="mr-1 h-4 w-4" />
+                            <RefreshCw className="me-1 h-4 w-4" />
                             Regenerate
                           </>
                         )}

@@ -101,7 +101,7 @@ function ContractSection({
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <FileText className="ml-1 h-4 w-4" />
+                    <FileText className="ms-1 h-4 w-4" />
                     تحميل عقد PDF
                   </a>
                 </Button>
@@ -327,7 +327,7 @@ export default function BookingDetailPage() {
         </div>
         <Button variant="outline" asChild>
           <Link href="/admin/bookings">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             العودة
           </Link>
         </Button>

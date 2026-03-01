@@ -138,8 +138,8 @@ export function AIFloatingWidget() {
         size="icon"
         className={cn(
           'fixed z-50 h-14 w-14 rounded-full shadow-lg transition-transform',
-          'bottom-6 left-6',
-          'rtl:left-auto rtl:right-6'
+          'bottom-6 start-6',
+          'rtl:left-auto rtl:end-6'
         )}
         onClick={() => setOpen((o) => !o)}
         aria-label="فتح مساعد الذكاء الاصطناعي"
@@ -152,7 +152,7 @@ export function AIFloatingWidget() {
           className={cn(
             'fixed z-50 flex flex-col rounded-lg border bg-background shadow-xl',
             'max-h-[480px] w-[360px]',
-            'bottom-20 left-6 rtl:bottom-20 rtl:left-auto rtl:right-6'
+            'bottom-20 start-6 rtl:bottom-20 rtl:left-auto rtl:end-6'
           )}
           dir="rtl"
         >
@@ -182,7 +182,7 @@ export function AIFloatingWidget() {
                 key={`${m.at}-${i}`}
                 className={cn(
                   'max-w-[85%] rounded-lg px-3 py-2 text-sm',
-                  m.role === 'user' ? 'ml-auto mr-0 bg-primary text-primary-foreground' : 'bg-muted'
+                  m.role === 'user' ? 'ms-auto me-0 bg-primary text-primary-foreground' : 'bg-muted'
                 )}
               >
                 {m.content}

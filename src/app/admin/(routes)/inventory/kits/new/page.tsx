@@ -263,7 +263,7 @@ export default function NewKitPage() {
                 onChange={(e) => setSelectedQuantity(parseInt(e.target.value, 10) || 1)}
               />
               <Button type="button" variant="secondary" onClick={addItem}>
-                <Plus className="ml-1 h-4 w-4" />
+                <Plus className="ms-1 h-4 w-4" />
                 إضافة
               </Button>
             </div>
@@ -316,7 +316,7 @@ export default function NewKitPage() {
 
         <div className="mt-6 flex gap-2">
           <Button type="submit" disabled={loading}>
-            {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+            {loading && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
             إنشاء الحزمة
           </Button>
           <Button type="button" variant="outline" asChild>

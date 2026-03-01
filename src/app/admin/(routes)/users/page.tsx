@@ -96,12 +96,12 @@ export default function UsersPage() {
         <div className="flex gap-2">
           <Button asChild>
             <Link href="/admin/users/new">
-              <Plus className="ml-2 h-4 w-4" />
+              <Plus className="ms-2 h-4 w-4" />
               مستخدم جديد
             </Link>
           </Button>
           <Button variant="outline" onClick={fetchUsers} disabled={loading}>
-            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`ms-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
         </div>
@@ -135,7 +135,7 @@ export default function UsersPage() {
               <TableHead>الحالة</TableHead>
               <TableHead>2FA</TableHead>
               <TableHead>تاريخ الإنشاء</TableHead>
-              <TableHead className="text-right">إجراءات</TableHead>
+              <TableHead className="text-end">إجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -166,7 +166,7 @@ export default function UsersPage() {
                     </TableCell>
                     <TableCell>{user.twoFactorEnabled ? 'نعم' : '—'}</TableCell>
                     <TableCell>{formatDate(user.createdAt)}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-end">
                       <Button variant="ghost" size="sm" asChild>
                         <Link href={`/admin/users/${user.id}`}>
                           <Eye className="h-4 w-4" />

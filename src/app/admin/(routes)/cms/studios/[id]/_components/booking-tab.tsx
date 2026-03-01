@@ -189,7 +189,7 @@ export function CmsStudioBookingTab({ studio, onSave, onDirtyChange, saving }: B
           </div>
           <Button type="submit" disabled={saving}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            <span className="mr-2">حفظ</span>
+            <span className="me-2">حفظ</span>
           </Button>
         </form>
       </CardContent>

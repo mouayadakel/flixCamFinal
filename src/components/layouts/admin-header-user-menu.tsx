@@ -39,13 +39,13 @@ export function AdminHeaderUserMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/admin/profile">
-            <User className="ml-2 h-4 w-4" />
+            <User className="ms-2 h-4 w-4" />
             الملف الشخصي
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/admin/settings">
-            <Settings className="ml-2 h-4 w-4" />
+            <Settings className="ms-2 h-4 w-4" />
             الإعدادات
           </Link>
         </DropdownMenuItem>
@@ -54,7 +54,7 @@ export function AdminHeaderUserMenu() {
           onClick={() => signOut({ callbackUrl: '/login' })}
           className="text-error-600 focus:text-error-600"
         >
-          <LogOut className="ml-2 h-4 w-4" />
+          <LogOut className="ms-2 h-4 w-4" />
           تسجيل الخروج
         </DropdownMenuItem>
       </DropdownMenuContent>

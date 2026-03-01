@@ -20,7 +20,7 @@ import { t } from '@/lib/i18n/translate'
 export default async function PortalBookingsPage({
   searchParams,
 }: {
-  searchParams: { status?: string; search?: string }
+  searchParams: Promise<{ status?: string; search?: string }>
 }) {
   const session = await auth()
 
@@ -28,9 +28,10 @@ export default async function PortalBookingsPage({
     redirect('/login?callbackUrl=/portal/bookings')
   }
 
+  const resolved = await searchParams
   const userId = session.user.id
-  const statusFilter = searchParams.status
-  const searchQuery = searchParams.search
+  const statusFilter = resolved.status
+  const searchQuery = resolved.search
 
   // Build where clause
   const where: any = {

@@ -375,12 +375,12 @@ export default function EquipmentDetailPage({ params }: { params: Promise<{ id: 
             onClick={handleDelete}
             className="text-error-600 hover:text-error-700"
           >
-            <Trash2 className="ml-2 h-4 w-4" />
+            <Trash2 className="ms-2 h-4 w-4" />
             حذف
           </Button>
           <Button asChild>
             <Link href={`/admin/inventory/equipment/${id}/edit`}>
-              <Edit className="ml-2 h-4 w-4" />
+              <Edit className="ms-2 h-4 w-4" />
               تعديل
             </Link>
           </Button>
@@ -701,7 +701,7 @@ export default function EquipmentDetailPage({ params }: { params: Promise<{ id: 
                           <Button variant="outline" size="sm" asChild className="mt-2">
                             <Link href={`/admin/inventory/equipment/${item.id}`}>
                               عرض
-                              <ArrowRight className="mr-2 h-3 w-3" />
+                              <ArrowRight className="me-2 h-3 w-3" />
                             </Link>
                           </Button>
                         </div>
@@ -727,7 +727,7 @@ export default function EquipmentDetailPage({ params }: { params: Promise<{ id: 
               <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
                 <DialogTrigger asChild>
                   <Button size="sm">
-                    <Plus className="ml-2 h-4 w-4" />
+                    <Plus className="ms-2 h-4 w-4" />
                     جدولة صيانة
                   </Button>
                 </DialogTrigger>
@@ -799,7 +799,7 @@ export default function EquipmentDetailPage({ params }: { params: Promise<{ id: 
                       onClick={handleScheduleMaintenance}
                       disabled={scheduling}
                     >
-                      {scheduling && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                      {scheduling && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
                       جدولة
                     </Button>
                   </div>
@@ -950,7 +950,7 @@ export default function EquipmentDetailPage({ params }: { params: Promise<{ id: 
                           <Button variant="ghost" size="sm" asChild>
                             <Link href={`/admin/bookings/${bookingEquipment.booking.id}`}>
                               عرض
-                              <ArrowRight className="mr-2 h-4 w-4" />
+                              <ArrowRight className="me-2 h-4 w-4" />
                             </Link>
                           </Button>
                         </TableCell>

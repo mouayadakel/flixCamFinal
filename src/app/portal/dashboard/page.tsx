@@ -269,19 +269,19 @@ export default async function PortalDashboardPage() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <Link href="/portal/bookings">
               <Button variant="outline" className="w-full justify-start">
-                <Calendar className="ml-2 h-4 w-4" />
+                <Calendar className="ms-2 h-4 w-4" />
                 {t('ar', 'portal.viewAllBookings')}
               </Button>
             </Link>
             <Link href="/portal/contracts">
               <Button variant="outline" className="w-full justify-start">
-                <FileText className="ml-2 h-4 w-4" />
+                <FileText className="ms-2 h-4 w-4" />
                 {t('ar', 'portal.contracts')}
               </Button>
             </Link>
             <Link href="/portal/invoices">
               <Button variant="outline" className="w-full justify-start">
-                <Receipt className="ml-2 h-4 w-4" />
+                <Receipt className="ms-2 h-4 w-4" />
                 {t('ar', 'portal.invoices')}
               </Button>
             </Link>

@@ -191,7 +191,7 @@ export default function UserDetailPage() {
             <div>
               <p className="text-sm text-muted-foreground">المصادقة الثنائية</p>
               <Badge variant={user.twoFactorEnabled ? 'default' : 'secondary'}>
-                <Shield className="ml-1 h-3 w-3" />
+                <Shield className="ms-1 h-3 w-3" />
                 {user.twoFactorEnabled ? 'مفعّلة' : 'غير مفعّلة'}
               </Badge>
             </div>
@@ -211,7 +211,7 @@ export default function UserDetailPage() {
               <CardDescription>الأدوار المعيّنة لهذا المستخدم</CardDescription>
             </div>
             <Button size="sm" onClick={() => setAssignModalOpen(true)}>
-              <UserPlus className="ml-2 h-4 w-4" />
+              <UserPlus className="ms-2 h-4 w-4" />
               تعيين دور
             </Button>
           </div>
@@ -262,9 +262,9 @@ export default function UserDetailPage() {
             onClick={() => setShowEffectivePerms(!showEffectivePerms)}
           >
             {showEffectivePerms ? (
-              <ChevronUp className="ml-2 h-4 w-4" />
+              <ChevronUp className="ms-2 h-4 w-4" />
             ) : (
-              <ChevronDown className="ml-2 h-4 w-4" />
+              <ChevronDown className="ms-2 h-4 w-4" />
             )}
             {showEffectivePerms ? 'إخفاء' : 'عرض'} ({effectivePerms.length})
           </Button>
@@ -301,9 +301,9 @@ export default function UserDetailPage() {
             </div>
             <Button variant="ghost" size="sm" onClick={() => setShowActivity(!showActivity)}>
               {showActivity ? (
-                <ChevronUp className="ml-2 h-4 w-4" />
+                <ChevronUp className="ms-2 h-4 w-4" />
               ) : (
-                <ChevronDown className="ml-2 h-4 w-4" />
+                <ChevronDown className="ms-2 h-4 w-4" />
               )}
               {showActivity ? 'إخفاء' : 'عرض'} ({activityLogs.length})
             </Button>

@@ -150,7 +150,7 @@ export default function MarketingPage() {
         </div>
         <Button asChild>
           <Link href="/admin/marketing/campaigns/new">
-            <Plus className="ml-2 h-4 w-4" />
+            <Plus className="ms-2 h-4 w-4" />
             حملة جديدة
           </Link>
         </Button>
@@ -286,7 +286,7 @@ export default function MarketingPage() {
                     <div className="flex gap-2">
                       <Link href={`/admin/marketing/campaigns/${campaign.id}`}>
                         <Button size="sm" variant="ghost">
-                          <Eye className="ml-1 h-4 w-4" />
+                          <Eye className="ms-1 h-4 w-4" />
                           عرض
                         </Button>
                       </Link>

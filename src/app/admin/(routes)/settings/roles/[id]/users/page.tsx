@@ -147,7 +147,7 @@ export default function RoleUsersPage() {
               </CardDescription>
             </div>
             <Button onClick={() => setAssignModalOpen(true)}>
-              <UserPlus className="ml-2 h-4 w-4" />
+              <UserPlus className="ms-2 h-4 w-4" />
               ربط مستخدم
             </Button>
           </div>
@@ -166,7 +166,7 @@ export default function RoleUsersPage() {
                     <TableHead>البريد الإلكتروني</TableHead>
                     <TableHead>تاريخ التعيين</TableHead>
                     <TableHead>دور أساسي</TableHead>
-                    <TableHead className="text-left">الإجراءات</TableHead>
+                    <TableHead className="text-start">الإجراءات</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -183,7 +183,7 @@ export default function RoleUsersPage() {
                         <TableCell>{u.email}</TableCell>
                         <TableCell>{formatDate(u.assignedAt)}</TableCell>
                         <TableCell>{u.isPrimary ? 'نعم' : '-'}</TableCell>
-                        <TableCell className="text-left">
+                        <TableCell className="text-start">
                           <div className="flex items-center gap-2">
                             <Button variant="ghost" size="sm" asChild>
                               <Link href={`/admin/users/${u.id}`}>عرض</Link>

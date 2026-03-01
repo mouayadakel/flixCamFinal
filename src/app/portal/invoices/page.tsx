@@ -140,7 +140,7 @@ export default async function PortalInvoicesPage() {
                         </Button>
                       </Link>
                       <Button variant="outline" size="sm">
-                        <Download className="ml-2 h-4 w-4" />
+                        <Download className="ms-2 h-4 w-4" />
                         {t('ar', 'portal.download')}
                       </Button>
                     </div>

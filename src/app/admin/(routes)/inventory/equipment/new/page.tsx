@@ -507,6 +507,63 @@ export default function NewEquipmentPage() {
     }
   }
 
+  const onFormError = (formErrors: import('react-hook-form').FieldErrors<CreateEquipmentFormData>) => {
+    const fieldToTab: Record<string, string> = {
+      sku: 'info',
+      model: 'info',
+      categoryId: 'info',
+      subCategoryId: 'info',
+      brandId: 'info',
+      condition: 'info',
+      quantityTotal: 'info',
+      quantityAvailable: 'info',
+      dailyPrice: 'info',
+      weeklyPrice: 'info',
+      monthlyPrice: 'info',
+      depositAmount: 'info',
+      purchasePrice: 'info',
+      requiresDeposit: 'info',
+      isActive: 'info',
+      requiresAssistant: 'info',
+      warehouseLocation: 'info',
+      barcode: 'info',
+      translations: 'content',
+      tags: 'content',
+      boxContents: 'content',
+      bufferTime: 'content',
+      bufferTimeUnit: 'content',
+      featuredImageUrl: 'media',
+      galleryImageUrls: 'media',
+      videoUrl: 'media',
+      specifications: 'specs',
+      relatedEquipmentIds: 'related',
+    }
+
+    const errorFields = Object.keys(formErrors)
+    const firstErrorTab = errorFields
+      .map((f) => fieldToTab[f])
+      .find(Boolean)
+
+    if (firstErrorTab && firstErrorTab !== activeTab) {
+      setActiveTab(firstErrorTab)
+    }
+
+    const messages = errorFields
+      .map((field) => {
+        const err = formErrors[field as keyof CreateEquipmentFormData]
+        if (err && 'message' in err && err.message) return String(err.message)
+        return null
+      })
+      .filter(Boolean)
+      .slice(0, 3)
+
+    toast({
+      title: 'يوجد أخطاء في النموذج',
+      description: messages.join(' • ') || 'يرجى مراجعة الحقول المطلوبة',
+      variant: 'destructive',
+    })
+  }
+
   const onSubmit = async (data: CreateEquipmentFormData) => {
     setLoading(true)
     try {
@@ -637,9 +694,9 @@ export default function NewEquipmentPage() {
           <Button variant="outline" size="sm" onClick={() => router.back()}>
             إلغاء
           </Button>
-          <Button size="sm" onClick={handleSubmit(onSubmit as import('react-hook-form').SubmitHandler<CreateEquipmentFormData>)} disabled={loading || autoFilling}>
-            {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
-            <Save className="ml-2 h-4 w-4" />
+          <Button size="sm" onClick={handleSubmit(onSubmit as import('react-hook-form').SubmitHandler<CreateEquipmentFormData>, onFormError)} disabled={loading || autoFilling}>
+            {loading && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
+            <Save className="ms-2 h-4 w-4" />
             حفظ المعدة
           </Button>
         </div>
@@ -651,7 +708,7 @@ export default function NewEquipmentPage() {
           <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
           <div>
             <span className="font-medium">جاري إنشاء المحتوى بالذكاء الاصطناعي...</span>
-            <span className="mr-1 text-violet-600">
+            <span className="me-1 text-violet-600">
               الأوصاف والترجمات وSEO والمواصفات لـ 3 لغات
             </span>
           </div>
@@ -662,13 +719,13 @@ export default function NewEquipmentPage() {
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           <div>
             <span className="font-medium">تم ملء {aiFilledCount} حقل بنجاح</span>
-            <span className="mr-1 text-emerald-600">— راجع التبويبات أدناه ثم اضغط حفظ</span>
+            <span className="me-1 text-emerald-600">— راجع التبويبات أدناه ثم اضغط حفظ</span>
           </div>
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="mr-auto text-xs text-emerald-600 hover:text-emerald-800"
+            className="me-auto text-xs text-emerald-600 hover:text-emerald-800"
             onClick={() => setAiFilled(false)}
           >
             إخفاء
@@ -685,7 +742,7 @@ export default function NewEquipmentPage() {
       />
 
       <div className="flex gap-6">
-        <form onSubmit={handleSubmit(onSubmit as import('react-hook-form').SubmitHandler<CreateEquipmentFormData>)} className="flex-1 space-y-6">
+        <form onSubmit={handleSubmit(onSubmit as import('react-hook-form').SubmitHandler<CreateEquipmentFormData>, onFormError)} className="flex-1 space-y-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="info">المعلومات والأسعار</TabsTrigger>
@@ -1398,9 +1455,9 @@ export default function NewEquipmentPage() {
               إلغاء
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              {loading && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
               حفظ المعدة
-              <ArrowRight className="mr-2 h-4 w-4" />
+              <ArrowRight className="me-2 h-4 w-4" />
             </Button>
           </div>
         </form>

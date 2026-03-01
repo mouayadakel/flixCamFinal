@@ -117,7 +117,7 @@ export function ApprovalRequestDialog({
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={submitting || !reason.trim()}>
-            {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {submitting && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
             Submit Request
           </Button>
         </DialogFooter>

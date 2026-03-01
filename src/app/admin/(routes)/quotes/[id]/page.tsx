@@ -152,13 +152,13 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
         <div className="flex gap-2">
           <Link href="/admin/quotes">
             <Button variant="outline">
-              <ArrowLeft className="ml-2 h-4 w-4" />
+              <ArrowLeft className="ms-2 h-4 w-4" />
               العودة
             </Button>
           </Link>
           {canConvert && (
             <Button onClick={handleConvert}>
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ms-2 h-4 w-4" />
               تحويل إلى حجز
             </Button>
           )}
@@ -313,7 +313,7 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
             {quote.status === 'draft' && (
               <>
                 <Button variant="outline" onClick={() => handleStatusUpdate('sent')}>
-                  <Send className="ml-2 h-4 w-4" />
+                  <Send className="ms-2 h-4 w-4" />
                   إرسال للعميل
                 </Button>
               </>
@@ -321,25 +321,25 @@ export default function QuoteDetailPage({ params }: { params: Promise<{ id: stri
             {quote.status === 'sent' && (
               <>
                 <Button variant="outline" onClick={() => handleStatusUpdate('accepted')}>
-                  <Check className="ml-2 h-4 w-4" />
+                  <Check className="ms-2 h-4 w-4" />
                   قبول العرض
                 </Button>
                 <Button variant="outline" onClick={() => handleStatusUpdate('rejected')}>
-                  <X className="ml-2 h-4 w-4" />
+                  <X className="ms-2 h-4 w-4" />
                   رفض العرض
                 </Button>
               </>
             )}
             {canConvert && (
               <Button onClick={handleConvert}>
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <ArrowRight className="ms-2 h-4 w-4" />
                 تحويل إلى حجز
               </Button>
             )}
             {quote.convertedToBookingId && (
               <Link href={`/admin/bookings/${quote.convertedToBookingId}`}>
                 <Button variant="outline">
-                  <FileText className="ml-2 h-4 w-4" />
+                  <FileText className="ms-2 h-4 w-4" />
                   عرض الحجز
                 </Button>
               </Link>

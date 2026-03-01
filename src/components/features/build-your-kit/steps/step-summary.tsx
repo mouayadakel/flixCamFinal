@@ -308,7 +308,7 @@ export function StepSummary() {
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 rounded-r-none"
+                            className="h-8 w-8 rounded-e-none"
                             onClick={() =>
                               item.qty <= 1 ? removeEquipment(id) : setQty(id, item.qty - 1)
                             }
@@ -330,7 +330,7 @@ export function StepSummary() {
                             type="button"
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 rounded-l-none"
+                            className="h-8 w-8 rounded-s-none"
                             onClick={() => setQty(id, item.qty + 1)}
                             aria-label={t('kit.add')}
                           >
@@ -343,7 +343,7 @@ export function StepSummary() {
                   )
                 })}
               </ul>
-              <p className="mt-2 text-right text-sm text-text-muted">
+              <p className="mt-2 text-end text-sm text-text-muted">
                 {name} subtotal: {formatSar(catSubtotal)}/day
               </p>
             </li>

@@ -130,7 +130,7 @@ export function ComparePageClient() {
             <h1 className="text-lg font-bold text-text-heading">
               مقارنة المعدات
             </h1>
-            <span className="mr-auto text-sm text-text-muted">
+            <span className="me-auto text-sm text-text-muted">
               {data.totalSpecKeys} مواصفة
             </span>
           </div>
@@ -268,10 +268,10 @@ export function ComparePageClient() {
                     key={row.key}
                     className={cn(row.isDifferent && 'bg-amber-50/50')}
                   >
-                    <td className="min-w-[200px] px-4 py-3 text-right font-medium text-text-muted">
+                    <td className="min-w-[200px] px-4 py-3 text-end font-medium text-text-muted">
                       {row.key.replace(/_/g, ' ')}
                       {row.isDifferent && (
-                        <span className="mr-1 text-xs text-amber-600">●</span>
+                        <span className="me-1 text-xs text-amber-600">●</span>
                       )}
                     </td>
                     {row.values.map((val, i) => (

@@ -41,8 +41,10 @@ export function useJobStream(jobId: string | null, options?: UseJobStreamOptions
 
   useEffect(() => {
     if (!jobId) {
-      setData(null)
-      setIsStreaming(false)
+      queueMicrotask(() => {
+        setData(null)
+        setIsStreaming(false)
+      })
       return
     }
 

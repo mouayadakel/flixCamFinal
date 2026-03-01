@@ -7,6 +7,7 @@
  */
 
 import { auth } from '@/lib/auth'
+import { logger } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import { QuoteService } from '@/lib/services/quote.service'
 import { QuotePolicy } from '@/lib/policies/quote.policy'
@@ -69,7 +70,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       )
     }
 
-    console.error('Update quote status error:', error)
+    logger.error('Update quote status error:', { error: error instanceof Error ? error.message : String(error) })
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

@@ -248,7 +248,7 @@ export default function CategoriesPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={loadCategories}>
-            <RefreshCw className="mr-2 h-4 w-4" />
+            <RefreshCw className="me-2 h-4 w-4" />
             Refresh
           </Button>
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -259,7 +259,7 @@ export default function CategoriesPage() {
                   setIsCreateOpen(true)
                 }}
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="me-2 h-4 w-4" />
                 Add Category
               </Button>
             </DialogTrigger>
@@ -333,12 +333,12 @@ export default function CategoriesPage() {
       <Card>
         <CardContent className="py-4">
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search by name or slug..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="ps-10"
             />
           </div>
         </CardContent>
@@ -360,7 +360,7 @@ export default function CategoriesPage() {
                   <TableHead>Slug</TableHead>
                   <TableHead>Parent</TableHead>
                   <TableHead>Equipment</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-end">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -387,7 +387,7 @@ export default function CategoriesPage() {
                       <TableCell className="font-mono text-sm">{category.slug}</TableCell>
                       <TableCell>{getParentName(category.parentId)}</TableCell>
                       <TableCell>{category.equipmentCount}</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-end">
                         <div className="flex justify-end gap-2">
                           <Button
                             size="sm"

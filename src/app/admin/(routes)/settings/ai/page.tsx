@@ -332,19 +332,19 @@ export default function AISettingsPage() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="provider">
-            <Settings className="ml-2 h-4 w-4" />
+            <Settings className="ms-2 h-4 w-4" />
             المزود
           </TabsTrigger>
           <TabsTrigger value="features">
-            <ToggleLeft className="ml-2 h-4 w-4" />
+            <ToggleLeft className="ms-2 h-4 w-4" />
             الميزات
           </TabsTrigger>
           <TabsTrigger value="costs">
-            <DollarSign className="ml-2 h-4 w-4" />
+            <DollarSign className="ms-2 h-4 w-4" />
             التكاليف
           </TabsTrigger>
           <TabsTrigger value="history">
-            <History className="ml-2 h-4 w-4" />
+            <History className="ms-2 h-4 w-4" />
             السجل
           </TabsTrigger>
         </TabsList>
@@ -360,9 +360,9 @@ export default function AISettingsPage() {
                   disabled={testingProvider !== null}
                 >
                   {testingProvider === provider ? (
-                    <Loader2 className="ml-1 h-4 w-4 animate-spin" />
+                    <Loader2 className="ms-1 h-4 w-4 animate-spin" />
                   ) : (
-                    <CheckCircle className="ml-1 h-4 w-4" />
+                    <CheckCircle className="ms-1 h-4 w-4" />
                   )}
                   اختبار الاتصال
                 </Button>
@@ -515,9 +515,9 @@ export default function AISettingsPage() {
                 <div className="flex items-end">
                   <Button onClick={saveBudget} disabled={savingBudget} className="w-full">
                     {savingBudget ? (
-                      <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                      <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                     ) : (
-                      <Save className="ml-2 h-4 w-4" />
+                      <Save className="ms-2 h-4 w-4" />
                     )}
                     حفظ الحدود
                   </Button>

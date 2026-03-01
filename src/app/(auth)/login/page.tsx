@@ -14,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { loginSchema, type LoginFormData } from '@/lib/validators/auth.validator'
@@ -216,9 +217,8 @@ export default function LoginPage() {
                 {t.forgotPassword}
               </Link>
             </div>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               autoComplete="current-password"
               disabled={isLoading}
               className={errors.password ? 'border-error-500 focus-visible:ring-error-500' : ''}
@@ -235,7 +235,7 @@ export default function LoginPage() {
           <Button type="submit" className="w-full" disabled={isLoading} aria-label={t.submit}>
             {isLoading ? (
               <>
-                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                 {t.loading}
               </>
             ) : (

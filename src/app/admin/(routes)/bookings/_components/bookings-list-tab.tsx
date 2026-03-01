@@ -322,7 +322,7 @@ export function BookingsListTab() {
                 {selectedIds.size} محدد
               </span>
               <Button variant="outline" size="sm" onClick={exportSelected}>
-                <Download className="ml-2 h-4 w-4" />
+                <Download className="ms-2 h-4 w-4" />
                 تصدير المحدد
               </Button>
               <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>
@@ -336,12 +336,12 @@ export function BookingsListTab() {
             onClick={handleExportCSV}
             disabled={sortedBookings.length === 0}
           >
-            <Download className="ml-2 h-4 w-4" />
+            <Download className="ms-2 h-4 w-4" />
             تصدير CSV
           </Button>
           <Button asChild>
             <Link href="/admin/bookings/new">
-              <Plus className="ml-2 h-4 w-4" />
+              <Plus className="ms-2 h-4 w-4" />
               حجز جديد
             </Link>
           </Button>
@@ -443,7 +443,7 @@ export function BookingsListTab() {
                   <span className="font-medium">{formatAmount(booking.totalAmount)}</span>
                   <Button variant="ghost" size="sm" asChild>
                     <Link href={`/admin/bookings/${booking.id}`}>
-                      <Eye className="ml-2 h-4 w-4" />
+                      <Eye className="ms-2 h-4 w-4" />
                       عرض
                     </Link>
                   </Button>
@@ -511,7 +511,7 @@ export function BookingsListTab() {
               >
                 تاريخ الإنشاء
               </SortableTableHead>
-              <TableHead className="text-right">الإجراءات</TableHead>
+              <TableHead className="text-end">الإجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -565,7 +565,7 @@ export function BookingsListTab() {
                     <TableCell>{formatDate(booking.startDate)}</TableCell>
                     <TableCell>{formatDate(booking.endDate)}</TableCell>
                     <TableCell>{formatDate(booking.createdAt)}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-end">
                       <Button variant="ghost" size="sm" asChild>
                         <Link href={`/admin/bookings/${booking.id}`}>
                           <Eye className="h-4 w-4" />

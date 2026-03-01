@@ -156,12 +156,12 @@ export default function NotificationsPage() {
         <div className="flex items-center gap-2">
           {unreadCount > 0 && (
             <Button variant="outline" onClick={handleMarkAllRead} disabled={loading}>
-              <CheckCheck className="ml-2 h-4 w-4" />
+              <CheckCheck className="ms-2 h-4 w-4" />
               تعليم الكل كمقروء
             </Button>
           )}
           <Button variant="outline" onClick={handleRefresh} disabled={refreshing}>
-            <RefreshCw className={cn('ml-2 h-4 w-4', refreshing && 'animate-spin')} />
+            <RefreshCw className={cn('ms-2 h-4 w-4', refreshing && 'animate-spin')} />
             تحديث
           </Button>
         </div>
@@ -183,7 +183,7 @@ export default function NotificationsPage() {
         >
           غير مقروءة
           {unreadCount > 0 && (
-            <Badge variant="secondary" className="mr-2 h-5 min-w-5 rounded-full px-1.5">
+            <Badge variant="secondary" className="me-2 h-5 min-w-5 rounded-full px-1.5">
               {unreadCount}
             </Badge>
           )}

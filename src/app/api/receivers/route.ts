@@ -25,6 +25,7 @@ export async function GET() {
       idNumber: true,
       phone: true,
       idPhotoUrl: true,
+      isDefault: true,
       createdAt: true,
     },
   })
@@ -60,6 +61,7 @@ export async function POST(request: NextRequest) {
       idNumber: parsed.data.idNumber,
       phone: parsed.data.phone,
       idPhotoUrl: parsed.data.idPhotoUrl,
+      isDefault: parsed.data.isDefault ?? false,
     },
   })
 

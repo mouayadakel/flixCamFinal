@@ -190,7 +190,7 @@ export default function ContractDetailPage() {
           </h1>
           <div className="mt-2 flex items-center gap-2">
             <Badge className={statusConfig.color}>
-              <StatusIcon className="ml-1 h-3 w-3" />
+              <StatusIcon className="ms-1 h-3 w-3" />
               {statusConfig.label}
             </Badge>
             <span className="text-muted-foreground">•</span>
@@ -200,12 +200,12 @@ export default function ContractDetailPage() {
         <div className="flex gap-2">
           <Button variant="outline" asChild>
             <Link href="/admin/contracts">
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ms-2 h-4 w-4" />
               العودة
             </Link>
           </Button>
           <Button variant="outline">
-            <Download className="ml-2 h-4 w-4" />
+            <Download className="ms-2 h-4 w-4" />
             تحميل PDF
           </Button>
         </div>
@@ -306,7 +306,7 @@ export default function ContractDetailPage() {
                   <p className="text-lg font-medium">معاينة العقد</p>
                   <p className="text-sm">سيتم عرض محتوى العقد هنا</p>
                   <Button variant="outline" className="mt-4">
-                    <Download className="ml-2 h-4 w-4" />
+                    <Download className="ms-2 h-4 w-4" />
                     تحميل النسخة الكاملة
                   </Button>
                 </div>
@@ -325,7 +325,7 @@ export default function ContractDetailPage() {
             <CardContent className="space-y-3">
               {contract.status === 'draft' && (
                 <Button className="w-full" onClick={handleSendForSignature} disabled={sending}>
-                  <Send className="ml-2 h-4 w-4" />
+                  <Send className="ms-2 h-4 w-4" />
                   {sending ? 'جاري الإرسال...' : 'إرسال للتوقيع'}
                 </Button>
               )}
@@ -337,11 +337,11 @@ export default function ContractDetailPage() {
                     onClick={handleSendForSignature}
                     disabled={sending}
                   >
-                    <RefreshCw className="ml-2 h-4 w-4" />
+                    <RefreshCw className="ms-2 h-4 w-4" />
                     إعادة الإرسال
                   </Button>
                   <Button className="w-full" onClick={() => handleStatusChange('signed')}>
-                    <CheckCircle className="ml-2 h-4 w-4" />
+                    <CheckCircle className="ms-2 h-4 w-4" />
                     تحديد كموقّع
                   </Button>
                 </>
@@ -352,12 +352,12 @@ export default function ContractDetailPage() {
                   variant="outline"
                   onClick={() => handleStatusChange('cancelled')}
                 >
-                  <AlertCircle className="ml-2 h-4 w-4" />
+                  <AlertCircle className="ms-2 h-4 w-4" />
                   إلغاء العقد
                 </Button>
               )}
               <Button className="w-full" variant="outline">
-                <Download className="ml-2 h-4 w-4" />
+                <Download className="ms-2 h-4 w-4" />
                 تحميل PDF
               </Button>
             </CardContent>

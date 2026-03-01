@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const passwordHash = await bcrypt.hash(password, 10)
+  const passwordHash = await bcrypt.hash(password, 12)
   const user = await prisma.user.create({
     data: {
       email,
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     ? await EmailService.sendVerificationEmail(email, verificationToken)
     : { ok: false, error: 'Email channel disabled' }
   if (!emailResult.ok && emailResult.error) {
-    console.error('[register] Verification email send failed:', emailResult.error)
+    // Intentionally silent — avoid exposing email service status
   }
 
   return NextResponse.json({

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -149,7 +150,7 @@ export default function SmsSettingsPage() {
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/admin/cms/messaging-center">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             مركز الرسائل
           </Link>
         </Button>
@@ -194,8 +195,7 @@ export default function SmsSettingsPage() {
           </div>
           <div>
             <Label>Auth Token</Label>
-            <Input
-              type="password"
+            <PasswordInput
               value={form.authToken}
               onChange={(e) => setForm((f) => ({ ...f, authToken: e.target.value }))}
               placeholder="رمز المصادقة"
@@ -213,7 +213,7 @@ export default function SmsSettingsPage() {
             يمكن أيضاً تعيين TWILIO_ACCOUNT_SID و TWILIO_AUTH_TOKEN و TWILIO_PHONE_NUMBER في .env
           </p>
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
+            {saving ? <Loader2 className="ms-2 h-4 w-4 animate-spin" /> : null}
             حفظ
           </Button>
         </CardContent>
@@ -232,7 +232,7 @@ export default function SmsSettingsPage() {
             className="max-w-xs"
           />
           <Button onClick={handleTestSend} disabled={testSending}>
-            {testSending ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <Send className="ml-2 h-4 w-4" />}
+            {testSending ? <Loader2 className="ms-2 h-4 w-4 animate-spin" /> : <Send className="ms-2 h-4 w-4" />}
             إرسال تجريبي
           </Button>
         </CardContent>

@@ -175,7 +175,7 @@ export default function SettingsBranchesPage() {
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
             <Link href="/admin/settings">
-              <ArrowLeft className="ml-1 h-4 w-4" />
+              <ArrowLeft className="ms-1 h-4 w-4" />
               الإعدادات
             </Link>
           </Button>
@@ -189,11 +189,11 @@ export default function SettingsBranchesPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={load} disabled={loading}>
-            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`ms-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
           <Button onClick={openCreate}>
-            <Plus className="ml-2 h-4 w-4" />
+            <Plus className="ms-2 h-4 w-4" />
             فرع جديد
           </Button>
         </div>

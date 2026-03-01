@@ -219,7 +219,7 @@ export default function NewInvoicePage() {
         </h1>
         <Button variant="outline" asChild>
           <Link href="/admin/invoices">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             إلغاء
           </Link>
         </Button>
@@ -335,12 +335,12 @@ export default function NewInvoicePage() {
             <div className="flex items-center justify-between mb-3">
               <Label className="text-xs font-bold uppercase text-gray-500">بنود الفاتورة</Label>
               <Button type="button" variant="outline" size="sm" onClick={addItem}>
-                <Plus className="ml-2 h-4 w-4" />
+                <Plus className="ms-2 h-4 w-4" />
                 إضافة بند
               </Button>
             </div>
             <div className="overflow-x-auto rounded-lg border border-gray-200">
-              <table className="w-full border-collapse text-right">
+              <table className="w-full border-collapse text-end">
                 <thead>
                   <tr className="bg-gray-50 text-gray-600">
                     <th className="p-3 text-xs font-semibold uppercase border-b">الوصف</th>
@@ -487,12 +487,12 @@ export default function NewInvoicePage() {
             <Button type="submit" disabled={loading}>
               {loading ? (
                 <>
-                  <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                   جاري الحفظ...
                 </>
               ) : (
                 <>
-                  <Plus className="ml-2 h-4 w-4" />
+                  <Plus className="ms-2 h-4 w-4" />
                   إنشاء الفاتورة
                 </>
               )}

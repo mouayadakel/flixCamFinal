@@ -146,13 +146,13 @@ export function ImportPreview({ onConfirm, onCancel, disabled }: ImportPreviewPr
               accept=".xlsx,.xls,.csv,.tsv"
               onChange={handleFileSelect}
               aria-label="اختر ملف Excel للمعاينة"
-              className="text-sm file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
+              className="text-sm file:me-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
             />
             <Button onClick={handlePreview} disabled={!file || loading} size="sm">
               {loading ? (
-                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                <Loader2 className="ms-2 h-4 w-4 animate-spin" />
               ) : (
-                <Upload className="ml-2 h-4 w-4" />
+                <Upload className="ms-2 h-4 w-4" />
               )}
               معاينة
             </Button>
@@ -231,7 +231,7 @@ export function ImportPreview({ onConfirm, onCancel, disabled }: ImportPreviewPr
                       className="text-xs"
                     >
                       {m.sourceHeader} → {m.mappedField || '❌ غير معروف'}
-                      {m.mappedField && <span className="mr-1 opacity-70">({m.confidence}%)</span>}
+                      {m.mappedField && <span className="me-1 opacity-70">({m.confidence}%)</span>}
                     </Badge>
                   ))}
                 </div>
@@ -277,7 +277,7 @@ export function ImportPreview({ onConfirm, onCancel, disabled }: ImportPreviewPr
                             <div className="flex flex-wrap gap-1">
                               {row.willAiFill.slice(0, 3).map((f) => (
                                 <Badge key={f} variant="secondary" className="text-[10px]">
-                                  <Sparkles className="ml-0.5 h-2.5 w-2.5" />
+                                  <Sparkles className="ms-0.5 h-2.5 w-2.5" />
                                   {FIELD_LABELS[f] || f}
                                 </Badge>
                               ))}
@@ -320,7 +320,7 @@ export function ImportPreview({ onConfirm, onCancel, disabled }: ImportPreviewPr
               إلغاء
             </Button>
             <Button onClick={onConfirm} disabled={disabled}>
-              {disabled && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              {disabled && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
               تأكيد واستيراد
             </Button>
           </div>

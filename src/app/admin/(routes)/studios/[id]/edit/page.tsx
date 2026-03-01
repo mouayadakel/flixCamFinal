@@ -109,7 +109,7 @@ export default function EditStudioPage() {
       <div className="space-y-6">
         <Button variant="ghost" size="sm" asChild>
           <Link href={`/admin/studios/${id}`}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="me-2 h-4 w-4" />
             Back
           </Link>
         </Button>
@@ -124,7 +124,7 @@ export default function EditStudioPage() {
     <div className="space-y-6">
       <Button variant="ghost" size="sm" asChild>
         <Link href={`/admin/studios/${id}`}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="me-2 h-4 w-4" />
           Back to Studio
         </Link>
       </Button>

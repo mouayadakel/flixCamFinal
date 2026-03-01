@@ -51,7 +51,8 @@ export function OrderSummary({ holdExpiresAt, depositAmount, className }: OrderS
 
   const vatAmount = Math.round((subtotal - discountAmount) * VAT_RATE * 100) / 100
   const deposit = depositAmount ?? 0
-  const totalWithDeposit = total + deposit
+  const totalWithVat = subtotal - discountAmount + vatAmount
+  const totalWithDeposit = totalWithVat + deposit
 
   const heldForMinutes = holdExpiresAt
     ? Math.max(0, Math.ceil((new Date(holdExpiresAt).getTime() - Date.now()) / 60000))
@@ -70,11 +71,12 @@ export function OrderSummary({ holdExpiresAt, depositAmount, className }: OrderS
         {items.map((item) => (
           <li key={item.id} className="flex justify-between text-sm">
             <span className="text-text-heading">
-              {(item as any).name ||
-                ({ EQUIPMENT: 'معدة', STUDIO: 'استوديو', ADDON: 'إضافة', PACKAGE: 'باقة' }[
+              {item.equipmentName ??
+                item.kitName ??
+                item.studioName ??
+                ({ EQUIPMENT: 'معدة', STUDIO: 'استوديو', PACKAGE: 'باقة', KIT: 'كيت' }[
                   item.itemType
-                ] ??
-                  item.itemType)}
+                ] ?? item.itemType)}
               {item.quantity > 1 && ` × ${item.quantity}`}
               {item.startDate && item.endDate && (
                 <span className="block text-xs text-text-muted">
@@ -110,7 +112,7 @@ export function OrderSummary({ holdExpiresAt, depositAmount, className }: OrderS
         )}
         <div className="flex justify-between border-t border-border-light pt-2 font-semibold">
           <dt>{t('checkout.total')}</dt>
-          <dd>{formatSar(deposit > 0 ? totalWithDeposit : total)}</dd>
+          <dd>{formatSar(deposit > 0 ? totalWithDeposit : totalWithVat)}</dd>
         </div>
       </dl>
 

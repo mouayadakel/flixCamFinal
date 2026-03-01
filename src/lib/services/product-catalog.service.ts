@@ -358,23 +358,44 @@ export class ProductCatalogService {
       })
 
       if (input.translations) {
-        await tx.productTranslation.deleteMany({ where: { productId: id } })
-        if (input.translations.length > 0) {
-          await tx.productTranslation.createMany({
-            data: input.translations.map((t) => ({
-              productId: id,
-              locale: t.locale,
-              name: t.name,
-              shortDescription: t.shortDescription,
-              longDescription: t.longDescription,
-              specifications: t.specifications ?? Prisma.JsonNull,
-              seoTitle: t.seoTitle,
-              seoDescription: t.seoDescription,
-              seoKeywords: t.seoKeywords,
-              createdBy: input.updatedBy,
-              updatedBy: input.updatedBy,
-            })),
+        const providedLocales = new Set(input.translations.map((t) => t.locale))
+
+        for (const t of input.translations) {
+          const existing = await tx.productTranslation.findUnique({
+            where: { productId_locale: { productId: id, locale: t.locale as any } },
           })
+
+          if (existing) {
+            await tx.productTranslation.update({
+              where: { productId_locale: { productId: id, locale: t.locale as any } },
+              data: {
+                name: t.name || existing.name,
+                shortDescription: t.shortDescription || existing.shortDescription,
+                longDescription: t.longDescription || existing.longDescription,
+                specifications: t.specifications ?? (existing.specifications as any) ?? undefined,
+                seoTitle: t.seoTitle || existing.seoTitle,
+                seoDescription: t.seoDescription || existing.seoDescription,
+                seoKeywords: t.seoKeywords || existing.seoKeywords,
+                updatedBy: input.updatedBy,
+              },
+            })
+          } else {
+            await tx.productTranslation.create({
+              data: {
+                productId: id,
+                locale: t.locale,
+                name: t.name,
+                shortDescription: t.shortDescription,
+                longDescription: t.longDescription,
+                specifications: t.specifications ?? Prisma.JsonNull,
+                seoTitle: t.seoTitle,
+                seoDescription: t.seoDescription,
+                seoKeywords: t.seoKeywords,
+                createdBy: input.updatedBy,
+                updatedBy: input.updatedBy,
+              },
+            })
+          }
         }
       }
 

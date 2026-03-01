@@ -283,7 +283,7 @@ export default function PortalNotificationsPage() {
                     onClick={() => fetchNotifications(notifications.length, true)}
                     disabled={loadingMore}
                   >
-                    {loadingMore ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
+                    {loadingMore ? <Loader2 className="ms-2 h-4 w-4 animate-spin" /> : null}
                     {t('portal.loadMore')}
                   </Button>
                 </div>

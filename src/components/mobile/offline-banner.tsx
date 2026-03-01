@@ -34,7 +34,7 @@ export function OfflineBanner() {
     <div
       role="status"
       aria-live="polite"
-      className="fixed left-0 right-0 top-0 z-[100] bg-amber-500 px-4 py-2 text-center text-sm font-medium text-amber-950"
+      className="fixed start-0 end-0 top-0 z-[100] bg-amber-500 px-4 py-2 text-center text-sm font-medium text-amber-950"
     >
       <span>لا يوجد اتصال بالإنترنت. سيتم المزامنة عند العودة.</span>
       <button

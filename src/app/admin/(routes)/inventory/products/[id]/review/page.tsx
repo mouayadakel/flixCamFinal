@@ -178,7 +178,7 @@ export default function ProductReviewPage() {
         <div className="py-12 text-center">
           <p className="text-muted-foreground">Product not found</p>
           <Button variant="outline" onClick={() => router.back()} className="mt-4">
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="me-2 h-4 w-4" />
             Go Back
           </Button>
         </div>
@@ -225,21 +225,21 @@ export default function ProductReviewPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => router.back()}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="me-2 h-4 w-4" />
             Back
           </Button>
           <Button variant="outline" onClick={handleBackfill} disabled={backfilling}>
-            {backfilling && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {backfilling && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
             Backfill (text + specs)
           </Button>
           <Button variant="outline" onClick={handleRetryAI} disabled={retrying}>
-            {retrying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            <RefreshCw className="mr-2 h-4 w-4" />
+            {retrying && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+            <RefreshCw className="me-2 h-4 w-4" />
             Retry AI
           </Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            <Save className="mr-2 h-4 w-4" />
+            {saving && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
+            <Save className="me-2 h-4 w-4" />
             Save Changes
           </Button>
         </div>

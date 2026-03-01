@@ -232,7 +232,7 @@ export default function CalendarPage() {
                   <TableHead>Status</TableHead>
                   <TableHead>Start</TableHead>
                   <TableHead>End</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-end">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -254,7 +254,7 @@ export default function CalendarPage() {
                     </TableCell>
                     <TableCell>{formatDate(ev.start)}</TableCell>
                     <TableCell>{formatDate(ev.end)}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-end">
                       <Button variant="ghost" size="sm" asChild>
                         <Link href={`/admin/bookings/${ev.bookingId}`}>View</Link>
                       </Button>

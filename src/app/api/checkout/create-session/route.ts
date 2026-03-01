@@ -120,6 +120,7 @@ export async function POST(request: NextRequest) {
   const booking = await BookingService.create(
     {
       customerId: session.user.id,
+      cartId: cart.id,
       startDate: start,
       endDate: end,
       equipment,
@@ -144,6 +145,31 @@ export async function POST(request: NextRequest) {
     },
     session.user.id
   )
+
+  if (
+    body.checkoutFormData?.receiver_save_for_later === true &&
+    body.receiver?.name &&
+    body.receiver?.phone
+  ) {
+    const existing = await prisma.receiver.findFirst({
+      where: {
+        userId: session.user.id,
+        phone: body.receiver.phone,
+        deletedAt: null,
+      },
+    })
+    if (!existing) {
+      await prisma.receiver.create({
+        data: {
+          userId: session.user.id,
+          name: body.receiver.name,
+          idNumber: body.receiver.idNumber ?? '',
+          phone: body.receiver.phone,
+          idPhotoUrl: body.receiver.idPhotoUrl ?? '',
+        },
+      })
+    }
+  }
 
   // Send confirmation email (fire-and-forget)
   const emailCustomer = await prisma.user.findUnique({

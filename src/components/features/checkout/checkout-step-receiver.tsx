@@ -5,12 +5,14 @@
 
 'use client'
 
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 import { useLocale } from '@/hooks/use-locale'
 import { Button } from '@/components/ui/button'
 import { useCheckoutStore } from '@/lib/stores/checkout.store'
 import { DynamicFormRenderer, type CustomFieldRender } from './dynamic-form-renderer'
-import { SavedReceiverSelector, type SavedReceiver } from './saved-receiver-selector'
+import { SavedReceiverSelector } from './saved-receiver-selector'
+
+const SAUDI_PHONE_REGEX = /^(05\d{8}|9665\d{8})$/
 
 interface CheckoutStepReceiverProps {
   onSuccess: () => void
@@ -18,6 +20,7 @@ interface CheckoutStepReceiverProps {
 
 export function CheckoutStepReceiver({ onSuccess }: CheckoutStepReceiverProps) {
   const { t } = useLocale()
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const formValues = useCheckoutStore((s) => s.formValues)
   const setFormValues = useCheckoutStore((s) => s.setFormValues)
   const setDetails = useCheckoutStore((s) => s.setDetails)
@@ -73,7 +76,54 @@ export function CheckoutStepReceiver({ onSuccess }: CheckoutStepReceiverProps) {
     [setFormValues]
   )
 
-  const handleContinue = () => {
+  const validateStep1 = useCallback((): Record<string, string> => {
+    const errs: Record<string, string> = {}
+    const receiverType = formValues.receiver_type as string | undefined
+    const name = (formValues.receiver_name as string)?.trim() ?? ''
+    const phone = (formValues.receiver_phone as string)?.trim() ?? ''
+    const idPhoto = formValues.receiver_id_photo as string | undefined
+    const method = (formValues.fulfillment_method as string) || 'PICKUP'
+    const mapVal = formValues.delivery_address_map as { lat?: number; lng?: number } | undefined
+    const legalAgreement = formValues.legal_agreement
+
+    if (receiverType === 'myself') {
+      if (name.length < 2) errs.receiver_name = t('checkout.nameMinLength') ?? 'Name must be at least 2 characters'
+      if (!SAUDI_PHONE_REGEX.test(phone)) errs.receiver_phone = t('checkout.invalidPhone') ?? 'Invalid Saudi phone number'
+    } else {
+      if (name.length < 2) errs.receiver_name = t('checkout.nameMinLength') ?? 'Name must be at least 2 characters'
+      if (!SAUDI_PHONE_REGEX.test(phone)) errs.receiver_phone = t('checkout.invalidPhone') ?? 'Invalid Saudi phone number'
+    }
+
+    if (!idPhoto?.trim()) errs.receiver_id_photo = t('checkout.idPhotoRequired') ?? 'ID photo is required'
+
+    if (method === 'delivery' && (!mapVal?.lat || !mapVal?.lng)) {
+      errs.delivery_address_map = t('checkout.addressRequired') ?? 'Please select an address on the map'
+    }
+
+    if (!legalAgreement) errs.legal_agreement = t('checkout.legalRequired') ?? 'You must accept the terms'
+
+    return errs
+  }, [formValues, t])
+
+  const handleContinue = async () => {
+    const errs = validateStep1()
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs)
+      return
+    }
+    setErrors({})
+
+    const res = await fetch('/api/checkout/validate-step', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ step: 1, formValues }),
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!data.valid && data.errors && Object.keys(data.errors).length > 0) {
+      setErrors(data.errors)
+      return
+    }
+
     const method = (formValues.fulfillment_method as string) || 'PICKUP'
     setFulfillment({
       method: method === 'delivery' ? 'DELIVERY' : 'PICKUP',
@@ -106,16 +156,17 @@ export function CheckoutStepReceiver({ onSuccess }: CheckoutStepReceiverProps) {
   }
 
   return (
-    <div className="rounded-lg border bg-card p-6">
+    <div className="rounded-lg border bg-card p-6 pb-24 lg:pb-6">
       <DynamicFormRenderer
         step={1}
         values={formValues}
         onChange={setFormValues}
+        errors={errors}
         customFieldRender={customFieldRender}
         className="space-y-6"
       />
-      <div className="mt-6">
-        <Button type="button" size="lg" className="w-full" onClick={handleContinue}>
+      <div className="fixed bottom-0 start-0 end-0 z-20 border-t bg-background p-4 lg:static lg:border-0 lg:p-0 lg:mt-6">
+        <Button type="button" size="lg" className="w-full" onClick={() => void handleContinue()}>
           {t('common.next')}
         </Button>
       </div>

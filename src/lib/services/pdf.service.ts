@@ -84,11 +84,11 @@ export class PdfService {
   /**
    * Generate report Excel buffer
    */
-  static generateReportExcelBuffer(
+  static async generateReportExcelBuffer(
     title: string,
     columns: { key: string; label: string }[],
     rows: Record<string, string | number>[]
-  ): Buffer {
+  ): Promise<Buffer> {
     return exportReportAsExcel(title, columns, rows)
   }
 }

@@ -7,6 +7,7 @@
  */
 
 import { auth } from '@/lib/auth'
+import { logger } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import { QuoteService } from '@/lib/services/quote.service'
 import { QuotePolicy } from '@/lib/policies/quote.policy'
@@ -81,7 +82,7 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    console.error('List quotes error:', error)
+    logger.error('List quotes error:', { error: error instanceof Error ? error.message : String(error) })
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }
@@ -135,7 +136,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    console.error('Create quote error:', error)
+    logger.error('Create quote error:', { error: error instanceof Error ? error.message : String(error) })
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

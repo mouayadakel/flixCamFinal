@@ -339,7 +339,7 @@ export default function AIRecommendationsPage() {
                 <div className="flex flex-col gap-2">
                   <p className="text-sm text-destructive">{fetchError}</p>
                   <Button variant="outline" onClick={loadEquipment}>
-                    <RefreshCw className="ml-2 h-4 w-4" />
+                    <RefreshCw className="ms-2 h-4 w-4" />
                     إعادة تحميل المعدات
                   </Button>
                 </div>
@@ -363,12 +363,12 @@ export default function AIRecommendationsPage() {
                   >
                     {loading ? (
                       <>
-                        <RefreshCw className="ml-2 h-4 w-4 animate-spin" />
+                        <RefreshCw className="ms-2 h-4 w-4 animate-spin" />
                         جاري التحليل...
                       </>
                     ) : (
                       <>
-                        <Sparkles className="ml-2 h-4 w-4" />
+                        <Sparkles className="ms-2 h-4 w-4" />
                         الحصول على البدائل
                       </>
                     )}
@@ -445,7 +445,7 @@ export default function AIRecommendationsPage() {
                               }
                             >
                               {rec.compatibility === 'exact' && (
-                                <CheckCircle className="ml-1 h-3 w-3" />
+                                <CheckCircle className="ms-1 h-3 w-3" />
                               )}
                               {compatibilityLabel[rec.compatibility] ?? rec.compatibility}
                             </Badge>
@@ -468,7 +468,7 @@ export default function AIRecommendationsPage() {
                             <Link href={`/admin/inventory/equipment/${rec.equipmentId}`}>
                               <Button size="sm" variant="ghost">
                                 عرض
-                                <ArrowRight className="mr-1 h-4 w-4" />
+                                <ArrowRight className="me-1 h-4 w-4" />
                               </Button>
                             </Link>
                           </TableCell>

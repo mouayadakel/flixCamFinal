@@ -164,15 +164,15 @@ export default function WalletPage() {
         </div>
         <div className="flex items-center gap-2">
           <Button variant="default" onClick={() => handleOpenAdd('credit')} disabled={loading}>
-            <ArrowDownCircle className="ml-2 h-4 w-4" />
+            <ArrowDownCircle className="ms-2 h-4 w-4" />
             إضافة رصيد
           </Button>
           <Button variant="outline" onClick={() => handleOpenAdd('debit')} disabled={loading}>
-            <ArrowUpCircle className="ml-2 h-4 w-4" />
+            <ArrowUpCircle className="ms-2 h-4 w-4" />
             خصم
           </Button>
           <Button variant="outline" onClick={fetchWallet} disabled={loading}>
-            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`ms-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
         </div>
@@ -260,7 +260,7 @@ export default function WalletPage() {
               <TableHead>مرجع</TableHead>
               <TableHead>ملاحظة</TableHead>
               <TableHead>التاريخ</TableHead>
-              <TableHead className="text-right">إجراءات</TableHead>
+              <TableHead className="text-end">إجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -297,7 +297,7 @@ export default function WalletPage() {
                   <TableCell>—</TableCell>
                   <TableCell>{tx.note ?? '—'}</TableCell>
                   <TableCell>{formatDate(tx.createdAt)}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     <Button variant="ghost" size="sm" asChild>
                       <Link href={`/admin/wallet/${tx.id}`}>
                         <Eye className="h-4 w-4" />

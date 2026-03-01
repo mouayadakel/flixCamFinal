@@ -121,7 +121,7 @@ export default async function VendorPayoutsPage() {
                         ` • ${t('ar', 'vendor.paidAt').replace('{date}', formatDate(p.paidAt))}`}
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <div className="font-medium">{formatCurrency(Number(p.netAmount))}</div>
                     <div className="text-xs text-muted-foreground">
                       {t('ar', 'vendor.grossMinusCommission')

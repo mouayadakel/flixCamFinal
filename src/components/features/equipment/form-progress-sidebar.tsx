@@ -51,7 +51,7 @@ export function FormProgressSidebar({
             type="button"
             onClick={() => onSectionClick(section.id)}
             className={cn(
-              'flex w-full items-center gap-2 rounded-md px-3 py-2 text-right text-sm transition-colors',
+              'flex w-full items-center gap-2 rounded-md px-3 py-2 text-end text-sm transition-colors',
               activeSection === section.id
                 ? 'bg-primary/10 font-medium text-primary'
                 : 'text-muted-foreground hover:bg-muted'
@@ -66,7 +66,7 @@ export function FormProgressSidebar({
             )}
             <span className="truncate">{section.label}</span>
             {section.detail && (
-              <span className="mr-auto text-xs text-muted-foreground">{section.detail}</span>
+              <span className="me-auto text-xs text-muted-foreground">{section.detail}</span>
             )}
           </button>
         ))}

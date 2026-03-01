@@ -7,6 +7,75 @@ import { Decimal } from '@prisma/client/runtime/library'
 import type { CartItemType } from '@prisma/client'
 
 const CART_EXPIRY_HOURS = 24
+const DAYS_PER_WEEK = 7
+const DAYS_PER_MONTH = 30
+
+/**
+ * Calculates the best rental price using daily/weekly/monthly rates.
+ * Returns { effectiveTotal, appliedRate } where appliedRate indicates which tier was used.
+ */
+function calculateBestRate(
+  days: number,
+  quantity: number,
+  dailyPrice: number,
+  weeklyPrice: number | null,
+  monthlyPrice: number | null
+): { effectiveTotal: number; appliedRate: 'daily' | 'weekly' | 'monthly' } {
+  const dailyTotal = dailyPrice * quantity * days
+
+  if (monthlyPrice && monthlyPrice > 0 && days >= DAYS_PER_MONTH) {
+    const months = Math.floor(days / DAYS_PER_MONTH)
+    const remainingDays = days % DAYS_PER_MONTH
+    let remainderCost: number
+    if (weeklyPrice && weeklyPrice > 0 && remainingDays >= DAYS_PER_WEEK) {
+      const weeks = Math.floor(remainingDays / DAYS_PER_WEEK)
+      const leftoverDays = remainingDays % DAYS_PER_WEEK
+      remainderCost = (weeks * weeklyPrice + leftoverDays * dailyPrice) * quantity
+    } else {
+      remainderCost = remainingDays * dailyPrice * quantity
+    }
+    const monthlyTotal = months * monthlyPrice * quantity + remainderCost
+    if (monthlyTotal < dailyTotal) {
+      return { effectiveTotal: Math.round(monthlyTotal * 100) / 100, appliedRate: 'monthly' }
+    }
+  }
+
+  if (weeklyPrice && weeklyPrice > 0 && days >= DAYS_PER_WEEK) {
+    const weeks = Math.floor(days / DAYS_PER_WEEK)
+    const remainingDays = days % DAYS_PER_WEEK
+    const weeklyTotal = (weeks * weeklyPrice + remainingDays * dailyPrice) * quantity
+    if (weeklyTotal < dailyTotal) {
+      return { effectiveTotal: Math.round(weeklyTotal * 100) / 100, appliedRate: 'weekly' }
+    }
+  }
+
+  return { effectiveTotal: Math.round(dailyTotal * 100) / 100, appliedRate: 'daily' }
+}
+
+const CART_INCLUDE = {
+  items: {
+    include: {
+      studio: {
+        select: {
+          name: true,
+          slug: true,
+          media: { take: 1, orderBy: { sortOrder: 'asc' }, select: { url: true } },
+        },
+      },
+      equipment: {
+        select: {
+          id: true,
+          sku: true,
+          model: true,
+          slug: true,
+          category: { select: { name: true } },
+          media: { take: 1, orderBy: { sortOrder: 'asc' }, select: { url: true } },
+        },
+      },
+      kit: { select: { id: true, name: true, nameEn: true } },
+    },
+  },
+} as const
 
 export interface AddCartItemInput {
   itemType: CartItemType
@@ -44,6 +113,18 @@ export interface CartWithItems {
     dailyRate: number | null
     subtotal: number
     isAvailable: boolean
+    /** Equipment display name (model or sku) for EQUIPMENT items */
+    equipmentName?: string | null
+    /** Equipment slug for link to detail page */
+    equipmentSlug?: string | null
+    /** Kit display name for KIT/PACKAGE items */
+    kitName?: string | null
+    /** Category name for display/filtering */
+    categoryName?: string | null
+    /** Thumbnail URL for equipment/studio (first media) */
+    imageUrl?: string | null
+    /** Rental days (from startDate/endDate); 1 if no dates */
+    days: number
   }[]
 }
 
@@ -60,7 +141,7 @@ export class CartService {
 
     const existing = await prisma.cart.findFirst({
       where: userId ? { userId } : { sessionId: sessionId ?? undefined },
-      include: { items: { include: { studio: { select: { name: true, slug: true } } } } },
+      include: CART_INCLUDE,
     })
 
     if (existing) {
@@ -68,7 +149,7 @@ export class CartService {
         await prisma.cartItem.deleteMany({ where: { cartId: existing.id } })
         await prisma.cart.delete({ where: { id: existing.id } })
       } else {
-        return this.toCartWithItems(existing)
+        return this.toCartWithItemsWithEnrichment(existing)
       }
     }
 
@@ -80,9 +161,9 @@ export class CartService {
         total: new Decimal(0),
         expiresAt,
       },
-      include: { items: { include: { studio: { select: { name: true, slug: true } } } } },
+      include: CART_INCLUDE,
     })
-    return this.toCartWithItems(cart)
+    return this.toCartWithItemsWithEnrichment(cart)
   }
 
   /**
@@ -91,13 +172,18 @@ export class CartService {
   static async addItem(cartId: string, input: AddCartItemInput): Promise<CartWithItems> {
     const quantity = Math.max(1, input.quantity ?? 1)
     let dailyRate = input.dailyRate ?? 0
+    let weeklyRate: number | null = null
+    let monthlyRate: number | null = null
     let studioTotalOverride: number | null = null
 
     if (input.itemType === 'EQUIPMENT' && input.equipmentId) {
       const eq = await prisma.equipment.findFirst({
         where: { id: input.equipmentId, deletedAt: null },
+        select: { dailyPrice: true, weeklyPrice: true, monthlyPrice: true },
       })
       dailyRate = eq?.dailyPrice ? Number(eq.dailyPrice) : 0
+      weeklyRate = eq?.weeklyPrice ? Number(eq.weeklyPrice) : null
+      monthlyRate = eq?.monthlyPrice ? Number(eq.monthlyPrice) : null
     } else if (input.itemType === 'STUDIO' && input.studioId) {
       if (input.dailyRate != null && input.dailyRate > 0) {
         studioTotalOverride = input.dailyRate
@@ -135,12 +221,18 @@ export class CartService {
       startDate && endDate && msDiff > 0 && msDiff < 24 * 60 * 60 * 1000
         ? msDiff / (60 * 60 * 1000)
         : null
-    const subtotalItem =
-      studioTotalOverride != null && input.itemType === 'STUDIO'
-        ? studioTotalOverride * quantity
-        : hoursSameDay != null && input.itemType === 'STUDIO'
-          ? dailyRate * quantity * hoursSameDay
-          : dailyRate * quantity * days
+
+    let subtotalItem: number
+    if (studioTotalOverride != null && input.itemType === 'STUDIO') {
+      subtotalItem = studioTotalOverride * quantity
+    } else if (hoursSameDay != null && input.itemType === 'STUDIO') {
+      subtotalItem = dailyRate * quantity * hoursSameDay
+    } else if (input.itemType === 'EQUIPMENT' && (weeklyRate || monthlyRate)) {
+      const best = calculateBestRate(days, quantity, dailyRate, weeklyRate, monthlyRate)
+      subtotalItem = best.effectiveTotal
+    } else {
+      subtotalItem = dailyRate * quantity * days
+    }
 
     await prisma.cartItem.create({
       data: {
@@ -182,7 +274,24 @@ export class CartService {
         ? Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000)))
         : 1
     const dailyRate = item.dailyRate ? Number(item.dailyRate) : 0
-    const subtotalItem = dailyRate * quantity * days
+
+    let subtotalItem: number
+    if (item.itemType === 'EQUIPMENT' && item.equipmentId) {
+      const eq = await prisma.equipment.findFirst({
+        where: { id: item.equipmentId, deletedAt: null },
+        select: { weeklyPrice: true, monthlyPrice: true },
+      })
+      const weeklyRate = eq?.weeklyPrice ? Number(eq.weeklyPrice) : null
+      const monthlyRate = eq?.monthlyPrice ? Number(eq.monthlyPrice) : null
+      if (weeklyRate || monthlyRate) {
+        const best = calculateBestRate(days, quantity, dailyRate, weeklyRate, monthlyRate)
+        subtotalItem = best.effectiveTotal
+      } else {
+        subtotalItem = dailyRate * quantity * days
+      }
+    } else {
+      subtotalItem = dailyRate * quantity * days
+    }
 
     await prisma.cartItem.update({
       where: { id: itemId },
@@ -401,12 +510,12 @@ export class CartService {
 
     const updated = await prisma.cart.findUnique({
       where: { id: cartId },
-      include: { items: { include: { studio: { select: { name: true, slug: true } } } } },
+      include: CART_INCLUDE,
     })
-    return this.toCartWithItems(updated!)
+    return this.toCartWithItemsWithEnrichment(updated!)
   }
 
-  private static toCartWithItems(cart: {
+  private static toCartWithItemsWithEnrichment(cart: {
     id: string
     userId: string | null
     sessionId: string | null
@@ -428,7 +537,20 @@ export class CartService {
       dailyRate: unknown
       subtotal: unknown
       isAvailable: boolean
-      studio?: { name: string; slug: string } | null
+      studio?: {
+        name: string
+        slug: string
+        media?: { url: string }[]
+      } | null
+      equipment?: {
+        id: string
+        sku: string
+        model: string | null
+        slug: string | null
+        category?: { name: string } | null
+        media?: { url: string }[]
+      } | null
+      kit?: { id: string; name: string; nameEn: string | null } | null
     }[]
   }): CartWithItems {
     return {
@@ -440,22 +562,40 @@ export class CartService {
       subtotal: Number(cart.subtotal),
       total: Number(cart.total),
       expiresAt: cart.expiresAt,
-      items: cart.items.map((i) => ({
-        id: i.id,
-        itemType: i.itemType,
-        equipmentId: i.equipmentId,
-        studioId: i.studioId,
-        studioName: i.studio?.name ?? null,
-        studioSlug: i.studio?.slug ?? null,
-        packageId: i.packageId,
-        kitId: i.kitId,
-        startDate: i.startDate,
-        endDate: i.endDate,
-        quantity: i.quantity,
-        dailyRate: i.dailyRate ? Number(i.dailyRate) : null,
-        subtotal: Number(i.subtotal),
-        isAvailable: i.isAvailable,
-      })),
+      items: cart.items.map((i) => {
+        const equipment = i.equipment
+        const kit = i.kit
+        const days =
+          i.startDate && i.endDate
+            ? Math.max(
+                1,
+                Math.ceil((i.endDate.getTime() - i.startDate.getTime()) / (24 * 60 * 60 * 1000))
+              )
+            : 1
+        return {
+          id: i.id,
+          itemType: i.itemType,
+          equipmentId: i.equipmentId,
+          studioId: i.studioId,
+          studioName: i.studio?.name ?? null,
+          studioSlug: i.studio?.slug ?? null,
+          packageId: i.packageId,
+          kitId: i.kitId,
+          startDate: i.startDate,
+          endDate: i.endDate,
+          quantity: i.quantity,
+          dailyRate: i.dailyRate ? Number(i.dailyRate) : null,
+          subtotal: Number(i.subtotal),
+          isAvailable: i.isAvailable,
+          equipmentName: equipment ? (equipment.model || equipment.sku) : null,
+          equipmentSlug: equipment?.slug ?? null,
+          kitName: kit ? (kit.name || kit.nameEn) : null,
+          categoryName: equipment?.category?.name ?? null,
+          imageUrl:
+            equipment?.media?.[0]?.url ?? i.studio?.media?.[0]?.url ?? null,
+          days,
+        }
+      }),
     }
   }
 }

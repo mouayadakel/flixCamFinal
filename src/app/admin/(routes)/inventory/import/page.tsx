@@ -977,14 +977,14 @@ export default function ImportPage() {
                                         }}
                                       />
                                     </th>
-                                    <th className="p-2 text-left font-medium">Row</th>
+                                    <th className="p-2 text-start font-medium">Row</th>
                                     {sheet.columns.slice(0, 7).map((col) => (
-                                      <th key={col} className="p-2 text-left font-medium">
+                                      <th key={col} className="p-2 text-start font-medium">
                                         {col}
                                       </th>
                                     ))}
                                     {sheet.columns.length > 7 && (
-                                      <th className="p-2 text-left font-medium">...</th>
+                                      <th className="p-2 text-start font-medium">...</th>
                                     )}
                                   </tr>
                                 </thead>
@@ -1051,14 +1051,14 @@ export default function ImportPage() {
                   onClick={handleAIPreview}
                   disabled={!allSheetsMapped || selectedSheetsCount === 0}
                 >
-                  <Sparkles className="mr-2 h-4 w-4" />
+                  <Sparkles className="me-2 h-4 w-4" />
                   Preview AI
                 </Button>
                 <Button
                   onClick={onSubmit}
                   disabled={submitting || !allSheetsMapped || selectedSheetsCount === 0}
                 >
-                  {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {submitting && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                   Start Import
                 </Button>
               </div>

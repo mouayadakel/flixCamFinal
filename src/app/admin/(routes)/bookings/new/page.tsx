@@ -273,7 +273,7 @@ export default function NewBookingPage() {
         </div>
         <Button variant="outline" asChild>
           <Link href="/admin/bookings">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             إلغاء
           </Link>
         </Button>
@@ -379,7 +379,7 @@ export default function NewBookingPage() {
                         <button
                           type="button"
                           onClick={() => removeEquipment(eq.id)}
-                          className="ml-1 hover:text-error-500"
+                          className="ms-1 hover:text-error-500"
                         >
                           <X className="h-3 w-3" />
                         </button>
@@ -435,7 +435,7 @@ export default function NewBookingPage() {
                             )}
                           </div>
                           {isSelected && (
-                            <Badge variant="default" className="ml-2">
+                            <Badge variant="default" className="ms-2">
                               مختار
                             </Badge>
                           )}
@@ -507,12 +507,12 @@ export default function NewBookingPage() {
           >
             {loading ? (
               <>
-                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                 جاري الحفظ...
               </>
             ) : (
               <>
-                <Plus className="ml-2 h-4 w-4" />
+                <Plus className="ms-2 h-4 w-4" />
                 إنشاء الحجز
               </>
             )}

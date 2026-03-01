@@ -95,35 +95,33 @@ export class InvoiceService {
     return status.toLowerCase().replace('_', '_') as InvoiceStatus
   }
 
-  /** Rental formula: line total = quantity × (days ?? 1) × unitPrice. Server is source of truth. */
+  /** Rental formula: line total = quantity × (days ?? 1) × unitPrice. Server is source of truth.
+   *  VAT is calculated ONCE on the aggregate taxable amount (subtotal - discount), NOT per line item. */
   private static calculateTotals(
-    items: Array<{ quantity: number; unitPrice: number; days?: number; vatRate?: number; vatAmount?: number; [k: string]: unknown }>,
-    discount: number = 0
+    items: Array<{ quantity: number; unitPrice: number; days?: number; [k: string]: unknown }>,
+    discount: number = 0,
+    vatRate: number = 0.15
   ): {
     itemsWithTotals: Array<InvoiceItem>
     subtotal: number
     vatAmount: number
     totalAmount: number
   } {
-    const VAT_RATE = 0.15
     const itemsWithTotals: InvoiceItem[] = items.map((item) => {
       const days = item.days ?? 1
-      const total = item.quantity * days * item.unitPrice
-      const vatAmount = total * VAT_RATE
+      const total = Math.round(item.quantity * days * item.unitPrice * 100) / 100
       return {
         description: item.description as string,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         ...(days > 1 && { days }),
         total,
-        vatRate: item.vatRate ?? 15,
-        vatAmount,
       }
     })
-    const subtotal = itemsWithTotals.reduce((sum, item) => sum + (item.total ?? 0), 0)
+    const subtotal = Math.round(itemsWithTotals.reduce((sum, item) => sum + (item.total ?? 0), 0) * 100) / 100
     const taxableAmount = Math.max(0, subtotal - discount)
-    const vatAmount = taxableAmount * VAT_RATE
-    const totalAmount = taxableAmount + vatAmount
+    const vatAmount = Math.round(taxableAmount * vatRate * 100) / 100
+    const totalAmount = Math.round((taxableAmount + vatAmount) * 100) / 100
     return { itemsWithTotals, subtotal, vatAmount, totalAmount }
   }
 
@@ -240,6 +238,110 @@ export class InvoiceService {
       totalAmount: Number(totalAmount),
       createdBy: userId,
       timestamp: new Date(),
+    } as any)
+
+    return this.transformToInvoice(invoice)
+  }
+
+  /**
+   * Auto-generate an invoice when a booking is confirmed.
+   * Idempotent: returns existing invoice if one already exists for the booking.
+   * Uses atomic counter for race-condition-safe invoice numbering.
+   */
+  static async autoGenerateForBooking(bookingId: string): Promise<Invoice> {
+    const existing = await prisma.invoice.findFirst({
+      where: { bookingId, deletedAt: null },
+      include: {
+        customer: {
+          select: { id: true, name: true, email: true, phone: true, taxId: true, companyName: true, billingAddress: true },
+        },
+        booking: { select: { id: true, bookingNumber: true } },
+      },
+    })
+    if (existing) {
+      return this.transformToInvoice(existing)
+    }
+
+    const booking = await prisma.booking.findFirst({
+      where: { id: bookingId, deletedAt: null },
+      include: {
+        customer: {
+          select: { id: true, name: true, email: true, phone: true, taxId: true, companyName: true, billingAddress: true },
+        },
+        equipment: {
+          where: { deletedAt: null },
+          include: { equipment: { select: { model: true, sku: true, dailyPrice: true, weeklyPrice: true, monthlyPrice: true } } },
+        },
+      },
+    })
+
+    if (!booking) {
+      throw new NotFoundError('Booking', bookingId)
+    }
+
+    const rentalDays = Math.max(1, Math.ceil(
+      (booking.endDate.getTime() - booking.startDate.getTime()) / (1000 * 60 * 60 * 24)
+    ))
+
+    const items: Array<{ description: string; quantity: number; unitPrice: number; days: number }> = booking.equipment.map((be) => ({
+      description: `${be.equipment.model || be.equipment.sku} (${rentalDays} days)`,
+      quantity: be.quantity,
+      unitPrice: Number(be.equipment.dailyPrice),
+      days: rentalDays,
+    }))
+
+    const { itemsWithTotals, subtotal, vatAmount, totalAmount } = this.calculateTotals(items, 0)
+    const invoiceNumber = await this.generateInvoiceNumber()
+    const now = new Date()
+    const dueDate = new Date(now)
+    dueDate.setDate(dueDate.getDate() + 30)
+
+    const paidAmount = booking.payments
+      ? (booking as { payments?: { amount: { toNumber: () => number } }[] }).payments
+          ?.reduce((sum: number, p: { amount: { toNumber: () => number } }) => sum + p.amount.toNumber(), 0) ?? 0
+      : 0
+
+    const invoice = await prisma.invoice.create({
+      data: {
+        invoiceNumber,
+        customerId: booking.customerId,
+        bookingId: booking.id,
+        type: 'BOOKING',
+        status: paidAmount >= totalAmount ? 'PAID' : 'SENT',
+        issueDate: now,
+        dueDate,
+        subtotal: new Decimal(subtotal),
+        vatAmount: new Decimal(vatAmount),
+        totalAmount: new Decimal(totalAmount),
+        paidAmount: new Decimal(paidAmount),
+        remainingAmount: new Decimal(Math.max(0, totalAmount - paidAmount)),
+        items: itemsWithTotals as unknown as NonNullable<Prisma.InvoiceCreateInput['items']>,
+        createdBy: booking.createdBy,
+      },
+      include: {
+        customer: {
+          select: { id: true, name: true, email: true, phone: true, taxId: true, companyName: true, billingAddress: true },
+        },
+        booking: { select: { id: true, bookingNumber: true } },
+      },
+    })
+
+    await AuditService.log({
+      action: 'invoice.auto_generated',
+      userId: booking.createdBy,
+      resourceType: 'invoice',
+      resourceId: invoice.id,
+      metadata: { invoiceNumber, bookingId, trigger: 'booking_confirmed' },
+    })
+
+    await EventBus.emit('invoice.created', {
+      invoiceId: invoice.id,
+      invoiceNumber,
+      bookingId,
+      customerId: booking.customerId,
+      totalAmount: Number(totalAmount),
+      createdBy: booking.createdBy,
+      timestamp: now,
     } as any)
 
     return this.transformToInvoice(invoice)
@@ -450,12 +552,13 @@ export class InvoiceService {
       updatedRemainingAmount = new Decimal(totalAmount - Number(existingInvoice.paidAmount))
       itemsToStore = itemsWithTotals
     } else if (input.discount !== undefined) {
-      const subtotalAfterDiscount = Number(existingInvoice.subtotal) - input.discount
-      const vatAmount = subtotalAfterDiscount * 0.15
+      const taxableAmount = Math.max(0, Number(existingInvoice.subtotal) - input.discount)
+      const vatAmount = Math.round(taxableAmount * 0.15 * 100) / 100
+      const totalAmount = Math.round((taxableAmount + vatAmount) * 100) / 100
       updatedVatAmount = new Decimal(vatAmount)
-      updatedTotalAmount = new Decimal(subtotalAfterDiscount + vatAmount)
+      updatedTotalAmount = new Decimal(totalAmount)
       updatedRemainingAmount = new Decimal(
-        subtotalAfterDiscount + vatAmount - Number(existingInvoice.paidAmount)
+        Math.round((totalAmount - Number(existingInvoice.paidAmount)) * 100) / 100
       )
     }
 
@@ -669,6 +772,8 @@ export class InvoiceService {
                 sku: true,
                 model: true,
                 dailyPrice: true,
+                categoryId: true,
+                category: { select: { id: true, name: true } },
               },
             },
           },
@@ -709,6 +814,10 @@ export class InvoiceService {
         total,
         vatRate: 15,
         vatAmount,
+        equipmentId: be.equipment.id,
+        equipmentSku: be.equipment.sku,
+        categoryId: be.equipment.category?.id,
+        categoryName: be.equipment.category?.name,
       }
     })
 

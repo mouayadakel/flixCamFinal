@@ -735,6 +735,55 @@ export class EquipmentService {
     }
 
     // Check for overlapping bookings
+    if (equipment.condition === 'MAINTENANCE') {
+      return {
+        available: false,
+        reason: 'MAINTENANCE',
+        totalQuantity: equipment.quantityTotal,
+        availableQuantity: 0,
+        rentedQuantity: 0,
+        maintenanceConflicts: [],
+        overlappingBookings: [],
+      }
+    }
+
+    const maintenanceConflicts = await prisma.maintenance.findMany({
+      where: {
+        equipmentId,
+        status: { in: ['SCHEDULED', 'IN_PROGRESS'] },
+        scheduledDate: { lte: endDate },
+        OR: [
+          { completedDate: null },
+          { completedDate: { gte: startDate } },
+        ],
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        maintenanceNumber: true,
+        scheduledDate: true,
+        completedDate: true,
+        status: true,
+      },
+    })
+
+    if (maintenanceConflicts.length > 0) {
+      return {
+        available: false,
+        reason: 'MAINTENANCE',
+        totalQuantity: equipment.quantityTotal,
+        availableQuantity: 0,
+        rentedQuantity: 0,
+        maintenanceConflicts: maintenanceConflicts.map((m) => ({
+          maintenanceNumber: m.maintenanceNumber,
+          scheduledDate: m.scheduledDate,
+          completedDate: m.completedDate,
+          status: m.status,
+        })),
+        overlappingBookings: [],
+      }
+    }
+
     const overlappingBookings = await prisma.bookingEquipment.findMany({
       where: {
         equipmentId,
@@ -771,6 +820,7 @@ export class EquipmentService {
       totalQuantity: equipment.quantityTotal,
       availableQuantity: equipment.quantityAvailable,
       rentedQuantity: totalRented,
+      maintenanceConflicts: [],
       overlappingBookings: overlappingBookings.map((be) => ({
         bookingNumber: be.booking.bookingNumber,
         startDate: be.booking.startDate,

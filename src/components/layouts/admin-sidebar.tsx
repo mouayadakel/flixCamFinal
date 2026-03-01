@@ -25,6 +25,7 @@ import {
   Users,
   Settings,
   Layout,
+  Newspaper,
   ChevronDown,
   ChevronLeft,
   Menu,
@@ -86,6 +87,7 @@ const sidebarSections: SidebarSection[] = [
       { label: { ar: 'الحزم', en: 'Kits & Bundles' }, href: '/admin/inventory/kits', permission: 'kit.read' },
       { label: { ar: 'الاستوديو', en: 'Studios' }, href: '/admin/studios', permission: 'studio.read' },
       { label: { ar: 'الاستيراد', en: 'Import' }, href: '/admin/inventory/import', permission: 'import.read' },
+      { label: { ar: 'حالة الذكاء الاصطناعي', en: 'AI Status' }, href: '/admin/inventory/ai-status', permission: 'equipment.read', activePaths: ['/admin/inventory/ai-status'] },
     ],
   },
   {
@@ -129,9 +131,21 @@ const sidebarSections: SidebarSection[] = [
     title: { ar: 'إدارة المحتوى', en: 'Content' },
     icon: Layout,
     items: [
-      { label: { ar: 'المحتوى', en: 'CMS' }, href: '/admin/cms', permission: 'settings.update', activePaths: ['/admin/cms', '/admin/cms/faq', '/admin/cms/policies', '/admin/cms/featured', '/admin/cms/checkout-form'] },
+      { label: { ar: 'المحتوى', en: 'CMS' }, href: '/admin/cms', permission: 'settings.update', activePaths: ['/admin/cms', '/admin/cms/faq', '/admin/cms/policies', '/admin/cms/featured', '/admin/cms/checkout-form', '/admin/cms/footer'] },
+      { label: { ar: 'الفوتر', en: 'Footer' }, href: '/admin/cms/footer', permission: 'settings.update', activePaths: ['/admin/cms/footer'] },
       { label: { ar: 'محتوى الاستوديو', en: 'Studios CMS' }, href: '/admin/cms/studios', permission: 'cms.studio.read' },
       { label: { ar: 'مركز الرسائل', en: 'Messaging Center' }, href: '/admin/cms/messaging-center', permission: 'settings.read' },
+    ],
+  },
+  {
+    title: { ar: 'المدونة | Blog', en: 'Blog' },
+    icon: Newspaper,
+    items: [
+      { label: { ar: 'المقالات', en: 'Posts' }, href: '/admin/blog', permission: 'settings.read', activePaths: ['/admin/blog', '/admin/blog/new', '/admin/blog/edit'] },
+      { label: { ar: 'التصنيفات', en: 'Categories' }, href: '/admin/blog/categories', permission: 'settings.read' },
+      { label: { ar: 'المؤلفون', en: 'Authors' }, href: '/admin/blog/authors', permission: 'settings.read' },
+      { label: { ar: 'التقويم', en: 'Calendar' }, href: '/admin/blog/calendar', permission: 'settings.read' },
+      { label: { ar: 'التحليلات', en: 'Analytics' }, href: '/admin/blog/analytics', permission: 'settings.read' },
     ],
   },
   {
@@ -218,7 +232,7 @@ export function AdminSidebar() {
 
       <aside
         className={cn(
-          'fixed right-0 top-0 z-50 flex h-screen flex-col border-l border-neutral-200 bg-white shadow-lg transition-transform duration-300 lg:relative lg:translate-x-0',
+          'fixed end-0 top-0 z-50 flex h-screen flex-col border-s border-neutral-200 bg-white shadow-lg transition-transform duration-300 lg:relative lg:translate-x-0',
           collapsed
             ? 'translate-x-full lg:w-16 lg:translate-x-0'
             : 'w-[80vw] max-w-[320px] translate-x-0 lg:w-64'
@@ -281,7 +295,7 @@ export function AdminSidebar() {
                     <section.icon className="h-4 w-4 flex-shrink-0" />
                     {!collapsed && (
                       <>
-                        <span className="flex-1 text-right">{section.title[language]}</span>
+                        <span className="flex-1 text-end">{section.title[language]}</span>
                         {isExpanded ? (
                           <ChevronDown className="h-4 w-4" />
                         ) : (
@@ -293,7 +307,7 @@ export function AdminSidebar() {
 
                   {/* Section Items */}
                   {!collapsed && isExpanded && (
-                    <ul className="mr-4 space-y-1 border-r-2 border-neutral-100 pr-2">
+                    <ul className="me-4 space-y-1 border-e-2 border-neutral-100 pe-2">
                       {filteredItems.map((item) => {
                         const active = isActive(item.href) || isItemOrChildActive(item)
                         return (

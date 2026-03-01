@@ -118,7 +118,7 @@ export default async function ContactPage() {
                   <div className="pt-4">
                     <Button asChild size="lg" className="w-full">
                       <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                        <MessageCircle className="ml-2 h-5 w-5" />
+                        <MessageCircle className="ms-2 h-5 w-5" />
                         تواصل عبر واتساب
                       </a>
                     </Button>

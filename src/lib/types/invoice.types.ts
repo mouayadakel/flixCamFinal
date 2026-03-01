@@ -19,6 +19,14 @@ export interface InvoiceItem {
   total?: number
   vatRate?: number
   vatAmount?: number
+  /** Equipment ID for linking to equipment detail / filtering */
+  equipmentId?: string
+  /** Equipment SKU for display */
+  equipmentSku?: string
+  /** Category ID for filtering invoices by category */
+  categoryId?: string
+  /** Category name for display */
+  categoryName?: string
 }
 
 export interface Invoice {

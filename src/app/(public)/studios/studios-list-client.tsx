@@ -165,7 +165,7 @@ export function StudiosListClient({ studios }: { studios: StudioItem[] }) {
           <p className="text-body-main text-white/85">{t('studios.heroSubtitle')}</p>
           <div className="mt-6 flex items-center gap-3 sm:justify-center">
             <Badge className="border-white/20 bg-white/15 text-white backdrop-blur-sm">
-              <Sparkles className="mr-1 h-3 w-3" />
+              <Sparkles className="me-1 h-3 w-3" />
               {studios.length} {t('studios.studiosAvailable')}
             </Badge>
           </div>
@@ -176,7 +176,7 @@ export function StudiosListClient({ studios }: { studios: StudioItem[] }) {
       <div className="space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 sm:max-w-md">
-            <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="pointer-events-none absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               value={search}

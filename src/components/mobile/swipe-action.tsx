@@ -60,7 +60,7 @@ function SwipeActionItem({ children, actions, className }: SwipeActionItemProps)
       <div
         className={cn(
           'absolute inset-y-0 flex items-center justify-end',
-          'rtl:left-0 rtl:right-auto rtl:justify-start'
+          'rtl:start-0 rtl:right-auto rtl:justify-start'
         )}
       >
         <div className="flex h-full items-stretch">{actions}</div>

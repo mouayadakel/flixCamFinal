@@ -19,19 +19,19 @@ export function QuickActions() {
         <div className="grid gap-2">
           <Button asChild>
             <Link href="/admin/inventory/equipment/new">
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="me-2 h-4 w-4" />
               Add Equipment
             </Link>
           </Button>
           <Button variant="outline" asChild>
             <Link href="/admin/bookings">
-              <Calendar className="mr-2 h-4 w-4" />
+              <Calendar className="me-2 h-4 w-4" />
               View Bookings
             </Link>
           </Button>
           <Button variant="outline" asChild>
             <Link href="/admin/inventory">
-              <Package className="mr-2 h-4 w-4" />
+              <Package className="me-2 h-4 w-4" />
               Manage Inventory
             </Link>
           </Button>

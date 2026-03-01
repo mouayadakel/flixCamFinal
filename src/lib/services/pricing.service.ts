@@ -115,27 +115,40 @@ export class PricingService {
     const weeklyRate = equipment.weeklyPrice ? Number(equipment.weeklyPrice) : undefined
     const monthlyRate = equipment.monthlyPrice ? Number(equipment.monthlyPrice) : undefined
 
-    let amount = 0
+    const dailyTotal = days * dailyRate
+    let amount = dailyTotal
 
-    // Calculate based on best rate (monthly > weekly > daily)
+    // Calculate best rate: monthly → remaining weeks → remaining days
     if (monthlyRate && days >= 30) {
       const months = Math.floor(days / 30)
       const remainingDays = days % 30
-      amount = months * monthlyRate + remainingDays * dailyRate
-    } else if (weeklyRate && days >= 7) {
+      let remainderCost: number
+      if (weeklyRate && remainingDays >= 7) {
+        const weeks = Math.floor(remainingDays / 7)
+        const leftoverDays = remainingDays % 7
+        remainderCost = weeks * weeklyRate + leftoverDays * dailyRate
+      } else {
+        remainderCost = remainingDays * dailyRate
+      }
+      const monthlyTotal = months * monthlyRate + remainderCost
+      if (monthlyTotal < amount) amount = monthlyTotal
+    }
+
+    if (weeklyRate && days >= 7) {
       const weeks = Math.floor(days / 7)
       const remainingDays = days % 7
-      amount = weeks * weeklyRate + remainingDays * dailyRate
-    } else {
-      amount = days * dailyRate
+      const weeklyTotal = weeks * weeklyRate + remainingDays * dailyRate
+      if (weeklyTotal < amount) amount = weeklyTotal
     }
+
+    amount = Math.round(amount * quantity * 100) / 100
 
     return {
       dailyRate,
       weeklyRate,
       monthlyRate,
       days,
-      amount: amount * quantity,
+      amount,
     }
   }
 

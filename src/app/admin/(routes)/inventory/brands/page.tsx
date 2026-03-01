@@ -235,7 +235,7 @@ export default function BrandsPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={loadBrands}>
-            <RefreshCw className="ml-2 h-4 w-4" />
+            <RefreshCw className="ms-2 h-4 w-4" />
             تحديث
           </Button>
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -246,7 +246,7 @@ export default function BrandsPage() {
                   setIsCreateOpen(true)
                 }}
               >
-                <Plus className="ml-2 h-4 w-4" />
+                <Plus className="ms-2 h-4 w-4" />
                 علامة جديدة
               </Button>
             </DialogTrigger>
@@ -314,12 +314,12 @@ export default function BrandsPage() {
       <Card>
         <CardContent className="py-4">
           <div className="relative max-w-md">
-            <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="بحث بالاسم..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pr-10"
+              className="pe-10"
             />
           </div>
         </CardContent>

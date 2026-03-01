@@ -458,7 +458,7 @@ export function AutomationRuleDialog({
                 إلغاء
               </Button>
               <Button type="submit" disabled={loading}>
-                {loading ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : null}
+                {loading ? <Loader2 className="ms-2 h-4 w-4 animate-spin" /> : null}
                 {isEdit ? 'حفظ' : 'إنشاء'}
               </Button>
             </DialogFooter>

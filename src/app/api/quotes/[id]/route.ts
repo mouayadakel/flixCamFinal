@@ -7,6 +7,7 @@
  */
 
 import { auth } from '@/lib/auth'
+import { logger } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import { QuoteService } from '@/lib/services/quote.service'
 import { QuotePolicy } from '@/lib/policies/quote.policy'
@@ -41,7 +42,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: error.message }, { status: 403 })
     }
 
-    console.error('Get quote error:', error)
+    logger.error('Get quote error:', { error: error instanceof Error ? error.message : String(error) })
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }
@@ -96,7 +97,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       )
     }
 
-    console.error('Update quote error:', error)
+    logger.error('Update quote error:', { error: error instanceof Error ? error.message : String(error) })
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }
@@ -136,7 +137,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       return NextResponse.json({ error: error.message }, { status: 403 })
     }
 
-    console.error('Delete quote error:', error)
+    logger.error('Delete quote error:', { error: error instanceof Error ? error.message : String(error) })
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

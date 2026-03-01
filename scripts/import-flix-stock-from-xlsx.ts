@@ -1,4 +1,5 @@
-import XLSX from 'xlsx'
+import * as fs from 'fs'
+import { parseSpreadsheetBuffer } from '../src/lib/utils/excel-parser'
 import { prisma } from '../src/lib/db/prisma'
 import { EquipmentService } from '../src/lib/services/equipment.service'
 import { createEquipmentSchema } from '../src/lib/validators/equipment.validator'
@@ -119,14 +120,17 @@ async function main() {
     categoriesCreated: 0,
   }
 
-  const wb = XLSX.readFile(filePath, { cellDates: true })
-  stats.sheets = wb.SheetNames.length
+  const buffer = fs.readFileSync(filePath)
+  const wb = await parseSpreadsheetBuffer(buffer, filePath)
+  stats.sheets = wb.sheetNames.length
 
   const usedSkusInFile = new Set<string>()
 
-  for (const sheetName of wb.SheetNames) {
-    const ws = wb.Sheets[sheetName]
-    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: '' }) as unknown[][]
+  for (const sheetName of wb.sheetNames) {
+    const data = wb.getSheetData(sheetName)
+    if (!data.length) continue
+    const headers = Object.keys(data[0] ?? {})
+    const rows: unknown[][] = [headers, ...data.map((row) => headers.map((h) => row[h] ?? ''))]
     if (!rows.length) continue
 
     const headers = normalizeHeaders(rows[0] ?? [])

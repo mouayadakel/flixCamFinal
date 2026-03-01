@@ -133,18 +133,18 @@ export default function PromissoryNotesPage() {
         <div className="flex flex-1 items-center gap-2">
           <Button asChild size="sm">
             <Link href="/admin/promissory-notes/new">
-              <Plus className="ml-2 h-4 w-4" />
+              <Plus className="ms-2 h-4 w-4" />
               {t('promissoryNote.admin.addNew')}
             </Link>
           </Button>
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={t('promissoryNote.admin.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && loadNotes()}
-              className="pr-9"
+              className="pe-9"
             />
           </div>
           <select
@@ -183,7 +183,7 @@ export default function PromissoryNotesPage() {
                   <TableHead>{t('promissoryNote.admin.booking')}</TableHead>
                   <TableHead>{t('promissoryNote.admin.signedAt')}</TableHead>
                   <TableHead>{t('promissoryNote.admin.returnDate')}</TableHead>
-                  <TableHead className="text-left">{t('promissoryNote.admin.actions')}</TableHead>
+                  <TableHead className="text-start">{t('promissoryNote.admin.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -218,7 +218,7 @@ export default function PromissoryNotesPage() {
                       </TableCell>
                       <TableCell>{formatDate(n.signedAt)}</TableCell>
                       <TableCell>{formatDate(n.expectedReturnDate)}</TableCell>
-                      <TableCell className="text-left">
+                      <TableCell className="text-start">
                         <div className="flex items-center gap-2">
                           <Button variant="ghost" size="sm" asChild>
                             <Link href={`/admin/promissory-notes/${n.id}`} title={t('promissoryNote.admin.view')} aria-label={`${t('promissoryNote.admin.view')} ${n.noteNumber}`}>

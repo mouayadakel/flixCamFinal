@@ -342,13 +342,13 @@ export function StudioBookingPanel({
           {/* Search bar for add-ons */}
           {addOns.length > 3 && (
             <div className="relative mb-2">
-              <Search className="absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute end-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="ابحث في الإضافات..."
                 value={addOnSearch}
                 onChange={(e) => setAddOnSearch(e.target.value)}
-                className="w-full rounded-xl border border-input bg-background py-2 pe-3 pr-9 ps-3 text-sm transition-shadow placeholder:text-muted-foreground focus:shadow-card-elevated focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full rounded-xl border border-input bg-background py-2 pe-3 pe-9 ps-3 text-sm transition-shadow placeholder:text-muted-foreground focus:shadow-card-elevated focus:outline-none focus:ring-2 focus:ring-primary/20"
                 aria-label="بحث في الإضافات"
                 dir="rtl"
               />

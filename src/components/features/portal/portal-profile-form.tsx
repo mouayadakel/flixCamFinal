@@ -3,9 +3,11 @@
 /**
  * Portal profile form – name, phone (email read-only).
  * Uses public site theme: input border/radius/focus, primary CTA button.
+ * When returnTo is provided (e.g. from checkout flow), redirects there after successful save if profile is complete.
  */
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -33,8 +35,14 @@ type ProfileFormData = z.infer<typeof profileSchema>
 const INPUT_CLASS =
   'h-10 rounded-public-input border border-input bg-background px-3 text-body-main placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0'
 
-export function PortalProfileForm() {
+interface PortalProfileFormProps {
+  /** After save, redirect here if profile (name+phone) is complete. Used when coming from checkout. */
+  returnTo?: string
+}
+
+export function PortalProfileForm({ returnTo }: PortalProfileFormProps) {
   const { toast } = useToast()
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [email, setEmail] = useState<string>('')
 
@@ -95,6 +103,10 @@ export function PortalProfileForm() {
         return
       }
       toast({ title: 'تم حفظ التغييرات' })
+      const profileComplete = !!(data.name?.trim() && data.phone?.trim())
+      if (returnTo && profileComplete && returnTo.startsWith('/')) {
+        router.push(returnTo)
+      }
     } catch {
       toast({ title: 'حدث خطأ', variant: 'destructive' })
     }
@@ -169,7 +181,7 @@ export function PortalProfileForm() {
       </div>
 
       <Collapsible className="space-y-4">
-        <CollapsibleTrigger className="flex w-full items-center justify-between rounded-public-input border border-input bg-muted/40 px-3 py-2.5 text-left text-body-main transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0">
+        <CollapsibleTrigger className="flex w-full items-center justify-between rounded-public-input border border-input bg-muted/40 px-3 py-2.5 text-start text-body-main transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0">
           <span className="flex items-center gap-2 font-medium text-foreground">
             <FileText className="h-4 w-4" aria-hidden />
             معلومات الفاتورة والعنوان (اختياري)
@@ -238,7 +250,7 @@ export function PortalProfileForm() {
       >
         {form.formState.isSubmitting ? (
           <>
-            <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+            <Loader2 className="ms-2 h-4 w-4 animate-spin" />
             جاري الحفظ...
           </>
         ) : (

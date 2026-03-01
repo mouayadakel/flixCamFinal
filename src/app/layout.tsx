@@ -36,12 +36,34 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'FlixCam.rent - Cinematic Equipment & Studio Rental',
-  description: 'Rent professional cinematic equipment and studios in Riyadh, Saudi Arabia',
+  title: {
+    default: 'FlixCam.rent - Cinematic Equipment & Studio Rental',
+    template: '%s | FlixCam.rent',
+  },
+  description: 'Rent professional cinematic equipment and studios in Riyadh, Saudi Arabia. Cameras, lenses, lighting, and more.',
   alternates: generateAlternatesMetadata('/'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://flixcam.rent'),
+  openGraph: {
+    type: 'website',
+    locale: 'ar_SA',
+    siteName: 'FlixCam.rent',
+    title: 'FlixCam.rent - Cinematic Equipment & Studio Rental',
+    description: 'Rent professional cinematic equipment and studios in Riyadh, Saudi Arabia.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'FlixCam.rent' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'FlixCam.rent - Cinematic Equipment & Studio Rental',
+    description: 'Rent professional cinematic equipment and studios in Riyadh.',
+    images: ['/og-image.png'],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 }
 

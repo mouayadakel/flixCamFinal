@@ -99,7 +99,7 @@ export function ReviewGrid({ rows, onApproveSelected, onEditRow, className }: Re
           <div className="flex items-center gap-2">
             {selected.size > 0 && onApproveSelected && (
               <Button size="sm" onClick={() => onApproveSelected(Array.from(selected))}>
-                <CheckCircle2 className="ml-1 h-3.5 w-3.5" />
+                <CheckCircle2 className="ms-1 h-3.5 w-3.5" />
                 اعتماد المحدد ({selected.size})
               </Button>
             )}
@@ -124,7 +124,7 @@ export function ReviewGrid({ rows, onApproveSelected, onEditRow, className }: Re
               <div
                 className={cn(
                   'grid cursor-pointer grid-cols-[32px_1fr_100px_80px_120px_80px] items-center gap-2 rounded-md px-2 py-2 hover:bg-muted/50',
-                  row.status === 'NEEDS_REVIEW' && 'border-r-2 border-r-amber-400 bg-amber-50',
+                  row.status === 'NEEDS_REVIEW' && 'border-e-2 border-e-amber-400 bg-amber-50',
                   row.status === 'DRAFT' && 'bg-muted/20',
                   selected.has(row.id) && 'bg-primary/5'
                 )}
@@ -204,7 +204,7 @@ export function ReviewGrid({ rows, onApproveSelected, onEditRow, className }: Re
                   )}
                   {onEditRow && (
                     <Button variant="outline" size="sm" onClick={() => onEditRow(row.id)}>
-                      <Edit className="ml-1 h-3 w-3" />
+                      <Edit className="ms-1 h-3 w-3" />
                       تعديل
                     </Button>
                   )}

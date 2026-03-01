@@ -308,15 +308,15 @@ export function FeaturedEquipmentTable({
           )}
           <Button variant="outline" size="sm" asChild>
             <a href="/" target="_blank" rel="noopener noreferrer">
-              <ExternalLink className="ml-2 h-4 w-4" />
+              <ExternalLink className="ms-2 h-4 w-4" />
               معاينة الصفحة الرئيسية
             </a>
           </Button>
           <Button onClick={handleSave} disabled={saving || !hasChanges}>
             {saving ? (
-              <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+              <Loader2 className="ms-2 h-4 w-4 animate-spin" />
             ) : (
-              <Save className="ml-2 h-4 w-4" />
+              <Save className="ms-2 h-4 w-4" />
             )}
             حفظ التغييرات
           </Button>
@@ -344,7 +344,7 @@ export function FeaturedEquipmentTable({
                 placeholder="بحث (SKU، الموديل، الفئة)..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pr-3"
+                className="pe-3"
                 dir="rtl"
               />
             </div>
@@ -409,7 +409,7 @@ export function FeaturedEquipmentTable({
                 size="sm"
                 onClick={() => setFeaturedFilter('featured')}
               >
-                <Star className="ml-1 h-4 w-4" />
+                <Star className="ms-1 h-4 w-4" />
                 المميزة فقط
               </Button>
             </div>

@@ -61,6 +61,7 @@ export const ROUTE_PERMISSIONS: Record<string, string> = {
   '/admin/reviews': 'client.read',
   '/admin/coupons': 'coupon.read',
   '/admin/marketing': 'marketing.read',
+  '/admin/blog': 'settings.read',
   '/admin/settings': 'settings.read',
   '/admin/settings/roles': 'settings.manage_roles',
   '/admin/settings/features': 'settings.update',

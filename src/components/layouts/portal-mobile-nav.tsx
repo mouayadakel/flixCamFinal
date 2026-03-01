@@ -20,7 +20,7 @@ export function PortalMobileNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-border bg-background/90 py-2 backdrop-blur-md pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden"
+      className="fixed bottom-0 start-0 end-0 z-50 flex items-center justify-around border-t border-border bg-background/90 py-2 backdrop-blur-md pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden"
       aria-label="Portal navigation"
     >
       <div className={cn('flex h-16 w-full items-center justify-around', 'rtl:flex-row-reverse')}>

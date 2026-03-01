@@ -7,7 +7,7 @@
  */
 
 import { jsPDF } from 'jspdf'
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 
 export interface ReportExportPdfOptions {
   title: string
@@ -71,16 +71,18 @@ export function exportReportAsPdf(options: ReportExportPdfOptions): Buffer {
 /**
  * Export report data as Excel buffer
  */
-export function exportReportAsExcel(
+export async function exportReportAsExcel(
   title: string,
   columns: { key: string; label: string }[],
   rows: Record<string, string | number>[]
-): Buffer {
+): Promise<Buffer> {
+  const workbook = new ExcelJS.Workbook()
+  const worksheet = workbook.addWorksheet(title.substring(0, 31), { headerFooter: { firstHeader: '' } })
   const headers = columns.map((c) => c.label)
-  const data = rows.map((row) => columns.map((c) => row[c.key] ?? ''))
-  const ws = XLSX.utils.aoa_to_sheet([headers, ...data])
-  const wb = XLSX.utils.book_new()
-  XLSX.utils.book_append_sheet(wb, ws, title.substring(0, 31))
-  const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' })
+  worksheet.addRow(headers)
+  for (const row of rows) {
+    worksheet.addRow(columns.map((c) => row[c.key] ?? ''))
+  }
+  const buf = await workbook.xlsx.writeBuffer()
   return Buffer.from(buf)
 }

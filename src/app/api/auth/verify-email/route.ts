@@ -4,8 +4,17 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
+import { checkRateLimitUpstash } from '@/lib/utils/rate-limit-upstash'
 
 export async function GET(request: NextRequest) {
+  const rate = await checkRateLimitUpstash(request, 'auth')
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': '300' } }
+    )
+  }
+
   const token = request.nextUrl.searchParams.get('token')
   if (!token) {
     return NextResponse.json({ error: 'Token required' }, { status: 400 })

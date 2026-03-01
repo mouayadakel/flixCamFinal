@@ -49,7 +49,7 @@ export function EquipmentTable({ equipment }: EquipmentTableProps) {
             <TableHead>Quantity</TableHead>
             <TableHead>Flags</TableHead>
             <TableHead>Updated</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="text-end">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -67,7 +67,7 @@ export function EquipmentTable({ equipment }: EquipmentTableProps) {
                 {item.boxMissing && <Badge variant="destructive">Missing box contents</Badge>}
               </TableCell>
               <TableCell>{formatDate(item.updatedAt)}</TableCell>
-              <TableCell className="text-right">
+              <TableCell className="text-end">
                 <div className="flex justify-end gap-2">
                   <Button variant="ghost" size="sm" asChild>
                     <Link href={`/admin/inventory/equipment/${item.id}`}>

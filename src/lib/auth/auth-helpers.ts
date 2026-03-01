@@ -10,7 +10,7 @@ import * as bcrypt from 'bcryptjs'
  * Hash password using bcrypt
  */
 export async function hashPassword(password: string): Promise<string> {
-  const saltRounds = 10
+  const saltRounds = 12
   return await bcrypt.hash(password, saltRounds)
 }
 

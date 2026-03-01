@@ -182,12 +182,12 @@ export default function ClientsListTab() {
           onClick={handleExportCSV}
           disabled={filteredClients.length === 0}
         >
-          <Download className="ml-2 h-4 w-4" />
+          <Download className="ms-2 h-4 w-4" />
           تصدير CSV
         </Button>
         <Button asChild>
           <Link href="/admin/clients/new">
-            <Plus className="ml-2 h-4 w-4" />
+            <Plus className="ms-2 h-4 w-4" />
             عميل جديد
           </Link>
         </Button>
@@ -253,7 +253,7 @@ export default function ClientsListTab() {
                   <TableCell>
                     <Link href={`/admin/clients/${c.id}`}>
                       <Button size="sm" variant="ghost">
-                        <Eye className="ml-1 h-4 w-4" />
+                        <Eye className="ms-1 h-4 w-4" />
                         عرض
                       </Button>
                     </Link>

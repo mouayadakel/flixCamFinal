@@ -92,7 +92,7 @@ export default function HeroBannersPage() {
         </div>
         <Button onClick={handleCreateBanner} disabled={creating}>
           {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-          <span className="mr-2">إنشاء بانر</span>
+          <span className="me-2">إنشاء بانر</span>
         </Button>
       </div>
 

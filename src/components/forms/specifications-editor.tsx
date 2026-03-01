@@ -112,10 +112,10 @@ function SpecItemEditor({
 }) {
   return (
     <div className="group relative space-y-3 rounded-lg border border-border-light bg-white p-4 transition-all hover:border-brand-primary/30 hover:shadow-sm">
-      <div className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="absolute start-2 top-1/2 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100">
         <GripVertical className="h-4 w-4 text-text-muted" />
       </div>
-      <div className="space-y-3 pl-6">
+      <div className="space-y-3 ps-6">
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label className="text-xs font-medium text-text-muted">Key *</Label>
@@ -201,7 +201,7 @@ function SpecItemEditor({
       <button
         type="button"
         onClick={onDelete}
-        className="absolute right-3 top-3 rounded-lg p-1.5 text-red-500 opacity-0 transition-all hover:bg-red-50 group-hover:opacity-100"
+        className="absolute end-3 top-3 rounded-lg p-1.5 text-red-500 opacity-0 transition-all hover:bg-red-50 group-hover:opacity-100"
         aria-label="Delete spec"
       >
         <Trash2 className="h-4 w-4" />
@@ -336,7 +336,7 @@ function GroupEditor({
             className="w-full border-2 border-dashed"
             onClick={addSpec}
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="me-2 h-4 w-4" />
             Add Specification
           </Button>
         </div>
@@ -480,7 +480,7 @@ export function SpecificationsEditor({
             onClick={() => setViewMode('htmlEditor')}
             title="محرر HTML / نصوص"
           >
-            <FileText className="ml-1.5 h-4 w-4" />
+            <FileText className="ms-1.5 h-4 w-4" />
             HTML / نصوص
           </Button>
           <Button
@@ -497,7 +497,7 @@ export function SpecificationsEditor({
             size="sm"
             onClick={() => setViewMode('preview')}
           >
-            <Eye className="ml-1.5 h-4 w-4" />
+            <Eye className="ms-1.5 h-4 w-4" />
             Preview
           </Button>
           <Button
@@ -507,7 +507,7 @@ export function SpecificationsEditor({
             onClick={() => setViewMode('htmlPreview')}
             title="معاينة HTML"
           >
-            <LayoutTemplate className="ml-1.5 h-4 w-4" />
+            <LayoutTemplate className="ms-1.5 h-4 w-4" />
             HTML Preview
           </Button>
           <Button
@@ -516,7 +516,7 @@ export function SpecificationsEditor({
             size="sm"
             onClick={() => setViewMode('json')}
           >
-            <Code className="ml-1.5 h-4 w-4" />
+            <Code className="ms-1.5 h-4 w-4" />
             JSON
           </Button>
         </div>
@@ -527,7 +527,7 @@ export function SpecificationsEditor({
             onClick={loadTemplate}
             className="bg-brand-primary hover:bg-brand-primary/90"
           >
-            <Sparkles className="ml-1.5 h-4 w-4" />
+            <Sparkles className="ms-1.5 h-4 w-4" />
             Load {categoryHint} Template
           </Button>
         )}
@@ -541,7 +541,7 @@ export function SpecificationsEditor({
             setFetchDialogOpen(true)
           }}
         >
-          <Link2 className="ml-1.5 h-4 w-4" />
+          <Link2 className="ms-1.5 h-4 w-4" />
           جلب المواصفات من رابط
         </Button>
         {onAiInfer && (
@@ -585,9 +585,9 @@ export function SpecificationsEditor({
             }}
           >
             {aiInferLoading ? (
-              <Loader2 className="ml-1.5 h-4 w-4 animate-spin" />
+              <Loader2 className="ms-1.5 h-4 w-4 animate-spin" />
             ) : (
-              <Sparkles className="ml-1.5 h-4 w-4" />
+              <Sparkles className="ms-1.5 h-4 w-4" />
             )}
             استنتاج AI
           </Button>
@@ -637,12 +637,12 @@ export function SpecificationsEditor({
             <Button type="button" onClick={handleFetchFromUrl} disabled={fetchLoading}>
               {fetchLoading ? (
                 <>
-                  <Loader2 className="ml-1.5 h-4 w-4 animate-spin" />
+                  <Loader2 className="ms-1.5 h-4 w-4 animate-spin" />
                   جاري الجلب...
                 </>
               ) : (
                 <>
-                  <Link2 className="ml-1.5 h-4 w-4" />
+                  <Link2 className="ms-1.5 h-4 w-4" />
                   جلب المواصفات
                 </>
               )}
@@ -822,7 +822,7 @@ export function SpecificationsEditor({
               className="w-full border-2 border-dashed"
               onClick={addGroup}
             >
-              <Plus className="ml-2 h-5 w-5" />
+              <Plus className="ms-2 h-5 w-5" />
               Add Group
             </Button>
           </div>
@@ -840,7 +840,7 @@ export function SpecificationsEditor({
           <CardContent className="pt-6">
             <h4 className="mb-3 text-sm font-semibold text-text-heading">معاينة HTML</h4>
             <div
-              className="min-h-[200px] rounded-xl border border-border-light bg-white p-4 [&_table]:w-full [&_th]:border [&_th]:bg-muted [&_th]:p-2 [&_td]:border [&_td]:p-2 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6"
+              className="min-h-[200px] rounded-xl border border-border-light bg-white p-4 [&_table]:w-full [&_th]:border [&_th]:bg-muted [&_th]:p-2 [&_td]:border [&_td]:p-2 [&_ul]:list-disc [&_ul]:ps-6 [&_ol]:list-decimal [&_ol]:ps-6"
               dir="rtl"
               dangerouslySetInnerHTML={{
                 __html: (() => {
@@ -884,17 +884,17 @@ export function SpecificationsEditor({
             type="button"
             variant="secondary"
             size="sm"
-            className="absolute right-3 top-3"
+            className="absolute end-3 top-3"
             onClick={copyJson}
           >
             {copied ? (
               <>
-                <Check className="ml-1.5 h-4 w-4 text-emerald-500" />
+                <Check className="ms-1.5 h-4 w-4 text-emerald-500" />
                 Copied!
               </>
             ) : (
               <>
-                <Copy className="ml-1.5 h-4 w-4" />
+                <Copy className="ms-1.5 h-4 w-4" />
                 Copy
               </>
             )}

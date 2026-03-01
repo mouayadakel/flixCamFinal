@@ -98,7 +98,7 @@ export default function CustomerSegmentsPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={loadSegments}>
-            <RefreshCw className="mr-2 h-4 w-4" />
+            <RefreshCw className="me-2 h-4 w-4" />
             Refresh
           </Button>
         </div>

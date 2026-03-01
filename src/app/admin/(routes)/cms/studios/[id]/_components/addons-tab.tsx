@@ -213,7 +213,7 @@ export function CmsStudioAddonsTab({ studioId, onRefresh }: AddonsTabProps) {
           <DialogTrigger asChild>
             <Button onClick={openCreate}>
               <Plus className="h-4 w-4" />
-              <span className="mr-2">إضافة جديدة</span>
+              <span className="me-2">إضافة جديدة</span>
             </Button>
           </DialogTrigger>
           <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg" dir="rtl">
@@ -343,12 +343,12 @@ export function CmsStudioAddonsTab({ studioId, onRefresh }: AddonsTabProps) {
         {/* Search & Filter */}
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative flex-1">
-            <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="بحث في الإضافات..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pr-9"
+              className="pe-9"
               dir="rtl"
             />
           </div>

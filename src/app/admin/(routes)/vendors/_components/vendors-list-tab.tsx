@@ -91,7 +91,7 @@ export default function VendorsListTab() {
       <div className="flex items-center justify-end gap-2">
         <Button asChild>
           <Link href="/admin/vendors/new">
-            <Plus className="ml-2 h-4 w-4" />
+            <Plus className="ms-2 h-4 w-4" />
             إضافة مورد
           </Link>
         </Button>

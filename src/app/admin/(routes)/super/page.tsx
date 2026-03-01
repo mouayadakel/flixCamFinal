@@ -297,7 +297,7 @@ export default function SuperAdminPage() {
               disabled={processing.readOnly}
               variant={readOnlyMode ? 'destructive' : 'default'}
             >
-              {processing.readOnly && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {processing.readOnly && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
               {readOnlyMode ? 'Disable Read-Only' : 'Enable Read-Only'}
             </Button>
           </div>
@@ -340,7 +340,7 @@ export default function SuperAdminPage() {
             <p className="text-sm text-muted-foreground">Leave empty for generic job rerun</p>
           </div>
           <Button onClick={handleRerunJob} disabled={processing.rerunJob || !jobId}>
-            {processing.rerunJob && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {processing.rerunJob && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
             Re-run Job
           </Button>
         </CardContent>
@@ -363,7 +363,7 @@ export default function SuperAdminPage() {
             />
           </div>
           <Button onClick={handleReleaseLock} disabled={processing.releaseLock || !lockId}>
-            {processing.releaseLock && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {processing.releaseLock && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
             Release Lock
           </Button>
         </CardContent>
@@ -409,7 +409,7 @@ export default function SuperAdminPage() {
             disabled={processing.forceTransition || !bookingId || !newStatus || !reason}
             variant="destructive"
           >
-            {processing.forceTransition && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {processing.forceTransition && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
             Force Transition
           </Button>
         </CardContent>

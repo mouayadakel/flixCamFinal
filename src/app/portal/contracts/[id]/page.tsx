@@ -17,6 +17,7 @@ import { formatDate } from '@/lib/utils/format.utils'
 import { ArrowRight, FileText, Download } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { t } from '@/lib/i18n/translate'
+import { sanitizeContractHtml } from '@/lib/utils/sanitize'
 
 export default async function PortalContractDetailPage({
   params,
@@ -128,12 +129,13 @@ export default async function PortalContractDetailPage({
             {contract.contractContent ? (
               <div
                 dangerouslySetInnerHTML={{
-                  __html:
+                  __html: sanitizeContractHtml(
                     typeof contract.contractContent === 'string'
                       ? contract.contractContent
-                      : (contract.contractContent as any)?.html ||
-                        (contract.contractContent as any)?.text ||
-                        '',
+                      : (contract.contractContent as Record<string, string>)?.html ||
+                        (contract.contractContent as Record<string, string>)?.text ||
+                        ''
+                  ),
                 }}
               />
             ) : (
@@ -156,7 +158,7 @@ export default async function PortalContractDetailPage({
               </Link>
             )}
             <Button variant="outline">
-              <Download className="ml-2 h-4 w-4" />
+              <Download className="ms-2 h-4 w-4" />
               {t('ar', 'portal.downloadPDF')}
             </Button>
             <Link href={`/portal/bookings/${contract.bookingId}`}>

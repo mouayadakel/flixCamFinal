@@ -116,6 +116,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
       alternates: generateAlternates('/contact'),
     },
+    {
+      url: `${BASE}/blog`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
+      alternates: generateAlternates('/blog'),
+    },
   ]
 
   let equipmentRoutes: MetadataRoute.Sitemap = []

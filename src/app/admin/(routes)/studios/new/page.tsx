@@ -79,7 +79,7 @@ export default function NewStudioPage() {
     <div className="space-y-6">
       <Button variant="ghost" size="sm" asChild>
         <Link href="/admin/studios">
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="me-2 h-4 w-4" />
           Back to Studios
         </Link>
       </Button>

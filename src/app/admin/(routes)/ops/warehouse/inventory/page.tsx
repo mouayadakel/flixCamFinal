@@ -152,7 +152,7 @@ export default function WarehouseInventoryPage() {
         </div>
         <Button variant="outline" asChild>
           <Link href="/admin/ops/warehouse">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             العودة
           </Link>
         </Button>
@@ -227,12 +227,12 @@ export default function WarehouseInventoryPage() {
         <CardContent className="py-4">
           <div className="flex flex-wrap items-center gap-4">
             <div className="relative min-w-[200px] flex-1">
-              <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="بحث بالرمز أو الموديل..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-10"
+                className="pe-10"
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -314,7 +314,7 @@ export default function WarehouseInventoryPage() {
                         <TableCell>{item.category?.name || '-'}</TableCell>
                         <TableCell>
                           <Badge className={statusConf.color}>
-                            <StatusIcon className="ml-1 h-3 w-3" />
+                            <StatusIcon className="ms-1 h-3 w-3" />
                             {statusConf.label}
                           </Badge>
                         </TableCell>
@@ -337,7 +337,7 @@ export default function WarehouseInventoryPage() {
                         <TableCell>
                           <Link href={`/admin/inventory/equipment/${item.id}`}>
                             <Button size="sm" variant="ghost">
-                              <Eye className="ml-1 h-4 w-4" />
+                              <Eye className="ms-1 h-4 w-4" />
                               عرض
                             </Button>
                           </Link>

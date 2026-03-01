@@ -35,6 +35,8 @@ interface EquipmentNavDropdownProps {
   isActive: boolean
   onLinkClick?: () => void
   hidden?: boolean
+  /** Optional class for the trigger link (e.g. header dark-theme: text-white/85 hover:text-white) */
+  triggerClassName?: string
 }
 
 export function EquipmentNavDropdown({
@@ -42,10 +44,12 @@ export function EquipmentNavDropdown({
   isActive,
   onLinkClick,
   hidden,
+  triggerClassName,
 }: EquipmentNavDropdownProps) {
   const { t } = useLocale()
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [panelHovered, setPanelHovered] = useState(false)
   const [categories, setCategories] = useState<CategoryItem[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
@@ -141,7 +145,13 @@ export function EquipmentNavDropdown({
 
   const handlePanelMouseEnter = () => {
     clearCloseTimer()
+    setPanelHovered(true)
     setOpen(true)
+  }
+
+  const handlePanelMouseLeave = () => {
+    setPanelHovered(false)
+    handleMouseLeave()
   }
 
   useEffect(() => {
@@ -158,10 +168,14 @@ export function EquipmentNavDropdown({
       role="menu"
       aria-label={t('nav.equipment')}
       onMouseEnter={handlePanelMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseLeave={handlePanelMouseLeave}
       className={cn(
-        'min-w-[200px] overflow-y-auto overflow-x-hidden rounded-xl border border-border-light/60 bg-white py-2 shadow-lg',
-        'max-h-[60vh]'
+        'min-w-[200px] overflow-y-auto overflow-x-hidden rounded-xl py-2 shadow-lg backdrop-blur-lg transition-all duration-200 ease-out',
+        'max-h-[60vh]',
+        'border bg-white/55',
+        panelHovered
+          ? 'border-brand-primary/40 bg-white/85 shadow-xl ring-1 ring-brand-primary/20'
+          : 'border-border-light/70'
       )}
       style={{
         position: 'fixed',
@@ -171,19 +185,6 @@ export function EquipmentNavDropdown({
         minWidth: DROPDOWN_MIN_WIDTH,
       }}
     >
-      <div className="border-b border-border-light/40 px-3 py-2">
-        <Link
-          href="/equipment"
-          onClick={onLinkClick}
-          role="menuitem"
-          className={cn(
-            'block rounded-lg px-2 py-1.5 text-sm font-medium text-text-heading transition-colors',
-            'hover:bg-brand-primary/10 hover:text-brand-primary'
-          )}
-        >
-          {t('common.viewAll')}
-        </Link>
-      </div>
       <div className="py-1">
         {loading && (
           <div className="px-3 py-4 text-center text-sm text-text-muted">{t('common.loading')}</div>
@@ -219,7 +220,7 @@ export function EquipmentNavDropdown({
                   onClick={onLinkClick}
                   role="menuitem"
                   className={cn(
-                    'block px-3 py-1.5 text-start text-sm transition-colors',
+                    'mx-2 block rounded-lg px-3 py-2 text-start text-sm transition-colors duration-150',
                     item.isSubcategory
                       ? 'ms-4 text-text-body hover:bg-brand-primary/10 hover:text-brand-primary'
                       : 'font-medium text-text-heading hover:bg-brand-primary/10 hover:text-brand-primary'
@@ -249,7 +250,8 @@ export function EquipmentNavDropdown({
         aria-expanded={open}
         className={cn(
           'flex h-10 items-center text-sm font-medium transition-colors',
-          isActive ? 'font-semibold text-brand-primary' : 'text-foreground/90 hover:text-foreground'
+          isActive ? 'font-semibold text-brand-primary' : 'text-foreground/90 hover:text-foreground',
+          triggerClassName
         )}
       >
         {t('nav.equipment')}

@@ -202,7 +202,7 @@ export function StudioAvailabilityCalendar({
                 >
                   {d}
                   {status === 'partial' && (
-                    <span className="absolute bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-amber-500" />
+                    <span className="absolute bottom-0.5 start-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-amber-500" />
                   )}
                 </button>
               )

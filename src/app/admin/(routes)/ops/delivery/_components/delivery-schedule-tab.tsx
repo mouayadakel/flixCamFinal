@@ -218,7 +218,7 @@ export function DeliveryScheduleTab() {
               <AlertTriangle className="mx-auto mb-4 h-12 w-12 text-destructive" />
               <p className="font-medium text-destructive">{loadError}</p>
               <Button variant="outline" className="mt-4" onClick={loadDeliveries}>
-                <RefreshCw className="ml-2 h-4 w-4" />
+                <RefreshCw className="ms-2 h-4 w-4" />
                 إعادة المحاولة
               </Button>
             </div>

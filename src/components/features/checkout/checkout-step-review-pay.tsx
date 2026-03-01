@@ -5,11 +5,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useLocale } from '@/hooks/use-locale'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { useCartStore } from '@/lib/stores/cart.store'
 import { useCheckoutStore } from '@/lib/stores/checkout.store'
 import { PriceLockNotice } from './price-lock-notice'
@@ -49,17 +46,15 @@ const ITEM_TYPE_LABELS: Record<string, string> = {
 
 export function CheckoutStepReviewPay() {
   const { t } = useLocale()
-  const router = useRouter()
-  const [promoCode, setPromoCode] = useState('')
-  const [promoLoading, setPromoLoading] = useState(false)
-  const [promoError, setPromoError] = useState<string | null>(null)
   const [lockedAt, setLockedAt] = useState<Date | null>(null)
+  const [lockTtlMinutes, setLockTtlMinutes] = useState(120)
   const [lockExpired, setLockExpired] = useState(false)
   const [lockLoading, setLockLoading] = useState(true)
   const [payError, setPayError] = useState<string | null>(null)
 
   const { items, subtotal, discountAmount, total, fetchCart } = useCartStore()
   const details = useCheckoutStore((s) => s.details)
+  const setStep = useCheckoutStore((s) => s.setStep)
   const formValues = useCheckoutStore((s) => s.formValues)
   const addons = useCheckoutStore((s) => s.addons)
 
@@ -67,46 +62,23 @@ export function CheckoutStepReviewPay() {
     fetchCart()
   }, [fetchCart])
 
-  useEffect(() => {
-    let cancelled = false
-    async function lock() {
-      setLockLoading(true)
-      try {
-        const res = await fetch('/api/checkout/lock-price', { method: 'POST' })
-        if (res.ok) {
-          const data = await res.json()
-          if (!cancelled && data.lockedAt) setLockedAt(new Date(data.lockedAt))
-        }
-      } finally {
-        if (!cancelled) setLockLoading(false)
-      }
-    }
-    lock()
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  const handleApplyPromo = async () => {
-    if (!promoCode.trim()) return
-    setPromoLoading(true)
-    setPromoError(null)
+  const lockPrice = async () => {
+    setLockLoading(true)
     try {
-      const res = await fetch('/api/cart/coupon', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: promoCode.trim() }),
-      })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        setPromoError(data.error || t('checkout.invalidPromo'))
-      } else {
-        await fetchCart()
+      const res = await fetch('/api/checkout/lock-price', { method: 'POST' })
+      if (res.ok) {
+        const data = await res.json()
+        setLockedAt(new Date(data.lockedAt))
+        setLockTtlMinutes(data.lockTtlMinutes ?? 120)
       }
     } finally {
-      setPromoLoading(false)
+      setLockLoading(false)
     }
   }
+
+  useEffect(() => {
+    lockPrice()
+  }, [])
 
   const vatAmount = Math.round((subtotal - discountAmount) * VAT_RATE * 100) / 100
 
@@ -114,7 +86,7 @@ export function CheckoutStepReviewPay() {
     return (
       <div className="rounded-lg border bg-card p-6 text-center text-muted-foreground">
         <p>{t('checkout.completePrevious')}</p>
-        <Button variant="link" onClick={() => router.push('/checkout')}>
+        <Button variant="link" onClick={() => setStep(1)}>
           {t('checkout.backToCheckout')}
         </Button>
       </div>
@@ -127,9 +99,14 @@ export function CheckoutStepReviewPay() {
     details.name
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24 lg:pb-0">
       <div className="rounded-lg border bg-card p-6">
-        <h2 className="mb-3 font-semibold">{t('checkout.receiverSummary')}</h2>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-semibold">{t('checkout.receiverSummary')}</h2>
+          <Button variant="link" size="sm" className="h-auto p-0" onClick={() => setStep(1)}>
+            {t('checkout.editReceiver')}
+          </Button>
+        </div>
         <p className="text-sm font-medium">{receiverName}</p>
         <p className="text-sm text-muted-foreground" dir="ltr">
           {details.phone}
@@ -148,7 +125,12 @@ export function CheckoutStepReviewPay() {
       </div>
 
       <div className="rounded-lg border bg-card p-6">
-        <h2 className="mb-3 font-semibold">{t('checkout.orderSummary')}</h2>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-semibold">{t('checkout.orderSummary')}</h2>
+          <Button variant="link" size="sm" className="h-auto p-0" onClick={() => setStep(2)}>
+            {t('checkout.editAddons')}
+          </Button>
+        </div>
         <ul className="space-y-2 text-sm">
           {items.map((item) => (
             <li key={item.id} className="flex justify-between">
@@ -178,34 +160,6 @@ export function CheckoutStepReviewPay() {
       </div>
 
       <div className="rounded-lg border bg-card p-6">
-        <h3 className="mb-2 font-semibold">{t('checkout.promoCode')}</h3>
-        <div className="flex gap-2">
-          <Input
-            placeholder={t('checkout.promoPlaceholder')}
-            value={promoCode}
-            onChange={(e) => setPromoCode(e.target.value)}
-            disabled={promoLoading}
-          />
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleApplyPromo}
-            disabled={promoLoading || !promoCode.trim()}
-          >
-            {promoLoading ? '...' : t('checkout.applyPromo')}
-          </Button>
-        </div>
-        {discountAmount > 0 && (
-          <p className="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
-            {t('checkout.youSaved')} {formatSar(discountAmount)} SAR
-          </p>
-        )}
-        {promoError && (
-          <p className="mt-1 text-sm text-destructive">{promoError}</p>
-        )}
-      </div>
-
-      <div className="rounded-lg border bg-card p-6">
         <h3 className="mb-3 font-semibold">{t('checkout.priceBreakdown')}</h3>
         <dl className="space-y-2 text-sm">
           <div className="flex justify-between">
@@ -230,7 +184,12 @@ export function CheckoutStepReviewPay() {
       </div>
 
       {!lockLoading && (
-        <PriceLockNotice lockedAt={lockedAt} onExpired={() => setLockExpired(true)} />
+        <PriceLockNotice
+          lockedAt={lockedAt}
+          lockTtlSeconds={lockTtlMinutes * 60}
+          onExpired={() => setLockExpired(true)}
+          onRefresh={lockPrice}
+        />
       )}
 
       {payError && (
@@ -239,10 +198,17 @@ export function CheckoutStepReviewPay() {
         </p>
       )}
 
-      <InlineTapPayment
-        totalAmount={total}
-        onError={setPayError}
-      />
+      <div className="fixed bottom-0 start-0 end-0 z-20 flex gap-3 border-t bg-background p-4 lg:static lg:border-0 lg:p-0">
+        <Button variant="outline" size="lg" onClick={() => setStep(2)}>
+          {t('common.back')}
+        </Button>
+        <div className="flex-1">
+          <InlineTapPayment
+            totalAmount={total}
+            onError={setPayError}
+          />
+        </div>
+      </div>
     </div>
   )
 }

@@ -34,6 +34,8 @@ export interface DynamicFormRendererProps {
   step: 1 | 2 | 3
   values: Record<string, unknown>
   onChange: (values: Record<string, unknown>) => void
+  /** Optional: field-level validation errors */
+  errors?: Record<string, string>
   /** Optional: validate required fields; return list of fieldKeys that are missing */
   onValidate?: () => string[]
   /** Optional: custom render for specific fields (e.g. saved receiver selector) */
@@ -45,6 +47,7 @@ export function DynamicFormRenderer({
   step,
   values,
   onChange,
+  errors,
   customFieldRender,
   className,
 }: DynamicFormRendererProps) {
@@ -84,6 +87,7 @@ export function DynamicFormRenderer({
 
   const shouldShowField = useCallback(
     (field: CheckoutFormFieldConfig): boolean => {
+      if (field.fieldKey === 'receiver_id_photo') return true
       if (!field.conditionFieldKey || field.conditionValue == null) return true
       const depValue = values[field.conditionFieldKey]
       const strDep = depValue != null ? String(depValue) : ''
@@ -118,7 +122,7 @@ export function DynamicFormRenderer({
           <h3 className="mb-3 text-sm font-semibold text-foreground">
             {section.nameEn}
             {section.nameAr && (
-              <span className="ml-1 font-normal text-muted-foreground">/ {section.nameAr}</span>
+              <span className="ms-1 font-normal text-muted-foreground">/ {section.nameAr}</span>
             )}
           </h3>
           <div className="space-y-4">
@@ -131,7 +135,9 @@ export function DynamicFormRenderer({
               return renderField(
                 field,
                 values[field.fieldKey],
-                handleFieldChange
+                handleFieldChange,
+                undefined,
+                errors?.[field.fieldKey]
               )
             })}
           </div>

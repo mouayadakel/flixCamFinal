@@ -134,7 +134,7 @@ export default async function middleware(req: NextRequest) {
   // API routes - check authentication
   if (pathname.startsWith('/api')) {
     // Public API routes (Phase 3: guest cart + public catalog)
-    const publicApiRoutes = ['/api/auth', '/api/health', '/api/cart', '/api/public']
+    const publicApiRoutes = ['/api/auth', '/api/health', '/api/cart', '/api/public', '/api/newsletter', '/api/footer']
     if (publicApiRoutes.some((route) => pathname.startsWith(route))) {
       return NextResponse.next()
     }

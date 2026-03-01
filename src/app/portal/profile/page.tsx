@@ -11,12 +11,19 @@ import { PortalProfileForm } from '@/components/features/portal/portal-profile-f
 import { t } from '@/lib/i18n/translate'
 import { ChevronLeft } from 'lucide-react'
 
-export default async function PortalProfilePage() {
+export default async function PortalProfilePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ complete?: string; returnTo?: string }>
+}) {
   const session = await auth()
 
   if (!session?.user?.id) {
     redirect('/login?callbackUrl=/portal/profile')
   }
+
+  const resolved = searchParams ? await searchParams : {}
+  const returnTo = typeof resolved?.returnTo === 'string' ? resolved.returnTo : undefined
 
   return (
     <div className="max-w-2xl space-y-8">
@@ -59,7 +66,7 @@ export default async function PortalProfilePage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-6 pt-0">
-          <PortalProfileForm />
+          <PortalProfileForm returnTo={returnTo} />
         </CardContent>
       </Card>
 

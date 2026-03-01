@@ -338,6 +338,8 @@ model User {
   status                String                 @default("active")
   twoFactorEnabled      Boolean                @default(false)
   twoFactorSecret       String?
+  twoFactorVerifiedAt   DateTime?
+  twoFactorBackupCodes  Json?                  // Array of bcrypt-hashed backup codes (one-time use)
   createdAt             DateTime               @default(now())
   createdBy             String?
   updatedAt             DateTime               @updatedAt
@@ -372,6 +374,20 @@ model User {
   receivers             Receiver[]
   notificationPreferences NotificationPreference[]
   promissoryNotesAsDebtor PromissoryNote[]
+  scanEventsPerformed     ScanEvent[]            @relation("ScanEventPerformer")
+  idDocumentUrl           String?                @db.Text
+  idDocumentType          IdDocumentType?
+  idDocumentNumber        String?
+  idVerifiedAt            DateTime?
+  idVerifiedBy            String?
+  idVerificationStatus    IdVerificationStatus   @default(NOT_SUBMITTED)
+  idRejectionReason       String?
+  skipIdVerification      Boolean                @default(false)
+  idVerifier              User?                  @relation("IdVerifier", fields: [idVerifiedBy], references: [id])
+  idVerifications         User[]                 @relation("IdVerifier")
+  waitlistEntries         WaitlistEntry[]
+  notifications           Notification[]         @relation("UserNotifications")
+  discountCodesCreated    DiscountCode[]         @relation("DiscountCodeCreator")
 
   @@index([email])
   @@index([role])
@@ -749,7 +765,8 @@ model Equipment {
   isActive                 Boolean                   @default(true)
   requiresAssistant        Boolean                   @default(false) // Requires an assistant to operate
   warehouseLocation        String?
-  barcode                  String?
+  barcode                  String?                   @unique
+  qrCodeData               String?                   @db.Text
   specifications           Json?
   customFields             Json?
   specSource               String? // "manual" | "ai" | "import" | "migrated"
@@ -766,6 +783,7 @@ model Equipment {
   budgetTier               BudgetTier?
   vendorId                 String?
   bookings                 BookingEquipment[]
+  cartItems                CartItem[]
   damageClaims             DamageClaim[]
   brand                    Brand?                    @relation(fields: [brandId], references: [id])
   category                 Category                  @relation(fields: [categoryId], references: [id])
@@ -778,6 +796,9 @@ model Equipment {
   savedByUsers             SavedEquipment[]
   shootTypeRecommendations ShootTypeRecommendation[]
   product                  Product?                  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  scanEvents               ScanEvent[]
+  waitlistEntries          WaitlistEntry[]
+  bundleItems              BundleItem[]
 
   @@index([sku])
   @@index([slug])
@@ -790,6 +811,7 @@ model Equipment {
   @@index([featured])
   @@index([deletedAt])
   @@index([budgetTier])
+  @@index([barcode])
 }
 
 model ShootType {
@@ -1120,6 +1142,23 @@ model Booking {
   actualReturnDate  DateTime?
   lateFeeAmount     Decimal?           @db.Decimal(10, 2)
   recurringSeriesId String?
+  // Guest checkout
+  guestEmail               String?
+  guestName                String?
+  guestPhone               String?
+  guestToken               String?            @unique
+  // Deposit lifecycle (Model A — held separately)
+  depositStatus            DepositStatus      @default(PENDING)
+  depositReturnedAt        DateTime?
+  depositReturnedBy        String?
+  depositDeductionAmount   Decimal?           @db.Decimal(10, 2)
+  depositDeductionReason   String?
+  depositRefundReference   String?
+  // Cancellation
+  cancelledAt              DateTime?
+  cancellationReason       String?
+  refundAmount             Decimal?           @db.Decimal(10, 2)
+  refundStatus             RefundStatus?
   // Receiver & fulfillment (checkout flow)
   receiverId                 String?
   receiverName               String?
@@ -1135,8 +1174,10 @@ model Booking {
   emergencyContactPhone      String?
   emergencyContactRelation   String?
   checkoutFormData           Json?     // dynamic CMS field values
+  cartId            String?            @unique
   createdByUser     User               @relation("CreatedBookings", fields: [createdBy], references: [id])
   customer          User               @relation("CustomerBookings", fields: [customerId], references: [id])
+  cart              Cart?              @relation("CartToBooking", fields: [cartId], references: [id], onDelete: SetNull)
   recurringSeries   RecurringSeries?   @relation(fields: [recurringSeriesId], references: [id])
   studio            Studio?            @relation(fields: [studioId], references: [id])
   equipment         BookingEquipment[]
@@ -1150,35 +1191,77 @@ model Booking {
   quotes            Quote?             @relation("ConvertedFromQuote")
   reviews           Review?
   promissoryNotes   PromissoryNote[]
+  scanEvents        ScanEvent[]
+  contractHtml         String?            @db.Text
+  contractSignedAt     DateTime?
+  contractSignedIp     String?
+  contractPdfUrl       String?
+  reminderSent         Boolean            @default(false)
+  returnReminderSent   Boolean            @default(false)
+  overdueAlerted       Boolean            @default(false)
+  discountCodeId       String?
+  discountCode         DiscountCode?      @relation(fields: [discountCodeId], references: [id])
+  discountCodeUsages   DiscountCodeUsage[]
 
   @@index([bookingNumber])
   @@index([customerId])
   @@index([status])
   @@index([startDate, endDate])
+  @@index([guestToken])
   @@index([studioId])
   @@index([softLockExpiresAt])
   @@index([recurringSeriesId])
+  @@index([cartId])
   @@index([deletedAt])
 }
 
 model BookingEquipment {
-  id          String    @id @default(cuid())
-  bookingId   String
-  equipmentId String
-  quantity    Int       @default(1)
-  createdAt   DateTime  @default(now())
-  createdBy   String?
-  updatedAt   DateTime  @updatedAt
-  updatedBy   String?
-  deletedAt   DateTime?
-  deletedBy   String?
-  booking     Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  equipment   Equipment @relation(fields: [equipmentId], references: [id])
+  id                   String                @id @default(cuid())
+  bookingId            String
+  equipmentId          String
+  quantity             Int                   @default(1)
+  itemStatus           BookingItemStatus     @default(PENDING)
+  dispatchedAt         DateTime?
+  dispatchedBy         String?
+  conditionOnDispatch  String?
+  returnedAt           DateTime?
+  returnedBy           String?
+  conditionOnReturn    String?
+  createdAt            DateTime              @default(now())
+  createdBy            String?
+  updatedAt            DateTime              @updatedAt
+  updatedBy            String?
+  deletedAt            DateTime?
+  deletedBy            String?
+  booking              Booking               @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  equipment            Equipment             @relation(fields: [equipmentId], references: [id])
 
   @@unique([bookingId, equipmentId])
   @@index([bookingId])
   @@index([equipmentId])
   @@index([deletedAt])
+  @@index([itemStatus])
+}
+
+model ScanEvent {
+  id              String        @id @default(cuid())
+  equipmentId     String
+  bookingId       String
+  action          ScanAction
+  performedBy     String
+  conditionNotes  String?       @db.Text
+  conditionPhotos Json?
+  scannedAt       DateTime      @default(now())
+  createdAt       DateTime      @default(now())
+  equipment       Equipment     @relation(fields: [equipmentId], references: [id])
+  booking         Booking       @relation(fields: [bookingId], references: [id])
+  performer       User          @relation("ScanEventPerformer", fields: [performedBy], references: [id])
+
+  @@index([equipmentId])
+  @@index([bookingId])
+  @@index([performedBy])
+  @@index([scannedAt])
+  @@index([action])
 }
 
 model BookingRequest {
@@ -1249,6 +1332,7 @@ model Kit {
   deletedAt       DateTime?
   deletedBy       String?
   items           KitEquipment[]
+  cartItems       CartItem[]
 
   @@index([slug])
   @@index([isActive])
@@ -1421,6 +1505,7 @@ model Notification {
   title     String
   message   String
   data      Json?
+  link      String?
   read      Boolean             @default(false)
   readAt    DateTime?
   createdAt DateTime            @default(now())
@@ -1429,6 +1514,7 @@ model Notification {
   updatedBy String?
   deletedAt DateTime?
   deletedBy String?
+  user      User?               @relation("UserNotifications", fields: [userId], references: [id])
 
   @@index([userId])
   @@index([channel])
@@ -1779,6 +1865,7 @@ model Quote {
   equipment       Json
   notes           String?
   bookingId       String?          @unique
+  cartId          String?          @unique
   convertedAt     DateTime?
   createdAt       DateTime         @default(now())
   createdBy       String
@@ -1787,6 +1874,7 @@ model Quote {
   deletedAt       DateTime?
   deletedBy       String?
   booking         Booking?         @relation("ConvertedFromQuote", fields: [bookingId], references: [id])
+  cart            Cart?            @relation("CartToQuote", fields: [cartId], references: [id], onDelete: SetNull)
   customer        User             @relation(fields: [customerId], references: [id])
   studio          Studio?          @relation(fields: [studioId], references: [id])
   equipmentItems  QuoteEquipment[]
@@ -1796,6 +1884,7 @@ model Quote {
   @@index([status])
   @@index([validUntil])
   @@index([bookingId])
+  @@index([cartId])
   @@index([deletedAt])
 }
 
@@ -2207,6 +2296,8 @@ model Cart {
   updatedAt      DateTime   @updatedAt
   user           User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
   items          CartItem[]
+  booking        Booking?   @relation("CartToBooking")
+  quote          Quote?     @relation("CartToQuote")
 
   @@index([userId])
   @@index([sessionId])
@@ -2231,11 +2322,14 @@ model CartItem {
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   cart          Cart         @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  equipment     Equipment?   @relation(fields: [equipmentId], references: [id], onDelete: SetNull)
   studio        Studio?      @relation(fields: [studioId], references: [id])
+  kit           Kit?         @relation(fields: [kitId], references: [id], onDelete: SetNull)
 
   @@index([cartId])
   @@index([equipmentId])
   @@index([studioId])
+  @@index([kitId])
 }
 
 // ──────────────────────────────────────────────────────────────────
@@ -2296,12 +2390,409 @@ model Receiver {
   idNumber    String
   phone       String
   idPhotoUrl  String
+  isDefault   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   deletedAt   DateTime?
 
   @@index([userId])
   @@index([deletedAt])
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Footer CMS (admin-configurable footer content)
+// ──────────────────────────────────────────────────────────────────
+
+model FooterSettings {
+  id                 String   @id @default(cuid())
+  enabled            Boolean  @default(true)
+  layout             String   @default("default") // default | minimal | extended
+  backgroundColor    String   @default("#1a1a1a")
+  textColor          String   @default("#ffffff")
+  linkColor          String   @default("#10b981")
+  linkHoverColor     String   @default("#34d399")
+  socialHoverEffect  String   @default("lift")   // lift | scale | glow | background
+  socialHoverColor   String?  // hex; used for glow/background
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  brand     FooterBrand?
+  contacts  FooterContact[]
+  socialLinks FooterSocialLink[]
+  columns   FooterColumn[]
+  legal     FooterLegal?
+  newsletter FooterNewsletter?
+}
+
+model FooterBrand {
+  id             String         @id @default(cuid())
+  footerId       String         @unique
+  footer         FooterSettings @relation(fields: [footerId], references: [id], onDelete: Cascade)
+  logoLight      String
+  logoDark       String
+  companyNameAr  String
+  companyNameEn  String
+  descriptionAr String         @db.Text
+  descriptionEn String         @db.Text
+  showBrand      Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model FooterContact {
+  id              String         @id @default(cuid())
+  footerId        String
+  footer          FooterSettings @relation(fields: [footerId], references: [id], onDelete: Cascade)
+  type            String         // phone | email | address
+  labelAr         String
+  labelEn         String
+  value           String
+  icon            String?
+  whatsappEnabled Boolean        @default(false)
+  mapsLink        String?
+  order           Int            @default(0)
+  enabled         Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([footerId, order])
+}
+
+model FooterSocialLink {
+  id           String         @id @default(cuid())
+  footerId     String
+  footer       FooterSettings @relation(fields: [footerId], references: [id], onDelete: Cascade)
+  platform     String         // instagram | whatsapp | twitter | facebook | linkedin | tiktok | youtube | snapchat | telegram | custom
+  url          String
+  displayNameAr String?
+  displayNameEn String?
+  customIcon   String?
+  order        Int            @default(0)
+  enabled      Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([footerId, order])
+}
+
+model FooterColumn {
+  id        String         @id @default(cuid())
+  footerId  String
+  footer    FooterSettings @relation(fields: [footerId], references: [id], onDelete: Cascade)
+  titleAr   String
+  titleEn   String
+  showTitle Boolean        @default(true)
+  order     Int            @default(0)
+  enabled   Boolean        @default(true)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  links     FooterLink[]
+
+  @@index([footerId, order])
+}
+
+model FooterLink {
+  id         String       @id @default(cuid())
+  columnId   String
+  column     FooterColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  textAr     String
+  textEn     String
+  linkType   String       // internal | external | phone | email | file | category | page
+  url        String
+  icon       String?
+  openNewTab Boolean      @default(false)
+  order      Int          @default(0)
+  enabled    Boolean      @default(true)
+  categoryId String?
+  pageSlug   String?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@index([columnId, order])
+}
+
+model FooterLegal {
+  id         String         @id @default(cuid())
+  footerId   String         @unique
+  footer     FooterSettings @relation(fields: [footerId], references: [id], onDelete: Cascade)
+  copyrightAr String        @db.Text
+  copyrightEn String        @db.Text
+  autoYear   Boolean        @default(true)
+  layout     String         @default("center") // center | left | right
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  links      FooterLegalLink[]
+}
+
+model FooterLegalLink {
+  id       String     @id @default(cuid())
+  legalId  String
+  legal    FooterLegal @relation(fields: [legalId], references: [id], onDelete: Cascade)
+  textAr   String
+  textEn   String
+  url      String
+  order    Int        @default(0)
+  enabled  Boolean    @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([legalId, order])
+}
+
+model FooterNewsletter {
+  id                String         @id @default(cuid())
+  footerId          String         @unique
+  footer            FooterSettings @relation(fields: [footerId], references: [id], onDelete: Cascade)
+  enabled           Boolean        @default(false)
+  titleAr           String
+  titleEn           String
+  descriptionAr     String         @db.Text
+  descriptionEn     String         @db.Text
+  placeholderAr     String
+  placeholderEn     String
+  buttonTextAr      String
+  buttonTextEn      String
+  successMessageAr  String         @db.Text
+  successMessageEn  String         @db.Text
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+}
+
+model NewsletterSubscription {
+  id        String   @id @default(cuid())
+  email     String
+  source    String?  // 'blog' | 'footer' | null (legacy)
+  createdAt DateTime @default(now())
+
+  @@unique([email])
+  @@index([email])
+  @@index([source])
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Blog System
+// ──────────────────────────────────────────────────────────────────
+
+enum BlogPostStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  SCHEDULED
+  ARCHIVED
+}
+
+enum BlogReactionType {
+  HELPFUL_YES
+  HELPFUL_NO
+}
+
+model BlogCategory {
+  id               String        @id @default(cuid())
+  nameAr           String
+  nameEn           String
+  slug             String         @unique
+  descriptionAr    String?        @db.Text
+  descriptionEn    String?        @db.Text
+  icon             String?
+  coverImage      String?
+  metaTitle        String?
+  metaDescription  String?        @db.Text
+  parentCategoryId String?
+  sortOrder        Int            @default(0)
+  isActive         Boolean        @default(true)
+  createdAt        DateTime      @default(now())
+  createdBy        String?
+  updatedAt        DateTime      @updatedAt
+  updatedBy        String?
+  deletedAt        DateTime?
+  deletedBy        String?
+  parent           BlogCategory?  @relation("CategoryHierarchy", fields: [parentCategoryId], references: [id])
+  children         BlogCategory[] @relation("CategoryHierarchy")
+  posts            BlogPost[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@index([deletedAt])
+  @@index([parentCategoryId])
+}
+
+model BlogTag {
+  id        String      @id @default(cuid())
+  nameAr    String
+  nameEn    String
+  slug      String      @unique
+  createdAt DateTime    @default(now())
+  createdBy String?
+  updatedAt DateTime    @updatedAt
+  updatedBy String?
+  deletedAt DateTime?
+  deletedBy String?
+  posts     BlogPostTag[]
+
+  @@index([slug])
+  @@index([deletedAt])
+}
+
+model BlogAuthor {
+  id             String      @id @default(cuid())
+  name           String
+  slug           String?     @unique
+  email          String?     @unique
+  bioAr          String?     @db.Text
+  bioEn          String?     @db.Text
+  avatar         String?
+  role           String?
+  userId         String?
+  twitterUrl     String?
+  linkedinUrl    String?
+  instagramUrl   String?
+  githubUrl      String?
+  websiteUrl     String?
+  metaTitle      String?
+  metaDescription String?    @db.Text
+  isActive       Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  createdBy      String?
+  updatedAt      DateTime    @updatedAt
+  updatedBy      String?
+  deletedAt      DateTime?
+  deletedBy      String?
+  posts          BlogPost[]
+
+  @@index([userId])
+  @@index([deletedAt])
+  @@index([slug])
+  @@index([email])
+  @@index([isActive])
+}
+
+model BlogPost {
+  id               String         @id @default(cuid())
+  titleAr          String
+  titleEn          String
+  slug             String         @unique
+  excerptAr        String         @db.Text
+  excerptEn        String         @db.Text
+  content          Json           // Tiptap JSON
+  coverImage       String
+  coverImageAltAr  String?
+  coverImageAltEn  String?
+  categoryId       String
+  authorId         String
+  status           BlogPostStatus @default(DRAFT)
+  publishedAt      DateTime?
+  readingTime      Int?           // minutes
+  featured         Boolean       @default(false)
+  trending         Boolean       @default(false)
+  views            Int           @default(0)
+  // SEO
+  metaTitleAr      String?
+  metaTitleEn      String?
+  metaDescriptionAr String?      @db.Text
+  metaDescriptionEn String?      @db.Text
+  metaKeywordsAr   String?
+  metaKeywordsEn   String?
+  ogImage          String?
+  // Conversion
+  relatedEquipmentIds String[]   // Equipment IDs
+  primaryCtaTextAr String?
+  primaryCtaTextEn String?
+  primaryCtaUrl    String?
+  primaryCtaType   String?
+  secondaryCtaTextAr String?
+  secondaryCtaTextEn String?
+  secondaryCtaUrl  String?
+  createdAt        DateTime      @default(now())
+  createdBy        String?
+  updatedAt        DateTime      @updatedAt
+  updatedBy        String?
+  deletedAt        DateTime?
+  deletedBy        String?
+  category         BlogCategory   @relation(fields: [categoryId], references: [id])
+  author           BlogAuthor     @relation(fields: [authorId], references: [id])
+  tags             BlogPostTag[]
+  reactions        BlogReaction[]
+  blogViews        BlogView[]
+  revisions        BlogRevision[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([featured])
+  @@index([deletedAt])
+  @@index([createdAt])
+}
+
+model BlogPostTag {
+  id        String    @id @default(cuid())
+  postId    String
+  tagId     String
+  createdAt DateTime  @default(now())
+  post      BlogPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag       BlogTag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, tagId])
+  @@index([postId])
+  @@index([tagId])
+}
+
+model BlogReaction {
+  id        String          @id @default(cuid())
+  postId    String
+  type      BlogReactionType
+  ipHash    String
+  createdAt DateTime        @default(now())
+  post      BlogPost        @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, ipHash])
+  @@index([postId])
+  @@index([ipHash])
+}
+
+model BlogView {
+  id        String   @id @default(cuid())
+  postId    String
+  ipHash    String
+  userAgent String?
+  referrer  String?
+  createdAt DateTime @default(now())
+  post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([ipHash])
+  @@index([createdAt])
+}
+
+model BlogRevision {
+  id        String   @id @default(cuid())
+  postId    String
+  content   Json
+  editedBy  String?
+  createdAt DateTime @default(now())
+  post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([createdAt])
+}
+
+model BlogAiUsageLog {
+  id               String   @id @default(cuid())
+  endpoint         String
+  userId           String?
+  ip               String
+  inputTokens      Int      @default(0)
+  outputTokens     Int      @default(0)
+  estimatedCostUsd Float    @default(0)
+  durationMs       Int      @default(0)
+  success          Boolean  @default(true)
+  errorMessage     String?  @db.Text
+  createdAt        DateTime @default(now())
+
+  @@index([userId])
+  @@index([endpoint])
+  @@index([createdAt])
 }
 
 // ──────────────────────────────────────────────────────────────────
@@ -2814,4 +3305,185 @@ model ColumnMappingHistory {
   @@unique([sourceHeader, mappedField])
   @@index([sourceHeader])
   @@index([frequency])
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Waitlist (notify customers when equipment becomes available)
+// ──────────────────────────────────────────────────────────────────
+
+model WaitlistEntry {
+  id               String         @id @default(cuid())
+  equipmentId      String
+  userId           String?
+  guestEmail       String?
+  desiredStartDate DateTime
+  desiredEndDate   DateTime
+  desiredQty       Int            @default(1)
+  status           WaitlistStatus @default(WAITING)
+  notifiedAt       DateTime?
+  expiresAt        DateTime
+  notes            String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  equipment        Equipment      @relation(fields: [equipmentId], references: [id])
+  user             User?          @relation(fields: [userId], references: [id])
+
+  @@index([equipmentId])
+  @@index([userId])
+  @@index([status])
+  @@index([desiredStartDate, desiredEndDate])
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Equipment Bundles (pre-configured equipment packages)
+// ──────────────────────────────────────────────────────────────────
+
+model EquipmentBundle {
+  id             String       @id @default(cuid())
+  name           String
+  nameAr         String?
+  nameZh         String?
+  description    String?      @db.Text
+  descriptionAr  String?      @db.Text
+  descriptionZh  String?      @db.Text
+  images         Json?
+  dailyRate      Decimal      @db.Decimal(10, 2)
+  weeklyRate     Decimal?     @db.Decimal(10, 2)
+  monthlyRate    Decimal?     @db.Decimal(10, 2)
+  depositAmount  Decimal?     @db.Decimal(10, 2)
+  isActive       Boolean      @default(true)
+  sortOrder      Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  deletedAt      DateTime?
+  items          BundleItem[]
+
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
+model BundleItem {
+  id          String          @id @default(cuid())
+  bundleId    String
+  equipmentId String
+  quantity    Int             @default(1)
+  bundle      EquipmentBundle @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  equipment   Equipment       @relation(fields: [equipmentId], references: [id])
+
+  @@unique([bundleId, equipmentId])
+  @@index([bundleId])
+  @@index([equipmentId])
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Discount Codes (promo codes with usage tracking)
+// ──────────────────────────────────────────────────────────────────
+
+model DiscountCode {
+  id                String            @id @default(cuid())
+  code              String            @unique
+  description       String?
+  type              DiscountType
+  value             Int
+  minOrderAmount    Int?
+  maxDiscountAmount Int?
+  usageLimit        Int?
+  usageLimitPerUser Int?
+  timesUsed         Int               @default(0)
+  validFrom         DateTime
+  validUntil        DateTime?
+  appliesTo         DiscountAppliesTo @default(ALL)
+  isActive          Boolean           @default(true)
+  createdBy         String
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  deletedAt         DateTime?
+  creator           User              @relation("DiscountCodeCreator", fields: [createdBy], references: [id])
+  usages            DiscountCodeUsage[]
+  bookings          Booking[]
+
+  @@index([code])
+  @@index([isActive])
+  @@index([validFrom, validUntil])
+}
+
+model DiscountCodeUsage {
+  id              String       @id @default(cuid())
+  discountCodeId  String
+  bookingId       String
+  userId          String?
+  guestEmail      String?
+  discountApplied Int
+  appliedAt       DateTime     @default(now())
+  discountCode    DiscountCode @relation(fields: [discountCodeId], references: [id])
+  booking         Booking      @relation(fields: [bookingId], references: [id])
+
+  @@index([discountCodeId])
+  @@index([bookingId])
+}
+
+// FIX-004: Warehouse scan actions
+enum ScanAction {
+  DISPATCH
+  RETURN
+  CHECK
+}
+
+// FIX-004: Booking item status in warehouse workflow
+enum BookingItemStatus {
+  PENDING
+  DISPATCHED
+  RETURNED
+  DAMAGED
+}
+
+// FIX-006: Deposit lifecycle status
+enum DepositStatus {
+  PENDING
+  HELD
+  RETURNED
+  PARTIALLY_RETURNED
+  FORFEITED
+}
+
+// FIX-007: Refund status
+enum RefundStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum IdDocumentType {
+  NATIONAL_ID
+  PASSPORT
+  DRIVING_LICENSE
+  IQAMA
+}
+
+enum IdVerificationStatus {
+  NOT_SUBMITTED
+  PENDING_REVIEW
+  VERIFIED
+  REJECTED
+}
+
+enum WaitlistStatus {
+  WAITING
+  NOTIFIED
+  BOOKED
+  EXPIRED
+  CANCELLED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+enum DiscountAppliesTo {
+  ALL
+  EQUIPMENT
+  STUDIO
+  BUNDLES
 }

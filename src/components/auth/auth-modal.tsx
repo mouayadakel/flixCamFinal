@@ -14,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
@@ -100,8 +101,16 @@ export function AuthModal() {
   const { locale, isRtl } = useLocale()
   const { isOpen, tab, closeAuthModal, setTab } = useAuthModal()
   const [isLoading, setIsLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
   const [keepSignedIn, setKeepSignedIn] = useState(true)
   const t = translations[locale === 'ar' ? 'ar' : 'en']
+
+  const handleGoogleSignIn = () => {
+    setGoogleLoading(true)
+    const callbackUrl =
+      typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/'
+    signIn('google', { callbackUrl })
+  }
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -311,9 +320,8 @@ export function AuthModal() {
                 <Label htmlFor="auth-modal-reg-password" className="text-sm font-medium">
                   {t.password}
                 </Label>
-                <Input
+                <PasswordInput
                   id="auth-modal-reg-password"
-                  type="password"
                   autoComplete="new-password"
                   disabled={isLoading}
                   className={cn(
@@ -333,9 +341,8 @@ export function AuthModal() {
                 <Label htmlFor="auth-modal-reg-confirm" className="text-sm font-medium">
                   {t.confirmPassword}
                 </Label>
-                <Input
+                <PasswordInput
                   id="auth-modal-reg-confirm"
-                  type="password"
                   autoComplete="new-password"
                   disabled={isLoading}
                   className={cn(
@@ -411,9 +418,8 @@ export function AuthModal() {
                 >
                   {t.password}
                 </Label>
-                <Input
+                <PasswordInput
                   id="auth-modal-login-password"
-                  type="password"
                   autoComplete="current-password"
                   placeholder={t.passwordPlaceholder}
                   disabled={isLoading}
@@ -490,9 +496,14 @@ export function AuthModal() {
                   </button>
                   <button
                     type="button"
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border-light bg-white transition-opacity hover:opacity-90"
+                    onClick={handleGoogleSignIn}
+                    disabled={googleLoading}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border-light bg-white transition-opacity hover:opacity-90 disabled:opacity-70"
                     aria-label="Google"
                   >
+                    {googleLoading ? (
+                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                    ) : (
                     <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden>
                       <path
                         fill="#4285F4"
@@ -511,6 +522,7 @@ export function AuthModal() {
                         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                       />
                     </svg>
+                    )}
                   </button>
                 </div>
               </div>

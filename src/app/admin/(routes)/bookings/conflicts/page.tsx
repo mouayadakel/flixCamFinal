@@ -81,7 +81,7 @@ export default function BookingConflictsPage() {
           <p className="mt-1 text-muted-foreground">حجوزات متداخلة على نفس المعدة في نفس الفترة</p>
         </div>
         <Button variant="outline" onClick={loadConflicts} disabled={loading}>
-          <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`ms-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           تحديث
         </Button>
       </div>
@@ -98,13 +98,13 @@ export default function BookingConflictsPage() {
                 <span className="text-2xl font-bold text-destructive">
                   {conflicts.filter((c) => c.severity === 'hard').length}
                 </span>
-                <span className="mr-2 text-muted-foreground">صارم</span>
+                <span className="me-2 text-muted-foreground">صارم</span>
               </div>
               <div>
                 <span className="text-2xl font-bold text-amber-600">
                   {conflicts.filter((c) => c.severity === 'soft').length}
                 </span>
-                <span className="mr-2 text-muted-foreground">خفيف</span>
+                <span className="me-2 text-muted-foreground">خفيف</span>
               </div>
             </div>
           </CardContent>
@@ -120,7 +120,7 @@ export default function BookingConflictsPage() {
               <TableHead>حجز ب</TableHead>
               <TableHead>فترة التداخل</TableHead>
               <TableHead>الشدة</TableHead>
-              <TableHead className="text-right">إجراءات</TableHead>
+              <TableHead className="text-end">إجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -183,16 +183,16 @@ export default function BookingConflictsPage() {
                       {c.severity === 'hard' ? 'صارم' : 'خفيف'}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     <div className="flex justify-end gap-2">
                       <Button variant="ghost" size="sm" asChild>
                         <Link href={`/admin/bookings/${c.bookingA.id}`}>
-                          <Eye className="ml-1 h-4 w-4" /> عرض أ
+                          <Eye className="ms-1 h-4 w-4" /> عرض أ
                         </Link>
                       </Button>
                       <Button variant="ghost" size="sm" asChild>
                         <Link href={`/admin/bookings/${c.bookingB.id}`}>
-                          <Eye className="ml-1 h-4 w-4" /> عرض ب
+                          <Eye className="ms-1 h-4 w-4" /> عرض ب
                         </Link>
                       </Button>
                     </div>

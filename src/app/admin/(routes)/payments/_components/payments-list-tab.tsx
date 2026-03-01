@@ -176,11 +176,11 @@ export default function PaymentsListTab() {
           onClick={handleExportCSV}
           disabled={filteredPayments.length === 0}
         >
-          <Download className="ml-2 h-4 w-4" />
+          <Download className="ms-2 h-4 w-4" />
           تصدير CSV
         </Button>
         <Button onClick={loadPayments} variant="outline">
-          <RefreshCw className="ml-2 h-4 w-4" />
+          <RefreshCw className="ms-2 h-4 w-4" />
           تحديث
         </Button>
       </div>
@@ -357,7 +357,7 @@ export default function PaymentsListTab() {
                   <TableCell>
                     <Link href={`/admin/payments/${payment.id}`}>
                       <Button size="sm" variant="ghost">
-                        <Eye className="ml-1 h-4 w-4" />
+                        <Eye className="ms-1 h-4 w-4" />
                         عرض
                       </Button>
                     </Link>

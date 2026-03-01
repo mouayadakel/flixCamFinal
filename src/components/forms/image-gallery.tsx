@@ -126,11 +126,11 @@ export function ImageGallery({
       <Tabs value={uploadMethod} onValueChange={(v) => setUploadMethod(v as 'file' | 'url')}>
         <TabsList>
           <TabsTrigger value="url">
-            <LinkIcon className="ml-2 h-4 w-4" />
+            <LinkIcon className="ms-2 h-4 w-4" />
             إضافة رابط
           </TabsTrigger>
           <TabsTrigger value="file">
-            <Upload className="ml-2 h-4 w-4" />
+            <Upload className="ms-2 h-4 w-4" />
             رفع ملفات
           </TabsTrigger>
         </TabsList>
@@ -187,12 +187,12 @@ export function ImageGallery({
                 <>جاري الرفع...</>
               ) : !equipmentId ? (
                 <>
-                  <Upload className="ml-2 h-4 w-4 opacity-50" />
+                  <Upload className="ms-2 h-4 w-4 opacity-50" />
                   غير متاح (استخدم URLs)
                 </>
               ) : (
                 <>
-                  <Upload className="ml-2 h-4 w-4" />
+                  <Upload className="ms-2 h-4 w-4" />
                   اختر صور
                 </>
               )}
@@ -252,7 +252,7 @@ export function ImageGallery({
                   <X className="h-4 w-4" />
                 </Button>
               </div>
-              <div className="absolute left-1 top-1 rounded bg-black/70 px-2 py-1 text-xs text-white">
+              <div className="absolute start-1 top-1 rounded bg-black/70 px-2 py-1 text-xs text-white">
                 {index + 1}
               </div>
             </div>

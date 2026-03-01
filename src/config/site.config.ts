@@ -14,6 +14,8 @@ export const siteConfig = {
     /** WhatsApp number (E.164 without +) for wa.me links */
     whatsappNumber: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '966500000000',
     instagramUrl: process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? 'https://instagram.com',
+    tiktokUrl: process.env.NEXT_PUBLIC_TIKTOK_URL ?? 'https://tiktok.com',
+    linkedinUrl: process.env.NEXT_PUBLIC_LINKEDIN_URL ?? 'https://linkedin.com',
   },
   /** Brand name and tagline from theme (FLIXCAM) */
   brandName: theme.brandName,

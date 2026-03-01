@@ -226,9 +226,9 @@ export default function ReviewDetailPage() {
                 }}
               >
                 {review.status === 'PENDING_MODERATION' ? (
-                  <CheckCircle className="mr-2 h-4 w-4" />
+                  <CheckCircle className="me-2 h-4 w-4" />
                 ) : (
-                  <XCircle className="mr-2 h-4 w-4" />
+                  <XCircle className="me-2 h-4 w-4" />
                 )}
                 {review.status === 'PENDING_MODERATION' ? 'Approve / Reject' : 'Change status'}
               </Button>
@@ -239,7 +239,7 @@ export default function ReviewDetailPage() {
                   setRespondOpen(true)
                 }}
               >
-                <Send className="mr-2 h-4 w-4" />
+                <Send className="me-2 h-4 w-4" />
                 {review.adminResponse ? 'Edit response' : 'Respond'}
               </Button>
             </div>

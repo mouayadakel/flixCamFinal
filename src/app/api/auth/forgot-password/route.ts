@@ -8,6 +8,7 @@ import { prisma } from '@/lib/db/prisma'
 import { EmailService } from '@/lib/services/email.service'
 import { randomBytes } from 'crypto'
 import { NotificationChannel } from '@prisma/client'
+import { checkRateLimitUpstash } from '@/lib/utils/rate-limit-upstash'
 
 const bodySchema = z.object({ email: z.string().email() })
 
@@ -15,6 +16,14 @@ const RESET_EXPIRY_HOURS = 1
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimitResult = await checkRateLimitUpstash(request, 'auth')
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': '300' } }
+      )
+    }
+
     const body = await request.json()
     const { email } = bodySchema.parse(body)
 
@@ -41,8 +50,7 @@ export async function POST(request: NextRequest) {
       const result =
         emailEnabled ? await EmailService.sendPasswordReset(email, token) : { ok: false, error: 'Email channel disabled' }
       if (!result.ok && result.error) {
-        console.error('[forgot-password] Email send failed:', result.error)
-        // Still return success to avoid email enumeration
+        // Intentionally silent — avoid email enumeration
       }
     }
 

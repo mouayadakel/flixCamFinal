@@ -339,7 +339,7 @@ export function AnalyticsTab() {
               onClick={() => exportJobsToCSV(jobs)}
               className="w-full sm:w-auto"
             >
-              <Download className="ml-1 h-4 w-4" />
+              <Download className="ms-1 h-4 w-4" />
               تصدير CSV
             </Button>
           </div>

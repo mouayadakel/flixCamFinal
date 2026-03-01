@@ -187,18 +187,33 @@ export async function processImageFromUrl(
     }
   }
 
-  try {
-    // Download image
-    const imageBuffer = await downloadImage(imageUrl, 10000)
+  const hasCloudinary =
+    process.env.CLOUDINARY_API_KEY &&
+    process.env.CLOUDINARY_API_KEY !== 'your_api_key' &&
+    process.env.CLOUDINARY_CLOUD_NAME &&
+    process.env.CLOUDINARY_CLOUD_NAME !== 'your_cloud_name'
 
-    // Upload to Cloudinary
+  if (!hasCloudinary) {
+    return {
+      url: imageUrl,
+      publicId: '',
+      width: 0,
+      height: 0,
+      format: 'jpg',
+      size: 0,
+      success: true,
+    }
+  }
+
+  try {
+    const imageBuffer = await downloadImage(imageUrl, 10000)
     const result = await uploadBufferToCloudinary(imageBuffer, folder)
 
     return result
   } catch (error: any) {
     console.error(`Image processing failed for ${imageUrl}:`, error)
     return {
-      url: PLACEHOLDER_IMAGE,
+      url: imageUrl,
       publicId: '',
       width: 0,
       height: 0,

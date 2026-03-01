@@ -105,7 +105,7 @@ export function TranslationTabSwitcher({
             className="text-xs"
             onClick={() => onCopyLocale('ar', activeLocale)}
           >
-            <Copy className="ml-1 h-3 w-3" />
+            <Copy className="ms-1 h-3 w-3" />
             نسخ من العربية → {LOCALE_LABELS[activeLocale]}
           </Button>
         </div>

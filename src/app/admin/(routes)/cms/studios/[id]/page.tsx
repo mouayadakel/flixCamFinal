@@ -133,7 +133,7 @@ export default function CmsStudioEditPage() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/admin/cms/studios">
               <ArrowLeft className="h-4 w-4" />
-              <span className="mr-2">رجوع</span>
+              <span className="me-2">رجوع</span>
             </Link>
           </Button>
           <div>
@@ -152,7 +152,7 @@ export default function CmsStudioEditPage() {
               aria-label="معاينة"
             >
               <ExternalLink className="h-4 w-4" />
-              <span className="mr-2">معاينة</span>
+              <span className="me-2">معاينة</span>
             </Link>
           </Button>
         </div>
@@ -256,7 +256,7 @@ export default function CmsStudioEditPage() {
       </Tabs>
 
       {dirty && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 p-4 shadow-lg backdrop-blur">
+        <div className="fixed bottom-0 start-0 end-0 z-50 border-t bg-background/95 p-4 shadow-lg backdrop-blur">
           <div className="mx-auto flex max-w-4xl items-center justify-between">
             <span className="text-sm text-muted-foreground">لديك تغييرات غير محفوظة</span>
             <div className="flex gap-2">
@@ -269,7 +269,7 @@ export default function CmsStudioEditPage() {
                 ) : (
                   <Save className="h-4 w-4" />
                 )}
-                <span className="mr-2">حفظ</span>
+                <span className="me-2">حفظ</span>
               </Button>
             </div>
           </div>

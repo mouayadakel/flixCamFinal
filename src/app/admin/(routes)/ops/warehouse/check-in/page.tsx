@@ -252,7 +252,7 @@ export default function CheckInPage() {
         </div>
         <Button variant="outline" asChild>
           <Link href="/admin/ops/warehouse">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             العودة
           </Link>
         </Button>
@@ -265,12 +265,12 @@ export default function CheckInPage() {
             <CardHeader>
               <CardTitle>الحجوزات الجاهزة للإرجاع</CardTitle>
               <div className="relative mt-2">
-                <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="بحث..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-12 pr-10 text-base"
+                  className="h-12 pe-10 text-base"
                 />
               </div>
             </CardHeader>

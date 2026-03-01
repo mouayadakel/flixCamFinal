@@ -184,7 +184,7 @@ export function HeroCarousel({
     >
       {/* Soft top fade so header–hero junction isn’t abrupt */}
       <div
-        className="pointer-events-none absolute left-0 right-0 top-0 z-[3] h-28 bg-gradient-to-b from-black/50 to-transparent"
+        className="pointer-events-none absolute start-0 end-0 top-0 z-[3] h-28 bg-gradient-to-b from-black/50 to-transparent"
         aria-hidden
       />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.1)_0%,_transparent_60%)]" />
@@ -192,7 +192,7 @@ export function HeroCarousel({
       <div className="absolute -bottom-32 -start-32 h-80 w-80 rounded-full bg-black/10 blur-3xl" />
 
       {/* Search bar – left corner at golden ratio (38.2% from top) */}
-      <div className="pointer-events-none absolute left-0 right-0 top-[38.2%] z-10">
+      <div className="pointer-events-none absolute start-0 end-0 top-[38.2%] z-10">
         <PublicContainer className="pointer-events-auto">
           <div className="w-full max-w-md">
             <PublicSearch />
@@ -344,8 +344,8 @@ export function HeroCarousel({
                               variant={slide.ctaStyle === 'outline' ? 'outline' : 'default'}
                               className={
                                 slide.ctaStyle === 'outline'
-                                  ? 'rounded-xl border-white/30 px-8 font-semibold text-white backdrop-blur-sm hover:bg-white/10 hover:text-white'
-                                  : 'rounded-xl bg-white px-8 font-semibold text-brand-primary shadow-lg hover:bg-white/90'
+                                  ? 'rounded-xl border-[rgba(140,198,63,1)] px-8 font-semibold text-[rgba(140,198,63,1)] backdrop-blur-sm hover:bg-[rgba(140,198,63,0.16)] hover:text-[rgba(140,198,63,1)]'
+                                  : 'rounded-[15px] bg-[rgba(140,198,63,0.16)] px-8 font-semibold text-[rgba(140,198,63,1)] shadow-lg hover:bg-[rgba(144,205,66,0.53)]'
                               }
                               asChild
                             >
@@ -359,7 +359,7 @@ export function HeroCarousel({
                             <Button
                               size="lg"
                               variant="outline"
-                              className="rounded-xl border-white/30 px-8 font-semibold text-white backdrop-blur-sm hover:bg-white/10 hover:text-white"
+                              className="rounded-xl border-[rgba(140,198,63,1)] px-8 font-semibold text-[rgba(140,198,63,1)] backdrop-blur-sm hover:bg-[rgba(140,198,63,0.16)] hover:text-[rgba(140,198,63,1)]"
                               asChild
                             >
                               <Link href={slide.cta2Url}>
@@ -378,7 +378,7 @@ export function HeroCarousel({
         </div>
 
         {/* Dot navigation */}
-        <div className="absolute bottom-6 left-0 right-0 z-10 flex justify-center gap-2">
+        <div className="absolute bottom-6 start-0 end-0 z-10 flex justify-center gap-2">
           {slides.map((_, index) => (
             <button
               key={index}
@@ -396,7 +396,7 @@ export function HeroCarousel({
         {/* Autoplay progress bar (current slide) */}
         {settings.autoPlay && slides.length > 0 && (
           <div
-            className="absolute bottom-0 left-0 right-0 z-10 h-1 bg-white/20"
+            className="absolute bottom-0 start-0 end-0 z-10 h-1 bg-white/20"
             role="presentation"
           >
             <div

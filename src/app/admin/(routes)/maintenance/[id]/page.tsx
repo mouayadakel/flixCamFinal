@@ -196,7 +196,7 @@ export default function MaintenanceDetailPage() {
           </h1>
           <div className="mt-2 flex items-center gap-2">
             <Badge className={statusConfig.color}>
-              <StatusIcon className="ml-1 h-3 w-3" />
+              <StatusIcon className="ms-1 h-3 w-3" />
               {statusConfig.label}
             </Badge>
             <Badge className={priorityConfig.color}>{priorityConfig.label}</Badge>
@@ -205,7 +205,7 @@ export default function MaintenanceDetailPage() {
         </div>
         <Button variant="outline" asChild>
           <Link href="/admin/maintenance">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             العودة
           </Link>
         </Button>
@@ -280,7 +280,7 @@ export default function MaintenanceDetailPage() {
                   onClick={() => handleStatusChange('completed', completionNotes)}
                   disabled={updating}
                 >
-                  <CheckCircle className="ml-2 h-4 w-4" />
+                  <CheckCircle className="ms-2 h-4 w-4" />
                   {updating ? 'جاري التحديث...' : 'تحديد كمكتمل'}
                 </Button>
               </CardContent>
@@ -314,7 +314,7 @@ export default function MaintenanceDetailPage() {
                   onClick={() => handleStatusChange('in_progress')}
                   disabled={updating}
                 >
-                  <Play className="ml-2 h-4 w-4" />
+                  <Play className="ms-2 h-4 w-4" />
                   بدء العمل
                 </Button>
               )}
@@ -325,7 +325,7 @@ export default function MaintenanceDetailPage() {
                     onClick={() => handleStatusChange('completed')}
                     disabled={updating}
                   >
-                    <CheckCircle className="ml-2 h-4 w-4" />
+                    <CheckCircle className="ms-2 h-4 w-4" />
                     تحديد كمكتمل
                   </Button>
                   <Button
@@ -334,7 +334,7 @@ export default function MaintenanceDetailPage() {
                     onClick={() => handleStatusChange('scheduled')}
                     disabled={updating}
                   >
-                    <Pause className="ml-2 h-4 w-4" />
+                    <Pause className="ms-2 h-4 w-4" />
                     إيقاف مؤقت
                   </Button>
                 </>
@@ -346,7 +346,7 @@ export default function MaintenanceDetailPage() {
                   onClick={() => handleStatusChange('cancelled')}
                   disabled={updating}
                 >
-                  <XCircle className="ml-2 h-4 w-4" />
+                  <XCircle className="ms-2 h-4 w-4" />
                   إلغاء
                 </Button>
               )}

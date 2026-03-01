@@ -33,10 +33,19 @@ export interface CheckoutFulfillment {
   address?: DeliveryAddress
 }
 
+export interface CheckoutAddonAccessory {
+  id: string
+  name: string
+  price: number
+  quantity: number
+}
+
 export interface CheckoutAddons {
   insuranceTier?: string
   technician?: boolean
+  technicianHours?: number
   deliveryFee?: number
+  accessories?: CheckoutAddonAccessory[]
 }
 
 /** 1 = Receiver & Fulfillment, 2 = Add-ons, 3 = Review & Pay */

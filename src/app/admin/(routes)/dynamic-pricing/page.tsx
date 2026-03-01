@@ -540,7 +540,7 @@ export default function DynamicPricingPage() {
           <p className="mt-1 text-muted-foreground">إدارة قواعد التسعير والخصومات التلقائية</p>
         </div>
         <Button onClick={handleCreateRule}>
-          <Plus className="ml-2 h-4 w-4" />
+          <Plus className="ms-2 h-4 w-4" />
           قاعدة جديدة
         </Button>
       </div>
@@ -602,11 +602,11 @@ export default function DynamicPricingPage() {
                 </TabsTrigger>
               ))}
               <TabsTrigger value="ai-analysis">
-                <BarChart3 className="ml-1 h-4 w-4" />
+                <BarChart3 className="ms-1 h-4 w-4" />
                 تحليل AI
               </TabsTrigger>
               <TabsTrigger value="demand-forecast">
-                <LineChartIcon className="ml-1 h-4 w-4" />
+                <LineChartIcon className="ms-1 h-4 w-4" />
                 توقع الطلب
               </TabsTrigger>
             </TabsList>
@@ -623,7 +623,7 @@ export default function DynamicPricingPage() {
                   <DollarSign className="mx-auto mb-4 h-12 w-12 opacity-50" />
                   <p className="text-lg font-medium">لا توجد قواعد</p>
                   <Button className="mt-4" onClick={handleCreateRule}>
-                    <Plus className="ml-2 h-4 w-4" />
+                    <Plus className="ms-2 h-4 w-4" />
                     إنشاء قاعدة
                   </Button>
                 </div>
@@ -670,9 +670,9 @@ export default function DynamicPricingPage() {
                           <TableCell>
                             <Badge variant={isDiscount ? 'default' : 'destructive'}>
                               {isDiscount ? (
-                                <TrendingDown className="ml-1 h-3 w-3" />
+                                <TrendingDown className="ms-1 h-3 w-3" />
                               ) : (
-                                <TrendingUp className="ml-1 h-3 w-3" />
+                                <TrendingUp className="ms-1 h-3 w-3" />
                               )}
                               {rule.adjustmentValue > 0 ? '+' : ''}
                               {rule.adjustmentValue}
@@ -872,7 +872,7 @@ export default function DynamicPricingPage() {
                   </Button>
                   {forecasts.length > 0 && (
                     <Button variant="outline" size="sm" onClick={exportForecastCsv}>
-                      <Download className="ml-1 h-4 w-4" />
+                      <Download className="ms-1 h-4 w-4" />
                       تصدير CSV
                     </Button>
                   )}
@@ -906,7 +906,7 @@ export default function DynamicPricingPage() {
                         <TableHead>المعدات</TableHead>
                         <TableHead>SKU</TableHead>
                         <TableHead>الفترة</TableHead>
-                        <TableHead className="text-left">الطلب المتوقع</TableHead>
+                        <TableHead className="text-start">الطلب المتوقع</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -915,7 +915,7 @@ export default function DynamicPricingPage() {
                           <TableCell className="font-medium">{f.equipmentName}</TableCell>
                           <TableCell>{f.sku}</TableCell>
                           <TableCell>{f.period}</TableCell>
-                          <TableCell className="text-left">{f.predictedDemand}</TableCell>
+                          <TableCell className="text-start">{f.predictedDemand}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -1150,7 +1150,7 @@ export default function DynamicPricingPage() {
               إلغاء
             </Button>
             <Button onClick={handleSaveRule} disabled={saving}>
-              <Save className="ml-2 h-4 w-4" />
+              <Save className="ms-2 h-4 w-4" />
               {saving ? 'جاري الحفظ...' : 'حفظ'}
             </Button>
           </DialogFooter>

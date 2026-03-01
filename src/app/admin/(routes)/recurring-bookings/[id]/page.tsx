@@ -233,14 +233,14 @@ export default function RecurringSeriesDetailPage() {
             </>
           ) : (
             <Button variant="outline" size="sm" onClick={() => setIsEditingName(true)}>
-              <Pencil className="ml-1 h-4 w-4" />
+              <Pencil className="ms-1 h-4 w-4" />
               تعديل الاسم
             </Button>
           )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm">
-                <Trash2 className="ml-1 h-4 w-4" />
+                <Trash2 className="ms-1 h-4 w-4" />
                 حذف
               </Button>
             </AlertDialogTrigger>
@@ -350,7 +350,7 @@ export default function RecurringSeriesDetailPage() {
                   <TableHead>البداية</TableHead>
                   <TableHead>النهاية</TableHead>
                   <TableHead>الحالة</TableHead>
-                  <TableHead className="text-right">الإجراءات</TableHead>
+                  <TableHead className="text-end">الإجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -369,7 +369,7 @@ export default function RecurringSeriesDetailPage() {
                       <TableCell>
                         <Badge variant="secondary">{STATUS_LABELS[b.status] ?? b.status}</Badge>
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-end">
                         <Button variant="ghost" size="sm" asChild>
                           <Link href={`/admin/bookings/${b.id}`}>
                             <Eye className="h-4 w-4" />

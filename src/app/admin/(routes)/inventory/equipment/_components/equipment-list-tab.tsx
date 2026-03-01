@@ -263,15 +263,15 @@ export default function EquipmentListTab() {
           disabled={migratingSpecs}
         >
           {migratingSpecs ? (
-            <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+            <Loader2 className="ms-2 h-4 w-4 animate-spin" />
           ) : (
-            <RefreshCw className="ml-2 h-4 w-4" />
+            <RefreshCw className="ms-2 h-4 w-4" />
           )}
           تحديث كل المواصفات
         </Button>
         <Button asChild>
           <Link href="/admin/inventory/equipment/new">
-            <Plus className="ml-2 h-4 w-4" />
+            <Plus className="ms-2 h-4 w-4" />
             إضافة معدات
           </Link>
         </Button>
@@ -333,7 +333,7 @@ export default function EquipmentListTab() {
               disabled={bulkLoading}
               onClick={() => handleBulkAction('activate')}
             >
-              <Power className="ml-1 h-4 w-4" /> تفعيل
+              <Power className="ms-1 h-4 w-4" /> تفعيل
             </Button>
             <Button
               size="sm"
@@ -341,7 +341,7 @@ export default function EquipmentListTab() {
               disabled={bulkLoading}
               onClick={() => handleBulkAction('deactivate')}
             >
-              <PowerOff className="ml-1 h-4 w-4" /> إلغاء تفعيل
+              <PowerOff className="ms-1 h-4 w-4" /> إلغاء تفعيل
             </Button>
             <Button
               size="sm"
@@ -350,9 +350,9 @@ export default function EquipmentListTab() {
               onClick={() => handleBulkAction('delete')}
             >
               {bulkLoading ? (
-                <Loader2 className="ml-1 h-4 w-4 animate-spin" />
+                <Loader2 className="ms-1 h-4 w-4 animate-spin" />
               ) : (
-                <Trash2 className="ml-1 h-4 w-4" />
+                <Trash2 className="ms-1 h-4 w-4" />
               )}
               حذف
             </Button>
@@ -367,12 +367,12 @@ export default function EquipmentListTab() {
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
             <div className="relative">
-              <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+              <Search className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
               <Input
                 placeholder="بحث (SKU، الموديل، الفئة)..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pr-10"
+                className="pe-10"
                 dir="rtl"
               />
             </div>

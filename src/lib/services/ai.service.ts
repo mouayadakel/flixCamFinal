@@ -1381,8 +1381,60 @@ Write exactly 3 short sentences in English: (1) why this utilization/demand supp
       ]
       confidence = 90
     } else {
-      // Use OpenAI if available, otherwise generic response
-      if (client) {
+      // Use Gemini or OpenAI for real AI responses; fallback to generic message
+      const geminiKey = this.getGeminiApiKey()
+      const provider = (process.env.AI_PROVIDER as 'openai' | 'gemini') || 'gemini'
+
+      if (provider === 'gemini' && geminiKey) {
+        try {
+          const genAI = new GoogleGenerativeAI(geminiKey)
+          const model = genAI.getGenerativeModel({
+            model: 'gemini-2.0-flash',
+            generationConfig: { maxOutputTokens: 200, temperature: 0.7 },
+          })
+          const systemPrompt =
+            'You are a helpful assistant for FlixCam.rent, a cinematic equipment rental platform in Saudi Arabia. Help users with equipment search, pricing, availability, and bookings. Be concise and friendly.'
+          const chatPrompt = `${systemPrompt}\n\n---\n\nUser: ${input.message}`
+          const result = await model.generateContent(chatPrompt)
+          const text = result.response.text()?.trim()
+          response = text || 'I apologize, I could not generate a response.'
+          confidence = 80
+        } catch (error) {
+          console.error('[ai.service] chat Gemini error:', error)
+          if (client) {
+            try {
+              const completion = await client.chat.completions.create({
+                model: 'gpt-4o-mini',
+                messages: [
+                  {
+                    role: 'system',
+                    content:
+                      'You are a helpful assistant for FlixCam.rent, a cinematic equipment rental platform in Saudi Arabia. Help users with equipment search, pricing, availability, and bookings. Be concise and friendly.',
+                  },
+                  { role: 'user', content: input.message },
+                ],
+                max_tokens: 200,
+                temperature: 0.7,
+              })
+              response =
+                completion.choices[0]?.message?.content ||
+                'I apologize, I could not generate a response.'
+              confidence = 80
+            } catch (openaiErr) {
+              console.error('[ai.service] chat OpenAI fallback error:', openaiErr)
+              response =
+                'I apologize, I am having trouble processing your request. Please try rephrasing or contact support.'
+              requiresHuman = true
+              confidence = 30
+            }
+          } else {
+            response =
+              'I can help you with equipment search, pricing, availability, and bookings. How can I assist you today?'
+            suggestions = ['Search equipment', 'View pricing', 'Check availability', 'Create booking']
+            confidence = 50
+          }
+        }
+      } else if (client) {
         try {
           const completion = await client.chat.completions.create({
             model: 'gpt-4o-mini',
@@ -1392,15 +1444,11 @@ Write exactly 3 short sentences in English: (1) why this utilization/demand supp
                 content:
                   'You are a helpful assistant for FlixCam.rent, a cinematic equipment rental platform in Saudi Arabia. Help users with equipment search, pricing, availability, and bookings. Be concise and friendly.',
               },
-              {
-                role: 'user',
-                content: input.message,
-              },
+              { role: 'user', content: input.message },
             ],
             max_tokens: 200,
             temperature: 0.7,
           })
-
           response =
             completion.choices[0]?.message?.content ||
             'I apologize, I could not generate a response.'

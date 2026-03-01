@@ -196,7 +196,7 @@ export default function ReviewsPage() {
               onClick={() => exportSelected()}
               disabled={reviews.length === 0}
             >
-              <Download className="ml-2 h-4 w-4" />
+              <Download className="ms-2 h-4 w-4" />
               تصدير المحدد
             </Button>
             <Button size="sm" onClick={() => bulkSetStatus('APPROVED')} disabled={bulkUpdating}>
@@ -221,11 +221,11 @@ export default function ReviewsPage() {
           onClick={exportSelected}
           disabled={reviews.length === 0}
         >
-          <Download className="ml-2 h-4 w-4" />
+          <Download className="ms-2 h-4 w-4" />
           تصدير CSV
         </Button>
         <Button variant="outline" onClick={loadReviews}>
-          <RefreshCw className="mr-2 h-4 w-4" />
+          <RefreshCw className="me-2 h-4 w-4" />
           Refresh
         </Button>
       </div>
@@ -345,7 +345,7 @@ export default function ReviewsPage() {
                       <TableCell>
                         <Button variant="ghost" size="sm" asChild>
                           <Link href={`/admin/reviews/${r.id}`}>
-                            <Eye className="mr-1 h-4 w-4" /> View
+                            <Eye className="me-1 h-4 w-4" /> View
                           </Link>
                         </Button>
                       </TableCell>

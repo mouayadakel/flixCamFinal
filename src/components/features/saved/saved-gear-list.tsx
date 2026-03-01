@@ -86,7 +86,7 @@ export function SavedGearList({ items, onRemove, removingId }: SavedGearListProp
                 disabled={removingId === eq.id}
                 onClick={() => onRemove(eq.id)}
               >
-                <Trash2 className="ml-1 h-4 w-4" />
+                <Trash2 className="ms-1 h-4 w-4" />
                 Remove
               </Button>
             </div>

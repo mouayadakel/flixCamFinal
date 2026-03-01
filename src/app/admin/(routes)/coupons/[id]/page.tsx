@@ -215,7 +215,7 @@ export default function CouponDetailPage() {
           </h1>
           <div className="mt-2 flex items-center gap-2">
             <Badge className={statusConfig.color}>
-              <StatusIcon className="ml-1 h-3 w-3" />
+              <StatusIcon className="ms-1 h-3 w-3" />
               {statusConfig.label}
             </Badge>
             {isExpired && coupon.status !== 'expired' && (
@@ -226,24 +226,24 @@ export default function CouponDetailPage() {
         <div className="flex gap-2">
           <Button variant="outline" asChild>
             <Link href="/admin/coupons">
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ms-2 h-4 w-4" />
               العودة
             </Link>
           </Button>
           <Button variant="outline" onClick={copyCode}>
-            <Copy className="ml-2 h-4 w-4" />
+            <Copy className="ms-2 h-4 w-4" />
             نسخ الرمز
           </Button>
           <Button variant="outline" asChild>
             <Link href={`/admin/coupons/${coupon.id}/edit`}>
-              <Edit className="ml-2 h-4 w-4" />
+              <Edit className="ms-2 h-4 w-4" />
               تعديل
             </Link>
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" disabled={deleting}>
-                <Trash2 className="ml-2 h-4 w-4" />
+                <Trash2 className="ms-2 h-4 w-4" />
                 حذف
               </Button>
             </AlertDialogTrigger>
@@ -406,18 +406,18 @@ export default function CouponDetailPage() {
               >
                 {coupon.status === 'active' ? (
                   <>
-                    <ToggleLeft className="ml-2 h-4 w-4" />
+                    <ToggleLeft className="ms-2 h-4 w-4" />
                     إلغاء التفعيل
                   </>
                 ) : (
                   <>
-                    <ToggleRight className="ml-2 h-4 w-4" />
+                    <ToggleRight className="ms-2 h-4 w-4" />
                     تفعيل
                   </>
                 )}
               </Button>
               <Button className="w-full" variant="outline" onClick={copyCode}>
-                <Copy className="ml-2 h-4 w-4" />
+                <Copy className="ms-2 h-4 w-4" />
                 نسخ الرمز
               </Button>
             </CardContent>

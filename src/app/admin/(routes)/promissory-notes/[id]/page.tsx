@@ -234,7 +234,7 @@ export default function PromissoryNoteDetailPage() {
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/admin/promissory-notes">
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ms-2 h-4 w-4" />
             {t('promissoryNote.admin.backToList')}
           </Link>
         </Button>
@@ -357,7 +357,7 @@ export default function PromissoryNoteDetailPage() {
                 />
               </div>
               <Button size="sm" onClick={handleSaveLetter} disabled={savingLetter}>
-                <Save className="ml-2 h-4 w-4" />
+                <Save className="ms-2 h-4 w-4" />
                 {savingLetter ? 'جاري الحفظ...' : 'حفظ النص'}
               </Button>
             </>
@@ -384,19 +384,19 @@ export default function PromissoryNoteDetailPage() {
       <div className="flex flex-wrap gap-4">
         <Button variant="outline" asChild>
           <a href={`/api/promissory-notes/${note.id}/pdf`} target="_blank" rel="noopener noreferrer" download>
-            <Download className="ml-2 h-4 w-4" />
+            <Download className="ms-2 h-4 w-4" />
             {t('promissoryNote.admin.downloadPdfBtn')}
           </a>
         </Button>
         {canEnforce && (
           <Button variant="destructive" onClick={() => setEnforceDialogOpen(true)}>
-            <AlertTriangle className="ml-2 h-4 w-4" />
+            <AlertTriangle className="ms-2 h-4 w-4" />
             {t('promissoryNote.admin.enforce')}
           </Button>
         )}
         {canFulfill && (
           <Button variant="default" onClick={handleFulfill} disabled={fulfilling}>
-            <CheckCircle className="ml-2 h-4 w-4" />
+            <CheckCircle className="ms-2 h-4 w-4" />
             {fulfilling ? t('promissoryNote.admin.fulfilling') : t('promissoryNote.admin.fulfill')}
           </Button>
         )}

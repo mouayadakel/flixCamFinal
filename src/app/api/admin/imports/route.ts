@@ -111,8 +111,8 @@ export async function POST(request: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer())
-    const XLSX = await import('xlsx')
-    const wb = XLSX.read(buffer, { type: 'buffer' })
+    const { parseSpreadsheetBuffer } = await import('@/lib/utils/excel-parser')
+    const wb = await parseSpreadsheetBuffer(buffer, file.name)
 
     const { ImportService } = await import('@/lib/services/import.service')
     const job = await ImportService.createJob({
@@ -154,20 +154,14 @@ export async function POST(request: NextRequest) {
     } else {
       const mappedSheets = new Set(mapping.map((m) => m.sheetName))
 
-      wb.SheetNames.forEach((sheetName) => {
+      wb.sheetNames.forEach((sheetName) => {
         if (totalRows >= MAX_ROWS) return
         // Filter by selectedSheets if provided
         if (selectedSheets && selectedSheets.length > 0 && !selectedSheets.includes(sheetName))
           return
         if (mappedSheets.size > 0 && !mappedSheets.has(sheetName)) return
 
-        const sheet = wb.Sheets[sheetName]
-        if (!sheet) return
-
-        const data = XLSX.utils.sheet_to_json<Record<string, any>>(sheet, {
-          defval: null,
-          raw: false,
-        })
+        const data = wb.getSheetData(sheetName) as Record<string, any>[]
         const mapEntry = mapping.find((m) => m.sheetName === sheetName)
 
         const sheetSelectedRows = selectedRows?.[sheetName] || []

@@ -58,7 +58,7 @@ export default async function SupportPage() {
               <p className="mb-4 text-sm text-text-muted">{t('ar', 'supportPage.phoneDesc')}</p>
               <Button asChild size="lg" className="w-full">
                 <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                  <MessageCircle className="ml-2 h-5 w-5" />
+                  <MessageCircle className="ms-2 h-5 w-5" />
                   {t('ar', 'supportPage.contactWhatsapp')}
                 </a>
               </Button>

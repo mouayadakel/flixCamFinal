@@ -315,7 +315,7 @@ export function StepCategoryEquipment() {
       <div>
         <button
           type="button"
-          className="flex w-full items-center justify-between rounded-xl border border-border-light/60 bg-surface-light/50 px-4 py-3 text-left font-medium text-text-heading"
+          className="flex w-full items-center justify-between rounded-xl border border-border-light/60 bg-surface-light/50 px-4 py-3 text-start font-medium text-text-heading"
           onClick={() => setShowMore(!showMore)}
         >
           <span>

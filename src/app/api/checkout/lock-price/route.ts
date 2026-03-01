@@ -1,6 +1,7 @@
 /**
- * POST /api/checkout/lock-price – Lock cart price for 2 hours.
- * Returns lockedUntil; actual price lock is enforced when creating booking/payment in Phase 3.5.
+ * POST /api/checkout/lock-price – Lock cart price.
+ * TTL configurable via SiteSetting key "checkout_lock_ttl_minutes" (default 120).
+ * Returns lockedUntil and lockTtlMinutes for frontend countdown.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -8,8 +9,9 @@ import { auth } from '@/lib/auth'
 import { CartService } from '@/lib/services/cart.service'
 import { getCartSessionId } from '@/lib/cart-session'
 import { checkRateLimitUpstash } from '@/lib/utils/rate-limit-upstash'
+import { prisma } from '@/lib/db/prisma'
 
-const LOCK_TTL_MINUTES = 120
+const DEFAULT_LOCK_TTL_MINUTES = 120
 
 export async function POST(request: NextRequest) {
   const rate = await checkRateLimitUpstash(request, 'checkout')
@@ -22,6 +24,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const setting = await prisma.siteSetting.findUnique({
+    where: { key: 'checkout_lock_ttl_minutes' },
+    select: { value: true },
+  })
+  const lockTtlMinutes = setting?.value
+    ? Math.max(1, Math.min(480, parseInt(setting.value, 10) || DEFAULT_LOCK_TTL_MINUTES))
+    : DEFAULT_LOCK_TTL_MINUTES
+
   const sessionId = getCartSessionId(request.headers.get('cookie') ?? null)
   const cart = await CartService.getOrCreateCart(session.user.id, sessionId)
   if (cart.items.length === 0) {
@@ -29,12 +39,13 @@ export async function POST(request: NextRequest) {
   }
 
   const lockedUntil = new Date()
-  lockedUntil.setMinutes(lockedUntil.getMinutes() + LOCK_TTL_MINUTES)
+  lockedUntil.setMinutes(lockedUntil.getMinutes() + lockTtlMinutes)
 
   return NextResponse.json({
     locked: true,
     lockedAt: new Date().toISOString(),
     lockedUntil: lockedUntil.toISOString(),
+    lockTtlMinutes,
     cartId: cart.id,
   })
 }

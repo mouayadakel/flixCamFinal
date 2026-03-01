@@ -100,17 +100,17 @@ export default function TechniciansPage() {
             onClick={handleExportCSV}
             disabled={data.length === 0}
           >
-            <Download className="ml-2 h-4 w-4" />
+            <Download className="ms-2 h-4 w-4" />
             تصدير CSV
           </Button>
           <Button asChild>
             <Link href="/admin/technicians/new">
-              <Plus className="ml-2 h-4 w-4" />
+              <Plus className="ms-2 h-4 w-4" />
               فني جديد
             </Link>
           </Button>
           <Button variant="outline" onClick={fetchTechnicians} disabled={loading}>
-            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`ms-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
         </div>
@@ -144,7 +144,7 @@ export default function TechniciansPage() {
               <TableHead>الحالة</TableHead>
               <TableHead>المهمة الحالية</TableHead>
               <TableHead>المهام</TableHead>
-              <TableHead className="text-right">إجراءات</TableHead>
+              <TableHead className="text-end">إجراءات</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -173,7 +173,7 @@ export default function TechniciansPage() {
                   </TableCell>
                   <TableCell>{tech.currentAssignment ?? '—'}</TableCell>
                   <TableCell>{tech.jobs ?? '—'}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     <Button variant="ghost" size="sm" asChild>
                       <Link href={`/admin/technicians/${tech.id}`}>
                         <Eye className="h-4 w-4" />

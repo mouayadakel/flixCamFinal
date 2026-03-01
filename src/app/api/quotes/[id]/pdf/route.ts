@@ -7,6 +7,7 @@
  */
 
 import { auth } from '@/lib/auth'
+import { logger } from '@/lib/logger'
 import { NextRequest, NextResponse } from 'next/server'
 import { QuoteService } from '@/lib/services/quote.service'
 import { QuotePolicy } from '@/lib/policies/quote.policy'
@@ -49,7 +50,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     if (error instanceof ForbiddenError) {
       return NextResponse.json({ error: error.message }, { status: 403 })
     }
-    console.error('Quote PDF error:', error)
+    logger.error('Quote PDF error:', { error: error instanceof Error ? error.message : String(error) })
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
 }

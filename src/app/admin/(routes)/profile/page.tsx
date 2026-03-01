@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
@@ -158,11 +159,11 @@ export default function ProfilePage() {
       <Tabs defaultValue="info" className="space-y-4">
         <TabsList>
           <TabsTrigger value="info">
-            <User className="ml-2 h-4 w-4" />
+            <User className="ms-2 h-4 w-4" />
             المعلومات الشخصية
           </TabsTrigger>
           <TabsTrigger value="security">
-            <Shield className="ml-2 h-4 w-4" />
+            <Shield className="ms-2 h-4 w-4" />
             الأمان
           </TabsTrigger>
         </TabsList>
@@ -205,7 +206,7 @@ export default function ProfilePage() {
                 />
               </div>
               <Button onClick={handleSave} disabled={saving}>
-                {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                {saving && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
                 حفظ التغييرات
               </Button>
             </CardContent>
@@ -221,9 +222,8 @@ export default function ProfilePage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="current-password">كلمة المرور الحالية</Label>
-                <Input
+                <PasswordInput
                   id="current-password"
-                  type="password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="••••••••"
@@ -232,9 +232,8 @@ export default function ProfilePage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="new-password">كلمة المرور الجديدة</Label>
-                <Input
+                <PasswordInput
                   id="new-password"
-                  type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="••••••••"
@@ -243,9 +242,8 @@ export default function ProfilePage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirm-password">تأكيد كلمة المرور</Label>
-                <Input
+                <PasswordInput
                   id="confirm-password"
-                  type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••"
@@ -253,7 +251,7 @@ export default function ProfilePage() {
                 />
               </div>
               <Button onClick={handlePasswordChange} disabled={changingPassword}>
-                {changingPassword && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                {changingPassword && <Loader2 className="ms-2 h-4 w-4 animate-spin" />}
                 تغيير كلمة المرور
               </Button>
             </CardContent>

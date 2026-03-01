@@ -182,7 +182,7 @@ export default function HeroBannerDetailPage() {
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/admin/settings/hero-banners">
-            <ArrowLeft className="ml-1 h-4 w-4" />
+            <ArrowLeft className="ms-1 h-4 w-4" />
             البانرات
           </Link>
         </Button>
@@ -255,7 +255,7 @@ export default function HeroBannerDetailPage() {
           </div>
           <Button onClick={saveBannerSettings} disabled={savingBanner}>
             {savingBanner ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            <span className="mr-2">حفظ الإعدادات</span>
+            <span className="me-2">حفظ الإعدادات</span>
           </Button>
         </CardContent>
       </Card>
@@ -271,7 +271,7 @@ export default function HeroBannerDetailPage() {
             </div>
             <Button onClick={openAddSlide}>
               <Plus className="h-4 w-4" />
-              <span className="mr-2">إضافة شريحة</span>
+              <span className="me-2">إضافة شريحة</span>
             </Button>
           </div>
         </CardHeader>
@@ -315,7 +315,7 @@ export default function HeroBannerDetailPage() {
                     <div className="text-sm text-muted-foreground">
                       ترتيب {slide.order + 1}
                       {!slide.isActive && (
-                        <Badge variant="secondary" className="mr-2">
+                        <Badge variant="secondary" className="me-2">
                           معطّل
                         </Badge>
                       )}

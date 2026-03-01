@@ -415,25 +415,25 @@ export function ContentReviewTab() {
                 />
                 <span className="text-xs text-muted-foreground">تحديد الكل</span>
                 {selectedIds.size > 0 && (
-                  <div className="mr-auto flex items-center gap-2">
+                  <div className="me-auto flex items-center gap-2">
                     <Button
                       size="sm"
                       disabled={bulkActing}
                       onClick={() => handleBulkAction('approve')}
                     >
                       {bulkActing ? (
-                        <Loader2 className="ml-1 h-3 w-3 animate-spin" />
+                        <Loader2 className="ms-1 h-3 w-3 animate-spin" />
                       ) : (
-                        <CheckCircle className="ml-1 h-3 w-3" />
+                        <CheckCircle className="ms-1 h-3 w-3" />
                       )}
                       اعتماد المحدد ({selectedIds.size})
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button size="sm" variant="outline" disabled={bulkActing}>
-                          <XCircle className="ml-1 h-3 w-3" />
+                          <XCircle className="ms-1 h-3 w-3" />
                           رفض المحدد ({selectedIds.size})
-                          <ChevronDown className="mr-1 h-3 w-3" />
+                          <ChevronDown className="me-1 h-3 w-3" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
@@ -495,7 +495,7 @@ export function ContentReviewTab() {
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
                         <Button size="sm" variant="outline" onClick={() => setPreviewDraft(draft)}>
-                          <Eye className="ml-1 h-4 w-4" />
+                          <Eye className="ms-1 h-4 w-4" />
                           معاينة
                         </Button>
                         <Button
@@ -505,9 +505,9 @@ export function ContentReviewTab() {
                           onClick={() => handleAction(draft.id, 'approve')}
                         >
                           {actingId === draft.id ? (
-                            <Loader2 className="ml-1 h-4 w-4 animate-spin" />
+                            <Loader2 className="ms-1 h-4 w-4 animate-spin" />
                           ) : (
-                            <CheckCircle className="ml-1 h-4 w-4" />
+                            <CheckCircle className="ms-1 h-4 w-4" />
                           )}
                           اعتماد
                         </Button>
@@ -515,12 +515,12 @@ export function ContentReviewTab() {
                           <DropdownMenuTrigger asChild>
                             <Button size="sm" variant="outline" disabled={actingId === draft.id}>
                               {actingId === draft.id ? (
-                                <Loader2 className="ml-1 h-4 w-4 animate-spin" />
+                                <Loader2 className="ms-1 h-4 w-4 animate-spin" />
                               ) : (
-                                <XCircle className="ml-1 h-4 w-4" />
+                                <XCircle className="ms-1 h-4 w-4" />
                               )}
                               رفض
-                              <ChevronDown className="mr-1 h-3 w-3" />
+                              <ChevronDown className="me-1 h-3 w-3" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
@@ -567,14 +567,14 @@ export function ContentReviewTab() {
               onClick={() => previewDraft && handleAction(previewDraft.id, 'reject')}
               disabled={!previewDraft || actingId === previewDraft?.id}
             >
-              <XCircle className="ml-1 h-4 w-4" />
+              <XCircle className="ms-1 h-4 w-4" />
               رفض
             </Button>
             <Button
               onClick={() => previewDraft && handleAction(previewDraft.id, 'approve')}
               disabled={!previewDraft || actingId === previewDraft?.id}
             >
-              <CheckCircle className="ml-1 h-4 w-4" />
+              <CheckCircle className="ms-1 h-4 w-4" />
               اعتماد
             </Button>
           </DialogFooter>

@@ -79,13 +79,13 @@ export function VideoUrlInput({
 
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <LinkIcon className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+          <LinkIcon className="absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
           <Input
             type="url"
             placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..."
             value={url}
             onChange={(e) => handleChange(e.target.value)}
-            className="pr-10"
+            className="pe-10"
             dir="ltr"
           />
         </div>

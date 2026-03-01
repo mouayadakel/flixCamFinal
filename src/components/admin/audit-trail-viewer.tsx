@@ -118,17 +118,17 @@ export function AuditTrailViewer({
       <CardContent className="space-y-4">
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search audit logs..."
-              className="pl-9"
+              className="ps-9"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <Select value={actionFilter} onValueChange={setActionFilter}>
             <SelectTrigger className="w-[180px]">
-              <Filter className="mr-2 h-4 w-4" />
+              <Filter className="me-2 h-4 w-4" />
               <SelectValue placeholder="Filter by action" />
             </SelectTrigger>
             <SelectContent>

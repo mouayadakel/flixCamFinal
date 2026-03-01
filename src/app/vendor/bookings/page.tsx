@@ -134,7 +134,7 @@ export default async function VendorBookingsPage() {
                       </div>
                     )}
                   </div>
-                  <div className="text-right">
+                  <div className="text-end">
                     <div className="font-medium">{formatCurrency(Number(b.totalAmount))}</div>
                   </div>
                 </div>

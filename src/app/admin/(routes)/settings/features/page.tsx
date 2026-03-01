@@ -189,7 +189,7 @@ export default function FeaturesPage() {
         <TabsList>
           <TabsTrigger value="flags">أعلام الميزات</TabsTrigger>
           <TabsTrigger value="audit">
-            <History className="ml-2 h-4 w-4" />
+            <History className="ms-2 h-4 w-4" />
             سجل التغييرات
           </TabsTrigger>
         </TabsList>
@@ -197,10 +197,10 @@ export default function FeaturesPage() {
         <TabsContent value="flags" className="space-y-6">
           <div className="sticky top-0 z-10 -mx-1 bg-background/95 px-1 py-2 backdrop-blur">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="البحث بالاسم أو التسمية أو الوصف..."
-                className="pl-9"
+                className="ps-9"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 aria-label="البحث في الميزات"
@@ -218,7 +218,7 @@ export default function FeaturesPage() {
                 <section key={group} className="space-y-4">
                   <h2 className="border-b pb-2 text-lg font-semibold">
                     {labels.en} / {labels.ar}
-                    <span className="ml-2 font-normal text-muted-foreground">
+                    <span className="ms-2 font-normal text-muted-foreground">
                       ({scopeFlags.length})
                     </span>
                   </h2>

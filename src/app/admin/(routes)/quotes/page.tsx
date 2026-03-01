@@ -175,12 +175,12 @@ export default function QuotesPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={loadQuotes} disabled={loading}>
-            <RefreshCw className={`ml-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`ms-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             تحديث
           </Button>
           <Button asChild>
             <Link href="/admin/quotes/new">
-              <Plus className="ml-2 h-4 w-4" />
+              <Plus className="ms-2 h-4 w-4" />
               عرض جديد
             </Link>
           </Button>
@@ -350,7 +350,7 @@ export default function QuotesPage() {
                     <div className="flex gap-2">
                       <Link href={`/admin/quotes/${quote.id}`}>
                         <Button size="sm" variant="ghost">
-                          <Eye className="ml-1 h-4 w-4" />
+                          <Eye className="ms-1 h-4 w-4" />
                           عرض
                         </Button>
                       </Link>
@@ -358,7 +358,7 @@ export default function QuotesPage() {
                       quote.status !== 'rejected' &&
                       quote.status !== 'expired' ? (
                         <Button size="sm" onClick={() => handleConvert(quote.id)}>
-                          <ArrowRight className="ml-1 h-4 w-4" />
+                          <ArrowRight className="ms-1 h-4 w-4" />
                           تحويل
                         </Button>
                       ) : null}

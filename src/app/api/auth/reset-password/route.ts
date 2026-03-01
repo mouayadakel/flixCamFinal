@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import * as bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/db/prisma'
+import { checkRateLimitUpstash } from '@/lib/utils/rate-limit-upstash'
 
 const bodySchema = z.object({
   token: z.string().min(1),
@@ -20,6 +21,14 @@ const bodySchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const rate = await checkRateLimitUpstash(request, 'auth')
+    if (!rate.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': '300' } }
+      )
+    }
+
     const body = await request.json()
     const { token, password } = bodySchema.parse(body)
 
@@ -35,7 +44,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const passwordHash = await bcrypt.hash(password, 10)
+    const passwordHash = await bcrypt.hash(password, 12)
 
     await prisma.$transaction([
       prisma.user.update({

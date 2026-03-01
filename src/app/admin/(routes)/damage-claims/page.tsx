@@ -116,7 +116,7 @@ export default function DamageClaimsPage() {
           </p>
         </div>
         <Button variant="outline" onClick={loadClaims}>
-          <RefreshCw className="mr-2 h-4 w-4" />
+          <RefreshCw className="me-2 h-4 w-4" />
           Refresh
         </Button>
       </div>

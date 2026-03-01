@@ -381,14 +381,14 @@ function SpecGroupCard({
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/30"
+        className="flex w-full items-center gap-3 px-4 py-3 text-start transition-colors hover:bg-muted/30"
       >
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary/10 to-primary/5">
           <SpecIcon name={group.icon} className="h-4 w-4 text-primary" />
         </div>
         <div className="flex-1">
           <span className="text-sm font-semibold text-foreground">{group.label}</span>
-          <span className="ml-2 text-xs text-muted-foreground">
+          <span className="ms-2 text-xs text-muted-foreground">
             {group.entries.length} spec{group.entries.length !== 1 ? 's' : ''}
           </span>
         </div>
@@ -626,7 +626,7 @@ export function AISuggestPreviewDialog({
                 <Gauge className="h-3.5 w-3.5" />
                 {tDialog(`${AI_SUGGEST_DIALOG_NS}.tabSpecs`)}
                 {totalSpecCount > 0 && (
-                  <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
+                  <Badge variant="secondary" className="ms-1 h-5 px-1.5 text-[10px]">
                     {totalSpecCount}
                   </Badge>
                 )}
@@ -668,7 +668,7 @@ export function AISuggestPreviewDialog({
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    <LayoutGrid className="mr-1 inline h-3 w-3" />
+                    <LayoutGrid className="me-1 inline h-3 w-3" />
                     {tDialog(`${AI_SUGGEST_DIALOG_NS}.grouped`)}
                   </button>
                   <button
@@ -680,7 +680,7 @@ export function AISuggestPreviewDialog({
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    <Code className="mr-1 inline h-3 w-3" />
+                    <Code className="me-1 inline h-3 w-3" />
                     {tDialog(`${AI_SUGGEST_DIALOG_NS}.json`)}
                   </button>
                 </div>
@@ -690,12 +690,12 @@ export function AISuggestPreviewDialog({
                 <>
                   {/* Search */}
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       placeholder={tDialog(`${AI_SUGGEST_DIALOG_NS}.searchPlaceholder`)}
                       value={specSearch}
                       onChange={(e) => setSpecSearch(e.target.value)}
-                      className="pl-9 text-sm"
+                      className="ps-9 text-sm"
                     />
                   </div>
 

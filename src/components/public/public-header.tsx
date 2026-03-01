@@ -15,6 +15,7 @@ import { useLocale } from '@/hooks/use-locale'
 import { useAuthModalOptional } from '@/components/auth/auth-modal-provider'
 import { Search, ChevronDown, User, LogOut, LayoutDashboard } from 'lucide-react'
 import { PublicContainer } from './public-container'
+import { EquipmentNavDropdown } from './equipment-nav-dropdown'
 import { LanguageSwitcher } from './language-switcher'
 import { PublicSearch } from './public-search'
 import { MiniCart } from './mini-cart'
@@ -44,6 +45,7 @@ const MAIN_LINKS = [
   { href: '/equipment', key: 'nav.equipment' as const },
   { href: '/studios', key: 'nav.studios' as const },
   { href: '/packages', key: 'nav.packages' as const },
+  { href: '/blog', key: 'nav.blog' as const },
 ] as const
 
 const MORE_LINKS = [
@@ -111,6 +113,7 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
                 width={180}
                 height={56}
                 className="h-12 w-auto object-contain md:h-14"
+                style={{ width: 'auto', height: 'auto' }}
                 priority
               />
             </Link>
@@ -122,6 +125,19 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
                   const isActive =
                     pathname !== null &&
                     (pathname === href || (href !== '/' && pathname.startsWith(href)))
+                  if (href === '/equipment') {
+                    return (
+                      <li key={href}>
+                        <EquipmentNavDropdown
+                          isActive={isActive}
+                          triggerClassName={cn(
+                            'block rounded-sm py-2 text-[15px] font-medium text-white/85 outline-none transition-colors hover:text-white focus-visible:text-white focus-visible:ring-2 focus-visible:ring-brand-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-header-surface',
+                            isActive && 'text-brand-primary'
+                          )}
+                        />
+                      </li>
+                    )
+                  }
                   return (
                     <li key={href}>
                       <Link
@@ -208,7 +224,7 @@ export function PublicHeader({ hiddenRoutes }: PublicHeaderProps = {}) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-9 gap-2 font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                          className="h-9 gap-2 font-medium text-[rgba(140,198,63,1)] transition-colors hover:bg-white/10 hover:text-[rgba(140,198,63,1)]"
                         >
                           <User className="h-4 w-4" />
                           <span className="max-w-[120px] truncate">

@@ -133,7 +133,7 @@ export default function CmsStudiosPage() {
                     <Button variant="default" size="sm" asChild>
                       <Link href={`/admin/cms/studios/${studio.id}`} aria-label="تعديل">
                         <Pencil className="h-4 w-4" />
-                        <span className="mr-2">تعديل</span>
+                        <span className="me-2">تعديل</span>
                       </Link>
                     </Button>
                   </div>

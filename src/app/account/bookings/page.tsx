@@ -138,7 +138,7 @@ export default function AccountBookingsPage() {
         </div>
         <Button asChild variant="outline" size="sm">
           <Link href="/equipment">
-            <Package className="ml-2 h-4 w-4" />
+            <Package className="ms-2 h-4 w-4" />
             تصفح المعدات
           </Link>
         </Button>
@@ -252,14 +252,14 @@ export default function AccountBookingsPage() {
                         {booking.invoices && booking.invoices.length > 0 && (
                           <Button size="sm" variant="outline" asChild>
                             <Link href={`/account/invoices/${booking.invoices[0].id}`}>
-                              <FileText className="ml-1 h-3 w-3" />
+                              <FileText className="ms-1 h-3 w-3" />
                               الفاتورة
                             </Link>
                           </Button>
                         )}
                         <Button size="sm" variant="ghost" asChild>
                           <Link href={`/booking/confirmation/${booking.id}`}>
-                            <ChevronLeft className="ml-1 h-3 w-3" />
+                            <ChevronLeft className="ms-1 h-3 w-3" />
                             التفاصيل
                           </Link>
                         </Button>

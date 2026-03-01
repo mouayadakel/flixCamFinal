@@ -286,7 +286,7 @@ export default function InvoiceDetailPage() {
           </h1>
           <div className="mt-2 flex items-center gap-2">
             <Badge className={statusConfig.color}>
-              <StatusIcon className="ml-1 h-3 w-3" />
+              <StatusIcon className="ms-1 h-3 w-3" />
               {statusConfig.label}
             </Badge>
             {isOverdue && invoice.status !== 'paid' && <Badge variant="destructive">متأخرة</Badge>}
@@ -295,12 +295,12 @@ export default function InvoiceDetailPage() {
         <div className="flex gap-2">
           <Button variant="outline" asChild>
             <Link href="/admin/invoices">
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ms-2 h-4 w-4" />
               العودة
             </Link>
           </Button>
           <Button variant="outline">
-            <Printer className="ml-2 h-4 w-4" />
+            <Printer className="ms-2 h-4 w-4" />
             طباعة
           </Button>
           <Button
@@ -310,7 +310,7 @@ export default function InvoiceDetailPage() {
               window.open(url, '_blank', 'noopener,noreferrer')
             }}
           >
-            <Download className="ml-2 h-4 w-4" />
+            <Download className="ms-2 h-4 w-4" />
             تحميل PDF
           </Button>
         </div>
@@ -435,8 +435,8 @@ export default function InvoiceDetailPage() {
                     <TableHead>الوصف</TableHead>
                     <TableHead className="text-center">الكمية</TableHead>
                     <TableHead className="text-center">الأيام</TableHead>
-                    <TableHead className="text-left">سعر الوحدة / يوم</TableHead>
-                    <TableHead className="text-left">الإجمالي</TableHead>
+                    <TableHead className="text-start">سعر الوحدة / يوم</TableHead>
+                    <TableHead className="text-start">الإجمالي</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -447,8 +447,8 @@ export default function InvoiceDetailPage() {
                       <TableCell className="text-center">
                         {item.days != null ? item.days : '—'}
                       </TableCell>
-                      <TableCell className="text-left">{formatCurrency(item.unitPrice)}</TableCell>
-                      <TableCell className="text-left font-medium">
+                      <TableCell className="text-start">{formatCurrency(item.unitPrice)}</TableCell>
+                      <TableCell className="text-start font-medium">
                         {formatCurrency(item.total)}
                       </TableCell>
                     </TableRow>
@@ -545,7 +545,7 @@ export default function InvoiceDetailPage() {
             <CardContent className="space-y-3">
               {invoice.status === 'draft' && (
                 <Button className="w-full" onClick={handleSendInvoice}>
-                  <Send className="ml-2 h-4 w-4" />
+                  <Send className="ms-2 h-4 w-4" />
                   إرسال للعميل
                 </Button>
               )}
@@ -555,7 +555,7 @@ export default function InvoiceDetailPage() {
                   variant="outline"
                   onClick={() => setPaymentDialogOpen(true)}
                 >
-                  <CreditCard className="ml-2 h-4 w-4" />
+                  <CreditCard className="ms-2 h-4 w-4" />
                   تسجيل دفعة
                 </Button>
               )}
@@ -565,7 +565,7 @@ export default function InvoiceDetailPage() {
                   variant="outline"
                   onClick={() => handleStatusChange('paid')}
                 >
-                  <CheckCircle className="ml-2 h-4 w-4" />
+                  <CheckCircle className="ms-2 h-4 w-4" />
                   تحديد كمدفوعة
                 </Button>
               )}
@@ -575,12 +575,12 @@ export default function InvoiceDetailPage() {
                   variant="outline"
                   onClick={() => handleStatusChange('cancelled')}
                 >
-                  <AlertCircle className="ml-2 h-4 w-4" />
+                  <AlertCircle className="ms-2 h-4 w-4" />
                   إلغاء الفاتورة
                 </Button>
               )}
               <Button className="w-full" variant="outline" onClick={loadInvoice}>
-                <RefreshCw className="ml-2 h-4 w-4" />
+                <RefreshCw className="ms-2 h-4 w-4" />
                 تحديث
               </Button>
             </CardContent>
