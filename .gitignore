@@ -75,6 +75,9 @@ uploads/
 /playwright-report/
 /playwright/.cache/
 
+# Lighthouse
+/reports/
+
 # Turbo
 .turbo/
 
@@ -84,6 +87,10 @@ uploads/
 .bash_logout
 .bash_profile
 .bashrc
+
+# AWStats: password file and analytics data (secrets + PII; never commit)
+.awstats-htpasswd
+awstats/
 
 # VPS deployment directory (production build + runtime, not source)
 public_html/FlixCam_Main/FlixCam_Main/
