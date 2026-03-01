@@ -159,7 +159,7 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
       include: {
         equipment: {
-          select: { id: true, name: true, sku: true },
+          select: { id: true, nameEn: true, model: true, sku: true },
         },
       },
     })

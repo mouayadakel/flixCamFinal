@@ -156,7 +156,14 @@ export async function POST(request: NextRequest) {
           tags: '',
         }
 
-        const confidence = scoreConfidence(out)
+        const normalizedForScore = {
+          ...out,
+          seo_keywords_en: Array.isArray(out.seo_keywords_en)
+            ? out.seo_keywords_en.join(', ')
+            : (out.seo_keywords_en ?? ''),
+          tags: Array.isArray(out.tags) ? out.tags.join(', ') : (out.tags ?? ''),
+        }
+        const confidence = scoreConfidence(normalizedForScore)
 
         return {
           rowIndex: idx,

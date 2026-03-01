@@ -333,9 +333,9 @@ export async function GET(request: NextRequest) {
         const [newCustomers, allBookings, topSpend, overdueInvoices] = await Promise.all([
           prisma.user.count({
             where: {
-              role: 'CUSTOMER',
               createdAt: { gte: rangeStart, lte: rangeEnd },
               deletedAt: null,
+              bookings: { some: {} },
             },
           }),
           prisma.booking.findMany({

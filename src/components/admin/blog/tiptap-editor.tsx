@@ -217,7 +217,9 @@ export function TiptapEditor({
       onChange(editor.getJSON() as Record<string, unknown>)
     }
     editor.on('update', handler)
-    return () => editor.off('update', handler)
+    return () => {
+      editor.off('update', handler)
+    }
   }, [editor, onChange])
 
   return (

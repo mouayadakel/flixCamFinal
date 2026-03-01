@@ -67,7 +67,7 @@ export function BlogPostClient({ post, relatedPosts, reactionCounts, isPreview, 
       {isPreview && (
         <div className="flex items-center justify-center gap-3 bg-amber-500 py-2.5 text-center text-sm font-medium text-white">
           <span>{locale === 'ar' ? 'معاينة' : 'Preview'}</span>
-          <BlogStatusBadge status={post.status} locale={locale} className="border-white/30 bg-white/20 text-white" />
+          <BlogStatusBadge status={post.status} locale={locale === 'ar' ? 'ar' : 'en'} className="border-white/30 bg-white/20 text-white" />
         </div>
       )}
 

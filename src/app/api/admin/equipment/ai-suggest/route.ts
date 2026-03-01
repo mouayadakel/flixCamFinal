@@ -245,16 +245,18 @@ export async function POST(request: NextRequest) {
             metaKeywords: masterResult.seo_keywords_en,
           }
         : { metaTitle: name, metaDescription: existingShortDescription ?? name, metaKeywords: '' },
-      boxContents: typeof masterResult?.box_contents === 'string'
-        ? masterResult.box_contents.trim() || undefined
-        : Array.isArray(masterResult?.box_contents)
-          ? masterResult.box_contents.join(', ')
-          : undefined,
-      tags: typeof masterResult?.tags === 'string'
-        ? masterResult.tags.trim() || undefined
-        : Array.isArray(masterResult?.tags)
-          ? masterResult.tags.join(', ')
-          : undefined,
+      boxContents: (() => {
+        const bc: unknown = masterResult?.box_contents
+        if (typeof bc === 'string') return bc.trim() || undefined
+        if (Array.isArray(bc)) return (bc as string[]).join(', ')
+        return undefined
+      })(),
+      tags: (() => {
+        const t: unknown = masterResult?.tags
+        if (typeof t === 'string') return t.trim() || undefined
+        if (Array.isArray(t)) return (t as string[]).join(', ')
+        return undefined
+      })(),
       relatedEquipmentIds: relatedEquipment.map((e) => e.id),
       confidence,
       // Full multilingual translations for auto-fill across all 3 locales

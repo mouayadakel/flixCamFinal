@@ -22,7 +22,9 @@ const COST_PER_OUTPUT_TOKEN = 0.0000004
 /** Max output tokens we allow per request (for budget guard). */
 const MAX_OUTPUT_ESTIMATE = 8000
 
-export async function requireBlogAiAuth(request: Request): Promise<NextResponse | { userId: string }> {
+export async function requireBlogAiAuth(
+  request: Request
+): Promise<NextResponse | Response | { userId: string }> {
   const session = await auth()
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -34,6 +36,13 @@ export async function requireBlogAiAuth(request: Request): Promise<NextResponse 
   const rateRes = await blogAiRateLimitResponse(request, `blog-ai:${session.user.id}`)
   if (rateRes) return rateRes
   return { userId: session.user.id }
+}
+
+/**
+ * Normalize content from schema (string | Record) to string for AI services.
+ */
+export function asContentString(content: string | Record<string, unknown>): string {
+  return typeof content === 'string' ? content : JSON.stringify(content)
 }
 
 /**

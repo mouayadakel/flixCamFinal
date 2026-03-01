@@ -12,7 +12,7 @@ import type { CreatePostInput } from '@/lib/validators/blog.validator'
 export default function AdminBlogEditPage() {
   const router = useRouter()
   const params = useParams()
-  const id = params.id as string
+  const id = (params?.id as string) ?? ''
 
   const [post, setPost] = useState<Record<string, unknown> | null>(null)
   const [categories, setCategories] = useState<{ id: string; nameAr: string; nameEn: string; slug: string }[]>([])

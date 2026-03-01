@@ -68,7 +68,7 @@ export function MadaIcon({ className, size = defaultSize, title = 'Mada' }: Paym
 }
 
 function CashIcon({ className, size = defaultSize, title = 'Cash' }: PaymentIconProps) {
-  return <Banknote className={className} size={size} aria-hidden role="img" title={title} />
+  return <Banknote className={className} size={size} aria-hidden role="img" aria-label={title} />
 }
 
 const PAYMENT_ICONS: Record<string, React.ComponentType<PaymentIconProps>> = {

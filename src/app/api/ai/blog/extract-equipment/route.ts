@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { BlogAIService } from '@/lib/services/blog-ai.service'
 import { extractEquipmentSchema } from '@/lib/validators/blog-ai.validator'
-import { requireBlogAiAuth, checkTokenBudget, logBlogAiUsage, estimateInputTokens, estimateOutputTokens } from '../_lib'
+import { requireBlogAiAuth, checkTokenBudget, logBlogAiUsage, estimateInputTokens, estimateOutputTokens, asContentString } from '../_lib'
 import { handleApiError } from '@/lib/utils/api-helpers'
 import { matchEquipmentNamesToIds } from '@/lib/utils/equipment-fuzzy-matcher'
 
@@ -9,7 +9,7 @@ const ENDPOINT = 'extract-equipment'
 
 export async function POST(request: NextRequest) {
   const authResult = await requireBlogAiAuth(request)
-  if (authResult instanceof NextResponse) return authResult
+  if (authResult instanceof NextResponse || authResult instanceof Response) return authResult
   const { userId } = authResult
   const start = Date.now()
   let body: unknown = {}
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const budgetErr = checkTokenBudget(body)
     if (budgetErr) return budgetErr
     const { content } = extractEquipmentSchema.parse(body)
-    const equipment = await BlogAIService.extractEquipment(content)
+    const equipment = await BlogAIService.extractEquipment(asContentString(content))
     const names = equipment
       .filter((e) => e.confidence >= 0.6)
       .map((e) => e.name)

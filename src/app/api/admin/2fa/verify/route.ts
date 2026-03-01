@@ -75,10 +75,10 @@ export async function POST(request: NextRequest) {
 
     const { token } = parseResult.data
 
-    let authenticator: typeof import('otplib').authenticator
+    let verify: (opts: { token: string; secret: string }) => Promise<{ valid: boolean }>
     try {
       const otplib = await import('otplib')
-      authenticator = otplib.authenticator
+      verify = otplib.verify
     } catch {
       logger.warn('otplib not installed')
       return NextResponse.json(
@@ -99,7 +99,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const isValid = authenticator.verify({ token, secret: user.twoFactorSecret })
+    const result = await verify({ token, secret: user.twoFactorSecret })
+    const isValid = result.valid
 
     if (!isValid) {
       return NextResponse.json(

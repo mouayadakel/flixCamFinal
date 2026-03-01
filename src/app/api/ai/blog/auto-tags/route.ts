@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { BlogAIService } from '@/lib/services/blog-ai.service'
 import { autoTagsSchema } from '@/lib/validators/blog-ai.validator'
-import { requireBlogAiAuth, checkTokenBudget, logBlogAiUsage, estimateInputTokens, estimateOutputTokens } from '../_lib'
+import { requireBlogAiAuth, checkTokenBudget, logBlogAiUsage, estimateInputTokens, estimateOutputTokens, asContentString } from '../_lib'
 import { handleApiError } from '@/lib/utils/api-helpers'
 
 const ENDPOINT = 'auto-tags'
 
 export async function POST(request: NextRequest) {
   const authResult = await requireBlogAiAuth(request)
-  if (authResult instanceof NextResponse) return authResult
+  if (authResult instanceof NextResponse || authResult instanceof Response) return authResult
   const { userId } = authResult
   const start = Date.now()
   let body: unknown = {}
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const budgetErr = checkTokenBudget(body)
     if (budgetErr) return budgetErr
     const { content } = autoTagsSchema.parse(body)
-    const tags = await BlogAIService.autoTags(content)
+    const tags = await BlogAIService.autoTags(asContentString(content))
     const durationMs = Date.now() - start
     const inputTokens = estimateInputTokens(body)
     const outputTokens = estimateOutputTokens(tags)

@@ -272,6 +272,7 @@ export class InvoiceService {
           where: { deletedAt: null },
           include: { equipment: { select: { model: true, sku: true, dailyPrice: true, weeklyPrice: true, monthlyPrice: true } } },
         },
+        payments: { select: { amount: true } },
       },
     })
 
@@ -296,10 +297,10 @@ export class InvoiceService {
     const dueDate = new Date(now)
     dueDate.setDate(dueDate.getDate() + 30)
 
-    const paidAmount = booking.payments
-      ? (booking as { payments?: { amount: { toNumber: () => number } }[] }).payments
-          ?.reduce((sum: number, p: { amount: { toNumber: () => number } }) => sum + p.amount.toNumber(), 0) ?? 0
-      : 0
+    const paidAmount = booking.payments?.reduce(
+      (sum: number, p: { amount: { toNumber: () => number } }) => sum + p.amount.toNumber(),
+      0
+    ) ?? 0
 
     const invoice = await prisma.invoice.create({
       data: {

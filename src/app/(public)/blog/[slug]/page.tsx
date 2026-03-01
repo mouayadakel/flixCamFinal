@@ -20,7 +20,7 @@ type Props = {
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { slug } = await params
   const { preview, token } = await searchParams
-  const isValidPreview = preview === 'true' && token && process.env.BLOG_PREVIEW_TOKEN === token
+  const isValidPreview = Boolean(preview === 'true' && token && process.env.BLOG_PREVIEW_TOKEN === token)
 
   const post = await BlogService.getPostBySlug(slug, {
     allowDraft: isValidPreview,
@@ -64,7 +64,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 export default async function BlogPostPage({ params, searchParams }: Props) {
   const { slug } = await params
   const { preview, token } = await searchParams
-  const isValidPreview = preview === 'true' && token && process.env.BLOG_PREVIEW_TOKEN === token
+  const isValidPreview = Boolean(preview === 'true' && token && process.env.BLOG_PREVIEW_TOKEN === token)
 
   const post = await BlogService.getPostBySlug(slug, {
     allowDraft: isValidPreview,
@@ -119,7 +119,7 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
         post={post}
         relatedPosts={relatedPosts}
         reactionCounts={reactionCounts}
-        isPreview={isValidPreview}
+        isPreview={!!isValidPreview}
         postUrl={`${baseUrl}/blog/${post.slug}`}
       />
     </main>

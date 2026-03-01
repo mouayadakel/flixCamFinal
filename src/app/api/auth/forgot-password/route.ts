@@ -17,7 +17,7 @@ const RESET_EXPIRY_HOURS = 1
 export async function POST(request: NextRequest) {
   try {
     const rateLimitResult = await checkRateLimitUpstash(request, 'auth')
-    if (!rateLimitResult.success) {
+    if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Too many requests. Please try again later.' },
         { status: 429, headers: { 'Retry-After': '300' } }

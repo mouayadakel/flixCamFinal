@@ -16,13 +16,14 @@ export interface SheetData {
 /**
  * Parse Excel buffer to sheet data (xlsx only - use parseCsvForBuffer for csv/tsv)
  */
-export async function parseExcelBuffer(buffer: Buffer): Promise<{
+export async function parseExcelBuffer(buffer: Buffer | Uint8Array): Promise<{
   sheetNames: string[]
   getSheetData: (sheetName: string) => Record<string, unknown>[]
   sheets: Record<string, Record<string, unknown>[]>
 }> {
   const workbook = new ExcelJS.Workbook()
-  await workbook.xlsx.load(buffer)
+  const buf = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer)
+  await workbook.xlsx.load(buf as unknown as Parameters<ExcelJS.Workbook['xlsx']['load']>[0])
 
   const sheets: Record<string, Record<string, unknown>[]> = {}
   const sheetNames: string[] = []
@@ -75,8 +76,9 @@ export async function parseExcelBuffer(buffer: Buffer): Promise<{
 /**
  * Parse CSV/TSV buffer to sheet-like structure (single "sheet")
  */
-export function parseCsvBuffer(buffer: Buffer, delimiter: ',' | '\t' = ','): Record<string, unknown>[] {
-  const text = buffer.toString('utf-8')
+export function parseCsvBuffer(buffer: Buffer | Uint8Array, delimiter: ',' | '\t' = ','): Record<string, unknown>[] {
+  const buf = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer)
+  const text = buf.toString('utf-8')
   const lines = text.split(/\r?\n/).filter((l) => l.trim())
   if (lines.length === 0) return []
 

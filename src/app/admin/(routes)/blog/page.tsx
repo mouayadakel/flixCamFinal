@@ -19,9 +19,9 @@ export default function AdminBlogPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const search = searchParams.get('q') ?? ''
-  const category = searchParams.get('category') ?? ''
-  const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))
+  const search = searchParams?.get('q') ?? ''
+  const category = searchParams?.get('category') ?? ''
+  const page = Math.max(1, parseInt(searchParams?.get('page') ?? '1', 10))
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -72,7 +72,7 @@ export default function AdminBlogPage() {
   }, [fetchData])
 
   const handleSearchChange = (q: string) => {
-    const next = new URLSearchParams(searchParams)
+    const next = new URLSearchParams(searchParams?.toString() ?? '')
     if (q) next.set('q', q)
     else next.delete('q')
     next.delete('page')
@@ -80,7 +80,7 @@ export default function AdminBlogPage() {
   }
 
   const handleCategoryChange = (c: string) => {
-    const next = new URLSearchParams(searchParams)
+    const next = new URLSearchParams(searchParams?.toString() ?? '')
     if (c) next.set('category', c)
     else next.delete('category')
     next.delete('page')
@@ -88,7 +88,7 @@ export default function AdminBlogPage() {
   }
 
   const handlePageChange = (p: number) => {
-    const next = new URLSearchParams(searchParams.toString())
+    const next = new URLSearchParams(searchParams?.toString() ?? '')
     next.set('page', String(p))
     router.push(`/admin/blog?${next}`)
   }

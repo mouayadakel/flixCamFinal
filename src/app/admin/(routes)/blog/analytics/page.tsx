@@ -252,8 +252,8 @@ export default function AdminBlogAnalyticsPage() {
                         cx="50%"
                         cy="50%"
                         outerRadius={80}
-                        label={({ categoryName, percent }) =>
-                          `${categoryName} ${(percent * 100).toFixed(0)}%`
+                        label={(payload: { name?: string; value?: number; percent?: number }) =>
+                          `${payload.name ?? ''} ${((payload.percent ?? 0) * 100).toFixed(0)}%`
                         }
                       >
                         {data.byCategory.map((_, i) => (

@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { BlogAIService } from '@/lib/services/blog-ai.service'
 import { seoScoreSchema } from '@/lib/validators/blog-ai.validator'
-import { requireBlogAiAuth, checkTokenBudget, logBlogAiUsage, estimateInputTokens, estimateOutputTokens } from '../_lib'
+import { requireBlogAiAuth, checkTokenBudget, logBlogAiUsage, estimateInputTokens, estimateOutputTokens, asContentString } from '../_lib'
 import { handleApiError } from '@/lib/utils/api-helpers'
 
 const ENDPOINT = 'seo-score'
 
 export async function POST(request: NextRequest) {
   const authResult = await requireBlogAiAuth(request)
-  if (authResult instanceof NextResponse) return authResult
+  if (authResult instanceof NextResponse || authResult instanceof Response) return authResult
   const { userId } = authResult
   const start = Date.now()
   let body: unknown = {}
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const budgetErr = checkTokenBudget(body)
     if (budgetErr) return budgetErr
     const { title, content, meta } = seoScoreSchema.parse(body)
-    const result = await BlogAIService.seoScore(title, content, meta ?? {})
+    const result = await BlogAIService.seoScore(title, asContentString(content), meta ?? {})
     const durationMs = Date.now() - start
     const inputTokens = estimateInputTokens(body)
     const outputTokens = estimateOutputTokens(result)

@@ -145,6 +145,8 @@ export const authorListParamsSchema = z.object({
 })
 
 export type CreatePostInput = z.infer<typeof createPostSchema>
+/** Form/submit values: schema output with defaults applied (e.g. status required) */
+export type CreatePostFormValues = z.output<typeof createPostSchema>
 export type UpdatePostInput = z.infer<typeof updatePostSchema>
 export type SearchParamsInput = z.infer<typeof searchParamsSchema>
 export type ReactionInput = z.infer<typeof reactionSchema>

@@ -8,7 +8,7 @@ const ENDPOINT = 'generate-outline'
 
 export async function POST(request: NextRequest) {
   const authResult = await requireBlogAiAuth(request)
-  if (authResult instanceof NextResponse) return authResult
+  if (authResult instanceof NextResponse || authResult instanceof Response) return authResult
   const { userId } = authResult
 
   const start = Date.now()

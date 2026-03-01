@@ -55,7 +55,7 @@ export function BlogListingClient({
   const searchPlaceholder = t('blog.searchPlaceholder')
 
   const buildUrl = (updates: Record<string, string | string[] | undefined>) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString() ?? '')
     Object.entries(updates).forEach(([key, value]) => {
       if (value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
         params.delete(key)
@@ -119,7 +119,7 @@ export function BlogListingClient({
               totalPages={initialTotalPages}
               locale={locale}
               basePath={basePath}
-              searchParams={searchParams.toString()}
+              searchParams={searchParams?.toString() ?? ''}
               useQueryParam={basePath !== '/blog'}
             />
           </>

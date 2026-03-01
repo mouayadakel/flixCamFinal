@@ -30,10 +30,12 @@ export async function POST() {
       )
     }
 
-    let authenticator: typeof import('otplib').authenticator
+    let generateSecret: () => string
+    let generateURI: (opts: { issuer: string; label: string; secret: string }) => string
     try {
       const otplib = await import('otplib')
-      authenticator = otplib.authenticator
+      generateSecret = otplib.generateSecret
+      generateURI = otplib.generateURI
     } catch {
       logger.warn('otplib not installed. Run: npm install otplib')
       return NextResponse.json(
@@ -51,9 +53,12 @@ export async function POST() {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    const secret = authenticator.generateSecret()
-
-    const qrCodeUrl = authenticator.keyuri(user.email ?? user.id, 'FlixCam', secret)
+    const secret = generateSecret()
+    const qrCodeUrl = generateURI({
+      issuer: 'FlixCam',
+      label: user.email ?? user.id,
+      secret,
+    })
 
     await prisma.user.update({
       where: { id: user.id },

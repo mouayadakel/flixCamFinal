@@ -4,9 +4,10 @@
 
 'use client'
 
+import type { Resolver } from 'react-hook-form'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createPostSchema, type CreatePostInput } from '@/lib/validators/blog.validator'
+import { createPostSchema, type CreatePostInput, type CreatePostFormValues } from '@/lib/validators/blog.validator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -35,7 +36,7 @@ interface BlogPostFormProps {
   categories: { id: string; nameAr: string; nameEn: string; slug: string }[]
   authors: { id: string; name: string; avatar: string | null; role: string | null }[]
   tags: { id: string; nameAr: string; nameEn: string; slug: string }[]
-  onSubmit: (data: CreatePostInput) => Promise<void>
+  onSubmit: (data: CreatePostFormValues) => Promise<void>
   isSubmitting?: boolean
 }
 
@@ -47,8 +48,8 @@ export function BlogPostForm({
   onSubmit,
   isSubmitting = false,
 }: BlogPostFormProps) {
-  const form = useForm<CreatePostInput>({
-    resolver: zodResolver(createPostSchema),
+  const form = useForm<CreatePostFormValues>({
+    resolver: zodResolver(createPostSchema) as Resolver<CreatePostFormValues>,
     defaultValues: {
       titleAr: '',
       titleEn: '',

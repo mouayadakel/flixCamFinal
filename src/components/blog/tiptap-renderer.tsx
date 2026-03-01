@@ -4,6 +4,7 @@
 
 'use client'
 
+import type { ReactNode } from 'react'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark.css'
 import { CalloutBlock } from './custom-blocks/callout'
@@ -18,7 +19,7 @@ interface TiptapRendererProps {
   locale: string
 }
 
-function renderNode(node: Record<string, unknown>, locale: string): React.ReactNode {
+function renderNode(node: Record<string, unknown>, locale: string): ReactNode {
   const type = node.type as string
   const content = node.content as Record<string, unknown>[] | undefined
   const attrs = (node.attrs ?? {}) as Record<string, unknown>
@@ -39,15 +40,15 @@ function renderNode(node: Record<string, unknown>, locale: string): React.ReactN
       )
 
     case 'heading': {
-      const level = (attrs.level as number) ?? 2
-      const Tag = `h${level}` as keyof JSX.IntrinsicElements
+      const level = Math.min(6, Math.max(1, (attrs.level as number) ?? 2))
+      const HeadingTag = (`h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6')
       return (
-        <Tag
+        <HeadingTag
           id={slugify(getTextContent(content))}
           className="mb-4 mt-8 font-bold text-gray-900 first:mt-0 scroll-mt-24"
         >
           {content?.map((child, i) => renderInline(child as Record<string, unknown>, i))}
-        </Tag>
+        </HeadingTag>
       )
     }
 
@@ -111,9 +112,9 @@ function renderNode(node: Record<string, unknown>, locale: string): React.ReactN
             alt={(attrs.alt as string) ?? ''}
             className="rounded-lg"
           />
-          {attrs.caption && (
+          {attrs.caption != null && String(attrs.caption) !== '' && (
             <figcaption className="mt-2 text-center text-sm text-gray-500">
-              {attrs.caption as string}
+              {String(attrs.caption)}
             </figcaption>
           )}
         </figure>

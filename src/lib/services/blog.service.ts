@@ -3,6 +3,7 @@
  * @description Business logic for blog posts, categories, tags, and authors
  */
 
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db/prisma'
 import { NotFoundError, ValidationError } from '@/lib/errors'
 import type {
@@ -127,7 +128,7 @@ const publishedWhere = {
   deletedAt: null,
   status: BlogPostStatus.PUBLISHED,
   OR: [{ publishedAt: null }, { publishedAt: { lte: new Date() } }],
-} as const
+}
 
 export class BlogService {
   /**
@@ -421,6 +422,7 @@ export class BlogService {
     const post = await prisma.blogPost.create({
       data: {
         ...rest,
+        content: (rest.content ?? {}) as Prisma.InputJsonValue,
         createdBy: userId,
         updatedBy: userId,
         tags: tagIds?.length
@@ -433,7 +435,8 @@ export class BlogService {
         tags: { include: { tag: { select: { id: true, nameAr: true, nameEn: true, slug: true } } } },
       },
     })
-    return { ...post, tags: post.tags.map((t) => t.tag) } as BlogPostPublic
+    const tags = 'tags' in post && Array.isArray(post.tags) ? post.tags.map((t: { tag: { id: string; nameAr: string; nameEn: string; slug: string } }) => t.tag) : []
+    return { ...post, tags } as unknown as BlogPostPublic
   }
 
   /**

@@ -42,7 +42,7 @@ export function BlogFilters({
   const searchParams = useSearchParams()
 
   const buildUrl = (updates: Record<string, string | string[] | undefined>) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString() ?? '')
     Object.entries(updates).forEach(([key, value]) => {
       if (value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
         params.delete(key)
