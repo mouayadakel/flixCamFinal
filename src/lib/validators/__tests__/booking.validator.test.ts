@@ -1,14 +1,108 @@
 /**
- * Unit tests for booking validators (Phase 8.1) – portal request/cancel schemas.
+ * ═══════════════════════════════════════════════════════
+ * FILE: src/lib/validators/booking.validator.ts
+ * FEATURE: Booking validation
+ * UNITS: requestChangeSchema, requestExtensionSchema, cancelBookingSchema
+ * ═══════════════════════════════════════════════════════
+ *
+ * REQUIREMENTS (requestChangeSchema):
+ *   - reason required, non-empty, max 500 chars; requestedChanges optional.
+ * REQUIREMENTS (requestExtensionSchema):
+ *   - reason required; requestedEndDate required and must be in future.
+ * REQUIREMENTS (cancelBookingSchema):
+ *   - reason required, non-empty.
  */
 
 import {
+  createBookingSchema,
+  updateBookingSchema,
+  stateTransitionSchema,
   requestChangeSchema,
   requestExtensionSchema,
   cancelBookingSchema,
 } from '../booking.validator'
+import { BookingStatus } from '@prisma/client'
 
 describe('booking.validator', () => {
+  describe('createBookingSchema', () => {
+    it('accepts valid input with endDate after startDate', () => {
+      const result = createBookingSchema.safeParse({
+        customerId: 'cust-1',
+        startDate: new Date('2026-03-01'),
+        endDate: new Date('2026-03-05'),
+        equipmentIds: ['eq-1'],
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects when endDate is before or equal to startDate', () => {
+      const result = createBookingSchema.safeParse({
+        customerId: 'cust-1',
+        startDate: new Date('2026-03-05'),
+        endDate: new Date('2026-03-01'),
+        equipmentIds: ['eq-1'],
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues.some((i) => i.path.includes('endDate'))).toBe(true)
+      }
+    })
+
+    it('rejects empty equipmentIds', () => {
+      const result = createBookingSchema.safeParse({
+        customerId: 'cust-1',
+        startDate: new Date('2026-03-01'),
+        endDate: new Date('2026-03-05'),
+        equipmentIds: [],
+      })
+      expect(result.success).toBe(false)
+    })
+  })
+
+  describe('updateBookingSchema', () => {
+    it('accepts partial update with no dates', () => {
+      const result = updateBookingSchema.safeParse({ notes: 'Updated' })
+      expect(result.success).toBe(true)
+    })
+
+    it('accepts update with both dates when endDate > startDate', () => {
+      const result = updateBookingSchema.safeParse({
+        startDate: new Date('2026-03-01'),
+        endDate: new Date('2026-03-10'),
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects update when both dates provided and endDate <= startDate', () => {
+      const result = updateBookingSchema.safeParse({
+        startDate: new Date('2026-03-10'),
+        endDate: new Date('2026-03-01'),
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues.some((i) => i.path.includes('endDate'))).toBe(true)
+      }
+    })
+  })
+
+  describe('stateTransitionSchema', () => {
+    it('accepts valid toState and optional reason', () => {
+      const result = stateTransitionSchema.safeParse({
+        toState: BookingStatus.CONFIRMED,
+        reason: 'Payment received',
+      })
+      expect(result.success).toBe(true)
+    })
+
+    it('rejects invalid toState', () => {
+      const result = stateTransitionSchema.safeParse({
+        toState: 'INVALID_STATE',
+        reason: 'Test',
+      })
+      expect(result.success).toBe(false)
+    })
+  })
+
   describe('requestChangeSchema', () => {
     it('accepts valid reason only', () => {
       const result = requestChangeSchema.safeParse({ reason: 'تعديل التواريخ' })

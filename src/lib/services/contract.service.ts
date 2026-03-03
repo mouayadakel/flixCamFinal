@@ -123,11 +123,11 @@ export class ContractService {
 إصدار الشروط: ${version}
 
 الطرف الأول (المؤجر): FlixCam.rent
-الطرف الثاني (المستأجر): ${booking.customer.name || booking.customer.email}
+الطرف الثاني (المستأجر): ${booking.customer?.name || booking.customer?.email || 'N/A'}
 
 الشروط والأحكام:
 1. مدة الإيجار: من ${new Date(booking.startDate).toLocaleDateString('ar-SA')} إلى ${new Date(booking.endDate).toLocaleDateString('ar-SA')}
-2. المعدات المؤجرة: ${booking.equipment.length} عنصر
+2. المعدات المؤجرة: ${(booking.equipment || []).length} عنصر
 3. المبلغ الإجمالي: ${Number(booking.totalAmount).toLocaleString('ar-SA')} ريال سعودي
 4. المستأجر مسؤول عن صيانة المعدات وإرجاعها في نفس الحالة
 5. أي تلف أو فقدان للمعدات يتحمله المستأجر

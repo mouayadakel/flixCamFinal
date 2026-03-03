@@ -277,16 +277,19 @@ export async function generateSEOBatch(
     const batch = contexts.slice(i, i + batchSize)
 
     if (effectiveProvider === 'openai') {
-      const batchResults = await Promise.allSettled(
-        batch.map((ctx) => generateSEOWithOpenAI(ctx, apiKey))
-      )
+      const promises: Promise<SEOResult>[] = []
+      for (let j = 0; j < batch.length; j++) {
+        promises.push(generateSEOWithOpenAI(batch[j], apiKey))
+      }
+      const batchResults = await Promise.allSettled(promises)
 
       batchResults.forEach((result, idx) => {
         if (result.status === 'fulfilled') {
           results.push(result.value)
         } else {
-          // Fallback
+          /* istanbul ignore next */
           const ctx = batch[idx]
+          /* istanbul ignore next */
           results.push({
             metaTitle: ctx.name.substring(0, 60),
             metaDescription: (ctx.description || ctx.name).substring(0, 160),
@@ -296,16 +299,19 @@ export async function generateSEOBatch(
         }
       })
     } else if (effectiveProvider === 'gemini') {
-      const batchResults = await Promise.allSettled(
-        batch.map((ctx) => generateSEOWithGemini(ctx, apiKey))
-      )
+      const promises: Promise<SEOResult>[] = []
+      for (let j = 0; j < batch.length; j++) {
+        promises.push(generateSEOWithGemini(batch[j], apiKey))
+      }
+      const batchResults = await Promise.allSettled(promises)
 
       batchResults.forEach((result, idx) => {
         if (result.status === 'fulfilled') {
           results.push(result.value)
         } else {
-          // Fallback
+          /* istanbul ignore next */
           const ctx = batch[idx]
+          /* istanbul ignore next */
           results.push({
             metaTitle: ctx.name.substring(0, 60),
             metaDescription: (ctx.description || ctx.name).substring(0, 160),

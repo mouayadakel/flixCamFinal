@@ -14,6 +14,14 @@ const config = {
     ],
   },
   coverageProvider: 'v8',
+  coverageThreshold: {
+    'src/lib/services/image-sourcing.service.ts': {
+      branches: 96,
+      functions: 100,
+      lines: 100,
+      statements: 100,
+    },
+  },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },

@@ -22,6 +22,21 @@ import type {
 } from '@/lib/types/reports.types'
 import { BookingStatus, EquipmentCondition } from '@prisma/client'
 
+const ZERO = 0
+
+/** Sum totalAmount from bookings. Exported for testing. */
+export function sumBookingRevenue(bookings: { totalAmount?: number | null }[]): number {
+  return bookings.reduce((s, b) => s + Number(b.totalAmount ?? ZERO), ZERO)
+}
+
+/** Calculate percentage growth; returns 0 when previous is 0 to avoid division by zero. Exported for testing. */
+export function calcGrowthPercent(current: number, previous: number): number {
+  if (previous > 0) {
+    return ((current - previous) / previous) * 100
+  }
+  return ZERO
+}
+
 export class ReportsService {
   /**
    * Generate revenue report
@@ -838,19 +853,12 @@ export class ReportsService {
       }),
     ])
 
-    const revenueToday = todayBookings.reduce((sum, b) => sum + Number(b.totalAmount || 0), 0)
-    const revenueThisWeek = thisWeekBookings.reduce((sum, b) => sum + Number(b.totalAmount || 0), 0)
-    const revenueThisMonth = thisMonthBookings.reduce(
-      (sum, b) => sum + Number(b.totalAmount || 0),
-      0
-    )
-    const revenueThisYear = thisYearBookings.reduce((sum, b) => sum + Number(b.totalAmount || 0), 0)
-    const revenueLastMonth = lastMonthBookings.reduce(
-      (sum, b) => sum + Number(b.totalAmount || 0),
-      0
-    )
-    const revenueGrowth =
-      revenueLastMonth > 0 ? ((revenueThisMonth - revenueLastMonth) / revenueLastMonth) * 100 : 0
+    const revenueToday = sumBookingRevenue(todayBookings)
+    const revenueThisWeek = sumBookingRevenue(thisWeekBookings)
+    const revenueThisMonth = sumBookingRevenue(thisMonthBookings)
+    const revenueThisYear = sumBookingRevenue(thisYearBookings)
+    const revenueLastMonth = sumBookingRevenue(lastMonthBookings)
+    const revenueGrowth = calcGrowthPercent(revenueThisMonth, revenueLastMonth)
 
     // Booking stats
     const [pendingBookings, activeBookings] = await Promise.all([
@@ -861,10 +869,10 @@ export class ReportsService {
     ])
 
     const bookingsLastMonth = lastMonthBookings.length
-    const bookingsGrowth =
-      bookingsLastMonth > 0
-        ? ((thisMonthBookings.length - bookingsLastMonth) / bookingsLastMonth) * 100
-        : 0
+    const bookingsGrowth = calcGrowthPercent(
+      thisMonthBookings.length,
+      bookingsLastMonth
+    )
 
     // Equipment stats (rented = rows where quantityAvailable < quantityTotal; Prisma cannot compare two columns in one count)
     const [equipmentList, totalEquipment, availableEquipment, maintenanceEquipment] =

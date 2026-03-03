@@ -13,7 +13,8 @@ const MESSAGES_DIR = path.resolve(__dirname, '../../messages')
 const SOURCE_LANG = 'en'
 const TARGET_LANGS = ['ar', 'zh', 'fr']
 
-function flattenObject(obj: Record<string, unknown>, prefix = ''): Record<string, string> {
+/** Exported for testing */
+export function flattenObject(obj: Record<string, unknown>, prefix = ''): Record<string, string> {
   const result: Record<string, string> = {}
   for (const [key, value] of Object.entries(obj)) {
     const fullKey = prefix ? `${prefix}.${key}` : key
@@ -26,8 +27,9 @@ function flattenObject(obj: Record<string, unknown>, prefix = ''): Record<string
   return result
 }
 
-function run() {
-  const sourcePath = path.join(MESSAGES_DIR, `${SOURCE_LANG}.json`)
+/** Exported for testing */
+export function run(messagesDir = MESSAGES_DIR) {
+  const sourcePath = path.join(messagesDir, `${SOURCE_LANG}.json`)
   if (!fs.existsSync(sourcePath)) {
     console.error(`Source file not found: ${sourcePath}`)
     process.exit(1)
@@ -42,7 +44,7 @@ function run() {
   console.log(`Source (${SOURCE_LANG}.json): ${sourceKeyCount} keys\n`)
 
   for (const lang of TARGET_LANGS) {
-    const langPath = path.join(MESSAGES_DIR, `${lang}.json`)
+    const langPath = path.join(messagesDir, `${lang}.json`)
     if (!fs.existsSync(langPath)) {
       console.error(`Missing language file: ${langPath}`)
       hasErrors = true
@@ -97,4 +99,6 @@ function run() {
   process.exit(0)
 }
 
-run()
+if (process.env.NODE_ENV !== 'test') {
+  run()
+}

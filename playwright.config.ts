@@ -28,11 +28,17 @@ export default defineConfig({
         { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
         { name: 'webkit', use: { ...devices['Desktop Safari'] } },
       ],
-  webServer: process.env.CI
-    ? undefined
-    : {
-        command: 'npm run dev',
-        url: baseURL,
-        reuseExistingServer: !process.env.CI,
-      },
+  webServer:
+    process.env.CI
+      ? {
+          command: 'npm run build && npm run start',
+          url: baseURL,
+          timeout: 180000,
+          reuseExistingServer: false,
+        }
+      : {
+          command: 'npm run dev',
+          url: baseURL,
+          reuseExistingServer: !process.env.CI,
+        },
 })

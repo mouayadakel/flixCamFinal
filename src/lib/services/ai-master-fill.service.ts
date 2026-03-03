@@ -208,8 +208,12 @@ export async function runMasterFill(productId: string): Promise<AiFillResult> {
       needsAiReview: aiContent._needs_review ?? false,
     }
 
-    if (brand.id) productUpdates.brandId = brand.id
-    if (category.id) productUpdates.categoryId = category.id
+    if (brand.id) {
+      productUpdates.brandId = brand.id
+    }
+    if (category.id) {
+      productUpdates.categoryId = category.id
+    }
 
     if (!product.boxContents && aiContent.box_contents) {
       productUpdates.boxContents = aiContent.box_contents

@@ -45,6 +45,13 @@ export class AIService {
     return process.env.GEMINI_API_KEY ?? process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? null
   }
 
+  /** Format error for logging (covers both Error and non-Error throws). Exported for testing. */
+  static formatErrorForLog(error: unknown): { error: string; stack?: string } {
+    const msg = error instanceof Error ? error.message : String(error)
+    const stack = error instanceof Error ? error.stack?.split('\n')[1] : undefined
+    return { error: msg, stack }
+  }
+
   /**
    * Generate plain text from a single prompt (e.g. for comparison summaries).
    * Uses OpenAI when available; throws if no API key.
@@ -64,6 +71,37 @@ export class AIService {
       temperature: options?.temperature ?? 0.4,
     })
     return completion.choices[0]?.message?.content?.trim() ?? ''
+  }
+
+  /** Exported for testing. Maps booking stats to customer history rating. */
+  static determineCustomerHistory(
+    completedBookings: number,
+    totalBookings: number,
+    cancelledBookings: number
+  ): 'excellent' | 'good' | 'fair' | 'poor' | 'new' {
+    if (totalBookings === 0) return 'new'
+    if (completedBookings / totalBookings >= 0.9 && cancelledBookings === 0) return 'excellent'
+    if (completedBookings / totalBookings >= 0.7 && cancelledBookings <= 1) return 'good'
+    if (completedBookings / totalBookings >= 0.5) return 'fair'
+    return 'poor'
+  }
+
+  /** Exported for testing. Parses Prisma Decimal or number to number. */
+  static parseDailyPrice(
+    raw: number | { toNumber?: () => number } | null | undefined
+  ): number {
+    if (typeof raw === 'object' && raw != null && 'toNumber' in raw) {
+      return (raw as { toNumber: () => number }).toNumber()
+    }
+    return Number(raw ?? 0)
+  }
+
+  /** Exported for testing. Returns rental duration risk points (0, 3, 8, or 15). */
+  static getRentalDurationRisk(rentalDuration: number): number {
+    if (rentalDuration > 30) return 15
+    if (rentalDuration > 14) return 8
+    if (rentalDuration > 7) return 3
+    return 0
   }
 
   /**
@@ -99,18 +137,11 @@ export class AIService {
       cancelledBookings = bookings.filter((b) => b.status === 'CANCELLED').length
       totalSpent = bookings.reduce((sum, b) => sum + Number(b.totalAmount || 0), 0)
 
-      // Determine history rating
-      if (totalBookings === 0) {
-        customerHistory = 'new'
-      } else if (completedBookings / totalBookings >= 0.9 && cancelledBookings === 0) {
-        customerHistory = 'excellent'
-      } else if (completedBookings / totalBookings >= 0.7 && cancelledBookings <= 1) {
-        customerHistory = 'good'
-      } else if (completedBookings / totalBookings >= 0.5) {
-        customerHistory = 'fair'
-      } else {
-        customerHistory = 'poor'
-      }
+      customerHistory = this.determineCustomerHistory(
+        completedBookings,
+        totalBookings,
+        cancelledBookings
+      )
     }
 
     // Calculate risk score (0-100)
@@ -127,13 +158,7 @@ export class AIService {
     riskScore += historyFactors[customerHistory] || 0
 
     // Factor 2: Rental duration (0-20 points)
-    if (input.rentalDuration > 30) {
-      riskScore += 15 // Long rentals are riskier
-    } else if (input.rentalDuration > 14) {
-      riskScore += 8
-    } else if (input.rentalDuration > 7) {
-      riskScore += 3
-    }
+    riskScore += this.getRentalDurationRisk(input.rentalDuration)
 
     // Factor 3: Total value (0-25 points)
     if (input.totalValue > 100000) {
@@ -244,10 +269,7 @@ export class AIService {
         })
         narrativeSummaryAr = res.choices[0]?.message?.content?.trim() ?? undefined
       } catch (error) {
-        console.error('[ai.service] assessRisk narrativeSummaryAr OpenAI failed:', {
-          error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
-        })
+        console.error('[ai.service] assessRisk narrativeSummaryAr OpenAI failed:', this.formatErrorForLog(error))
         // keep undefined
       }
     }
@@ -258,10 +280,7 @@ export class AIService {
         const result = await model.generateContent(llmPrompt)
         narrativeSummaryAr = result.response.text()?.trim() ?? undefined
       } catch (error) {
-        console.error('[ai.service] assessRisk narrativeSummaryAr Gemini failed:', {
-          error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
-        })
+        console.error('[ai.service] assessRisk narrativeSummaryAr Gemini failed:', this.formatErrorForLog(error))
         // keep undefined
       }
     }
@@ -362,10 +381,7 @@ export class AIService {
       })
       return res.data[0]?.embedding ?? null
     } catch (error) {
-      console.error('[ai.service] getEmbedding failed:', {
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
-      })
+      console.error('[ai.service] getEmbedding failed:', this.formatErrorForLog(error))
       return null
     }
   }
@@ -426,10 +442,7 @@ export class AIService {
           while (altEmbeddings.length < alternatives.length) altEmbeddings.push(null)
         }
       } catch (error) {
-        console.error('[ai.service] recommendAlternatives embeddings batch failed:', {
-          error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
-        })
+        console.error('[ai.service] recommendAlternatives embeddings batch failed:', this.formatErrorForLog(error))
         altEmbeddings = alternatives.map(() => null)
       }
     } else {
@@ -707,10 +720,7 @@ export class AIService {
       try {
         shootTypeConfig = await ShootTypeService.getById(id)
       } catch (error) {
-        console.error('[ai.service] buildKit ShootTypeService.getById failed:', {
-          error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
-        })
+        console.error('[ai.service] buildKit ShootTypeService.getById failed:', this.formatErrorForLog(error))
         shootTypeConfig = null
       }
     }
@@ -744,11 +754,7 @@ export class AIService {
         questionnaire['crew_size'] === 'large' || questionnaire['crew_size'] === '4+'
 
       let equipment: KitEquipment[] = recs.map((r) => {
-        const raw = r.equipment.dailyPrice
-        const dailyPrice =
-          typeof raw === 'object' && raw != null && 'toNumber' in raw
-            ? (raw as { toNumber: () => number }).toNumber()
-            : Number(raw)
+        const dailyPrice = this.parseDailyPrice(r.equipment.dailyPrice)
         let reason = r.reason ?? `Recommended for ${shootTypeConfig!.name}`
         if (isOutdoor && reason.toLowerCase().includes('light')) {
           reason = `${reason} Portable and ideal for outdoor use.`
@@ -792,10 +798,7 @@ export class AIService {
               enhanced = true
             }
           } catch (error) {
-            console.error('[ai.service] buildKit Gemini kit reasons failed:', {
-              error: error instanceof Error ? error.message : String(error),
-              stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
-            })
+            console.error('[ai.service] buildKit Gemini kit reasons failed:', this.formatErrorForLog(error))
             // fall through to OpenAI or rule-based
           }
         }
@@ -815,10 +818,7 @@ export class AIService {
                 equipment = equipment.map((e, i) => ({ ...e, reason: arr[i] ?? e.reason }))
               }
             } catch (error) {
-              console.error('[ai.service] buildKit OpenAI kit reasons failed:', {
-                error: error instanceof Error ? error.message : String(error),
-                stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
-              })
+              console.error('[ai.service] buildKit OpenAI kit reasons failed:', this.formatErrorForLog(error))
               // keep rule-based reasons
             }
           }
@@ -895,10 +895,7 @@ Equipment list (id, sku, category, dailyPrice): ${JSON.stringify(equipmentListFo
           }
         }
       } catch (error) {
-        console.error('[ai.service] buildKit OpenAI kit selection failed:', {
-          error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
-        })
+        console.error('[ai.service] buildKit OpenAI kit selection failed:', this.formatErrorForLog(error))
         // fall through to rule-based
       }
     }
@@ -921,10 +918,7 @@ Equipment list (id, sku, category, dailyPrice): ${JSON.stringify(equipmentListFo
           }
         }
       } catch (error) {
-        console.error('[ai.service] buildKit Gemini kit selection failed:', {
-          error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
-        })
+        console.error('[ai.service] buildKit Gemini kit selection failed:', this.formatErrorForLog(error))
         // fall through
       }
     }
@@ -1134,10 +1128,7 @@ Write exactly 3 short sentences in English: (1) why this utilization/demand supp
         })
         rationale = res.choices[0]?.message?.content?.trim() ?? undefined
       } catch (error) {
-        console.error('[ai.service] suggestPricing OpenAI rationale failed:', {
-          error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
-        })
+        console.error('[ai.service] suggestPricing OpenAI rationale failed:', this.formatErrorForLog(error))
         // keep undefined
       }
     }
@@ -1148,10 +1139,7 @@ Write exactly 3 short sentences in English: (1) why this utilization/demand supp
         const result = await model.generateContent(llmPrompt)
         rationale = result.response.text()?.trim() ?? undefined
       } catch (error) {
-        console.error('[ai.service] suggestPricing Gemini rationale failed:', {
-          error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
-        })
+        console.error('[ai.service] suggestPricing Gemini rationale failed:', this.formatErrorForLog(error))
         // keep undefined
       }
     }
@@ -1264,10 +1252,7 @@ Write exactly 3 short sentences in English: (1) why this utilization/demand supp
             }
           }
         } catch (error) {
-          console.error('[ai.service] forecastDemand weekly projection failed:', {
-            error: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
-          })
+          console.error('[ai.service] forecastDemand weekly projection failed:', this.formatErrorForLog(error))
           // keep undefined
         }
       }
@@ -1560,10 +1545,7 @@ ${pageText.slice(0, 18_000)}
           }
         }
       } catch (error) {
-        console.error('[ai.service] extractSpecificationsFromProductPage Gemini failed:', {
-          error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack?.split('\n')[1] : undefined,
-        })
+        console.error('[ai.service] extractSpecificationsFromProductPage Gemini failed:', this.formatErrorForLog(error))
         // fall through to OpenAI
       }
     }

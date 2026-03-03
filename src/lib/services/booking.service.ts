@@ -78,9 +78,9 @@ export interface RiskCheckResult {
 }
 
 export class BookingService {
-  // State machine transitions
+  // State machine transitions (DRAFT→PAYMENT_PENDING for low-risk auto-approve)
   private static readonly VALID_TRANSITIONS: Record<BookingStatus, BookingStatus[]> = {
-    DRAFT: ['RISK_CHECK', 'CANCELLED'],
+    DRAFT: ['RISK_CHECK', 'PAYMENT_PENDING', 'CANCELLED'],
     RISK_CHECK: ['PAYMENT_PENDING', 'CANCELLED'],
     PAYMENT_PENDING: ['CONFIRMED', 'CANCELLED'],
     CONFIRMED: ['ACTIVE', 'CANCELLED'],
@@ -489,12 +489,7 @@ export class BookingService {
       }
     }
 
-    if (newStatus === BookingStatus.ACTIVE) {
-      // Must be CONFIRMED
-      if (booking.status !== BookingStatus.CONFIRMED) {
-        throw new ValidationError('Booking must be CONFIRMED before becoming ACTIVE')
-      }
-    }
+    // ACTIVE only reachable from CONFIRMED (enforced by VALID_TRANSITIONS)
 
     // Update status
     const updated = await prisma.booking.update({

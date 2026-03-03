@@ -1,5 +1,13 @@
 /**
- * Unit tests for late fee calculation (Phase 8.1).
+ * ═══════════════════════════════════════════════════════
+ * FILE: src/lib/utils/late-fee.utils.ts
+ * FEATURE: Late return fees
+ * UNITS: computeLateFee
+ * ═══════════════════════════════════════════════════════
+ *
+ * REQUIREMENTS:
+ *   - Returns 0 when returnDate <= endDate.
+ *   - Otherwise: 1.5 × (sum of quantity × dailyRate per item) × lateDays (full days after endDate).
  */
 
 import { computeLateFee } from '../late-fee.utils'

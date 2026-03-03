@@ -1,5 +1,13 @@
 /**
- * Unit tests for WhatsApp URL helper (Phase 8.1).
+ * ═══════════════════════════════════════════════════════
+ * FILE: src/lib/utils/whatsapp-context.ts
+ * FEATURE: WhatsApp deep links
+ * UNITS: getWhatsAppUrl
+ * ═══════════════════════════════════════════════════════
+ *
+ * REQUIREMENTS:
+ *   - Returns https://wa.me/{number} with number optional; strips non-digits.
+ *   - Optional message appended as encoded text= query param; message trimmed.
  */
 
 import { getWhatsAppUrl } from '../whatsapp-context'

@@ -2,6 +2,7 @@
  * Public website footer – CMS-driven when data exists and enabled; otherwise static fallback.
  */
 
+/* eslint-disable react-hooks/static-components -- Dynamic icons from getFooterIcon are resolved at render; pattern is intentional for CMS-driven footer */
 'use client'
 
 import { useState, useEffect } from 'react'

@@ -10,7 +10,6 @@ export class CircuitOpenError extends Error {
     message?: string
   ) {
     super(message ?? `Circuit open for provider: ${provider}`)
-    super(message)
     this.name = 'CircuitOpenError'
   }
 }

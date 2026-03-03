@@ -13,8 +13,9 @@ const DAYS_PER_MONTH = 30
 /**
  * Calculates the best rental price using daily/weekly/monthly rates.
  * Returns { effectiveTotal, appliedRate } where appliedRate indicates which tier was used.
+ * @internal Exported for unit testing
  */
-function calculateBestRate(
+export function calculateBestRate(
   days: number,
   quantity: number,
   dailyPrice: number,

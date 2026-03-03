@@ -100,7 +100,7 @@ export async function embedProduct(productId: string): Promise<number[] | null> 
       category: { select: { name: true } },
       translations: {
         where: { locale: 'en', deletedAt: null },
-        select: { name: true, shortDescription: true },
+        select: { name: true, shortDescription: true, specifications: true },
         take: 1,
       },
     },
@@ -115,6 +115,7 @@ export async function embedProduct(productId: string): Promise<number[] | null> 
     category: product.category?.name,
     description: trans?.shortDescription || undefined,
     tags: product.tags || undefined,
+    specs: (trans as { specifications?: Record<string, unknown> })?.specifications ?? undefined,
   })
 
   const embedding = await generateEmbedding(text)
@@ -148,7 +149,7 @@ export async function findSimilarProducts(
     include: {
       translations: {
         where: { locale: 'en', deletedAt: null },
-        select: { name: true, shortDescription: true },
+        select: { name: true, shortDescription: true, specifications: true },
         take: 1,
       },
       brand: { select: { name: true } },
@@ -169,6 +170,7 @@ export async function findSimilarProducts(
         category: p.category?.name,
         description: trans?.shortDescription || undefined,
         tags: p.tags || undefined,
+        specs: (trans as { specifications?: Record<string, unknown> })?.specifications ?? undefined,
       })
       embedding = (await generateEmbedding(text)) ?? undefined
       if (embedding) embeddingCache.set(p.id, embedding)

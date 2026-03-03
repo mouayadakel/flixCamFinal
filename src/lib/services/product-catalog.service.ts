@@ -104,13 +104,6 @@ function enforceStatusRules(
     return ProductStatus.DRAFT
   }
 
-  // If requested Active/Hidden but invalid pricing, block
-  if ((status === ProductStatus.ACTIVE || status === ProductStatus.HIDDEN) && daily <= 0) {
-    throw new ValidationError('Daily price must be greater than 0 to activate', {
-      priceDaily: ['Daily price must be > 0 to set Active/Hidden'],
-    })
-  }
-
   return status ?? ProductStatus.DRAFT
 }
 

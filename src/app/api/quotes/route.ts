@@ -115,11 +115,14 @@ export async function POST(req: NextRequest) {
 
     const quote = await QuoteService.create(validated, userId, auditContext)
 
-    return NextResponse.json({
-      success: true,
-      data: quote,
-      message: 'تم إنشاء العرض بنجاح',
-    })
+    return NextResponse.json(
+      {
+        success: true,
+        data: quote,
+        message: 'تم إنشاء العرض بنجاح',
+      },
+      { status: 201 }
+    )
   } catch (error: any) {
     if (error instanceof ValidationError) {
       return NextResponse.json({ error: error.message }, { status: 400 })

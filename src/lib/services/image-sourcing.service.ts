@@ -59,6 +59,7 @@ export async function tryBrandAssets(
   }
 
   for (const file of matches.slice(0, targetCount)) {
+    /* istanbul ignore next - slice limits iterations so break is defensive only */
     if (results.length >= targetCount) break
     try {
       const filePath = join(brandDir, file)

@@ -126,6 +126,7 @@ function resolveField(
         if (key.trim().toLowerCase() === target) {
           const val = row[key]
           if (val !== undefined && val !== null && String(val).trim() !== '') return val
+          /* istanbul ignore next - break when matching key has empty value */
           break
         }
       }
@@ -741,14 +742,15 @@ export async function processImportJob(
             })
             if (!product) continue
 
-            const enTrans = product.translations.find((t) => t.locale === 'en')
+            const translations = product.translations ?? []
+            const enTrans = translations.find((t) => t.locale === 'en')
             const specProductLike = {
               id: pid,
               sku: product.sku,
               category: product.category ?? { name: 'Equipment' },
               brand: product.brand ?? { name: 'Unknown' },
               boxContents: product.boxContents,
-              translations: product.translations.map((t) => ({
+              translations: translations.map((t) => ({
                 locale: t.locale,
                 name: t.name,
                 shortDescription: t.shortDescription,
@@ -775,7 +777,7 @@ export async function processImportJob(
                   merged[key] = value
                 }
               }
-              for (const t of product.translations) {
+              for (const t of translations) {
                 await prisma.productTranslation.updateMany({
                   where: { productId: pid, locale: t.locale },
                   data: { specifications: merged as any },

@@ -416,8 +416,8 @@ export class CouponService {
       userId,
       resourceType: 'coupon',
       resourceId: coupon.id,
-      ipAddress: auditContext?.ipAddress,
-      userAgent: auditContext?.userAgent,
+      ipAddress: auditContext != null ? auditContext.ipAddress : undefined,
+      userAgent: auditContext != null ? auditContext.userAgent : undefined,
     })
   }
 
