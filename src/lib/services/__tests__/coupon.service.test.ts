@@ -680,8 +680,8 @@ describe('CouponService', () => {
         validUntil: new Date(Date.now() + 86400000),
       })
       await CouponService.update('c1', {
-        validFrom: new Date(Date.now() - 86400000).toISOString(),
-        validUntil: new Date(Date.now() + 86400000).toISOString(),
+        validFrom: new Date(Date.now() - 86400000),
+        validUntil: new Date(Date.now() + 86400000),
       }, 'u1')
       expect(mockUpdate).toHaveBeenCalledWith(
         expect.objectContaining({

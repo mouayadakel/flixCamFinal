@@ -35,7 +35,11 @@ describe('handleApiError', () => {
   const originalEnv = process.env.NODE_ENV
 
   afterEach(() => {
-    process.env.NODE_ENV = originalEnv
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: originalEnv,
+      writable: true,
+      configurable: true,
+    })
     jest.restoreAllMocks()
   })
 
@@ -45,7 +49,7 @@ describe('handleApiError', () => {
       const error = new AppError('Custom message', 418, 'CUSTOM_CODE')
 
       // Act
-      const response = handleApiError(error) as { body: { error: string }; status: number }
+      const response = handleApiError(error) as unknown as { body: { error: string }; status: number }
 
       // Assert
       expect(response.status).toBe(418)
@@ -57,7 +61,7 @@ describe('handleApiError', () => {
       const error = new ValidationError('Invalid input', { email: ['Required'] })
 
       // Act
-      const response = handleApiError(error) as { body: { error: string }; status: number }
+      const response = handleApiError(error) as unknown as { body: { error: string }; status: number }
 
       // Assert
       expect(response.status).toBe(400)
@@ -69,7 +73,7 @@ describe('handleApiError', () => {
       const error = new NotFoundError('Booking', 'bk_123')
 
       // Act
-      const response = handleApiError(error) as { body: { error: string }; status: number }
+      const response = handleApiError(error) as unknown as { body: { error: string }; status: number }
 
       // Assert
       expect(response.status).toBe(404)
@@ -81,11 +85,11 @@ describe('handleApiError', () => {
     it('returns 400 with validation failed and details when error is ZodError', () => {
       // Arrange
       const error = new z.ZodError([
-        { path: ['email'], message: 'Invalid email', code: 'invalid_string' },
+        { path: ['email'], message: 'Invalid email', code: 'invalid_string', validation: 'email' },
       ])
 
       // Act
-      const response = handleApiError(error) as {
+      const response = handleApiError(error) as unknown as {
         body: { error: string; details: unknown }
         status: number
       }
@@ -101,11 +105,11 @@ describe('handleApiError', () => {
   describe('production mode', () => {
     it('returns 500 with generic message when in production and error is generic Error', () => {
       // Arrange
-      process.env.NODE_ENV = 'production'
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true })
       const error = new Error('Sensitive stack trace')
 
       // Act
-      const response = handleApiError(error) as { body: { error: string }; status: number }
+      const response = handleApiError(error) as unknown as { body: { error: string }; status: number }
 
       // Assert
       expect(response.status).toBe(500)
@@ -114,10 +118,10 @@ describe('handleApiError', () => {
 
     it('returns 500 with generic message when in production and error is unknown', () => {
       // Arrange
-      process.env.NODE_ENV = 'production'
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true })
 
       // Act
-      const response = handleApiError('string throw') as { body: { error: string }; status: number }
+      const response = handleApiError('string throw') as unknown as { body: { error: string }; status: number }
 
       // Assert
       expect(response.status).toBe(500)
@@ -128,12 +132,12 @@ describe('handleApiError', () => {
   describe('non-production mode', () => {
     it('returns 500 with error message when error is Error and not production', () => {
       // Arrange
-      process.env.NODE_ENV = 'development'
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true })
       const error = new Error('Database connection failed')
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
 
       // Act
-      const response = handleApiError(error) as { body: { error: string }; status: number }
+      const response = handleApiError(error) as unknown as { body: { error: string }; status: number }
 
       // Assert
       expect(response.status).toBe(500)
@@ -144,10 +148,10 @@ describe('handleApiError', () => {
 
     it('returns 500 with Unknown error when error is not Error instance and not production', () => {
       // Arrange
-      process.env.NODE_ENV = 'development'
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true })
 
       // Act
-      const response = handleApiError(42) as { body: { error: string }; status: number }
+      const response = handleApiError(42) as unknown as { body: { error: string }; status: number }
 
       // Assert
       expect(response.status).toBe(500)

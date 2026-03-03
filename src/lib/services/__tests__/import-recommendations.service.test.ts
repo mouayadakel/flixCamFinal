@@ -13,7 +13,6 @@ jest.mock('@/lib/db/prisma', () => ({
     },
     productTranslation: { findMany: jest.fn() },
     brand: { findMany: jest.fn() },
-    importRun: { findFirst: jest.fn() },
     importJob: { findFirst: jest.fn() },
   },
 }))
@@ -21,7 +20,7 @@ jest.mock('@/lib/db/prisma', () => ({
 const mockCount = prisma.product.count as jest.Mock
 const mockFindMany = prisma.product.findMany as jest.Mock
 const mockGroupBy = prisma.product.groupBy as jest.Mock
-const mockImportFindFirst = prisma.importRun.findFirst as jest.Mock
+const mockImportFindFirst = prisma.importJob.findFirst as jest.Mock
 
 describe('import-recommendations.service', () => {
   beforeEach(() => {

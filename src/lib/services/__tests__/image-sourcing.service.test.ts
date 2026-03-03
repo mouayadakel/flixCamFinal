@@ -1372,13 +1372,13 @@ describe('image-sourcing.service', () => {
                   },
                 ],
               }),
-          }) as Promise<Response>
+          }) as unknown as Promise<Response>
         }
         return Promise.resolve({
           ok: true,
           arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
           headers: { get: () => 'image/jpeg' },
-        }) as Promise<Response>
+        }) as unknown as Promise<Response>
       })
       mockGenerateContent.mockResolvedValue({
         response: { text: () => '{"score": 0.8, "description": "OK"}' },
@@ -1416,9 +1416,9 @@ describe('image-sourcing.service', () => {
                   },
                 ],
               }),
-          }) as Promise<Response>
+          }) as unknown as Promise<Response>
         }
-        return Promise.resolve(imageFetchResponse) as Promise<Response>
+        return Promise.resolve(imageFetchResponse) as unknown as Promise<Response>
       })
       mockGenerateContent.mockResolvedValue({
         response: { text: () => '{"score": 0.8, "description": "OK"}' },

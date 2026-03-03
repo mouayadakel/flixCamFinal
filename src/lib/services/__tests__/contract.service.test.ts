@@ -342,7 +342,7 @@ describe('ContractService', () => {
     it('throws ForbiddenError when user lacks permission', async () => {
       hasPermission.mockResolvedValue(false)
       await expect(
-        ContractService.update('ctr_1', { notes: 'Updated' }, 'usr_01HX4K2M8P')
+        ContractService.update('ctr_1', { termsVersion: '1.0.1' }, 'usr_01HX4K2M8P')
       ).rejects.toThrow(ForbiddenError)
     })
 

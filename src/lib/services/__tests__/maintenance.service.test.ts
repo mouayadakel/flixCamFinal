@@ -49,6 +49,7 @@ describe('MaintenanceService', () => {
         {
           equipmentId: 'eq1',
           type: 'preventive',
+          priority: 'medium',
           scheduledDate: new Date(),
           description: 'Routine',
           notes: 'Routine',
@@ -63,7 +64,7 @@ describe('MaintenanceService', () => {
       mockHasPermission.mockResolvedValue(false)
       await expect(
         MaintenanceService.create(
-          { equipmentId: 'eq1', type: 'preventive', scheduledDate: new Date(), description: 'x' },
+          { equipmentId: 'eq1', type: 'preventive', priority: 'medium', scheduledDate: new Date(), description: 'x' },
           'u1'
         )
       ).rejects.toThrow('You do not have permission to create maintenance')
@@ -83,7 +84,7 @@ describe('MaintenanceService', () => {
         status: 'SCHEDULED',
       })
       const result = await MaintenanceService.create(
-        { equipmentId: 'eq1', type: 'preventive', scheduledDate: new Date(), description: 'x' },
+        { equipmentId: 'eq1', type: 'preventive', priority: 'medium', scheduledDate: new Date(), description: 'x' },
         'u1'
       )
       expect(result).toMatchObject({ id: 'm1' })
@@ -92,7 +93,7 @@ describe('MaintenanceService', () => {
     it('updates equipment condition when not already MAINTENANCE', async () => {
       mockEquipmentFindFirst.mockResolvedValue({ id: 'eq1', condition: 'GOOD' })
       await MaintenanceService.create(
-        { equipmentId: 'eq1', type: 'corrective', scheduledDate: new Date(), description: 'x' },
+        { equipmentId: 'eq1', type: 'corrective', priority: 'medium', scheduledDate: new Date(), description: 'x' },
         'u1'
       )
       expect(mockEquipmentUpdate).toHaveBeenCalledWith(
@@ -102,7 +103,7 @@ describe('MaintenanceService', () => {
 
     it('maps corrective type to CORRECTIVE', async () => {
       await MaintenanceService.create(
-        { equipmentId: 'eq1', type: 'corrective', scheduledDate: new Date(), description: 'x' },
+        { equipmentId: 'eq1', type: 'corrective', priority: 'medium', scheduledDate: new Date(), description: 'x' },
         'u1'
       )
       expect(mockCreate).toHaveBeenCalledWith(
@@ -114,7 +115,7 @@ describe('MaintenanceService', () => {
 
     it('maps inspection and repair types', async () => {
       await MaintenanceService.create(
-        { equipmentId: 'eq1', type: 'inspection', scheduledDate: new Date(), description: 'x' },
+        { equipmentId: 'eq1', type: 'inspection', priority: 'medium', scheduledDate: new Date(), description: 'x' },
         'u1'
       )
       expect(mockCreate).toHaveBeenCalledWith(
@@ -130,6 +131,7 @@ describe('MaintenanceService', () => {
         {
           equipmentId: 'eq1',
           type: 'preventive',
+          priority: 'medium',
           scheduledDate: new Date(),
           description: 'x',
           technicianId: 'tech1',
@@ -148,6 +150,7 @@ describe('MaintenanceService', () => {
           {
             equipmentId: 'eq1',
             type: 'preventive',
+            priority: 'medium',
             scheduledDate: new Date(),
             description: 'x',
             technicianId: 'tech_invalid',
@@ -161,7 +164,7 @@ describe('MaintenanceService', () => {
       mockEquipmentFindFirst.mockResolvedValue(null)
       await expect(
         MaintenanceService.create(
-          { equipmentId: 'eq_nonexistent', type: 'preventive', scheduledDate: new Date(), description: 'x' },
+          { equipmentId: 'eq_nonexistent', type: 'preventive', priority: 'medium', scheduledDate: new Date(), description: 'x' },
           'u1'
         )
       ).rejects.toThrow('Equipment')

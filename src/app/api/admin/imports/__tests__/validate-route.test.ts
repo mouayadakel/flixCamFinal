@@ -14,6 +14,7 @@ jest.mock('@/lib/services/import-validation.service', () => ({
   validateImportRows: jest.fn(),
 }))
 
+import type { NextRequest } from 'next/server'
 import { auth } from '@/lib/auth'
 import { validateImportRows } from '@/lib/services/import-validation.service'
 import { POST } from '@/app/api/admin/imports/validate/route'
@@ -37,7 +38,7 @@ describe('POST /api/admin/imports/validate', () => {
   it('returns 401 when not authenticated', async () => {
     mockAuth.mockResolvedValue(null)
     const req = createRequest({ rows: [] })
-    const res = await POST(req)
+    const res = await POST(req as unknown as NextRequest)
     expect(res.status).toBe(401)
     const data = await res.json()
     expect(data.error).toBe('Unauthorized')
@@ -47,7 +48,7 @@ describe('POST /api/admin/imports/validate', () => {
   it('returns 400 when rows is missing', async () => {
     mockAuth.mockResolvedValue({ user: { id: 'user-1' } })
     const req = createRequest({})
-    const res = await POST(req)
+    const res = await POST(req as unknown as NextRequest)
     expect(res.status).toBe(400)
     const data = await res.json()
     expect(data.error).toContain('rows array')
@@ -57,7 +58,7 @@ describe('POST /api/admin/imports/validate', () => {
   it('returns 400 when rows is not array', async () => {
     mockAuth.mockResolvedValue({ user: { id: 'user-1' } })
     const req = createRequest({ rows: 'invalid' })
-    const res = await POST(req)
+    const res = await POST(req as unknown as NextRequest)
     expect(res.status).toBe(400)
     expect(mockValidateImportRows).not.toHaveBeenCalled()
   })
@@ -70,7 +71,7 @@ describe('POST /api/admin/imports/validate', () => {
       warnings: [],
     })
     const req = createRequest({ rows: [{ name: 'Product 1', sku: 'SKU-1' }] })
-    const res = await POST(req)
+    const res = await POST(req as unknown as NextRequest)
     expect(res.status).toBe(200)
     const data = await res.json()
     expect(data.valid).toBe(true)

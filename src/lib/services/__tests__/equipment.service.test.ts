@@ -814,8 +814,8 @@ describe('EquipmentService', () => {
       )
       expect(result.available).toBe(false)
       expect(result.reason).toBe('MAINTENANCE')
-      expect(result.maintenanceConflicts).toHaveLength(1)
-      expect(result.maintenanceConflicts[0]).toMatchObject({ maintenanceNumber: 'M001' })
+      expect(result.maintenanceConflicts ?? []).toHaveLength(1)
+      expect((result.maintenanceConflicts ?? [])[0]).toMatchObject({ maintenanceNumber: 'M001' })
     })
 
     it('returns available with overlappingBookings when qty sufficient', async () => {
@@ -844,8 +844,8 @@ describe('EquipmentService', () => {
       expect(result.available).toBe(true)
       expect(result.availableQuantity).toBe(5)
       expect(result.rentedQuantity).toBe(2)
-      expect(result.overlappingBookings).toHaveLength(1)
-      expect(result.overlappingBookings[0]).toMatchObject({
+      expect(result.overlappingBookings ?? []).toHaveLength(1)
+      expect((result.overlappingBookings ?? [])[0]).toMatchObject({
         bookingNumber: 'BK-001',
         quantity: 2,
       })

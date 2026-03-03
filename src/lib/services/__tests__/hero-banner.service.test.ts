@@ -164,7 +164,7 @@ describe('HeroBannerService', () => {
     it('throws ValidationError when pageSlug already exists', async () => {
       mockBannerFindFirst.mockResolvedValue({ id: 'existing', pageSlug: 'home' })
       await expect(
-        HeroBannerService.createBanner({ name: 'New', pageSlug: 'home' }, 'u1')
+        HeroBannerService.createBanner({ name: 'New', pageSlug: 'home', isActive: true, autoPlay: true, autoPlayInterval: 6000, transitionType: 'fade' }, 'u1')
       ).rejects.toThrow('already exists')
     })
 
@@ -187,7 +187,7 @@ describe('HeroBannerService', () => {
         transitionType: 'fade',
         slides: [],
       })
-      const result = await HeroBannerService.createBanner({ name: 'New', pageSlug: 'home' }, 'u1')
+      const result = await HeroBannerService.createBanner({ name: 'New', pageSlug: 'home', isActive: true, autoPlay: true, autoPlayInterval: 6000, transitionType: 'fade' }, 'u1')
       expect(result.id).toBe('b1')
       expect(mockBannerCreate).toHaveBeenCalled()
     })
@@ -310,6 +310,11 @@ describe('HeroBannerService', () => {
           imageUrl: 'https://example.com/img.jpg',
           titleAr: 'عربي',
           titleEn: 'English',
+          isActive: true,
+          order: 0,
+          ctaStyle: 'primary',
+          overlayOpacity: 0.3,
+          textPosition: 'start',
         }, 'u1')
       ).rejects.toThrow('Hero banner')
     })
@@ -319,11 +324,16 @@ describe('HeroBannerService', () => {
         .mockResolvedValueOnce({ id: 'b1', pageSlug: 'home' })
         .mockResolvedValueOnce({ id: 'b1', name: 'B', pageSlug: 'home', autoPlay: true, autoPlayInterval: 6000, transitionType: 'fade', slides: [] })
       mockSlideAggregate.mockResolvedValue({ _max: { order: null } })
-      mockSlideCreate.mockResolvedValue({ id: 's1', ...baseSlide, order: 0 })
+      mockSlideCreate.mockResolvedValue({ ...baseSlide, id: 's1', order: 0 })
       const result = await HeroBannerService.createSlide('b1', {
         imageUrl: 'https://example.com/img.jpg',
         titleAr: 'عربي',
         titleEn: 'English',
+        isActive: true,
+        order: 0,
+        ctaStyle: 'primary',
+        overlayOpacity: 0.3,
+        textPosition: 'start',
       }, 'u1')
       expect(result.id).toBe('b1')
       expect(mockSlideCreate).toHaveBeenCalledWith(
@@ -338,11 +348,16 @@ describe('HeroBannerService', () => {
         .mockResolvedValueOnce({ id: 'b1', pageSlug: 'home' })
         .mockResolvedValueOnce({ id: 'b1', name: 'B', pageSlug: 'home', autoPlay: true, autoPlayInterval: 6000, transitionType: 'fade', slides: [{ ...baseSlide }] })
       mockSlideAggregate.mockResolvedValue({ _max: { order: 0 } })
-      mockSlideCreate.mockResolvedValue({ id: 's1', ...baseSlide })
+      mockSlideCreate.mockResolvedValue({ ...baseSlide, id: 's1' })
       const result = await HeroBannerService.createSlide('b1', {
         imageUrl: 'https://example.com/img.jpg',
         titleAr: 'عربي',
         titleEn: 'English',
+        isActive: true,
+        order: 0,
+        ctaStyle: 'primary',
+        overlayOpacity: 0.3,
+        textPosition: 'start',
       }, 'u1')
       expect(result.id).toBe('b1')
       expect(mockSlideCreate).toHaveBeenCalled()
@@ -374,7 +389,7 @@ describe('HeroBannerService', () => {
           }],
         })
       mockSlideAggregate.mockResolvedValue({ _max: { order: 2 } })
-      mockSlideCreate.mockResolvedValue({ id: 's2', ...baseSlide })
+      mockSlideCreate.mockResolvedValue({ ...baseSlide, id: 's2' })
       const result = await HeroBannerService.createSlide('b1', {
         imageUrl: 'https://example.com/img.jpg',
         mobileImageUrl: 'https://example.com/mobile.jpg',
@@ -383,6 +398,8 @@ describe('HeroBannerService', () => {
         titleEn: 'English',
         titleZh: '中文',
         subtitleAr: 'فرعي',
+        isActive: true,
+        order: 0,
         ctaStyle: 'secondary',
         cta2Style: 'outline',
         overlayOpacity: 0.5,
@@ -418,10 +435,10 @@ describe('HeroBannerService', () => {
 
     it('updates slide', async () => {
       ;(prisma.heroSlide.findFirst as jest.Mock).mockResolvedValue({
+        ...baseSlide,
         id: 's1',
         bannerId: 'b1',
         banner: { id: 'b1', pageSlug: 'home', deletedAt: null },
-        ...baseSlide,
       })
       mockBannerFindFirst.mockResolvedValue({
         id: 'b1',
@@ -439,10 +456,10 @@ describe('HeroBannerService', () => {
 
     it('throws NotFoundError when slide banner is deleted', async () => {
       ;(prisma.heroSlide.findFirst as jest.Mock).mockResolvedValue({
+        ...baseSlide,
         id: 's1',
         bannerId: 'b1',
         banner: { id: 'b1', pageSlug: 'home', deletedAt: new Date() },
-        ...baseSlide,
       })
       await expect(
         HeroBannerService.updateSlide('s1', { titleEn: 'Updated' }, 'u1')
@@ -451,10 +468,10 @@ describe('HeroBannerService', () => {
 
     it('updates slide with multiple optional fields', async () => {
       ;(prisma.heroSlide.findFirst as jest.Mock).mockResolvedValue({
+        ...baseSlide,
         id: 's1',
         bannerId: 'b1',
         banner: { id: 'b1', pageSlug: 'home', deletedAt: null },
-        ...baseSlide,
       })
       mockBannerFindFirst.mockResolvedValue({
         id: 'b1',

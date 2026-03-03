@@ -498,7 +498,7 @@ describe('BookingService', () => {
       expect(mockBookingFindFirst).toHaveBeenCalled()
       const findFirstCalls = mockBookingFindFirst.mock.calls
       const uniquenessChecks = findFirstCalls.filter(
-        (c: unknown[]) => c[0]?.where?.bookingNumber != null
+        (c: unknown[]) => (c[0] as { where?: { bookingNumber?: unknown } })?.where?.bookingNumber != null
       )
       expect(uniquenessChecks.length).toBeGreaterThanOrEqual(2)
     })
@@ -1429,7 +1429,7 @@ describe('BookingService', () => {
       prismaTx.equipment.update.mockResolvedValue({})
       await BookingService.markReturned('bk1', 'u1', new Date('2026-06-04'))
       const logCall = (AuditService.log as jest.Mock).mock.calls.find(
-        (c: unknown[]) => c[0]?.action === 'booking.mark_returned'
+        (c: unknown[]) => (c[0] as { action?: string })?.action === 'booking.mark_returned'
       )
       expect(logCall).toBeDefined()
       expect(logCall[0].metadata.lateFeeAmount).toBeUndefined()

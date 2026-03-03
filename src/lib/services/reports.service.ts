@@ -853,11 +853,14 @@ export class ReportsService {
       }),
     ])
 
-    const revenueToday = sumBookingRevenue(todayBookings)
-    const revenueThisWeek = sumBookingRevenue(thisWeekBookings)
-    const revenueThisMonth = sumBookingRevenue(thisMonthBookings)
-    const revenueThisYear = sumBookingRevenue(thisYearBookings)
-    const revenueLastMonth = sumBookingRevenue(lastMonthBookings)
+    const toRevenueInput = (b: { totalAmount?: unknown }) => ({
+      totalAmount: b.totalAmount != null ? Number(b.totalAmount) : null,
+    })
+    const revenueToday = sumBookingRevenue(todayBookings.map(toRevenueInput))
+    const revenueThisWeek = sumBookingRevenue(thisWeekBookings.map(toRevenueInput))
+    const revenueThisMonth = sumBookingRevenue(thisMonthBookings.map(toRevenueInput))
+    const revenueThisYear = sumBookingRevenue(thisYearBookings.map(toRevenueInput))
+    const revenueLastMonth = sumBookingRevenue(lastMonthBookings.map(toRevenueInput))
     const revenueGrowth = calcGrowthPercent(revenueThisMonth, revenueLastMonth)
 
     // Booking stats

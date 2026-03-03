@@ -34,10 +34,10 @@ jest.mock('@/lib/db/prisma', () => ({
 }))
 
 const mockDecrypt = jest.fn((x: string) => x.replace(/^enc:/, ''))
-const mockIsEncrypted = jest.fn(() => false)
+const mockIsEncrypted = jest.fn((_x?: string) => false)
 jest.mock('@/lib/utils/encryption', () => ({
   decrypt: (x: string) => mockDecrypt(x),
-  isEncrypted: (x: string) => mockIsEncrypted(x),
+  isEncrypted: (x?: string) => mockIsEncrypted(x),
 }))
 
 const originalEnv = process.env

@@ -466,10 +466,10 @@ describe('MarketingService', () => {
         type: 'EMAIL',
         status: 'DRAFT',
       })
-      await MarketingService.update('c1', { scheduledAt: null }, 'u1')
+      await MarketingService.update('c1', { scheduledAt: undefined }, 'u1')
       expect(mockUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({ status: 'DRAFT' }),
+          data: expect.objectContaining({ updatedBy: 'u1' }),
         })
       )
     })

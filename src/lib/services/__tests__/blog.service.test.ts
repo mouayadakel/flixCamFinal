@@ -67,7 +67,7 @@ const samplePost = {
   titleAr: 'اختبار',
   excerptEn: 'Excerpt',
   excerptAr: 'مقتطف',
-  coverImage: '/img.jpg',
+  coverImage: 'https://example.com/img.jpg',
   coverImageAltEn: null,
   coverImageAltAr: null,
   status: BlogPostStatus.PUBLISHED,
@@ -517,11 +517,15 @@ describe('BlogService', () => {
           excerptEn: 'Excerpt',
           excerptAr: 'مقتطف',
           slug: 'slug',
-          coverImage: '/img.jpg',
+          coverImage: 'https://example.com/img.jpg',
           status: BlogPostStatus.PUBLISHED,
           categoryId: 'cat-1',
           authorId: 'auth-1',
           tagIds: ['tag-1'],
+          content: {},
+          featured: false,
+          relatedEquipmentIds: [],
+          trending: false,
         },
         'user-1'
       )
@@ -544,10 +548,15 @@ describe('BlogService', () => {
           excerptEn: 'Excerpt',
           excerptAr: 'مقتطف',
           slug: 'slug',
-          coverImage: '/img.jpg',
+          coverImage: 'https://example.com/img.jpg',
           status: BlogPostStatus.PUBLISHED,
           categoryId: 'cat-1',
           authorId: 'auth-1',
+          tagIds: [],
+          content: {},
+          featured: false,
+          relatedEquipmentIds: [],
+          trending: false,
         },
         'user-1'
       )
@@ -568,11 +577,15 @@ describe('BlogService', () => {
           excerptEn: 'Excerpt',
           excerptAr: 'مقتطف',
           slug: 'slug',
-          coverImage: '/img.jpg',
+          coverImage: 'https://example.com/img.jpg',
           status: BlogPostStatus.PUBLISHED,
           categoryId: 'cat-1',
           authorId: 'auth-1',
           tagIds: [],
+          content: {},
+          featured: false,
+          relatedEquipmentIds: [],
+          trending: false,
         },
         'user-1'
       )
@@ -843,7 +856,7 @@ describe('BlogService', () => {
       mockCategoryFindFirst.mockResolvedValue({ id: 'existing' })
       await expect(
         BlogService.createCategory(
-          { nameEn: 'Cameras', nameAr: 'كاميرات', slug: 'cameras' },
+          { nameEn: 'Cameras', nameAr: 'كاميرات', slug: 'cameras', isActive: true, sortOrder: 0 },
           'user-1'
         )
       ).rejects.toThrow('A category with this slug already exists')
@@ -869,7 +882,7 @@ describe('BlogService', () => {
         createdAt: new Date(),
       })
       const result = await BlogService.createCategory(
-        { nameEn: 'Cameras', nameAr: 'كاميرات', slug: 'cameras' },
+        { nameEn: 'Cameras', nameAr: 'كاميرات', slug: 'cameras', isActive: true, sortOrder: 0 },
         'user-1'
       )
       expect(result.slug).toBe('cameras')
@@ -897,7 +910,7 @@ describe('BlogService', () => {
         createdAt: new Date(),
       })
       const result = await BlogService.createCategory(
-        { nameEn: 'Cameras', nameAr: 'كاميرات', slug: 'cameras', parentCategoryId: 'p1' },
+        { nameEn: 'Cameras', nameAr: 'كاميرات', slug: 'cameras', parentCategoryId: 'p1', isActive: true, sortOrder: 0 },
         'user-1'
       )
       expect(result.parent).toEqual({ id: 'p1', nameAr: 'Parent', nameEn: 'Parent', slug: 'parent' })
@@ -1034,7 +1047,7 @@ describe('BlogService', () => {
         descriptionAr: null,
         descriptionEn: null,
         icon: 'camera',
-        coverImage: '/img.jpg',
+        coverImage: 'https://example.com/img.jpg',
         metaTitle: 'Meta',
         metaDescription: 'Desc',
         sortOrder: 1,
@@ -1043,11 +1056,11 @@ describe('BlogService', () => {
       })
       const result = await BlogService.updateCategory(
         'c1',
-        { icon: 'camera', coverImage: '/img.jpg', metaTitle: 'Meta', metaDescription: 'Desc', sortOrder: 1, isActive: false },
+        { icon: 'camera', coverImage: 'https://example.com/img.jpg', metaTitle: 'Meta', metaDescription: 'Desc', sortOrder: 1, isActive: false },
         'user-1'
       )
       expect(result.icon).toBe('camera')
-      expect(result.coverImage).toBe('/img.jpg')
+      expect(result.coverImage).toBe('https://example.com/img.jpg')
     })
 
     it('updates category with descriptionAr descriptionEn parentCategoryId', async () => {
@@ -1195,7 +1208,7 @@ describe('BlogService', () => {
       mockAuthorFindFirst.mockResolvedValue({ id: 'existing' })
       await expect(
         BlogService.createAuthor(
-          { name: 'Author', slug: 'author' },
+          { name: 'Author', slug: 'author', email: 'author@test.com', isActive: true },
           'user-1'
         )
       ).rejects.toThrow('An author with this slug already exists')
@@ -1205,7 +1218,7 @@ describe('BlogService', () => {
       mockAuthorFindFirst.mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 'existing' })
       await expect(
         BlogService.createAuthor(
-          { name: 'Author', slug: 'author', email: 'taken@email.com' },
+          { name: 'Author', slug: 'author', email: 'taken@email.com', isActive: true },
           'user-1'
         )
       ).rejects.toThrow('An author with this email already exists')
@@ -1220,7 +1233,7 @@ describe('BlogService', () => {
         _count: { posts: 0 },
       })
       const result = await BlogService.createAuthor(
-        { name: 'Author', slug: 'author' },
+        { name: 'Author', slug: 'author', email: 'author@test.com', isActive: true },
         'user-1'
       )
       expect(result.name).toBe('Author')
@@ -1235,7 +1248,7 @@ describe('BlogService', () => {
         _count: { posts: 0 },
       })
       await BlogService.createAuthor(
-        { name: 'Jane Doe', slug: '   ' },
+        { name: 'Jane Doe', slug: '   ', email: 'jane@test.com', isActive: true },
         'user-1'
       )
       expect(mockAuthorCreate).toHaveBeenCalledWith(
@@ -1256,7 +1269,7 @@ describe('BlogService', () => {
         _count: { posts: 0 },
       })
       const result = await BlogService.createAuthor(
-        { name: 'No Slug', email: 'n@x.com' },
+        { name: 'No Slug', email: 'n@x.com', isActive: true },
         'user-1'
       )
       expect(mockAuthorCreate).toHaveBeenCalledWith(
@@ -1277,7 +1290,7 @@ describe('BlogService', () => {
         _count: { posts: 0 },
       })
       const result = await BlogService.createAuthor(
-        { name: 'John Doe' },
+        { name: 'John Doe', email: 'john@test.com', isActive: true },
         'user-1'
       )
       expect(mockAuthorCreate).toHaveBeenCalledWith(
@@ -1299,7 +1312,7 @@ describe('BlogService', () => {
         bioAr: 'سيرة',
         bioEn: 'Bio',
         avatar: '/av.jpg',
-        role: 'writer',
+        role: 'WRITER',
         _count: { posts: 0 },
       })
       const result = await BlogService.createAuthor(
@@ -1309,8 +1322,9 @@ describe('BlogService', () => {
           email: 'a@x.com',
           bioAr: 'سيرة',
           bioEn: 'Bio',
-          avatar: '/av.jpg',
-          role: 'writer',
+          avatar: 'https://example.com/av.jpg',
+          role: 'WRITER',
+          isActive: true,
         },
         'user-1'
       )
@@ -1320,8 +1334,8 @@ describe('BlogService', () => {
             email: 'a@x.com',
             bioAr: 'سيرة',
             bioEn: 'Bio',
-            avatar: '/av.jpg',
-            role: 'writer',
+            avatar: 'https://example.com/av.jpg',
+            role: 'WRITER',
           }),
         })
       )
@@ -1613,7 +1627,7 @@ describe('BlogService', () => {
         id: 'a1',
         name: 'Old',
         slug: 'old',
-        role: 'editor',
+        role: 'EDITOR',
         userId: 'u1',
         linkedinUrl: 'https://linkedin.com',
         instagramUrl: 'https://instagram.com',
@@ -1627,7 +1641,7 @@ describe('BlogService', () => {
       const result = await BlogService.updateAuthor(
         'a1',
         {
-          role: 'editor',
+          role: 'EDITOR',
           userId: 'u1',
           linkedinUrl: 'https://linkedin.com',
           instagramUrl: 'https://instagram.com',
@@ -1639,7 +1653,7 @@ describe('BlogService', () => {
         },
         'user-1'
       )
-      expect(result.role).toBe('editor')
+      expect(result.role).toBe('EDITOR')
       expect(result.isActive).toBe(false)
     })
   })

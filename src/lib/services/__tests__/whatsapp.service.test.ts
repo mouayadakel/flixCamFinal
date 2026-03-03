@@ -237,3 +237,5 @@ describe('whatsapp.service', () => {
     })
   })
 })
+
+export {}

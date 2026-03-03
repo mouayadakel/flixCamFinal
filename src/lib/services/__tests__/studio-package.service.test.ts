@@ -39,12 +39,12 @@ describe('StudioPackageService', () => {
     it('throws when max packages reached', async () => {
       mockCount.mockResolvedValue(15)
       await expect(
-        StudioPackageService.create('std_01', { name: 'Pkg', price: 500 }, 'usr_01')
+        StudioPackageService.create('std_01', { name: 'Pkg', price: 500, isActive: true, order: 0, recommended: false }, 'usr_01')
       ).rejects.toThrow('Maximum 15 packages per studio')
     })
 
     it('creates package when under limit', async () => {
-      const result = await StudioPackageService.create('std_01', { name: 'Pkg', price: 500 }, 'usr_01')
+      const result = await StudioPackageService.create('std_01', { name: 'Pkg', price: 500, isActive: true, order: 0, recommended: false }, 'usr_01')
       expect(result).toMatchObject({ id: 'pkg_01' })
     })
   })

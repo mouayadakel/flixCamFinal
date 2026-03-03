@@ -262,7 +262,7 @@ describe('StudioService', () => {
           equipmentCarePolicy: 'Policy',
           cancellationPolicyShort: 'Short',
           cancellationPolicyLink: 'https://example.com',
-          bookingCountDisplay: 'count',
+          bookingCountDisplay: 100,
         },
         'usr_01'
       )
@@ -275,7 +275,7 @@ describe('StudioService', () => {
             equipmentCarePolicy: 'Policy',
             cancellationPolicyShort: 'Short',
             cancellationPolicyLink: 'https://example.com',
-            bookingCountDisplay: 'count',
+            bookingCountDisplay: 100,
           }),
         })
       )

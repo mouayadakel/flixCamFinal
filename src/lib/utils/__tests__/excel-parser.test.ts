@@ -50,7 +50,7 @@ describe('excel-parser', () => {
       ws.addRow(['name', 'price', 'sku'])
       ws.addRow(['Camera A', 100, 'CAM-001'])
       ws.addRow(['Lens B', 50, 'LNS-001'])
-      const buf = (await wb.xlsx.writeBuffer()) as Buffer
+      const buf = (await wb.xlsx.writeBuffer()) as unknown as Buffer
       const result = await parseExcelBuffer(buf)
       expect(result.sheetNames).toEqual(['Sheet1'])
       expect(result.getSheetData('Sheet1')).toHaveLength(2)
@@ -60,7 +60,7 @@ describe('excel-parser', () => {
     it('returns empty array for getSheetData of unknown sheet', async () => {
       const wb = new ExcelJS.Workbook()
       wb.addWorksheet('Sheet1')
-      const buf = (await wb.xlsx.writeBuffer()) as Buffer
+      const buf = (await wb.xlsx.writeBuffer()) as unknown as Buffer
       const result = await parseExcelBuffer(buf)
       expect(result.getSheetData('Unknown')).toEqual([])
     })
@@ -69,7 +69,7 @@ describe('excel-parser', () => {
       const ws = wb.addWorksheet('Dupes')
       ws.addRow(['name', 'name', 'name', 'price'])
       ws.addRow(['Camera', 'Lens', 'Light', 100])
-      const buf = (await wb.xlsx.writeBuffer()) as Buffer
+      const buf = (await wb.xlsx.writeBuffer()) as unknown as Buffer
       const result = await parseExcelBuffer(buf)
       const rows = result.sheets.Dupes
       expect(rows).toHaveLength(1)
@@ -107,7 +107,7 @@ describe('excel-parser', () => {
       const ws = wb.addWorksheet('MySheet')
       ws.addRow(['col'])
       ws.addRow([1])
-      const buf = (await wb.xlsx.writeBuffer()) as Buffer
+      const buf = (await wb.xlsx.writeBuffer()) as unknown as Buffer
       const result = await parseSpreadsheetBuffer(buf, 'file.xlsx')
       expect(result.sheetNames).toContain('MySheet')
       expect(result.sheets.MySheet[0]).toEqual({ col: 1 })

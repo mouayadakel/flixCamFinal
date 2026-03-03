@@ -64,19 +64,19 @@ describe('encryption', () => {
 
   describe('getEncryptionKey production', () => {
     it('throws when NODE_ENV is production and ENCRYPTION_KEY is missing', () => {
-      process.env.NODE_ENV = 'production'
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true, configurable: true })
       process.env.ENCRYPTION_KEY = ''
       expect(() => encrypt('test')).toThrow('ENCRYPTION_KEY must be set in production')
     })
 
     it('throws when NODE_ENV is production and ENCRYPTION_KEY is too short', () => {
-      process.env.NODE_ENV = 'production'
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true, configurable: true })
       process.env.ENCRYPTION_KEY = 'short'
       expect(() => encrypt('test')).toThrow('ENCRYPTION_KEY must be set in production')
     })
 
     it('uses ENCRYPTION_KEY when production and key is valid (>=32 chars)', () => {
-      process.env.NODE_ENV = 'production'
+      Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true, configurable: true })
       process.env.ENCRYPTION_KEY = 'a'.repeat(32)
       const enc = encrypt('secret')
       expect(decrypt(enc)).toBe('secret')

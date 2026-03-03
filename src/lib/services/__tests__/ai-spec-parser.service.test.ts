@@ -8,12 +8,12 @@ const mockFlattenStructuredSpecs = jest.fn((s: Record<string, string>) => s)
 const mockResolveSpecKey = jest.fn((k: string) => k)
 
 jest.mock('@/lib/ai/spec-templates', () => ({
-  getExpectedSpecs: (...args: unknown[]) => mockGetExpectedSpecs(...args),
+  getExpectedSpecs: (x: string) => mockGetExpectedSpecs(x),
 }))
 
 jest.mock('@/lib/utils/specifications.utils', () => ({
-  flattenStructuredSpecs: (...args: unknown[]) => mockFlattenStructuredSpecs(...args),
-  resolveSpecKey: (...args: unknown[]) => mockResolveSpecKey(...args),
+  flattenStructuredSpecs: (x: Record<string, string>) => mockFlattenStructuredSpecs(x),
+  resolveSpecKey: (x: string) => mockResolveSpecKey(x),
 }))
 
 const mockOpenAICreate = jest.fn()

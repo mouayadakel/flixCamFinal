@@ -111,9 +111,9 @@ describe('use-kit-queries', () => {
         () =>
           useEquipmentInfinite({
             categoryId: 'cat_1',
-            budgetTier: null,
-            q: null,
-            sort: null,
+            budgetTier: undefined,
+            q: undefined,
+            sort: undefined,
           }),
         { wrapper: createWrapper() }
       )
@@ -140,9 +140,9 @@ describe('use-kit-queries', () => {
         () =>
           useEquipmentInfinite({
             categoryId: null,
-            budgetTier: null,
-            q: null,
-            sort: null,
+            budgetTier: undefined,
+            q: undefined,
+            sort: undefined,
           }),
         { wrapper: createWrapper() }
       )
@@ -165,9 +165,9 @@ describe('use-kit-queries', () => {
         () =>
           useEquipmentInfinite({
             categoryId: null,
-            budgetTier: null,
-            q: null,
-            sort: null,
+            budgetTier: undefined,
+            q: undefined,
+            sort: undefined,
           }),
         { wrapper: createWrapper() }
       )

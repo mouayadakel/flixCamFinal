@@ -692,14 +692,14 @@ describe('InvoiceService', () => {
     it('throws ForbiddenError when user lacks invoice.mark_paid', async () => {
       hasPermission.mockResolvedValue(false)
       await expect(
-        InvoiceService.recordPayment('inv1', { amount: 500 }, 'u1')
+        InvoiceService.recordPayment('inv1', { amount: 500, paymentMethod: 'CARD' }, 'u1')
       ).rejects.toThrow(ForbiddenError)
     })
 
     it('throws NotFoundError when invoice not found', async () => {
       mockInvoiceFindFirst.mockResolvedValue(null)
       await expect(
-        InvoiceService.recordPayment('missing', { amount: 500 }, 'u1')
+        InvoiceService.recordPayment('missing', { amount: 500, paymentMethod: 'CARD' }, 'u1')
       ).rejects.toThrow(NotFoundError)
     })
 
@@ -712,7 +712,7 @@ describe('InvoiceService', () => {
         remainingAmount: 650,
         status: 'PARTIALLY_PAID',
       })
-      const result = await InvoiceService.recordPayment('inv1', { amount: 500 }, 'u1')
+      const result = await InvoiceService.recordPayment('inv1', { amount: 500, paymentMethod: 'CARD' }, 'u1')
       expect(result).toBeDefined()
       expect(mockInvoiceUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -736,7 +736,7 @@ describe('InvoiceService', () => {
       })
       await InvoiceService.recordPayment(
         'inv1',
-        { amount: 500 },
+        { amount: 500, paymentMethod: 'CARD' },
         'u1',
         { ipAddress: '1.2.3.4', userAgent: 'Chrome' }
       )
@@ -758,7 +758,7 @@ describe('InvoiceService', () => {
         remainingAmount: 0,
         status: 'PAID',
       })
-      const result = await InvoiceService.recordPayment('inv1', { amount: 1150 }, 'u1')
+      const result = await InvoiceService.recordPayment('inv1', { amount: 1150, paymentMethod: 'CARD' }, 'u1')
       expect(result).toBeDefined()
       expect(mockInvoiceUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -773,7 +773,7 @@ describe('InvoiceService', () => {
       mockInvoiceUpdate.mockResolvedValue({ ...inv, status: 'PAID' })
       mockPaymentCreate?.mockResolvedValue({ id: 'pay1' })
       mockInvoicePaymentCreate?.mockResolvedValue({})
-      await InvoiceService.recordPayment('inv1', { amount: 500 }, 'u1')
+      await InvoiceService.recordPayment('inv1', { amount: 500, paymentMethod: 'CARD' }, 'u1')
       expect(mockPaymentCreate).toHaveBeenCalled()
       expect(mockInvoicePaymentCreate).toHaveBeenCalled()
     })

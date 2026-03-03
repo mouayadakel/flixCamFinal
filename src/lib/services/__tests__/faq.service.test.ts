@@ -116,6 +116,8 @@ describe('FaqService', () => {
         questionEn: 'Question',
         answerAr: 'جواب',
         answerEn: 'Answer',
+        isActive: true,
+        order: 1,
       }
       const result = await FaqService.create(input)
       expect(result).toMatchObject({ id: 'f1' })
@@ -132,6 +134,8 @@ describe('FaqService', () => {
         questionEn: 'Question',
         answerAr: 'جواب',
         answerEn: 'Answer',
+        isActive: true,
+        order: 1,
       })
       expect(result).toMatchObject({ id: 'f1' })
     })

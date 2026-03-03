@@ -321,8 +321,8 @@ describe('QuoteService', () => {
           equipment: [{ equipmentId: 'e1', quantity: 1 }],
           validUntil: customValidUntil,
           studioId: 'studio1',
-          studioStartTime: '09:00',
-          studioEndTime: '18:00',
+          studioStartTime: new Date('2026-03-01T09:00:00'),
+          studioEndTime: new Date('2026-03-01T18:00:00'),
         },
         'user_1'
       )
@@ -332,8 +332,8 @@ describe('QuoteService', () => {
           data: expect.objectContaining({
             validUntil: customValidUntil,
             studioId: 'studio1',
-            studioStartTime: '09:00',
-            studioEndTime: '18:00',
+            studioStartTime: expect.any(Date),
+            studioEndTime: expect.any(Date),
           }),
         })
       )
@@ -621,8 +621,8 @@ describe('QuoteService', () => {
           startDate: new Date('2026-03-01'),
           endDate: new Date('2026-03-05'),
           studioId: 'studio2',
-          studioStartTime: '10:00',
-          studioEndTime: '19:00',
+          studioStartTime: new Date('2026-03-01T10:00:00'),
+          studioEndTime: new Date('2026-03-01T19:00:00'),
         },
         'user_1'
       )
@@ -630,8 +630,8 @@ describe('QuoteService', () => {
         expect.objectContaining({
           data: expect.objectContaining({
             studioId: 'studio2',
-            studioStartTime: '10:00',
-            studioEndTime: '19:00',
+            studioStartTime: new Date('2026-03-01T10:00:00'),
+            studioEndTime: new Date('2026-03-01T19:00:00'),
           }),
         })
       )

@@ -39,12 +39,12 @@ describe('StudioFaqService', () => {
     it('throws when max FAQs reached', async () => {
       mockCount.mockResolvedValue(9)
       await expect(
-        StudioFaqService.create('std_01', { questionEn: 'Q', answerEn: 'A' }, 'usr_01')
+        StudioFaqService.create('std_01', { questionAr: 'س', answerAr: 'ج', questionEn: 'Q', answerEn: 'A', isActive: true, order: 0 }, 'usr_01')
       ).rejects.toThrow('Maximum 9 FAQs per studio')
     })
 
     it('creates FAQ when under limit', async () => {
-      const result = await StudioFaqService.create('std_01', { questionEn: 'Q', answerEn: 'A' }, 'usr_01')
+      const result = await StudioFaqService.create('std_01', { questionAr: 'س', answerAr: 'ج', questionEn: 'Q', answerEn: 'A', isActive: true, order: 0 }, 'usr_01')
       expect(result).toMatchObject({ id: 'faq_01' })
     })
   })
@@ -53,7 +53,7 @@ describe('StudioFaqService', () => {
     it('throws NotFoundError when FAQ not found', async () => {
       mockFindFirst.mockResolvedValue(null)
       await expect(
-        StudioFaqService.update('faq_missing', { questionEn: 'Q' }, 'usr_01')
+        StudioFaqService.update('faq_missing', { questionAr: 'س', answerAr: 'ج', questionEn: 'Q' }, 'usr_01')
       ).rejects.toThrow(NotFoundError)
     })
   })

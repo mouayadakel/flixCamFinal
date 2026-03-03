@@ -292,27 +292,27 @@ describe('ShootTypeService', () => {
     it('throws NotFoundError when not found', async () => {
       mockFindFirst.mockResolvedValue(null)
       await expect(
-        ShootTypeService.update('missing', { name: 'Updated' }, 'usr_01')
+        ShootTypeService.update('missing', { id: 'missing', name: 'Updated' }, 'usr_01')
       ).rejects.toThrow(NotFoundError)
     })
 
     it('throws ValidationError when new slug exists', async () => {
       mockFindFirst.mockResolvedValueOnce(sampleShootType).mockResolvedValueOnce({ id: 'other' })
       await expect(
-        ShootTypeService.update('st_01', { slug: 'taken' }, 'usr_01')
+        ShootTypeService.update('st_01', { id: 'st_01', slug: 'taken' }, 'usr_01')
       ).rejects.toThrow(ValidationError)
     })
 
     it('updates shoot type when valid', async () => {
       mockFindFirst.mockResolvedValue(sampleShootType)
-      const result = await ShootTypeService.update('st_01', { name: 'Updated' }, 'usr_01')
+      const result = await ShootTypeService.update('st_01', { id: 'st_01', name: 'Updated' }, 'usr_01')
       expect(mockUpdate).toHaveBeenCalled()
       expect(result).toBeDefined()
     })
 
     it('updates coverImageUrl to null when empty string', async () => {
       mockFindFirst.mockResolvedValue(sampleShootType)
-      await ShootTypeService.update('st_01', { coverImageUrl: '' }, 'usr_01')
+      await ShootTypeService.update('st_01', { id: 'st_01', coverImageUrl: '' }, 'usr_01')
       expect(mockUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({ coverImageUrl: null }),
@@ -325,7 +325,7 @@ describe('ShootTypeService', () => {
         .mockResolvedValueOnce(sampleShootType)
         .mockResolvedValueOnce(null)
         .mockResolvedValueOnce({ ...sampleShootType, slug: 'new-slug' })
-      await ShootTypeService.update('st_01', { slug: 'new-slug' }, 'usr_01')
+      await ShootTypeService.update('st_01', { id: 'st_01', slug: 'new-slug' }, 'usr_01')
       expect(mockUpdate).toHaveBeenCalled()
     })
 
@@ -333,7 +333,7 @@ describe('ShootTypeService', () => {
       const cache = require('@/lib/cache')
       ;(cache.cacheDelete as jest.Mock).mockRejectedValueOnce(new Error('Cache down'))
       mockFindFirst.mockResolvedValue(sampleShootType)
-      const result = await ShootTypeService.update('st_01', { name: 'Updated' }, 'usr_01')
+      const result = await ShootTypeService.update('st_01', { id: 'st_01', name: 'Updated' }, 'usr_01')
       expect(result).toBeDefined()
     })
   })
@@ -409,7 +409,7 @@ describe('ShootTypeService', () => {
       mockRecCreate.mockResolvedValue({})
       await ShootTypeService.setRecommendations(
         'st_01',
-        [{ equipmentId: 'eq_1', budgetTier: 'BUDGET' }],
+        [{ equipmentId: 'eq_1', budgetTier: 'ESSENTIAL' }],
         'cat_1'
       )
       expect(mockRecDelete).toHaveBeenCalled()
@@ -421,7 +421,7 @@ describe('ShootTypeService', () => {
       mockRecCreate.mockResolvedValue({})
       await ShootTypeService.setRecommendations(
         'st_01',
-        [{ equipmentId: 'eq_1', budgetTier: 'BUDGET' }]
+        [{ equipmentId: 'eq_1', budgetTier: 'ESSENTIAL' }]
       )
       expect(mockRecDelete).toHaveBeenCalled()
       expect(mockRecCreate).toHaveBeenCalled()
@@ -433,7 +433,7 @@ describe('ShootTypeService', () => {
       mockRecCreate.mockResolvedValue({})
       await ShootTypeService.setRecommendations(
         'st_01',
-        [{ equipmentId: 'eq_1', budgetTier: 'BUDGET' }],
+        [{ equipmentId: 'eq_1', budgetTier: 'ESSENTIAL' }],
         'cat_1'
       )
       expect(mockRecDelete).not.toHaveBeenCalled()
@@ -447,7 +447,7 @@ describe('ShootTypeService', () => {
         {
           id: 'r1',
           equipmentId: 'eq_1',
-          budgetTier: 'BUDGET',
+          budgetTier: 'ESSENTIAL',
           reason: 'Good',
           reasonAr: null,
           defaultQuantity: 1,

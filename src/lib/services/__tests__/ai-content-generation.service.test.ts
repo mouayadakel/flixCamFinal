@@ -24,14 +24,14 @@ jest.mock('@/lib/db/prisma', () => ({
 }))
 
 jest.mock('@/lib/utils/encryption', () => ({
-  decrypt: (...args: unknown[]) => mockDecrypt(...args),
-  isEncrypted: (...args: unknown[]) => mockIsEncrypted(...args),
+  decrypt: (x: string) => mockDecrypt(x),
+  isEncrypted: () => mockIsEncrypted(),
 }))
 
 jest.mock('@/lib/prompts/master-fill', () => ({
   MASTER_SYSTEM_PROMPT: 'System prompt',
-  buildMasterFillPrompt: (...args: unknown[]) => mockBuildMasterFillPrompt(...args),
-  parseMasterFillOutput: (...args: unknown[]) => mockParseMasterFillOutput(...args),
+  buildMasterFillPrompt: (x: unknown) => mockBuildMasterFillPrompt(x),
+  parseMasterFillOutput: (x: unknown, y?: unknown) => mockParseMasterFillOutput(x, y),
 }))
 
 jest.mock('openai', () => ({
@@ -387,3 +387,5 @@ describe('ai-content-generation.service', () => {
     }, 15000)
   })
 })
+
+export {}

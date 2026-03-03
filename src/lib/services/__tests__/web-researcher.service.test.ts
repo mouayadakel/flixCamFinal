@@ -108,3 +108,5 @@ describe('web-researcher.service', () => {
     }, 15000)
   })
 })
+
+export {}

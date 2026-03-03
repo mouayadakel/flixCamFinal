@@ -31,6 +31,7 @@ jest.mock('@/lib/logger', () => ({
   logger: { error: jest.fn() },
 }))
 
+import type { NextRequest } from 'next/server'
 import { auth } from '@/lib/auth'
 import { hasPermission } from '@/lib/auth/permissions'
 import { prisma } from '@/lib/db/prisma'
@@ -55,7 +56,7 @@ describe('GET /api/admin/reports', () => {
   it('returns 401 when not authenticated', async () => {
     mockAuth.mockResolvedValue(null)
     const req = createRequest({ type: 'revenue' })
-    const res = await GET(req)
+    const res = await GET(req as unknown as NextRequest)
     expect(res.status).toBe(401)
     const data = await res.json()
     expect(data.error).toBe('Unauthorized')
@@ -64,7 +65,7 @@ describe('GET /api/admin/reports', () => {
   it('returns 401 when session has no user id', async () => {
     mockAuth.mockResolvedValue({ user: {} })
     const req = createRequest({ type: 'revenue' })
-    const res = await GET(req)
+    const res = await GET(req as unknown as NextRequest)
     expect(res.status).toBe(401)
   })
 
@@ -72,7 +73,7 @@ describe('GET /api/admin/reports', () => {
     mockAuth.mockResolvedValue({ user: { id: 'user-1', role: 'CUSTOMER' } })
     mockHasPermission.mockResolvedValue(false)
     const req = createRequest({ type: 'revenue' })
-    const res = await GET(req)
+    const res = await GET(req as unknown as NextRequest)
     expect(res.status).toBe(403)
     const data = await res.json()
     expect(data.error).toContain('Forbidden')
@@ -81,7 +82,7 @@ describe('GET /api/admin/reports', () => {
   it('returns 400 when type is missing', async () => {
     mockAuth.mockResolvedValue({ user: { id: 'user-1', role: 'ADMIN' } })
     const req = createRequest({})
-    const res = await GET(req)
+    const res = await GET(req as unknown as NextRequest)
     expect(res.status).toBe(400)
     const data = await res.json()
     expect(data.error).toContain('Invalid type')
@@ -90,7 +91,7 @@ describe('GET /api/admin/reports', () => {
   it('returns 400 when type is invalid', async () => {
     mockAuth.mockResolvedValue({ user: { id: 'user-1', role: 'ADMIN' } })
     const req = createRequest({ type: 'invalid' })
-    const res = await GET(req)
+    const res = await GET(req as unknown as NextRequest)
     expect(res.status).toBe(400)
   })
 
@@ -103,7 +104,7 @@ describe('GET /api/admin/reports', () => {
     ;(prisma.invoice.findMany as jest.Mock).mockResolvedValue([])
 
     const req = createRequest({ type: 'revenue' })
-    const res = await GET(req)
+    const res = await GET(req as unknown as NextRequest)
     expect(res.status).toBe(200)
     const data = await res.json()
     expect(data.data).toBeDefined()

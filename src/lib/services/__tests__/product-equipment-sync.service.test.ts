@@ -303,7 +303,7 @@ describe('product-equipment-sync.service', () => {
       await syncProductToEquipment('prod-1')
 
       expect(mockTx.media.create).toHaveBeenCalledTimes(3)
-      const urls = mockTx.media.create.mock.calls.map((c: unknown[]) => c[0].data.url)
+      const urls = mockTx.media.create.mock.calls.map((c: unknown[]) => (c[0] as { data: { url: string } }).data.url)
       expect(urls).toContain('https://example.com/f.jpg')
       expect(urls).toContain('https://example.com/g1.jpg')
       expect(urls).toContain('https://example.com/g2.jpg')
@@ -348,13 +348,16 @@ describe('product-equipment-sync.service', () => {
 
       expect(mockTx.translation.upsert).toHaveBeenCalled()
       const upsertCalls = mockTx.translation.upsert.mock.calls
+      interface UpsertArg { where?: { entityType_entityId_field_language?: { field?: string; language?: string } }; create?: { value?: string } }
       const nameUpsert = upsertCalls.find(
-        (c: unknown[]) =>
-          c[0].where.entityType_entityId_field_language.field === 'name' &&
-          c[0].where.entityType_entityId_field_language.language === 'en'
+        (c: unknown[]) => {
+          const arg = (c as [UpsertArg])[0]
+          return arg?.where?.entityType_entityId_field_language?.field === 'name' &&
+            arg?.where?.entityType_entityId_field_language?.language === 'en'
+        }
       )
       expect(nameUpsert).toBeDefined()
-      expect(nameUpsert[0].create.value).toBe('EN Name')
+      expect(((nameUpsert as [UpsertArg])[0] as UpsertArg).create?.value).toBe('EN Name')
     })
 
     it('handles model fallback to product.id when no en translation and no sku', async () => {

@@ -20,6 +20,7 @@ jest.mock('@/lib/db/prisma', () => ({
   },
 }))
 
+import type { NextRequest } from 'next/server'
 import { auth } from '@/lib/auth'
 import { generateMasterFill } from '@/lib/services/ai-content-generation.service'
 import { prisma } from '@/lib/db/prisma'
@@ -57,7 +58,7 @@ describe('POST /api/admin/imports/preview-ai', () => {
   it('returns 401 when not authenticated', async () => {
     mockAuth.mockResolvedValue(null)
     const req = createRequest({ rows: [{ name: 'Product 1' }] })
-    const res = await POST(req)
+    const res = await POST(req as unknown as NextRequest)
     expect(res.status).toBe(401)
     const data = await res.json()
     expect(data.error).toBe('Unauthorized')
@@ -67,7 +68,7 @@ describe('POST /api/admin/imports/preview-ai', () => {
   it('returns 400 when rows is missing', async () => {
     mockAuth.mockResolvedValue({ user: { id: 'user-1' } })
     const req = createRequest({})
-    const res = await POST(req)
+    const res = await POST(req as unknown as NextRequest)
     expect(res.status).toBe(400)
     const data = await res.json()
     expect(data.error).toContain('Rows array')
@@ -76,7 +77,7 @@ describe('POST /api/admin/imports/preview-ai', () => {
   it('returns 400 when rows is empty array', async () => {
     mockAuth.mockResolvedValue({ user: { id: 'user-1' } })
     const req = createRequest({ rows: [] })
-    const res = await POST(req)
+    const res = await POST(req as unknown as NextRequest)
     expect(res.status).toBe(400)
   })
 
@@ -85,7 +86,7 @@ describe('POST /api/admin/imports/preview-ai', () => {
     const req = createRequest({
       rows: [{ name: 'Sony FX3', brand: 'Sony', category: 'Cameras' }],
     })
-    const res = await POST(req)
+    const res = await POST(req as unknown as NextRequest)
     expect(res.status).toBe(200)
     const data = await res.json()
     expect(data.suggestions).toBeDefined()

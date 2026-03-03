@@ -32,7 +32,7 @@ describe('catalog-scanner.service', () => {
   })
 
   it('scanAndQueue with dryRun returns empty jobId', async () => {
-    const out = await scanAndQueue({ dryRun: true })
+    const out = await scanAndQueue({ dryRun: true, types: [], trigger: 'manual' })
     expect(out.jobId).toBe('')
     expect(out.report).toBeDefined()
   })

@@ -68,16 +68,16 @@ describe('FeatureFlagService', () => {
 
   describe('create', () => {
     it('calls prisma.featureFlag.create with correct data', async () => {
-      mockCreate.mockResolvedValue({ id: 'f2', name: 'new', scope: 'GLOBAL', enabled: false })
+      mockCreate.mockResolvedValue({ id: 'f2', name: 'new', scope: 'MODULE', enabled: false })
       const result = await FeatureFlagService.create({
         name: 'new',
-        scope: 'GLOBAL',
+        scope: 'MODULE',
         userId: 'u1',
       })
       expect(result.name).toBe('new')
       expect(mockCreate).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({ name: 'new', scope: 'GLOBAL' }),
+          data: expect.objectContaining({ name: 'new', scope: 'MODULE' }),
         })
       )
     })
@@ -138,11 +138,11 @@ describe('FeatureFlagService', () => {
 
   describe('getByScope', () => {
     it('returns flags for scope', async () => {
-      mockFindMany.mockResolvedValue([{ id: 'f1', name: 'flag1', scope: 'GLOBAL' }])
-      const result = await FeatureFlagService.getByScope('GLOBAL')
+      mockFindMany.mockResolvedValue([{ id: 'f1', name: 'flag1', scope: 'MODULE' }])
+      const result = await FeatureFlagService.getByScope('MODULE')
       expect(result).toHaveLength(1)
       expect(mockFindMany).toHaveBeenCalledWith({
-        where: { scope: 'GLOBAL', deletedAt: null },
+        where: { scope: 'MODULE', deletedAt: null },
         orderBy: { name: 'asc' },
       })
     })
