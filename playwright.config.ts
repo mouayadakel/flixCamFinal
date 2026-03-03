@@ -7,6 +7,9 @@ import { defineConfig, devices } from '@playwright/test'
 
 const baseURL = process.env.NEXT_PUBLIC_APP_URL || process.env.BASE_URL || 'http://localhost:3000'
 
+/** CI database URL – must match PostgreSQL service user (ci) in .github/workflows/ci.yml */
+const CI_DATABASE_URL = 'postgresql://ci:ci@localhost:5432/ci?schema=public'
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -35,6 +38,15 @@ export default defineConfig({
           url: baseURL,
           timeout: 180000,
           reuseExistingServer: false,
+          env: {
+            ...process.env,
+            DATABASE_URL: process.env.DATABASE_URL || CI_DATABASE_URL,
+            AUTH_SECRET: process.env.AUTH_SECRET || 'ci-secret-minimum-32-characters-long',
+            NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'ci-secret-minimum-32-characters-long',
+            NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
+            NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+            ENCRYPTION_KEY: process.env.ENCRYPTION_KEY || 'ci-encryption-key-32-chars-long!',
+          },
         }
       : {
           command: 'npm run dev',
