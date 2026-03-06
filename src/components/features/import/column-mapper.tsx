@@ -32,35 +32,65 @@ interface ColumnMapperProps {
 
 const SYSTEM_FIELDS = [
   { value: 'skip', label: '-- تخطي --', group: 'control' },
-  { value: 'name', label: 'الاسم', group: 'required', color: 'green' },
+  // Required
+  { value: 'name', label: 'الاسم (EN)', group: 'required', color: 'green' },
   { value: 'brand', label: 'العلامة التجارية', group: 'required', color: 'green' },
+  { value: 'model', label: 'الموديل', group: 'required', color: 'green' },
   { value: 'sku', label: 'رمز SKU', group: 'required', color: 'green' },
   { value: 'barcode', label: 'الباركود', group: 'required', color: 'green' },
-  { value: 'daily_price', label: 'السعر اليومي', group: 'required', color: 'green' },
+  // Pricing
+  { value: 'daily_price', label: 'السعر اليومي', group: 'pricing', color: 'green' },
   { value: 'weekly_price', label: 'السعر الأسبوعي', group: 'pricing', color: 'blue' },
   { value: 'monthly_price', label: 'السعر الشهري', group: 'pricing', color: 'blue' },
-  { value: 'deposit', label: 'التأمين', group: 'pricing', color: 'blue' },
-  { value: 'quantity', label: 'الكمية', group: 'inventory', color: 'blue' },
+  { value: 'purchase_price', label: 'سعر الشراء', group: 'pricing', color: 'blue' },
+  { value: 'deposit', label: 'مبلغ التأمين', group: 'pricing', color: 'blue' },
+  { value: 'requires_deposit', label: 'يتطلب تأمين', group: 'pricing', color: 'blue' },
+  // Inventory
+  { value: 'quantity', label: 'الكمية الإجمالية', group: 'inventory', color: 'blue' },
+  { value: 'quantity_available', label: 'الكمية المتاحة', group: 'inventory', color: 'blue' },
+  { value: 'condition', label: 'الحالة', group: 'inventory', color: 'blue' },
+  { value: 'warehouse_location', label: 'موقع المستودع', group: 'inventory', color: 'blue' },
+  // Settings
+  { value: 'featured', label: 'مميز', group: 'settings', color: 'blue' },
+  { value: 'is_active', label: 'نشط', group: 'settings', color: 'blue' },
+  { value: 'requires_assistant', label: 'يتطلب مساعد', group: 'settings', color: 'blue' },
+  { value: 'budget_tier', label: 'فئة الميزانية', group: 'settings', color: 'blue' },
+  { value: 'category_slug', label: 'الفئة', group: 'settings', color: 'blue' },
+  { value: 'sub_category', label: 'الفئة الفرعية', group: 'settings', color: 'blue' },
+  // English Content
+  { value: 'description', label: 'وصف (EN)', group: 'ai', color: 'yellow' },
   { value: 'short_description', label: 'وصف مختصر (EN)', group: 'ai', color: 'yellow' },
   { value: 'long_description', label: 'وصف طويل (EN)', group: 'ai', color: 'yellow' },
   { value: 'seo_title', label: 'عنوان SEO (EN)', group: 'ai', color: 'yellow' },
   { value: 'seo_description', label: 'وصف SEO (EN)', group: 'ai', color: 'yellow' },
   { value: 'seo_keywords', label: 'كلمات SEO (EN)', group: 'ai', color: 'yellow' },
+  // Arabic Content
+  { value: 'name_ar', label: 'الاسم (عربي)', group: 'ai', color: 'yellow' },
+  { value: 'description_ar', label: 'وصف (عربي)', group: 'ai', color: 'yellow' },
+  { value: 'short_desc_ar', label: 'وصف مختصر (عربي)', group: 'ai', color: 'yellow' },
+  { value: 'long_desc_ar', label: 'وصف طويل (عربي)', group: 'ai', color: 'yellow' },
+  { value: 'seo_title_ar', label: 'عنوان SEO (عربي)', group: 'ai', color: 'yellow' },
+  { value: 'seo_desc_ar', label: 'وصف SEO (عربي)', group: 'ai', color: 'yellow' },
+  { value: 'seo_keywords_ar', label: 'كلمات SEO (عربي)', group: 'ai', color: 'yellow' },
+  // Chinese Content
+  { value: 'name_zh', label: 'الاسم (صيني)', group: 'ai', color: 'yellow' },
+  { value: 'description_zh', label: 'وصف (صيني)', group: 'ai', color: 'yellow' },
+  { value: 'short_desc_zh', label: 'وصف مختصر (صيني)', group: 'ai', color: 'yellow' },
+  { value: 'long_desc_zh', label: 'وصف طويل (صيني)', group: 'ai', color: 'yellow' },
+  { value: 'seo_title_zh', label: 'عنوان SEO (صيني)', group: 'ai', color: 'yellow' },
+  { value: 'seo_desc_zh', label: 'وصف SEO (صيني)', group: 'ai', color: 'yellow' },
+  { value: 'seo_keywords_zh', label: 'كلمات SEO (صيني)', group: 'ai', color: 'yellow' },
+  // Media
   { value: 'featured_image', label: 'الصورة الرئيسية', group: 'media', color: 'blue' },
   { value: 'gallery', label: 'معرض الصور', group: 'media', color: 'blue' },
   { value: 'video', label: 'فيديو', group: 'media', color: 'blue' },
+  // Content
   { value: 'specifications', label: 'المواصفات', group: 'ai', color: 'yellow' },
   { value: 'box_contents', label: 'محتوى الصندوق', group: 'ai', color: 'yellow' },
   { value: 'tags', label: 'الوسوم', group: 'ai', color: 'yellow' },
   { value: 'related_products', label: 'منتجات ذات صلة', group: 'ai', color: 'yellow' },
   { value: 'buffer_time', label: 'وقت الفاصل', group: 'settings', color: 'blue' },
   { value: 'buffer_time_unit', label: 'وحدة وقت الفاصل', group: 'settings', color: 'blue' },
-  { value: 'name_ar', label: 'الاسم (عربي)', group: 'ai', color: 'yellow' },
-  { value: 'short_desc_ar', label: 'وصف مختصر (عربي)', group: 'ai', color: 'yellow' },
-  { value: 'long_desc_ar', label: 'وصف طويل (عربي)', group: 'ai', color: 'yellow' },
-  { value: 'name_zh', label: 'الاسم (صيني)', group: 'ai', color: 'yellow' },
-  { value: 'short_desc_zh', label: 'وصف مختصر (صيني)', group: 'ai', color: 'yellow' },
-  { value: 'long_desc_zh', label: 'وصف طويل (صيني)', group: 'ai', color: 'yellow' },
 ]
 
 function getColorForField(value: string): string {

@@ -7,7 +7,14 @@
  */
 
 import { ImportService } from './import.service'
-import { ImportRowStatus, ProductStatus, ProductType, TranslationLocale } from '@prisma/client'
+import {
+  ImportRowStatus,
+  ProductStatus,
+  ProductType,
+  TranslationLocale,
+  BudgetTier,
+  EquipmentCondition,
+} from '@prisma/client'
 import { ProductCatalogService } from './product-catalog.service'
 import { syncProductToEquipment } from './product-equipment-sync.service'
 import { prisma } from '@/lib/db/prisma'
@@ -135,6 +142,44 @@ function resolveField(
   return undefined
 }
 
+function parseBool(val: unknown): boolean {
+  if (val == null) return false
+  const s = String(val).trim().toLowerCase()
+  return s === 'true' || s === '1' || s === 'yes'
+}
+
+function parseBudgetTier(val: unknown): BudgetTier | null {
+  if (!val) return null
+  const s = String(val).trim().toUpperCase()
+  if (s === 'ESSENTIAL' || s === 'PROFESSIONAL' || s === 'PREMIUM') return s as BudgetTier
+  return null
+}
+
+function parseConditionEnum(val: unknown): EquipmentCondition {
+  if (!val) return EquipmentCondition.GOOD
+  const s = String(val).trim().toUpperCase()
+  const valid: Record<string, EquipmentCondition> = {
+    EXCELLENT: EquipmentCondition.EXCELLENT,
+    GOOD: EquipmentCondition.GOOD,
+    FAIR: EquipmentCondition.FAIR,
+    POOR: EquipmentCondition.POOR,
+    MAINTENANCE: EquipmentCondition.MAINTENANCE,
+    DAMAGED: EquipmentCondition.DAMAGED,
+    NEW: EquipmentCondition.EXCELLENT,
+  }
+  return valid[s] ?? EquipmentCondition.GOOD
+}
+
+interface EquipmentExtraFields {
+  purchasePrice?: number
+  requiresAssistant?: boolean
+  budgetTier?: BudgetTier
+  condition?: EquipmentCondition
+  quantityAvailable?: number
+  warehouseLocation?: string
+  featured?: boolean
+}
+
 const BATCH_SIZE = 100
 
 export async function processImportJob(
@@ -188,6 +233,7 @@ export async function processImportJob(
 
   // Track SKUs used in this job to avoid duplicates within file (e.g. "50000009" appearing twice)
   const usedSkusInJob = new Set<string>()
+  const equipmentExtras = new Map<string, EquipmentExtraFields>()
 
   const batches: (typeof job.rows)[] = []
   for (let i = 0; i < job.rows.length; i += BATCH_SIZE) {
@@ -237,14 +283,10 @@ export async function processImportJob(
 
         // New mapped fields
         const conditionRaw = resolveField(r, 'condition', columnMappings)
+        const conditionEnum = parseConditionEnum(conditionRaw)
         const warehouseLocation = resolveField(r, 'warehouse_location', columnMappings) ?? null
         const featuredRaw = resolveField(r, 'featured', columnMappings)
-        const isFeatured =
-          featuredRaw != null
-            ? String(featuredRaw).toLowerCase() === 'true' ||
-              featuredRaw === '1' ||
-              featuredRaw === true
-            : false
+        const isFeatured = parseBool(featuredRaw)
         const isActiveRaw = resolveField(r, 'is_active', columnMappings)
         const isActive =
           isActiveRaw != null
@@ -253,6 +295,19 @@ export async function processImportJob(
               isActiveRaw !== false
             : true
         const subCategoryFromExcel = resolveField(r, 'sub_category', columnMappings) ?? null
+        const categorySlugFromExcel = resolveField(r, 'category_slug', columnMappings) ?? null
+
+        const purchasePriceRaw = num(resolveField(r, 'purchase_price', columnMappings))
+        const requiresAssistantRaw = resolveField(r, 'requires_assistant', columnMappings)
+        const requiresAssistant = parseBool(requiresAssistantRaw)
+        const budgetTierRaw = resolveField(r, 'budget_tier', columnMappings)
+        const budgetTier = parseBudgetTier(budgetTierRaw)
+        const quantityAvailableRaw = num(resolveField(r, 'quantity_available', columnMappings))
+        const quantityAvailable = quantityAvailableRaw != null && quantityAvailableRaw >= 0 ? quantityAvailableRaw : quantity
+
+        const descriptionEn = resolveField(r, 'description', columnMappings) ?? ''
+        const descriptionAr = resolveField(r, 'description_ar', columnMappings) ?? ''
+        const descriptionZh = resolveField(r, 'description_zh', columnMappings) ?? ''
 
         const priceDaily = safePrice(daily) ?? 0
         const priceWeekly = safePrice(weekly) ?? (priceDaily > 0 ? safePrice(priceDaily * WEEKLY_FACTOR) ?? null : null)
@@ -358,10 +413,13 @@ export async function processImportJob(
 
         const shortDescEn =
           enFromSuggestion?.shortDescription ||
-          (resolveField(r, 'short_description', columnMappings) ?? '')
+          resolveField(r, 'short_description', columnMappings) ||
+          descriptionEn ||
+          ''
         const longDescEn =
           enFromSuggestion?.longDescription ||
-          (resolveField(r, 'long_description', columnMappings) ?? '')
+          resolveField(r, 'long_description', columnMappings) ||
+          ''
         const seoTitleEn =
           seoFromSuggestion?.metaTitle || (resolveField(r, 'seo_title', columnMappings) ?? name)
         const seoDescEn =
@@ -384,10 +442,13 @@ export async function processImportJob(
         const nameAr = arFromSuggestion?.name || (resolveField(r, 'name_ar', columnMappings) ?? '')
         const shortDescAr =
           arFromSuggestion?.shortDescription ||
-          (resolveField(r, 'short_desc_ar', columnMappings) ?? '')
+          resolveField(r, 'short_desc_ar', columnMappings) ||
+          descriptionAr ||
+          ''
         const longDescAr =
           arFromSuggestion?.longDescription ||
-          (resolveField(r, 'long_desc_ar', columnMappings) ?? '')
+          resolveField(r, 'long_desc_ar', columnMappings) ||
+          ''
         if (nameAr) {
           translations.push({
             locale: TranslationLocale.ar,
@@ -413,10 +474,13 @@ export async function processImportJob(
         const nameZh = zhFromSuggestion?.name || (resolveField(r, 'name_zh', columnMappings) ?? '')
         const shortDescZh =
           zhFromSuggestion?.shortDescription ||
-          (resolveField(r, 'short_desc_zh', columnMappings) ?? '')
+          resolveField(r, 'short_desc_zh', columnMappings) ||
+          descriptionZh ||
+          ''
         const longDescZh =
           zhFromSuggestion?.longDescription ||
-          (resolveField(r, 'long_desc_zh', columnMappings) ?? '')
+          resolveField(r, 'long_desc_zh', columnMappings) ||
+          ''
         if (nameZh) {
           translations.push({
             locale: TranslationLocale.zh,
@@ -655,6 +719,16 @@ export async function processImportJob(
 
         batchProductIds.push(product.id)
 
+        equipmentExtras.set(product.id, {
+          ...(purchasePriceRaw != null && { purchasePrice: purchasePriceRaw }),
+          requiresAssistant,
+          ...(budgetTier != null && { budgetTier }),
+          condition: conditionEnum,
+          quantityAvailable,
+          ...(warehouseLocation && { warehouseLocation }),
+          featured: isFeatured,
+        })
+
         // Queue AI fill for this product; fallback to direct sync if queue unavailable
         try {
           const { addAIProcessingJob } = await import('@/lib/queue/ai-processing.queue')
@@ -688,6 +762,37 @@ export async function processImportJob(
         console.warn(
           `[Import] Sync to equipment failed for product ${pid}:`,
           syncErr instanceof Error ? syncErr.message : String(syncErr)
+        )
+      }
+    }
+
+    // Apply extra fields that exist on Equipment but not on Product
+    for (const pid of batchProductIds) {
+      const extras = equipmentExtras.get(pid)
+      if (!extras) continue
+      try {
+        const equip = await prisma.equipment.findFirst({
+          where: { productId: pid, deletedAt: null },
+          select: { id: true },
+        })
+        if (equip) {
+          await prisma.equipment.update({
+            where: { id: equip.id },
+            data: {
+              ...(extras.purchasePrice != null && { purchasePrice: extras.purchasePrice }),
+              ...(extras.requiresAssistant != null && { requiresAssistant: extras.requiresAssistant }),
+              ...(extras.budgetTier != null && { budgetTier: extras.budgetTier }),
+              ...(extras.condition != null && { condition: extras.condition }),
+              ...(extras.quantityAvailable != null && { quantityAvailable: extras.quantityAvailable }),
+              ...(extras.warehouseLocation != null && { warehouseLocation: extras.warehouseLocation }),
+              ...(extras.featured != null && { featured: extras.featured }),
+            },
+          })
+        }
+      } catch (extraErr) {
+        console.warn(
+          `[Import] Extra equipment field update failed for ${pid}:`,
+          extraErr instanceof Error ? extraErr.message : String(extraErr)
         )
       }
     }
